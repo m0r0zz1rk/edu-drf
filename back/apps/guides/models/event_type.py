@@ -12,3 +12,10 @@ class EventType(BaseTable):
         null=False,
         default='Новый тип мероприятий'
     )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Тип мероприятия'
+        verbose_name_plural = 'Типы мероприятий'
