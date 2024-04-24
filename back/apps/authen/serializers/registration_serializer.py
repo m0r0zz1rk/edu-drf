@@ -1,7 +1,7 @@
 from django.core.validators import MinLengthValidator
 from rest_framework import serializers
 
-from apps.authen.models import Profiles
+from apps.authen.models import Profile
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Profiles
+        model = Profile
         fields = [
             'state',
             'surname',

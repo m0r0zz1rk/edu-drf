@@ -1,17 +1,17 @@
 from django.db import models
 
-from apps.commons.models.base_table import BaseTable
+from apps.commons.models import BaseTable
 
 
-class States(BaseTable):
+class State(BaseTable):
     """Модель государств"""
     name = models.CharField(
-        max_length=200,
-        null=False,
-        blank=False,
+        max_length=100,
         unique=True,
+        blank=False,
+        null=False,
         default='Новое государство',
-        verbose_name='Наименование государства'
+        verbose_name='Название государства'
     )
 
     def __str__(self):

@@ -1,16 +1,14 @@
-import datetime
-
 from django.contrib.auth.models import User, Group
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from apps.authen.models.states import States
 from apps.commons.models.base_table import BaseTable
+from apps.guides.models import State
 
 
-class Profiles(BaseTable):
+class Profile(BaseTable):
     """Модель профиля пользователя"""
     django_user = models.OneToOneField(
         User,
@@ -18,7 +16,7 @@ class Profiles(BaseTable):
         verbose_name='Пользователь Django'
     )
     state = models.ForeignKey(
-        States,
+        State,
         on_delete=models.SET_NULL,
         null=True,
         default=None,
@@ -59,26 +57,24 @@ class Profiles(BaseTable):
         verbose_name='Пол'
     )
     phone = models.CharField(
-        max_length=18,
+        max_length=25,
         null=False,
         blank=False,
         unique=True,
         default='+7 (999) 999-99-99',
         verbose_name='Номер телефона'
     )
-    oo_fullname = models.CharField(
-        max_length=500,
-        null=True,
-        blank=True,
-        default='',
-        verbose_name='Полное наименование образовательной организации'
+    teacher = models.BooleanField(
+        default=False,
+        verbose_name='Пользователь является преподавателем'
     )
-    oo_shortname = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True,
-        default='',
-        verbose_name='Краткое наименование образовательной организации'
+    health = models.BooleanField(
+        default=False,
+        verbose_name='У пользователя имеются ограничения по здоровью'
+    )
+    curator_groups = models.BooleanField(
+        default=False,
+        verbose_name='Отображать только учебные группы как куратора'
     )
 
     def __str__(self):
@@ -110,7 +106,7 @@ class Profiles(BaseTable):
 def create_user_profile(instance, created, **kwargs):
     """Создание профиля пользователя после добавления нового пользователя Django"""
     if created:
-        new_profile = Profiles(django_user_id=instance.id)
+        new_profile = Profile(django_user_id=instance.id)
         new_profile.save()
 
 

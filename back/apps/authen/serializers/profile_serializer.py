@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.authen.models import Profiles
+from apps.authen.models import Profile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Profiles
+        model = Profile
         fields = [
             'state',
             'surname',
