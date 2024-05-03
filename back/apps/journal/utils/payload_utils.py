@@ -13,7 +13,7 @@ class PayloadUtils:
 
     def __init__(self):
         """Инициализация класса - определение модели JournalPayload"""
-        self.payload_model = apps.get_model('apps.journal', 'JournalPayload')
+        self.payload_model = apps.get_model('journal', 'JournalPayload')
 
     def is_payload_exist(self, journal_rec_id: uuid) -> bool:
         """

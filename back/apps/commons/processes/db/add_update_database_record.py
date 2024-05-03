@@ -4,6 +4,7 @@ from django.apps import apps
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
+from apps.commons.utils.django.model import ModelUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
@@ -34,6 +35,35 @@ class AddUpdateDataBaseRecord(MainProcessing):
             return False
         except Exception:
             return ExceptionHandling.get_traceback()
+
+    def _check_model_exist(self) -> bool:
+        """
+        Проверка на существующую модель в приложении
+        :return: true - Модель существует, false - Модель не существует
+        """
+        model_exist = ModelUtils.is_model_exist_in_app(
+            self.process_data['model_info']['app'],
+            self.process_data['model_info']['model_name']
+        )
+        if model_exist is False or isinstance(model_exist, str):
+            description = 'Указанная модель не найдена в приложении'
+            output = None
+            if isinstance(model_exist, str):
+                description = 'Системная ошибка'
+                output = model_exist
+            JournalUtils().create_journal_rec(
+                {
+                    'source': 'Добавление/обновление записи',
+                    'module': self.module,
+                    'status': ERROR,
+                    'description': description
+                },
+                f"Приложение: {self.process_data['model_info']['app']}, "
+                f"Модель: {self.process_data['model_info']['model_name']}",
+                output
+            )
+            return False
+        return True
 
     def _validate_model_fields(self) -> bool:
         """
@@ -83,6 +113,9 @@ class AddUpdateDataBaseRecord(MainProcessing):
         Описание процесса добавления/обновления записи в БД
         :return:
         """
+        if not self._check_model_exist():
+            self.process_completed = False
+            return None
         self.model = apps.get_model(
             self.process_data['model_info']['app'],
             self.process_data['model_info']['model_name']

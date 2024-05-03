@@ -18,7 +18,7 @@ def app_change_status_task(app_id: uuid, status: APP_STATUSES, message=None):
     """Отправка сообщения об изменении статуса заявки"""
     try:
         appl = apps_model.objects.get(object_id=app_id)
-        match status:
+        """match status:
             case 'ACCEPTED':
                 subject = 'АИС "Мероприятия ИОХК": Заявка успешно принята'
                 text = (f'<br>Ваша заявка на участие в мероприятии: {appl.event.event_type.name} <b>"{appl.event.name}"</b> '
@@ -41,7 +41,7 @@ def app_change_status_task(app_id: uuid, status: APP_STATUSES, message=None):
                         f'АИС "Мероприятия ИОХК", перейдя к соответствующей заявке')
 
             case _:
-                return 'Некорректный статус заявки'
+                return 'Некорректный статус заявки'"""
         profile = appl.profile
         appeal = 'Уважаемая'
         if profile.sex:

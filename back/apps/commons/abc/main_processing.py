@@ -19,6 +19,24 @@ class MainProcessing(ABC):
     source = module = process_data = None
     process_completed = True
 
+    def __init__(self, income_data: dict):
+        """Инициализация класса"""
+        if self._validate_income_data(income_data):
+            self._set_data(income_data)
+            self._processing()
+        else:
+            JournalUtils().create_journal_rec(
+                {
+                    'source': 'Процесс обработки информации',
+                    'module': COMMON,
+                    'status': ERROR,
+                    'description': 'Ошибки при инициализации процесса обработки - данные не прошли валидацию'
+                },
+                repr(income_data),
+                None
+            )
+            self.process_completed = False
+
     def _validate_income_data(self, income_data) -> bool:
         """
         Валидация полученных данных
@@ -99,22 +117,4 @@ class MainProcessing(ABC):
                 self.process_completed = False
         except Exception:
             self._process_error(ExceptionHandling.get_traceback())
-            self.process_completed = False
-
-    def __init__(self, income_data: dict):
-        """Инициализация класса"""
-        if self._validate_income_data(income_data):
-            self._set_data(income_data)
-            self._processing()
-        else:
-            JournalUtils().create_journal_rec(
-                {
-                    'source': 'Процесс обработки информации',
-                    'module': COMMON,
-                    'status': ERROR,
-                    'description': 'Ошибки при инициализации процесса обработки - данные не прошли валидацию'
-                },
-                repr(income_data),
-                None
-            )
             self.process_completed = False

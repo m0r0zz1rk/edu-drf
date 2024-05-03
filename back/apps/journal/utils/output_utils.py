@@ -13,7 +13,7 @@ class OutputUtils:
 
     def __init__(self):
         """Инициализация класса - определение модели JournalOutput"""
-        self.output_model = apps.get_model('apps.journal', 'JournalOutput')
+        self.output_model = apps.get_model('journal', 'JournalOutput')
 
     def is_output_exist(self, journal_rec_id: uuid) -> bool:
         """

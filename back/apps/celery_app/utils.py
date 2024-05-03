@@ -31,7 +31,7 @@ class UserEventEmailsUtils:
             user_id=user_id,
             event_id=event_id
         )
-        match type:
+        """match type:
             case 'PUBLISHED':
                 rec.event_published = True
 
@@ -42,5 +42,5 @@ class UserEventEmailsUtils:
                 rec.event_start = True
 
             case _:
-                pass
+                pass"""
         rec.save()

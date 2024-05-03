@@ -18,7 +18,7 @@ class JournalUtils:
 
     def __init__(self):
         """Инициализация класса - получение списка полей модели для валидации данных"""
-        self.journal_model = apps.get_model('apps.journal', 'Journal')
+        self.journal_model = apps.get_model('journal', 'Journal')
         self.fields = [field.name for field in self.journal_model._meta.get_fields()]
 
     def is_journal_rec_exist(self, rec_id: uuid) -> bool:

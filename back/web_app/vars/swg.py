@@ -1,4 +1,4 @@
-from .tinymce import *
+from .rest import *
 
 SWAGGER_SETTINGS = {
    'USE_SESSION_AUTH': False,

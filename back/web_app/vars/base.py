@@ -31,7 +31,7 @@ REQ_APPS = [
 PROJECT_APPS = [
     'apps.admins',
     'apps.applications',
-    'apps.authen.apps.AuthenConfig',
+    'apps.authen',
     'apps.celery_app',
     'apps.commons',
     'apps.docs',

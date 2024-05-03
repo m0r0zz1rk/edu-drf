@@ -8,9 +8,10 @@ from apps.journal.utils.payload_utils import PayloadUtils
 @admin.register(Journal)
 class JournalAdmin(admin.ModelAdmin):
     """Класс для отображения записей журнала событий в административной панели"""
-    list_display = ('source', 'module', 'status', 'description', 'payload', 'output')
+    list_display = ('date_create', 'source', 'module', 'status', 'description', 'payload', 'output')
     list_filter = ('status', )
     search_fields = ('source', 'description')
+    ordering = ('-date_create',)
 
     def payload(self, obj):
         """Получение полезной нагрузки"""

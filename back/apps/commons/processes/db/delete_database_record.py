@@ -45,7 +45,7 @@ class DeleteDataBaseRecord(MainProcessing):
             self.process_data['model_info']['model_name']
         )
         try:
-            self.model.objects.get(object_id=self.process_data['object_id']).delete()
+            self.model.objects.get(object_id=self.process_data['object']['id']).delete()
             return None
         except Exception:
             self._main_process_error(ExceptionHandling.get_traceback())

@@ -61,3 +61,16 @@ class ResponseUtils:
     def ok_response_no_data() -> Response:
         """Генерация ответа с кодом 200 без данных"""
         return Response(status=status.HTTP_200_OK)
+
+    @staticmethod
+    def auth_failed_response(text: str) -> Response:
+        """Генерация ответа с кодом 401 при ошибке авторизации"""
+        return Response(
+            {'error': text},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    @staticmethod
+    def conflict_failed_response_no_data() -> Response:
+        """Генерация пустого ответа с кодом 409"""
+        return Response(status=status.HTTP_409_CONFLICT)

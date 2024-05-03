@@ -1,31 +1,36 @@
+from django.apps import apps
 from django.core.validators import MinLengthValidator
 from rest_framework import serializers
 
-from apps.authen.models import Profile
+from apps.guides.utils.state import StateUtils
+
+student_profile_model = apps.get_model('authen', 'StudentProfile')
+
+state_model = apps.get_model('guides', 'State')
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Сериализатор данных для регистрации пользователя"""
-    email = serializers.EmailField()
-    role = serializers.CharField(max_length=20)
+    email = serializers.EmailField(label='Email')
     password = serializers.CharField(
-        validators=[MinLengthValidator(8, 'Минимальная длина пароля - 8 символов'), ]
+        validators=[MinLengthValidator(8, 'Минимальная длина пароля - 8 символов'), ],
+        label='Пароль'
     )
+    state = serializers.SlugRelatedField(slug_field='name', queryset=state_model.objects.all())
 
     class Meta:
-        model = Profile
+        model = student_profile_model
         fields = [
-            'state',
             'surname',
             'name',
             'patronymic',
-            'sex',
-            'birthday',
             'phone',
             'email',
-            'role',
-            'oo_shortname',
-            'oo_fullname',
+            'snils',
+            'state',
+            'birthday',
+            'sex',
+            'health',
             'password'
         ]
 

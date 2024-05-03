@@ -27,7 +27,7 @@ def email_for_event_change_status_task(event_id: uuid, new_status: EVENT_STATUSE
         subject = text = ''
         count = 0
         recipient_list = []
-        match new_status:
+        """match new_status:
             case 'PUBLISHED':
                 if event.check_date_in_app_dates():
                     subject = 'АИС "Мероприятия ИОХК": Опубликовано новое мероприятие'
@@ -38,7 +38,7 @@ def email_for_event_change_status_task(event_id: uuid, new_status: EVENT_STATUSE
                             f'{event.app_date_end.strftime('%d.%m.%Y')}</b>'
                             f'<br>Сроки проведения: <b>{event.date_start.strftime('%d.%m.%Y')}-'
                             f'{event.date_end.strftime('%d.%m.%Y')}</b>')
-
+        """
         if len(subject) > 0:
             if new_status == 'PUBLISHED':
                 for email in eu.get_list_of_potential_user_emails(event.object_id):

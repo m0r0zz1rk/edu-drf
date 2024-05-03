@@ -1,22 +1,22 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 
-from apps.authen.actions.authorization_action import AuthorizationAction
+from apps.authen.operations.auth_check import AuthCheck
+from apps.authen.operations.authorization import Authorization
 from apps.authen.serializers.auth_serializer import AuthSerializer, AuthorizationResponseSerializer
-from apps.commons.consts.journals.journal_event_results import ERROR
-from apps.commons.consts.journals.journal_rec_types import AUTHEN
-from apps.commons.utils.data_types.dict import DictUtils
+
+from apps.authen.serializers.user_role_serializer import UserRoleSerializer
 from apps.commons.utils.django.response import ResponseUtils
-from apps.commons.utils.django.rest import RestUtils
-from apps.journals.writer.journal_writer import JournalWriter
+from apps.journal.consts.journal_modules import AUTHEN
+from apps.journal.consts.journal_rec_statuses import ERROR
+from apps.journal.utils.journal_utils import JournalUtils
 
 
 class AuthorizationViewSet(viewsets.ViewSet):
     """Авторизация пользователей"""
 
-    journal = JournalWriter(AUTHEN)
+    ru = ResponseUtils()
 
-    @staticmethod
     @swagger_auto_schema(
         tags=['Авторизация/Аутентификация', ],
         operation_description="Проверка на авторизованного пользователя",
@@ -32,18 +32,17 @@ class AuthorizationViewSet(viewsets.ViewSet):
         responses={'401': 'Пользователь не авторизован',
                    '200': 'Пользователь авторизован'}
     )
-    def check_auth(request, *args, **kwargs):
+    def check_auth(self, request, *args, **kwargs):
         """Проверка авторизации пользователя"""
-        init = AuthorizationAction(request=request)
-        if init.is_request_auth:
-            return ResponseUtils.ok_response_no_data()
+        ac = AuthCheck(request)
+        if ac.is_request_auth:
+            return self.ru.ok_response_no_data()
         else:
-            return ResponseUtils.unauthorized_no_data()
+            return self.ru.unauthorized_no_data()
 
-    @staticmethod
     @swagger_auto_schema(
         tags=['Авторизация/Аутентификация', ],
-        operation_description="Проверка пользователя на администратора",
+        operation_description="Получение роли пользователя",
         security=[
             {
                 'Token': {
@@ -53,60 +52,51 @@ class AuthorizationViewSet(viewsets.ViewSet):
                 }
             }
         ],
-        responses={'403': 'Пользователь не является администратором',
-                   '200': 'Пользователь является администратором'}
+        responses={'401': 'Пользователь не авторизован',
+                   '200': UserRoleSerializer}
     )
-    def check_admin(request, *args, **kwargs):
-        """Проверка пользователя на права администратора"""
-        init = AuthorizationAction(request=request)
-        if init.is_request_admin:
-            return ResponseUtils.ok_response_no_data()
-        else:
-            return ResponseUtils.forbidden_no_data()
+    def get_user_role(self, request, *args, **kwargs):
+        """Получение роли пользователя"""
+        role = AuthCheck(request).get_user_role
+        if role is None:
+            return self.ru.unauthorized_no_data()
+        return self.ru.ok_response_dict(
+            {'role': role}
+        )
 
     @swagger_auto_schema(
         tags=['Авторизация/Аутентификация', ],
         operation_description="Авторизация пользователя",
         request_body=AuthSerializer,
-        responses={'400': 'Ошибка в процессе авторизации (сообщение "Повторите попытку позже" или ошибка)',
+        responses={'401': 'Ошибка в процессе авторизации',
                    '200': AuthorizationResponseSerializer}
     )
     def user_login(self, request, *args, **kwargs):
         """Авторизация пользователя"""
-        params = ['username', 'password']
-        ru = RestUtils()
-        if not ru.validate_params_to_list(request, params):
-            self.journal.write(
-                'Система',
-                ERROR,
-                'Ошибка при попытке входа в систему: Ошибка валидации тела запроса"'
-            )
-            return ResponseUtils().sorry_try_again_response()
-        try:
-            serialize = AuthSerializer(data=request.data)
-        except Exception:
-            self.journal.write(
-                'Система',
-                ERROR,
-                'Ошибка при попытке входа в систему: Ошибка сериализации данных'
-            )
-            return ResponseUtils().sorry_try_again_response()
-        if serialize.is_valid(raise_exception=True):
-            init_auth = AuthorizationAction(request, serialize.data)
-            auth_data = init_auth.authorization_user()
-            du = DictUtils()
-            if du.exist_key_in_dict('error', auth_data):
-                return ResponseUtils().bad_request_response(
-                    du.get_str_value_in_dict_by_key("error", auth_data)
-                )
-            else:
-                return ResponseUtils.ok_response_dict(
-                    auth_data
-                )
+        serialize = AuthSerializer(data=request.data)
+        if serialize.is_valid():
+            authorization = Authorization({
+                'source': 'Неавторизованный пользователь',
+                'module': AUTHEN,
+                'process_data': {
+                    'request': request,
+                    'login': serialize.data['login'],
+                    'password': serialize.data['password'],
+                    'centre_auth': serialize.data['centre_auth']
+                }
+            })
+            if not authorization.process_completed:
+                return self.ru.auth_failed_response(authorization.auth_error)
+            return self.ru.ok_response('Вход выполнен успешно')
         else:
-            self.journal.write(
-                'Система',
-                ERROR,
-                f'Ошибка при попытке входа в систему: Валидация данных сериализатора не пройдена'
+            JournalUtils().create_journal_rec(
+                {
+                    'source': 'Запрос на авторизацию пользователя',
+                    'module': AUTHEN,
+                    'status': ERROR,
+                    'description': 'Полученный данные не прошли валидацию'
+                },
+                repr(request.data),
+                None
             )
-            return ResponseUtils().sorry_try_again_response()
+            return self.ru.auth_failed_response('Данные не прошли валидацию')

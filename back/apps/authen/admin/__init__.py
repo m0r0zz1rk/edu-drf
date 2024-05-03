@@ -1,1 +1,2 @@
-from .profile_admin import ProfileAdmin
+from .student_profile_admin import StudentProfileAdmin
+from .coko_profile_admin import CokoProfileAdmin

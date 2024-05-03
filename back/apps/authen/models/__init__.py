@@ -1,1 +1,1 @@
-from .profile import Profile
+from .student_profile import StudentProfile

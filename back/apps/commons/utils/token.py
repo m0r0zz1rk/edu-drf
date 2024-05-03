@@ -4,15 +4,15 @@ from datetime import timedelta, datetime
 from django.conf import settings
 
 from apps.commons.consts.jwt_algorythms import SUPPORTED_ALG
-from apps.commons.utils.django.django import DjangoUtils
+from apps.commons.utils.django.settings import SettingsUtils
 
 
 class TokenUtils:
     """Класс работы с токенами JWT"""
-    du = DjangoUtils()
+    su = SettingsUtils()
     user_id = 0
     access_token_expires = 120
-    jwt_algorithm = du.get_parameter_from_settings('JWT_ALGORITHM')
+    jwt_algorithm = su.get_parameter_from_settings('JWT_ALGORITHM')
 
     def __init__(self, user_id: int):
         """
@@ -26,22 +26,22 @@ class TokenUtils:
     def _set_access_token_expire(self):
         """Установка значения времени жизни токена"""
         if hasattr(settings, 'JWT_ACCESS_TOKEN_EXPIRE_MINUTES'):
-            temp = self.du.get_parameter_from_settings('JWT_ACCESS_TOKEN_EXPIRE_MINUTES')
+            temp = self.su.get_parameter_from_settings('JWT_ACCESS_TOKEN_EXPIRE_MINUTES')
             if temp is not None:
                 self.access_token_expires = temp
 
     def _set_jwt_algorithm(self):
         """Установка значения алгоритма шифрования для токена"""
-        if self.du.is_settings_parameter_exists('JWT_ALGORITHM'):
-            temp = self.du.get_parameter_from_settings('JWT_ALGORITHM')
+        if self.su.is_settings_parameter_exists('JWT_ALGORITHM'):
+            temp = self.su.get_parameter_from_settings('JWT_ALGORITHM')
             if temp in SUPPORTED_ALG:
                 self.jwt_algorithm = temp
 
     def jwt_token(self) -> dict:
         """Формирование словаря с ID пользователя и созданным токеном"""
         return {
-            'user_id': self.user_id,
-            'access_token': self._new_access_token(),
+            'coko_token': self._new_access_token(),
+            'coko_user_id': self.user_id
         }
 
     def _new_access_token(self):
@@ -58,6 +58,6 @@ class TokenUtils:
         print(self.jwt_algorithm)
         jwt_token = jwt.encode(
             data,
-            self.du.get_parameter_from_settings('SECRET_KEY'),
+            self.su.get_parameter_from_settings('SECRET_KEY'),
             algorithm=self.jwt_algorithm)
         return jwt_token

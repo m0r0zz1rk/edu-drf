@@ -1,0 +1,77 @@
+@media screen and (max-width: 6000px) {
+
+    .v-text-field input{
+        width: 100%;
+    }
+
+    .v-card .v-card-title,
+    .v-card .v-card-text,
+    .v-tab.v-tab.v-btn,
+    .v-selection-control .v-label,
+    .v-btn__content,
+    .v-alert__content,
+    .v-text-field input {
+        font-size: 32px;
+    }
+
+    .v-field--center-affix .v-label.v-field-label,
+    .v-alert-title {
+        font-size: 24px;
+    }
+
+    .v-messages__message {
+        font-size: 20px;
+    }
+
+    .v-field__prepend-inner > .v-icon, .v-field__append-inner > .v-icon, .v-field__clearable > .v-icon {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 2560px) {
+
+    .v-card .v-card-title,
+    .v-card .v-card-text,
+    .v-tab.v-tab.v-btn,
+    .v-selection-control .v-label,
+    .v-btn__content,
+    .v-alert__content,
+    .v-text-field input {
+        font-size: 26px;
+    }
+
+    .v-field--center-affix .v-label.v-field-label,
+    .v-alert-title {
+        font-size: 20px;
+    }
+
+    .v-messages__message {
+        font-size: 18px;
+    }
+
+    .v-field__prepend-inner > .v-icon, .v-field__append-inner > .v-icon, .v-field__clearable > .v-icon {
+        font-size: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 1920px) {
+
+    .v-card .v-card-title,
+    .v-card .v-card-text,
+    .v-tab.v-tab.v-btn,
+    .v-selection-control .v-label,
+    .v-btn__content,
+    .v-alert__content,
+    .v-text-field input {
+        font-size: 18px;
+    }
+
+    .v-field--center-affix .v-label.v-field-label,
+    .v-alert-title {
+        font-size: 16px;
+    }
+
+    .v-messages__message {
+        font-size: 14px;
+    }
+}

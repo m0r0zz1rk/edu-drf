@@ -1,4 +1,4 @@
-from .email import *
+from .base import *
 from kombu.serialization import registry
 
 #Настройки инстанса Celery
