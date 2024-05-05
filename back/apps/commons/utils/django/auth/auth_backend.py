@@ -59,13 +59,13 @@ class AuthBackend(authentication.BaseAuthentication):
 
     def authenticate(self, request, token=None, **kwargs) -> Optional[User]:
         """Валидация заголовка запроса и аутентификация"""
-        self.auth_header = authentication.get_authorization_header(request)
-        if not self._validate_header(self.auth_header.split()):
+        self.auth_header = authentication.get_authorization_header(request).split()
+        if not self._validate_header(self.auth_header):
             return None
         try:
             token = self.auth_header[1].decode('utf-8')
             return JWTCredential(token).authenticate_credential()
-        except UnicodeError:
+        except Exception:
             self._journal_error(
                 'Ошибка при декодировании токена',
                 self.auth_header[1],

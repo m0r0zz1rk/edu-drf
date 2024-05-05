@@ -87,7 +87,7 @@ class AuthorizationViewSet(viewsets.ViewSet):
             })
             if not authorization.process_completed:
                 return self.ru.auth_failed_response(authorization.auth_error)
-            return self.ru.ok_response('Вход выполнен успешно')
+            return self.ru.ok_response_dict(authorization.auth_data)
         else:
             JournalUtils().create_journal_rec(
                 {

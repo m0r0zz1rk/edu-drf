@@ -5,6 +5,7 @@ from django.conf import settings
 
 from apps.commons.consts.jwt_algorythms import SUPPORTED_ALG
 from apps.commons.utils.django.settings import SettingsUtils
+from apps.commons.utils.django.user import UserUtils
 
 
 class TokenUtils:
@@ -41,6 +42,7 @@ class TokenUtils:
         """Формирование словаря с ID пользователя и созданным токеном"""
         return {
             'coko_token': self._new_access_token(),
+            'coko_role': UserUtils().get_user_role_by_id(self.user_id),
             'coko_user_id': self.user_id
         }
 
@@ -55,7 +57,6 @@ class TokenUtils:
             'user_id': self.user_id,
             'exp': expire
         }
-        print(self.jwt_algorithm)
         jwt_token = jwt.encode(
             data,
             self.su.get_parameter_from_settings('SECRET_KEY'),

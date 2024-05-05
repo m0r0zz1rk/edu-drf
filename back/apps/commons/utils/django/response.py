@@ -74,3 +74,8 @@ class ResponseUtils:
     def conflict_failed_response_no_data() -> Response:
         """Генерация пустого ответа с кодом 409"""
         return Response(status=status.HTTP_409_CONFLICT)
+
+    @staticmethod
+    def not_acceptable_response_no_data() -> Response:
+        """Генерация пустого ответа с кодом 406"""
+        return Response(status=status.HTTP_406_NOT_ACCEPTABLE)

@@ -16,6 +16,7 @@ registration_urlpatterns = [
     path('registration/', RegistrationViewSet.as_view({'post': 'registration'})),
     path('check_email/', RegistrationViewSet.as_view({'post': 'check_unique_email'})),
     path('check_phone/', RegistrationViewSet.as_view({'post': 'check_unique_phone'})),
+    path('check_snils/', RegistrationViewSet.as_view({'post': 'check_unique_snils'})),
 ]
 
 profile_urlpatterns = [

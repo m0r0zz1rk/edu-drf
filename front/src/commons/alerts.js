@@ -6,7 +6,6 @@ export function showAlert (type, title, text, noHide = false) {
             if (!(alert.classList.contains('alert-visible'))) {
                 alert.classList.remove('alert-hidden')
                 alert.classList.add('alert-visible')
-                console.log(alert.querySelector('.v-alert__content'))
                 let vAlertContent = alert.querySelector('.v-alert__content')
                 vAlertContent.innerHTML=`
                   <div class='v-alert-title'>`+title+`</div>`+text

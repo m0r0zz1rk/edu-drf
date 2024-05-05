@@ -1,7 +1,10 @@
 <template>
   <div>
     <v-app class="my-app">
-      <router-view/>
+      <keep-alive>
+        <PreLoader ref="preLoader" />
+      </keep-alive>
+      <router-view :usePreLoader="usePreLoader"/>
       <div class="alerts adaptive-alerts">
         <v-alert
           id="error-alert"
@@ -31,8 +34,26 @@
 
 <script>
 
+import PreLoader from "@/components/Preloader.vue";
+
 export default {
   name: 'App',
+  data() {
+    return {
+      firstRender: true
+    }
+  },
+  components: {PreLoader},
+  methods: {
+    usePreLoader(onlyClose = false) {
+      this.$refs.preLoader.usePreloader(onlyClose)
+    }
+  },
+  mounted() {
+    if (!(this.$refs.preLoader.preLoader)) {
+      this.usePreLoader()
+    }
+  }
 }
 </script>
 

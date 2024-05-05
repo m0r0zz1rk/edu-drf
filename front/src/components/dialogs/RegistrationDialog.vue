@@ -295,13 +295,32 @@
 <script>
 
 import {apiRequest} from "@/commons/api_request";
+import {showAlert} from "@/commons/alerts";
 
 export default {
   name: 'RegistrationDialog',
+  props: {
+    usePreLoader: Function
+  },
   data() {
     return {
       agreementDialog: false,
       dialog: false,
+      uniqFailed: false,
+      uniqueData: [
+        {
+          attr: 'phone',
+          alias: 'номером телефона',
+        },
+        {
+          attr: 'email',
+          alias: 'email',
+        },
+        {
+          attr: 'snils',
+          alias: 'СНИЛС',
+        },
+      ],
       formLoading: false,
       pass1Visible: false,
       pass2Visible: false,
@@ -324,7 +343,7 @@ export default {
   methods: {
     async getStates() {
       apiRequest(
-        '/backend/api/v1/guides/states',
+        '/backend/api/v1/guides/states/',
         'GET',
         false,
         null,
@@ -334,6 +353,7 @@ export default {
           data.map((state) => {
             this.states.push(state.name)
           })
+          this.usePreLoader()
         })
     },
     hideRegError() {
@@ -425,11 +445,58 @@ export default {
         'password': password
       }
     },
-    registration() {
+    async registration() {
+      this.formLoading = true
       this.hideRegError()
+      this.uniqFailed = false
       let regData = this.verifyData()
       if (regData !== null) {
-        return true
+        for (let i=0;i<this.uniqueData.length;i++) {
+          let obj = this.uniqueData[i]
+          if (!(this.uniqFailed)) {
+            let body = {}
+            body[obj.attr] = regData[obj.attr]
+            let uniqResp = await apiRequest(
+              '/backend/api/v1/auth/check_'+obj.attr+'/',
+              'POST',
+              false,
+              body,
+              true
+            )
+            if (uniqResp.status === 406) {
+              this.uniqFailed = true
+              this.showRegError('Пользователь с указанным '+obj.alias+' уже существует')
+            }
+          }
+        }
+        if (!(this.uniqFailed)) {
+          apiRequest(
+            '/backend/api/v1/auth/registration/',
+            'POST',
+            false,
+            regData
+          )
+            .then((data) => {
+              if (data.success) {
+                this.dialog = false
+                showAlert(
+                  'success',
+                  'Регистрация обучающегося',
+                  data.success
+                )
+              } else {
+                showAlert(
+                  'error',
+                  'Регистрация обучающегося',
+                  data.error
+                )
+              }
+              this.formLoading = false
+              return false
+            })
+        } else {
+          this.formLoading = false
+        }
       }
     }
   },

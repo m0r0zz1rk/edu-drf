@@ -23,7 +23,8 @@ class Authorization(MainProcessing):
     ]
     ju = JournalUtils()
     uu = UserUtils()
-    request = username = password = auth_error = auth_user = auth_data = None
+    pu = ProfileUtils()
+    request = username = auth_error = auth_user = auth_data = None
 
     def _validate_process_data(self) -> Union[bool, str]:
         return ValidateUtils.validate_data(
@@ -76,23 +77,28 @@ class Authorization(MainProcessing):
         )
 
     def _main_process(self):
-        pu = ProfileUtils()
-        username = pu.get_profile_or_info_by_attribute(
+        username = self.pu.get_profile_or_info_by_attribute(
             'phone',
             self.process_data['login'],
             'username'
         )
         if username is None:
-            username = self.uu.get_username_by_email(self.process_data['login'])
+            username = self.pu.get_profile_or_info_by_attribute(
+                'snils',
+                self.process_data['login'],
+                'username'
+            )
             if username is None:
-                self.auth_error = 'Пользователь не найден'
-                self._auth_error(False)
-                self.process_completed = False
-                return None
+                username = self.uu.get_username_by_email(self.process_data['login'])
+                if username is None:
+                    self.auth_error = 'Пользователь не найден'
+                    self._auth_error(False)
+                    self.process_completed = False
+                    return None
         self.auth_user = authenticate(
             self.process_data['request'],
             username=username,
-            password=self.password
+            password=self.process_data['password']
         )
         if self.auth_user is None:
             self.auth_error = 'Неверный пароль, повторите попытку'

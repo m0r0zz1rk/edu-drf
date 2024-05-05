@@ -10,7 +10,10 @@ export function getCookie(cName) {
             if (cEnd === -1) {
                 cEnd = document.cookie.length;
             }
-            return unescape(document.cookie.substring(cStart, cEnd));
+            let checkDate = new Date(document.cookie.substring(cStart, cEnd))
+            if (!(checkDate instanceof Date && !isNaN(checkDate))) {
+              return unescape(document.cookie.substring(cStart, cEnd));
+            }
         }
     }
 }
@@ -22,7 +25,7 @@ export function setCookie(cName, cValue) {
             delCookie(cName)
         }
     }
-    document.cookie = cName + '=' + cValue + ';httpOnly';
+    document.cookie = cName + '=' + cValue
 }
 
 export function delCookie(cName) {

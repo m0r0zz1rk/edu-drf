@@ -14,5 +14,5 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('swg/', schema_view.with_ui('swagger', cache_timeout=0), name='docs'),
+    path('backend/swg/', schema_view.with_ui('swagger', cache_timeout=0), name='docs'),
 ]

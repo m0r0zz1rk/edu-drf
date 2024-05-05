@@ -26,6 +26,12 @@ class AuthorizationResponseSerializer(serializers.Serializer):
         allow_null=False,
         label='JWT-токен пользователя'
     )
+    coko_role = serializers.CharField(
+        max_length=7,
+        allow_null=True,
+        allow_blank=False,
+        label='Роль пользователя'
+    )
     coko_user_id = serializers.IntegerField(
         label='ID пользователя'
     )

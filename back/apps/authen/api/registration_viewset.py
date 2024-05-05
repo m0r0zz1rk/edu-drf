@@ -4,7 +4,7 @@ from rest_framework import viewsets
 
 from apps.authen.operations.registration import Registration
 from apps.authen.serializers.registration_serializer import RegistrationSerializer, RegistrationUniquePhoneSerializer, \
-    RegistrationUniqueEmailSerializer
+    RegistrationUniqueEmailSerializer, RegistrationUniqueSnilsSerializer
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.authen.utils.profile import ProfileUtils
 from apps.commons.utils.django.response import ResponseUtils
@@ -31,7 +31,7 @@ class RegistrationViewSet(viewsets.ViewSet):
         request_body=RegistrationUniquePhoneSerializer,
         responses={
             '400': 'Ошибка при проверке',
-            '409': 'Проверка не пройдена - указанный номер телефон уже используется',
+            '406': 'Проверка не пройдена - указанный номер телефон уже используется',
             '200': 'Проверка пройдена - указанный номер телефона уникален'
         }
     )
@@ -57,7 +57,7 @@ class RegistrationViewSet(viewsets.ViewSet):
             ):
                 return self.respu.ok_response_no_data()
             else:
-                return self.respu.conflict_failed_response_no_data()
+                return self.respu.not_acceptable_response_no_data()
         except Exception:
             self.ju.create_journal_rec(
                 {
@@ -73,11 +73,57 @@ class RegistrationViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
         tags=['Регистрация', ],
+        operation_description="Проверка на уникальность СНИЛС",
+        request_body=RegistrationUniqueSnilsSerializer,
+        responses={
+            '400': 'Ошибка при проверке',
+            '406': 'Проверка не пройдена - указанный СНИЛС уже используется',
+            '200': 'Проверка пройдена - указанный СНИЛС уникален'
+        }
+    )
+    def check_unique_snils(self, request, *args, **kwargs):
+        """Проверка на существующий профиль с полученным СНИЛС"""
+        params = ['snils', ]
+        if not self.ru.validate_params_to_list(request, params):
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Внешний запрос',
+                    'module': AUTHEN,
+                    'status': ERROR,
+                    'description': 'Ошибка при проверке уникальности СНИЛС: данные не прошли валидацию'
+                },
+                repr(request.data),
+                None
+            )
+            return self.respu.bad_request_no_data()
+        try:
+            if not self.pu.is_profile_exist(
+                    'snils',
+                    self.ru.get_request_parameter_by_key(request, 'snils')
+            ):
+                return self.respu.ok_response_no_data()
+            else:
+                return self.respu.not_acceptable_response_no_data()
+        except Exception:
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Внешний запрос',
+                    'module': AUTHEN,
+                    'status': ERROR,
+                    'description': 'Системная ошибка при проверке уникальности СНИЛС'
+                },
+                repr(request.data),
+                ExceptionHandling.get_traceback()
+            )
+            return self.respu.bad_request_no_data()
+
+    @swagger_auto_schema(
+        tags=['Регистрация', ],
         operation_description="Проверка на уникальность email",
         request_body=RegistrationUniqueEmailSerializer,
         responses={
             '400': 'Ошибка при проверке',
-            '409': 'Проверка не пройдена - указанный email уже используется',
+            '406': 'Проверка не пройдена - указанный email уже используется',
             '200': 'Проверка пройдена - указанный email уникален'
         }
     )
@@ -97,13 +143,13 @@ class RegistrationViewSet(viewsets.ViewSet):
             )
             return self.respu.bad_request_no_data()
         try:
-            if self.uu.is_user_exists(
+            if not self.uu.is_user_exists(
                     'email',
                     self.ru.get_request_parameter_by_key(request, 'email')
             ):
                 return self.respu.ok_response_no_data()
             else:
-                return self.respu.conflict_failed_response_no_data()
+                return self.respu.not_acceptable_response_no_data()
         except Exception as e:
             self.ju.create_journal_rec(
                 {

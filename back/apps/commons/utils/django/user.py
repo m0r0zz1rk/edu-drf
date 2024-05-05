@@ -126,3 +126,20 @@ class UserUtils:
             GroupUtils().get_group_by_name(group_name).user_set.add(
                 self.get_user(user_attr, attr_value)
             )
+
+    def get_user_role_by_id(self, user_id: int) -> Optional[str]:
+        """
+        Получение роли пользователя по полученному ID
+        :param user_id: ID пользователя
+        :return: centre - Администратор, dep - сотрудник подразделения, student - обучающийся, None - не найдено
+        """
+        if self.is_user_exists('id', user_id):
+            if User.objects.get(id=user_id).groups.exists():
+                group_name = User.objects.get(id=user_id).groups.first().name
+                if group_name == 'Администраторы':
+                    return 'centre'
+                elif group_name == 'Сотрудники':
+                    return 'dep'
+                else:
+                    return 'student'
+        return None

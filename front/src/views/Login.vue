@@ -83,7 +83,7 @@
               :loading="formLoading"
               @click="userLogin(false)"
             >Войти</v-btn><br/>
-            <RegistrationDialog ref="regDialog" />
+            <RegistrationDialog ref="regDialog" :usePreLoader="usePreLoader" />
             <v-btn
               style="margin-top: 5px;"
               class="login-button adaptive-login-button"
@@ -136,11 +136,15 @@
 
 <script>
 import {showAlert} from "@/commons/alerts";
-import RegistrationDialog from "@/components/RegistrationDialog.vue";
+import RegistrationDialog from "@/components/dialogs/RegistrationDialog.vue";
+import {getUrlParameter} from "@/commons/get_url_parameter";
 
 export default {
   name: 'Login',
   components: {RegistrationDialog},
+  props: {
+    usePreLoader: Function,
+  },
   data() {
     return {
       loginTab: 'student',
@@ -160,27 +164,27 @@ export default {
   },
   methods: {
     validateLoginForm(cokoLogin) {
-      let username = ''
+      let login = ''
       let password = ''
       if (cokoLogin) {
-        username = document.querySelector('#cokoLogin').value
+        login = document.querySelector('#cokoLogin').value
         password = document.querySelector('#cokoPassword').value
       } else {
         switch (this.loginStudentType) {
           case 'phone':
-            username = document.querySelector('#phoneTextField').value
+            login = document.querySelector('#phoneTextField').value
             break
 
           case 'email':
-            username = document.querySelector('#emailTextField').value
+            login = document.querySelector('#emailTextField').value
             break
 
           default:
-            username = document.querySelector('#snilsTextField').value
+            login = document.querySelector('#snilsTextField').value
         }
         password = document.querySelector('#userPassword').value
       }
-      if (username.length === 0) {
+      if (login.length === 0) {
         showAlert(
           'error',
           'Форма входа',
@@ -197,7 +201,7 @@ export default {
         )
         return false
       }
-      if (!(cokoLogin) && (this.loginStudentType === 'phone') && (username.length !== 18)) {
+      if (!(cokoLogin) && (this.loginStudentType === 'phone') && (login.length !== 18)) {
         showAlert(
           'error',
           'Форма входа',
@@ -205,7 +209,7 @@ export default {
         )
         return false
       }
-      if (!(cokoLogin) && (this.loginStudentType === 'snils') && (username.length !== 14)) {
+      if (!(cokoLogin) && (this.loginStudentType === 'snils') && (login.length !== 14)) {
         showAlert(
           'error',
           'Форма входа',
@@ -221,24 +225,38 @@ export default {
         )
         return false
       }
-      return true
+      return {
+        'login': login,
+        'password': password
+      }
     },
     userLogin(cokoLogin) {
-      if (this.validateLoginForm(cokoLogin)) {
-        this.$refs.regDialog.formLoading = true
+      let validData = this.validateLoginForm(cokoLogin)
+      if (validData !== false) {
+        let username = validData['login']
+        let password = validData['password']
         this.formLoading = true
-        setTimeout(() => {
-          this.formLoading = false
-          this.$refs.regDialog.formLoading = false
-          showAlert(
-            'error',
-            'Ошибка входа',
-            'Неверная комбинация имени пользователя или пароля'
-          )
-        }, 3000)
+        this.usePreLoader()
+        this.$refs.regDialog.formLoading = true
+        this.$store.dispatch('AUTH_REQUEST', { username, password, cokoLogin }).then(() => {
+          if (getUrlParameter('nextUrl')) {
+            this.$router.push({ path: getUrlParameter('nextUrl') })
+          } else {
+            this.$router.push('/')
+          }})
+            .catch((error) => {
+              showAlert(
+                'error',
+                'Авторизация пользователя',
+                error
+              )
+              this.$refs.regDialog.formLoading = false
+              this.formLoading = false
+              this.usePreLoader()
+            })
       }
     }
-  }
+  },
 }
 </script>
 

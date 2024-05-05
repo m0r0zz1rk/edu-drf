@@ -11,7 +11,6 @@ class RestUtils:
         params = self.get_request_parameters(request)
         for k in params.keys():
             if k not in available:
-                print(k)
                 return False
         return True
 
