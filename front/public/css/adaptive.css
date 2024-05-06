@@ -1,8 +1,27 @@
 @media screen and (max-width: 6000px) {
 
+    .adaptive-content-div{
+        margin-top: 70px;
+        margin-right: 1vw;
+        margin-left: 1vw;
+    }
+
+    .lk-full-page-card {
+        width: 100%;
+        height: calc(100vh - 85px);
+    }
+
+    .lk-full-page-card .v-card-text {
+        height: calc(100vh - 205px);
+        overflow: auto;
+        background: white;
+    }
+
     .adaptive-alerts {
         font-size: 18px;
         width: 45vw;
+        right: 5px;
+        bottom: 5px;
     }
 
     .adaptive-login-card {
@@ -23,13 +42,25 @@
     .adaptive-registration-dialog{
         max-width: 80%;
     }
+
+    .adaptive-main-card-text-height {
+        height: 600px;
+    }
 }
 
 @media screen and (max-width: 2560px) {
 
+    .lk-full-page-card .v-card-text {
+        height: calc(100vh - 200px);
+        overflow: auto;
+        background: white;
+    }
+
     .adaptive-alerts {
         font-size: 16px;
         width: 40vw;
+        right: 5px;
+        bottom: 5px;
     }
 
     .adaptive-login-card {
@@ -46,9 +77,19 @@
     .adaptive-login-button {
         width: 65%;
     }
+
+    .adaptive-main-card-text-height {
+        height: 500px;
+    }
 }
 
 @media screen and (max-width: 1920px) {
+
+    .lk-full-page-card .v-card-text {
+        height: calc(100vh - 180px);
+        overflow: auto;
+        background: white;
+    }
 
     .adaptive-login-card {
         top: 15vh;
@@ -63,6 +104,10 @@
 
     .adaptive-login-button {
         width: 80%;
+    }
+
+    .adaptive-main-card-text-height {
+        height: 350px;
     }
 }
 
@@ -108,6 +153,27 @@
 
 @media screen and (max-width: 600px) {
 
+    .adaptive-content-div{
+        margin-top: 45px;
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .login-card-title {
+        width: 100vw;
+    }
+
+    .lk-full-page-card {
+        width: 100%;
+        height: calc(100vh - 45px);
+    }
+
+    .lk-full-page-card .v-card-text {
+        height: calc(100vh - 150px);
+        overflow: auto;
+        background: white;
+    }
+
     .adaptive-login-card {
         right: 0;
         width: 100vw;
@@ -120,5 +186,12 @@
 
     .adaptive-login-button {
         width: 100%;
+    }
+
+    .adaptive-alerts {
+        font-size: 16px;
+        width: 100vw;
+        right: 0;
+        bottom: 0;
     }
 }

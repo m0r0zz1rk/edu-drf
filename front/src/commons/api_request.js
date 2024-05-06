@@ -40,7 +40,7 @@ export function apiRequest (
         return fetch(backendUrl+endpoint, request_parameters)
             .catch(e => {return null})
             .then(resp => {
-                if(!([200, 201, 202, 204, 401, 403, 404, 409, 500].includes(resp.status))) {
+                if(!([200, 201, 202, 204, 400, 401, 403, 404, 409, 500].includes(resp.status))) {
                     showAlert(
                         'error',
                         'Ошибка запроса',

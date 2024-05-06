@@ -130,6 +130,7 @@
               label="Государство*"
               :loading="formLoading"
               :rules="[rules.required,]"
+              variant="solo"
             ></v-select>
           </v-col>
 
@@ -163,6 +164,7 @@
               label="Пол*"
               :loading="formLoading"
               :rules="[rules.required,]"
+              variant="solo"
             ></v-select>
           </v-col>
 
@@ -178,6 +180,7 @@
               label="Ограничения по здоровью*"
               :loading="formLoading"
               :rules="[rules.required,]"
+              variant="solo"
             ></v-select>
           </v-col>
 
@@ -296,6 +299,7 @@
 
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
+import email_pattern from "@/commons/email_pattern";
 
 export default {
   name: 'RegistrationDialog',
@@ -329,10 +333,7 @@ export default {
         required: value => !!value || 'Обязательно для заполнения.',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
-        email: value => {
-          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          return pattern.test(value) || 'Некорректный e-mail.'
-        },
+        email: value => email_pattern.test(value) || 'Некорректный e-mail.'
       },
       states: ['Россия', 'Украина', 'Беларусь', 'Казахстан'],
       sex: ['Мужской', 'Женский'],
@@ -387,8 +388,7 @@ export default {
         this.showRegError('Задан некорректный номер телефона')
         return null
       }
-      const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      if (!(pattern.test(email))) {
+      if (!(email_pattern.test(email))) {
         this.showRegError('Задан некорректный email')
         return null
       }
@@ -498,6 +498,9 @@ export default {
           this.formLoading = false
         }
       }
+      else {
+        this.formLoading = false
+      }
     }
   },
   mounted() {
@@ -508,10 +511,6 @@ export default {
 </script>
 
 <style scoped>
-  .registration-card-title {
-    background-color: #373c59;
-    color: white;
-  }
 
   .alert-visible {
     z-index: 100;

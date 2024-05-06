@@ -1,9 +1,9 @@
 <template>
-  <v-app-bar :elevation="0" color="coko-blue">
+  <v-app-bar :elevation="0" height="20px" color="coko-blue">
 
     <v-app-bar-nav-icon
       variant="text"
-      @click.stop="$vuetify.display.xs ? sideMenuProminent = !sideMenuProminent : sideMenuRail = !sideMenuRail"
+      @click.stop="$vuetify.display.xs ? sideMenu = !sideMenu : sideMenuRail = !sideMenuRail"
     ></v-app-bar-nav-icon>
 
     <v-app-bar-title >
@@ -11,8 +11,8 @@
         <a href="https://coko38.ru" target="_blank">
           <img src="../assets/img/app-bar-logo.png"
                style="vertical-align: center"
-               width="50px"
-               height="50px"
+               width="30px"
+               height="30px"
                alt="logo"/>
         </a>&nbsp;&nbsp;
         <span v-if="!($vuetify.display.xs)">АИС "Учебный центр"</span>
@@ -38,12 +38,13 @@
   </v-app-bar>
 
   <v-navigation-drawer
+    style="padding-top: 50px"
     class="adaptive-side-menu-permanent"
     :permanent="!($vuetify.display.xs)"
     :prominent="$vuetify.display.xs"
     color="coko-blue"
     :rail="$vuetify.display.xs ? false : sideMenuRail"
-    v-model="sideMenuProminent"
+    v-model="sideMenu"
   >
 
     <SideMenu />
@@ -51,9 +52,17 @@
   </v-navigation-drawer>
 
   <v-main
-    class="v-main"
+    style="height: calc(100vh - 80px);
+            overflow-y: auto;
+            overflow-x: hidden;"
   >
-    <slot></slot>
+
+      <div class="background-div"></div>
+
+      <div class="content-div adaptive-content-div">
+        <slot></slot>
+      </div>
+
   </v-main>
 
 </template>
@@ -72,21 +81,31 @@ export default {
   data() {
     return {
       sideMenuRail: true,
-      sideMenuProminent: true,
+      sideMenuProminent: false,
+      sideMenu: false
     }
   },
   mounted() {
-    console.log(this.$route.path)
+    this.sideMenu = !(this.$vuetify.display.xs)
   }
 }
 
 </script>
 
 <style scoped>
-  .v-main{
+  .background-div{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     background-image: url('../assets/img/lk-background.jpg');
     background-repeat: repeat;
     opacity: 25%;
+  }
+
+  .content-div {
+    z-index: 15;
   }
 
 </style>

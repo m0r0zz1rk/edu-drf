@@ -89,7 +89,7 @@ class StudentProfile(BaseTable):
         except Exception:
             return '(Данные не найдены)'
 
-    def get_display_name(self):
+    def get_display_name(self) -> str:
         """Получение ФИО пользователя"""
         try:
             display_name = f'{self.surname} {self.name}'

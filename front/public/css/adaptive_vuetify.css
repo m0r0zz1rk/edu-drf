@@ -1,5 +1,16 @@
 @media screen and (max-width: 6000px) {
 
+    .v-card-title {
+        background-color: #373c59;
+        color: white;
+    }
+
+    .v-card-text {
+        width: 100%;
+        background-color: white;
+        padding: 0;
+    }
+
     .v-text-field input{
         width: 100%;
     }
@@ -15,6 +26,7 @@
     .v-tab.v-tab.v-btn,
     .v-selection-control .v-label,
     .v-btn__content,
+    .v-select .v-field .v-field__input,
     .v-alert__content,
     .v-text-field input,
     .v-list-item--nav .v-list-item-title {
@@ -52,6 +64,7 @@
     .v-tab.v-tab.v-btn,
     .v-selection-control .v-label,
     .v-btn__content,
+    .v-select .v-field .v-field__input,
     .v-alert__content,
     .v-text-field input,
     .v-list-item--nav .v-list-item-title {
@@ -85,6 +98,7 @@
     .v-tab.v-tab.v-btn,
     .v-selection-control .v-label,
     .v-btn__content,
+    .v-select .v-field .v-field__input,
     .v-alert__content,
     .v-text-field input,
     .adaptive-side-menu-permanent,

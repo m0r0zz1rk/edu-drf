@@ -3,7 +3,7 @@ from django.urls import path
 from apps.authen.api.authorization_viewset import AuthorizationViewSet
 from apps.authen.api.registration_viewset import RegistrationViewSet
 
-# from apps.authen.api.profile_viewset import ProfileViewSet
+from apps.authen.api.profile_viewset import ProfileViewSet
 # from apps.authen.api.registration_viewset import RegistrationViewSet
 
 authorization_urlpatterns = [
@@ -20,9 +20,12 @@ registration_urlpatterns = [
 ]
 
 profile_urlpatterns = [
-    # path('profile/', ProfileViewSet.as_view({'get': 'get_user_information'})),
-    # path('check_change_email/', ProfileViewSet.as_view({'post': 'check_change_email'})),
-    # path('check_change_phone/', ProfileViewSet.as_view({'post': 'check_change_phone'})),
+    path('main_page_info/', ProfileViewSet.as_view({'get': 'get_main_page_profile_info'})),
+    path('get_profile/', ProfileViewSet.as_view({'get': 'get_profile_info'})),
+    path('save_profile/', ProfileViewSet.as_view({'post': 'save_profile_info'})),
+    path('check_profile_email/', ProfileViewSet.as_view({'post': 'check_profile_email'})),
+    path('check_profile_phone/', ProfileViewSet.as_view({'post': 'check_profile_phone'})),
+    path('check_profile_snils/', ProfileViewSet.as_view({'post': 'check_profile_snils'})),
     # path('change_profile/', ProfileViewSet.as_view({'post': 'save_profile_changes'})),
     # path('change_password/', ProfileViewSet.as_view({'post': 'change_user_password'}))
 ]

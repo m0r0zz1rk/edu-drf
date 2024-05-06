@@ -276,12 +276,6 @@ export default {
   .login-card {
     position: absolute;
     vertical-align: middle;
-    //overflow: auto;
-  }
-
-  .login-card-title {
-    background-color: #373c59;
-    color: white;
   }
 
   .login-card-text {

@@ -2,6 +2,8 @@ import Login from "../../../views/Login.vue";
 import HelloWorld from "../../../components/HelloWorld.vue";
 import Main from "@/views/Main.vue";
 import isAuthenticated from "@/modules/router/permissions/is_authenticated";
+import Profile from "@/views/Profile.vue";
+import isStudent from "@/modules/router/permissions/is_student";
 // import Main from "../../../views/Main.vue";
 // import isAuthenticated from "../permissions/is_authenticated.js";
 // import Profile from "../../../views/Profile.vue";
@@ -19,17 +21,16 @@ const base_routes = [
       component: Main,
       beforeEnter: isAuthenticated
     },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile,
+      beforeEnter: isAuthenticated, isStudent
+    }
     /*{
         path: '/password_reset',
         name: 'PasswordReset',
         component: PasswordReset,
-    },
-
-    {
-        path: '/profile',
-        name: 'Profile',
-        component: Profile,
-        beforeEnter: isAuthenticated
     }*/
 ]
 

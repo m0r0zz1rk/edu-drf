@@ -62,8 +62,6 @@ export default {
 .alerts {
   position: absolute;
   z-index: 100;
-  right: 5px;
-  bottom: 5px;
 }
 
 .alert-visible {

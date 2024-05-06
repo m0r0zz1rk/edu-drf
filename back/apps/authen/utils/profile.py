@@ -1,39 +1,42 @@
-from typing import Union
+from typing import Union, Optional
 
 from django.apps import apps
+from django.contrib.auth.models import User
 
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.user import UserUtils
 from apps.commons.utils.validate import ValidateUtils
 
-student_profile_model = apps.get_model('authen', 'StudentProfile')
-coko_profile_model = apps.get_model('authen', 'CokoProfile')
-state_model = apps.get_model('guides', 'State')
-
-set_student_profile_fields = [
-    'surname',
-    'name',
-    'patronymic',
-    'phone',
-    'email',
-    'snils',
-    'state',
-    'birthday',
-    'sex',
-    'health'
-]
-set_coko_profile_fields = [
-    'surname',
-    'name',
-    'patronymic',
-]
-
 
 class ProfileUtils:
     """Класс методов для работы с профилями пользователей"""
 
-    @staticmethod
-    def is_profile_exist(attribute_name: str, value) -> bool:
+    student_profile_model = apps.get_model('authen', 'StudentProfile')
+    coko_profile_model = apps.get_model('authen', 'CokoProfile')
+    state_model = apps.get_model('guides', 'State')
+
+    set_student_profile_fields = [
+        'surname',
+        'name',
+        'patronymic',
+        'phone',
+        'email',
+        'snils',
+        'state',
+        'birthday',
+        'sex',
+        'health'
+    ]
+
+    set_coko_profile_fields = [
+        'surname',
+        'name',
+        'patronymic',
+    ]
+
+    uu = UserUtils()
+
+    def is_profile_exist(self, attribute_name: str, value) -> bool:
         """
         Проверка на существующий профиль пользователя по заданному атрибуту и его значению
         :param attribute_name: наименование атрибута (поле модели профиля)
@@ -42,8 +45,8 @@ class ProfileUtils:
         """
         data = {attribute_name: value}
         try:
-            return (student_profile_model.objects.filter(**data).exists() or
-                    coko_profile_model.objects.filter(**data).exists())
+            return (self.student_profile_model.objects.filter(**data).exists() or
+                    self.coko_profile_model.objects.filter(**data).exists())
         except Exception:
             return False
 
@@ -62,10 +65,10 @@ class ProfileUtils:
         """
         if self.is_profile_exist(attribute_name, value):
             find = {attribute_name: value}
-            if student_profile_model.objects.filter(**find).exists():
-                prof = student_profile_model.objects.filter(**find).first()
+            if self.student_profile_model.objects.filter(**find).exists():
+                prof = self.student_profile_model.objects.filter(**find).first()
             else:
-                prof = coko_profile_model.objects.filter(**find).first()
+                prof = self.coko_profile_model.objects.filter(**find).first()
             if output in ['profile', 'username', 'display_name']:
                 if output == 'profile':
                     return prof
@@ -75,8 +78,8 @@ class ProfileUtils:
                     return prof.get_display_name()
         return None
 
-    @staticmethod
     def set_student_profile_data(
+            self,
             prof: student_profile_model,
             data: dict
     ) -> Union[bool, str]:
@@ -86,22 +89,26 @@ class ProfileUtils:
         :param data: словарь с данными профиля
         :return: true - информация сохранена, false - данные не прошли валидацию, str - traceback системной ошибки
         """
-        if ValidateUtils.validate_data(set_student_profile_fields, data):
+        if ValidateUtils.validate_data(self.set_student_profile_fields, data):
             try:
                 for key, value in data.items():
-                    if key != 'state':
-                        setattr(prof, key, value)
-                    else:
-                        state = state_model.objects.filter(name=value).first()
+                    if key == 'state':
+                        state = self.state_model.objects.filter(name=value).first()
                         setattr(prof, key, state)
+                    elif key == 'email':
+                        user = User.objects.get(id=prof.django_user_id)
+                        setattr(user, key, value)
+                    else:
+                        if getattr(prof, key) != value:
+                            setattr(prof, key, value)
                 prof.save()
                 return True
             except Exception:
                 return ExceptionHandling.get_traceback()
         return False
 
-    @staticmethod
     def set_coko_profile_data(
+            self,
             prof: coko_profile_model,
             data: dict
     ) -> Union[bool, str]:
@@ -111,7 +118,7 @@ class ProfileUtils:
         :param data: словарь с данными профиля
         :return: true - информация сохранена, false - данные не прошли валидацию, str - traceback сисетмной ошибки
         """
-        if ValidateUtils.validate_data(set_coko_profile_fields, data):
+        if ValidateUtils.validate_data(self.set_coko_profile_fields, data):
             try:
                 for key, value in data.items():
                     setattr(prof, key, value)
@@ -119,4 +126,55 @@ class ProfileUtils:
                 return True
             except Exception:
                 return ExceptionHandling.get_traceback()
+        return False
+
+    def get_profile_main_page_info(self, user_id: int) -> Optional[dict]:
+        """
+        Получение информации из профиля пользователя для главной страницы по полученнмому ID пользователя
+        :param user_id: id пользователя Django
+        :return: словарь с информацией из профиля, None - профиль не найден
+        """
+        if self.is_profile_exist('django_user_id', user_id):
+            prof = self.get_profile_or_info_by_attribute(
+                'django_user_id',
+                user_id,
+                'profile'
+            )
+            user = self.uu.get_user('id', user_id)
+            return {
+                'fio': prof.get_display_name(),
+                'email': user.email,
+                'phone': prof.phone,
+                'snils': prof.snils
+            }
+        return None
+
+    def check_unique_data_for_profile(self, user_id: int, attr_name: str, value: str) -> bool:
+        """
+        Проверка на уникальность полученного поля и его значения для пользователей
+        :param user_id: ID пользователя Django
+        :param attr_name: атрибут (phone, email или snils)
+        :param value: значение атрибута
+        :return: True - значение уникально, False - используется другим пользователей
+        """
+        if self.is_profile_exist('django_user_id', user_id):
+            prof = self.get_profile_or_info_by_attribute(
+                'django_user_id',
+                user_id,
+                'profile'
+            )
+            if attr_name != 'email':
+                if self.is_profile_exist(attr_name, value):
+                    if self.get_profile_or_info_by_attribute(
+                        attr_name,
+                        value,
+                        'profile'
+                    ) != prof:
+                        return False
+                return True
+            else:
+                if User.objects.filter(email=value).exists():
+                    if User.objects.filter(email=value).first().id != user_id:
+                        return False
+                return True
         return False
