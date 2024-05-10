@@ -98,6 +98,7 @@ class ProfileUtils:
                     elif key == 'email':
                         user = User.objects.get(id=prof.django_user_id)
                         setattr(user, key, value)
+                        user.save()
                     else:
                         if getattr(prof, key) != value:
                             setattr(prof, key, value)

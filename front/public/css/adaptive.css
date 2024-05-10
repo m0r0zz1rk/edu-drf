@@ -46,6 +46,18 @@
     .adaptive-main-card-text-height {
         height: 600px;
     }
+
+    .adaptive-change-pass-dialog{
+        width: 50vw;
+    }
+
+    .adaptive-no-tab-table-card-text {
+        height: 92vh;
+    }
+
+    .adaptive-no-tab-table {
+        height: 100%;
+    }
 }
 
 @media screen and (max-width: 2560px) {
@@ -81,6 +93,11 @@
     .adaptive-main-card-text-height {
         height: 500px;
     }
+
+    .adaptive-no-tab-table-card-text {
+        height: 90vh;
+    }
+
 }
 
 @media screen and (max-width: 1920px) {
@@ -106,9 +123,10 @@
         width: 80%;
     }
 
-    .adaptive-main-card-text-height {
-        height: 350px;
+    .adaptive-no-tab-table-card-text {
+        height: 88vh;
     }
+
 }
 
 @media screen and (max-width: 1280px) {
@@ -135,6 +153,10 @@
 
 @media screen and (max-width: 960px) {
 
+    .v-card-text {
+        padding: 0 !important;
+    }
+
     .adaptive-login-card {
         top: 0;
         right: 12.5vw;
@@ -148,6 +170,14 @@
 
     .adaptive-login-button {
         width: 100%;
+    }
+
+    .adaptive-change-pass-dialog{
+        width: 100vw;
+    }
+
+    .adaptive-no-tab-table-card-text {
+        height: 91vh;
     }
 }
 
@@ -194,4 +224,9 @@
         right: 0;
         bottom: 0;
     }
+
+    .adaptive-no-tab-table-card-text {
+        height: 94vh;
+    }
+
 }

@@ -194,14 +194,17 @@
 
     </v-card-text>
 
+    <v-divider></v-divider>
+
     <v-card-actions style="background-color: white">
-      <v-divider></v-divider>
+
+      <v-spacer></v-spacer>
 
       <v-btn
         color="coko-blue"
         text="Смена пароля"
         :loading="formLoading"
-        @click="dialog = false"
+        @click="passwordDialog = true"
       ></v-btn>
 
       <v-btn
@@ -213,6 +216,13 @@
     </v-card-actions>
 
   </v-card>
+
+  <v-dialog
+    class="adaptive-change-pass-dialog"
+    v-model="passwordDialog"
+  >
+    <PasswordChange :profile="true" :closeDialog="() => {passwordDialog = false}" />
+  </v-dialog>
 </template>
 
 <script>
@@ -220,9 +230,11 @@ import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import email_pattern from "@/commons/email_pattern";
+import PasswordChange from "@/components/PasswordChange.vue";
 
 export default {
   name: "ProfileForm",
+  components: {PasswordChange},
   data() {
     return {
       profileData: {
@@ -256,7 +268,8 @@ export default {
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
         email: value => email_pattern.test(value) || 'Некорректный e-mail.'
       },
-      dataValid: false
+      dataValid: false,
+      passwordDialog: false
     }
   },
   methods: {
@@ -286,7 +299,6 @@ export default {
                   data.error
                 )
               } else {
-                console.log(data)
                 this.profileData = data
               }
             })

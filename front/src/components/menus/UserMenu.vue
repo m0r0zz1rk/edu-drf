@@ -50,9 +50,10 @@ export default {
       this.$router.push(path)
     },
     logout() {
+      let that = this
       this.$store.dispatch('AUTH_LOGOUT')
         .then(() => {
-          this.usePreLoader()
+          that.usePreLoader()
           this.$router.push('/login')
         })
     },

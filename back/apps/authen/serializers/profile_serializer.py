@@ -5,30 +5,6 @@ student_profile_model = apps.get_model('authen', 'StudentProfile')
 
 states_model = apps.get_model('guides', 'State')
 
-
-class ProfileMainPageSerializer(serializers.ModelSerializer):
-    """Сериализация данных пользователя для главной странице АИС"""
-    email = serializers.EmailField(
-        allow_null=False,
-        allow_blank=False,
-        label='Email'
-    )
-    fio = serializers.CharField(
-        allow_null=False,
-        allow_blank=False,
-        label='ФИО'
-    )
-
-    class Meta:
-        model = student_profile_model
-        fields = [
-            'fio',
-            'email',
-            'phone',
-            'snils'
-        ]
-
-
 class BaseProfileSerializer(serializers.ModelSerializer):
     """Базовая сериализация данных профиля пользователя"""
     state = serializers.SlugRelatedField(
@@ -37,7 +13,6 @@ class BaseProfileSerializer(serializers.ModelSerializer):
         label='Государство'
     )
     email = serializers.SerializerMethodField(label='Email')
-    birthday = serializers.DateField(format='%d.%m.%Y')
 
     def get_email(self, obj):
         """Получение Email из объекта User"""
@@ -79,6 +54,7 @@ class ProfileInputSerializer(BaseProfileSerializer):
 class ProfileOutputSerializer(BaseProfileSerializer):
     """Сериализация данных профиля пользователя при выдаче"""
     email = serializers.SerializerMethodField(label='Email')
+    birthday = serializers.DateField(format='%d.%m.%Y')
 
     def get_email(self, obj):
         return obj.django_user.email
@@ -88,6 +64,8 @@ class ProfileChangePasswordSerializer(serializers.Serializer):
     """Сериализация данных при смене пароля пользователя"""
     password = serializers.CharField(
         min_length=8,
+        allow_blank=False,
+        allow_null=False,
         label='Пароль'
     )
 

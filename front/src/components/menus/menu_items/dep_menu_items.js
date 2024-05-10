@@ -2,13 +2,13 @@ const depMenuItems = [
   {
     'icon': 'mdi-bank',
     'title': 'Учебная деятельность',
-    'link': '/centre/study',
+    'link': '/dep/study',
     'value': 'study'
   },
   {
-    'icon': 'mdi-invoice-text-clock',
+    'icon': 'mdi-book-clock-outline',
     'title': 'Личное расписание',
-    'link': '/centre/personal_schedule',
+    'link': '/dep/personal_schedule',
     'value': 'personal_schedule'
   }
 ]

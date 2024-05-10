@@ -1,0 +1,133 @@
+<template>
+  <v-toolbar
+    color="coko-blue"
+    flat
+  >
+    <v-toolbar-title
+      bg-color="coko-blue"
+    >{{ tableTitle }}</v-toolbar-title>
+
+    <v-spacer></v-spacer>
+
+    <v-divider
+      class="mx-4"
+      inset
+      vertical
+    ></v-divider>
+
+    <v-btn
+      v-if="!(mobileDisplay)"
+      prepend-icon="mdi-magnify"
+      text="Поиск"
+      @click="searchShowEvent()"
+    />
+
+    <v-dialog
+        v-if="mobileDisplay"
+        v-model="searchDialog"
+    >
+        <template v-slot:activator="{ props: activatorProps }">
+
+            <v-btn
+                icon="mdi-magnify"
+                v-bind="activatorProps"
+            />
+
+        </template>
+
+        <v-card>
+            <v-card-title class="d-flex justify-space-between align-center">
+                <span class="text-h5">Поиск записей</span>
+                <v-btn
+                  icon="mdi-close"
+                  color="coko-blue"
+                  @click="searchDialog = !(searchDialog)"
+                ></v-btn>
+            </v-card-title>
+
+            <v-card-text>
+                <v-container>
+                    <v-row>
+                        <v-col v-for="field in fieldsArray"
+                               cols="12"
+                               md="4"
+                               sm="6"
+                        >
+                            <PaginationTableSearchField
+                                    :useInTableManage="true"
+                                    :field="field"
+                                    :fieldTitle = "tableHeaders.filter((header) => header.key === field.key)[0].title"
+                                    :onChangeEvent="onChangeEvent"
+                            />
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-card-text>
+        </v-card>
+
+    </v-dialog>
+
+
+    <v-btn v-if="xlsxButton && !(foreignKey)"
+      :icon="mobileDisplay && 'mdi-file-excel'"
+      :prepend-icon="!(mobileDisplay) && 'mdi-file-excel'"
+      :text="!(mobileDisplay) && 'Скачать'"
+      @click="xlsxDownload()"
+    />
+
+    <PaginationTableAddDialog
+      v-if="addButton && !(foreignKey)"
+      :mobileDisplay="mobileDisplay"
+    />
+
+    <v-btn
+      v-if="foreignKey"
+      :icon="mobileDisplay && 'mdi-open-in-new'"
+      :prepend-icon="!(mobileDisplay) && 'mdi-open-in-new'"
+      color="coko-blue"
+      :text="!(mobileDisplay) && 'Перейти к таблице'"
+      @click="nextPage()"
+    />
+
+  </v-toolbar>
+</template>
+
+<script>
+import PaginationTableAddDialog from "@/components/pagination_table/dialogs/PaginationTableAddDialog.vue";
+import PaginationTableSearchField from "@/components/pagination_table/PaginationTableSearchField.vue";
+
+export default {
+  name: "PaginationTableManage",
+  components: {PaginationTableSearchField, PaginationTableAddDialog},
+  props: {
+    tableTitle: String, // Заголовок таблицы
+    foreignKey: String, // FK таблица
+    tableTabUrl: String, //URL перехода по кнопку "Перейти к таблице (для FK таблицы)"
+    addButton: Boolean, // Параметр, отвечающий за отображение кнопки "Добавить"
+    xlsxButton: Boolean, // Параметр, отвечающий за отображение кнопки "Скачать"
+    xlsxDownload: Function, // Событий, вызываемое для выгрузки записей таблцы в Excel
+    searchShowEvent: Function, // Функция для изменения параметра отображения поисковых полей,
+    mobileDisplay: Boolean, // Отображение на дисплее мобильного устройства
+    tableHeaders: Array, // Объект fieldsArray из пагинационной таблицы (для диалогового окна поиска записей)
+    fieldsArray: Array, // Объект fieldsArray из пагинационной таблицы (для диалогового окна поиска записей)
+    onChangeEvent: Function // Функция для вызова поиска записей
+  },
+  data() {
+    return {
+      newItemDialog: false,
+      searchDialog: false,
+    }
+  },
+  methods: {
+    nextPage() {
+      let route = this.$router.resolve({path: this.tableTab});
+      // let route = this.$router.resolve('/link/to/page'); // This also works.
+      window.open(route.href, '_blank');
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

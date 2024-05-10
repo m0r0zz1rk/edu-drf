@@ -13,10 +13,11 @@ media_root = du.get_parameter_from_settings('MEDIA_ROOT')
 
 urlpatterns = [
     path('backend/admin/', admin.site.urls),
-    #path('api/v1/admins/', include('apps.admins.urls')),
+    path('backend/api/v1/admins/', include('apps.admins.urls')),
     #path('api/v1/applications/', include('apps.applications.urls')),
     path('backend/api/v1/auth/', include('apps.authen.urls')),
     path('backend/api/v1/guides/', include('apps.guides.urls')),
+    path('backend/api/v1/journal/', include('apps.journal.urls')),
     #path('api/v1/reports/', include('apps.reports.urls')),
     #path('api/v1/users/', include('apps.users.urls')),
     #path('api/v1/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),

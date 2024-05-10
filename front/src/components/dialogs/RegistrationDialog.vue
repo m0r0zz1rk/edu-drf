@@ -16,7 +16,7 @@
     </template>
 
     <v-card>
-      <v-card-title class="registration-card-title">
+      <v-card-title>
         Регистрация обучающегося
       </v-card-title>
       <v-card-text>
@@ -195,7 +195,7 @@
               :type="pass1Visible ? 'text' : 'password'"
               bg-color="white"
               label="Пароль*"
-              :rules="[rules.required,]"
+              :rules="[rules.required, rules.password]"
               variant="solo"
               @click:append-inner="pass1Visible = !pass1Visible"
               :loading="formLoading"
@@ -214,7 +214,7 @@
               :type="pass2Visible ? 'text' : 'password'"
               bg-color="white"
               label="Подтверждение пароля*"
-              :rules="[rules.required,]"
+              :rules="[rules.required, rules.password]"
               variant="solo"
               @click:append-inner="pass2Visible = !pass2Visible"
               :loading="formLoading"
@@ -333,7 +333,8 @@ export default {
         required: value => !!value || 'Обязательно для заполнения.',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
-        email: value => email_pattern.test(value) || 'Некорректный e-mail.'
+        email: value => email_pattern.test(value) || 'Некорректный e-mail.',
+        password: value => value.length >= 8 || 'Минимальная длина пароля - 8 символов'
       },
       states: ['Россия', 'Украина', 'Беларусь', 'Казахстан'],
       sex: ['Мужской', 'Женский'],
@@ -511,14 +512,12 @@ export default {
 </script>
 
 <style scoped>
+.alert-visible {
+  z-index: 100;
+}
 
-  .alert-visible {
-    z-index: 100;
-  }
-
-  .alert-hidden {
-    display: none;
-    z-index: 0;
-  }
-
+.alert-hidden {
+  display: none;
+  z-index: 0;
+}
 </style>

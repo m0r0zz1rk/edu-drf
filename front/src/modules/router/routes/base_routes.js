@@ -25,7 +25,7 @@ const base_routes = [
       path: '/profile',
       name: 'Profile',
       component: Profile,
-      beforeEnter: isAuthenticated, isStudent
+      beforeEnter: [isAuthenticated, isStudent]
     }
     /*{
         path: '/password_reset',

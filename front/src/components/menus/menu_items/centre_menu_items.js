@@ -24,7 +24,7 @@ const centreMenuItems = [
     'value': 'reports'
   },
   {
-    'icon': 'mdi-invoice-text-clock',
+    'icon': 'mdi-book-clock-outline',
     'title': 'Личное расписание',
     'link': '/centre/personal_schedule',
     'value': 'personal_schedule'

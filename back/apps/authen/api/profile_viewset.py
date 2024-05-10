@@ -1,27 +1,30 @@
 from typing import Union
 
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ViewSet
 
-from apps.authen.serializers.profile_serializer import (ProfileMainPageSerializer, ProfileInputSerializer,
-                                                        ProfileOutputSerializer)
+from apps.authen.serializers.main_pages.student_main_page_serializer import StudentMainPageSerializer
+from apps.authen.serializers.profile_serializer import (ProfileInputSerializer,
+                                                        ProfileOutputSerializer, ProfileChangePasswordSerializer)
 from apps.authen.serializers.registration_serializer import RegistrationUniquePhoneSerializer, \
     RegistrationUniqueEmailSerializer, RegistrationUniqueSnilsSerializer
 from apps.authen.utils.profile import ProfileUtils
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
+from apps.commons.utils.django.user import UserUtils
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR, JOURNAL_REC_STATUSES, SUCCESS
 from apps.journal.utils.journal_utils import JournalUtils
 
 
-class ProfileViewSet(viewsets.ViewSet):
+class ProfileViewSet(ViewSet):
     """Работа с профилем пользователя"""
     permission_classes = [IsAuthenticated, ]
 
     ju = JournalUtils()
     pu = ProfileUtils()
+    uu = UserUtils()
     respu = ResponseUtils()
 
     def _endpoint_rec_journal(
@@ -87,13 +90,13 @@ class ProfileViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
         tags=['Профиль', ],
-        operation_description="Получение информации о пользователе для главной страницы",
+        operation_description="Получение информации для главной страницы (для обучающихся)",
         responses={
             '400': 'Сообщение "Повторите попытку позже"',
             '403': 'Пользователь не авторизован',
-            '200': ProfileMainPageSerializer}
+            '200': StudentMainPageSerializer}
     )
-    def get_main_page_profile_info(self, request, *args, **kwargs):
+    def get_main_page_student(self, request, *args, **kwargs):
         output_data = self.pu.get_profile_main_page_info(request.user.id)
         if output_data is None:
             self._endpoint_rec_journal(
@@ -104,7 +107,7 @@ class ProfileViewSet(viewsets.ViewSet):
             )
             return self.respu.sorry_try_again_response()
         try:
-            serialize = ProfileMainPageSerializer(output_data)
+            serialize = StudentMainPageSerializer(output_data)
             return ResponseUtils.ok_response_dict(serialize.data)
         except Exception:
             self._endpoint_rec_journal(
@@ -115,6 +118,9 @@ class ProfileViewSet(viewsets.ViewSet):
                 ExceptionHandling.get_traceback()
             )
             return ResponseUtils().sorry_try_again_response()
+
+
+
 
     @swagger_auto_schema(
         tags=['Профиль', ],
@@ -319,43 +325,41 @@ class ProfileViewSet(viewsets.ViewSet):
                 f'Произошла ошибка при изменении профиля пользователя: {repr(serialize.errors)}'
             )
 
-    """@swagger_auto_schema(
+    @swagger_auto_schema(
         tags=['Профиль', ],
         operation_description="Смена пароля пользователя",
         request_body=ProfileChangePasswordSerializer,
         responses={
             '400': 'Ошибка при попытке смены пароля',
-            '401': 'Пользователь не авторизован',
+            '403': 'Пользователь не авторизован',
             '200': 'Пароль успешно изменен'
         }
     )
     def change_user_password(self, request, *args, **kwargs):
-        "Смена пароля пользователя"
-        params = ['password', ]
-        ru = RestUtils()
-        if not ru.validate_params_to_list(request, params):
-            self.journal.write(
-                'Система',
-                ERROR,
-                f'Ошибка при изменении пароля пользователя {request.user.id}: '
-                f'Ошибка валидации тела запроса"'
-            )
-            return ResponseUtils().sorry_try_again_response()
-        pu = ProfileUtils()
-        if pu.change_user_password(
-            request.user.id,
-            ru.get_request_parameter_by_key(request, 'password')
-        ):
-            self.journal.write(
-                pu.get_display_name('django_user_id', request.user.id),
-                SUCCESS,
-                f'Пароль пользователя успешно изменен'
-            )
-            return ResponseUtils.ok_response('Пароль успешно изменен')
+        """Смена пароля пользователя"""
+        serialize = ProfileChangePasswordSerializer(data=request.data)
+        if serialize.is_valid():
+            process = self.uu.password_change(request.user.id, serialize.data['password'])
+            if process is True:
+                self._endpoint_rec_journal(
+                    request.user.id,
+                    SUCCESS,
+                    'Пароль пользователя успешно изменен',
+                    '-'
+                )
+                return self.respu.ok_response('Пароль успешно изменен')
+            else:
+                self._endpoint_rec_journal(
+                    request.user.id,
+                    ERROR,
+                    'Ошибка при смене пароля - пользователь не найден',
+                    '-'
+                )
         else:
-            self.journal.write(
-                'Система',
+            self._endpoint_rec_journal(
+                request.user.id,
                 ERROR,
-                f'Ошибка при изменении пароля пользователя {request.user.id}'
+                'Ошибка при смене пароля - данные не прошли валидацию',
+                repr(request.data)
             )
-            return ResponseUtils().sorry_try_again_response()"""
+        return self.respu.ok_response('Пароль успешно изменен')

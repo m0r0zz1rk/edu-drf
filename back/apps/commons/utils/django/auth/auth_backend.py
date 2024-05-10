@@ -6,7 +6,7 @@ from rest_framework import authentication
 from apps.commons.utils.django.auth.jwt_credential import JWTCredential
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.journal.consts.journal_modules import AUTHEN
-from apps.journal.consts.journal_rec_statuses import ERROR
+from apps.journal.consts.journal_rec_statuses import ERROR, JOURNAL_REC_STATUSES, WARNING
 from apps.journal.utils.journal_utils import JournalUtils
 
 
@@ -16,9 +16,15 @@ class AuthBackend(authentication.BaseAuthentication):
     ju = JournalUtils()
     auth_header = None
 
-    def _journal_error(self, description: str, payload: str = None, output: str = None):
+    def _journal_rec(
+            self,
+            rec_type: JOURNAL_REC_STATUSES,
+            description: str,
+            payload: str = None,
+            output: str = None):
         """
         Фиксация ошибок
+        :param rec_type: Тип сообщения
         :param description: краткое описание ошибки
         :param output: выходные данные (при наличии)
         :return:
@@ -27,7 +33,7 @@ class AuthBackend(authentication.BaseAuthentication):
             {
                 'source': 'Аутентификация по JWT токену',
                 'module': AUTHEN,
-                'status': ERROR,
+                'status': rec_type,
                 'description': description
             },
             payload,
@@ -37,19 +43,22 @@ class AuthBackend(authentication.BaseAuthentication):
     def _validate_header(self, header: list) -> bool:
         """Валидация полученного заголовка запроса"""
         if not header or header[0].lower() != b'token':
-            self._journal_error(
+            self._journal_rec(
+                WARNING,
                 'Заголовок не содержит данных токена',
                 str(self.auth_header)
             )
             return False
         if len(header) == 1:
-            self._journal_error(
+            self._journal_rec(
+                ERROR,
                 'Отсутствует данные авторизации в полученном заголовке',
                 str(self.auth_header)
             )
             return False
         elif len(header) > 2:
-            self._journal_error(
+            self._journal_rec(
+                ERROR,
                 'Некорретный формат данных заголовка токена',
                 str(self.auth_header)
             )
@@ -66,7 +75,8 @@ class AuthBackend(authentication.BaseAuthentication):
             token = self.auth_header[1].decode('utf-8')
             return JWTCredential(token).authenticate_credential()
         except Exception:
-            self._journal_error(
+            self._journal_rec(
+                ERROR,
                 'Ошибка при декодировании токена',
                 self.auth_header[1],
                 ExceptionHandling.get_traceback()

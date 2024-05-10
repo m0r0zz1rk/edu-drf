@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 from typing import Optional, Union
 
@@ -142,4 +143,29 @@ class UserUtils:
                     return 'dep'
                 else:
                     return 'student'
+        return None
+
+    def password_change(self, user_id: int, password: str) -> bool:
+        """
+        Смена пароля у пользователя
+        :param user_id: ID пользователя Django
+        :param password: новый пароль
+        :return: True - пароль изменен, False - пароль не изменен
+        """
+        user = self.get_user('id', user_id)
+        if user is not None:
+            user.set_password(password)
+            user.save()
+            return True
+        return False
+
+    def get_user_date_joined(self, user_id: int) -> Optional[datetime]:
+        """
+        Получение даты первого входа в АИС пользователя
+        :param user_id: ID пользователя Django
+        :return: None - пользователь не найден, datetime - дата первого входа в АИС
+        """
+        user = self.get_user('id', user_id)
+        if user is not None:
+            return user.date_joined
         return None

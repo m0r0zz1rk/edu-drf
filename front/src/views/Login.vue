@@ -36,53 +36,55 @@
                 </template>
               </v-radio>
             </v-radio-group>
-            <v-text-field v-if="loginStudentType === 'phone'"
-                          id="phoneTextField"
-                          bg-color="white"
-                          v-mask="'+7 (###) ###-##-##'"
-                          :rules="[rules.required, rules.phone]"
-                          label="Номер телефона"
-                          variant="solo"
-                          :loading="formLoading"
-                          clearable>
-            </v-text-field>
-            <v-text-field v-if="loginStudentType === 'email'"
-                          id="emailTextField"
-                          bg-color="white"
-                          label="Email"
-                          :rules="[rules.required, rules.email]"
-                          variant="solo"
-                          :loading="formLoading"
-                          clearable>
-            </v-text-field>
-            <v-text-field v-if="loginStudentType === 'snils'"
-                          id="snilsTextField"
-                          bg-color="white"
-                          v-mask="'###-###-### ##'"
-                          label="СНИЛС"
-                          :rules="[rules.required, rules.snils]"
-                          variant="solo"
-                          :loading="formLoading"
-                          clearable>
-            </v-text-field>
-            <v-text-field
-              id="userPassword"
-              :append-inner-icon="passVisible ? 'mdi-eye-off' : 'mdi-eye'"
-              :type="passVisible ? 'text' : 'password'"
-              bg-color="white"
-              label="Пароль"
-              :rules="[rules.required,]"
-              variant="solo"
-              @click:append-inner="passVisible = !passVisible"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-            <v-btn
-              class="login-button adaptive-login-button"
-              color="coko-blue"
-              :loading="formLoading"
-              @click="userLogin(false)"
-            >Войти</v-btn><br/>
+            <v-form @submit.prevent="userLogin(false)">
+              <v-text-field v-if="loginStudentType === 'phone'"
+                            id="phoneTextField"
+                            bg-color="white"
+                            v-mask="'+7 (###) ###-##-##'"
+                            :rules="[rules.required, rules.phone]"
+                            label="Номер телефона"
+                            variant="solo"
+                            :loading="formLoading"
+                            clearable>
+              </v-text-field>
+              <v-text-field v-if="loginStudentType === 'email'"
+                            id="emailTextField"
+                            bg-color="white"
+                            label="Email"
+                            :rules="[rules.required, rules.email]"
+                            variant="solo"
+                            :loading="formLoading"
+                            clearable>
+              </v-text-field>
+              <v-text-field v-if="loginStudentType === 'snils'"
+                            id="snilsTextField"
+                            bg-color="white"
+                            v-mask="'###-###-### ##'"
+                            label="СНИЛС"
+                            :rules="[rules.required, rules.snils]"
+                            variant="solo"
+                            :loading="formLoading"
+                            clearable>
+              </v-text-field>
+              <v-text-field
+                id="userPassword"
+                :append-inner-icon="passVisible ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="passVisible ? 'text' : 'password'"
+                bg-color="white"
+                label="Пароль"
+                :rules="[rules.required,]"
+                variant="solo"
+                @click:append-inner="passVisible = !passVisible"
+                :loading="formLoading"
+                clearable
+              ></v-text-field>
+              <v-btn
+                class="login-button adaptive-login-button"
+                color="coko-blue"
+                :loading="formLoading"
+                type="submit"
+              >Войти</v-btn>
+            </v-form>
             <RegistrationDialog ref="regDialog" :usePreLoader="usePreLoader" />
             <v-btn
               style="margin-top: 5px;"
@@ -100,33 +102,35 @@
         </v-tabs-window-item>
         <v-tabs-window-item value="coko">
           <div class="login-form">
-            <v-text-field
-              id="cokoLogin"
-              bg-color="white"
-              label="Логин"
-              :rules="[rules.required,]"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-            <v-text-field
-              id="cokoPassword"
-              :append-inner-icon="passVisible ? 'mdi-eye-off' : 'mdi-eye'"
-              :type="passVisible ? 'text' : 'password'"
-              bg-color="white"
-              label="Пароль"
-              :rules="[rules.required,]"
-              variant="solo"
-              :loading="formLoading"
-              @click:append-inner="passVisible = !passVisible"
-              clearable
-            ></v-text-field>
-            <v-btn
-              class="login-button"
-              color="coko-blue"
-              :loading="formLoading"
-              @click="userLogin(true)"
-            >Войти</v-btn>
+            <v-form @submit.prevent="userLogin(true)">
+              <v-text-field
+                id="cokoLogin"
+                bg-color="white"
+                label="Логин"
+                :rules="[rules.required,]"
+                variant="solo"
+                :loading="formLoading"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                id="cokoPassword"
+                :append-inner-icon="passVisible ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="passVisible ? 'text' : 'password'"
+                bg-color="white"
+                label="Пароль"
+                :rules="[rules.required,]"
+                variant="solo"
+                :loading="formLoading"
+                @click:append-inner="passVisible = !passVisible"
+                clearable
+              ></v-text-field>
+              <v-btn
+                class="login-button"
+                color="coko-blue"
+                :loading="formLoading"
+                type="submit"
+              >Войти</v-btn>
+            </v-form>
           </div>
         </v-tabs-window-item>
       </v-tabs-window>

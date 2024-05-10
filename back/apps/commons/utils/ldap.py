@@ -50,7 +50,7 @@ class LdapUtils:
         """
         Получение атрибута AD для сотрудника ЦОКО по username
         :param attribute: наименование атрибута
-        :param username: имя пользоваля (sAMAccountName)
+        :param username: имя пользователя (sAMAccountName)
         :return: значение атрибута (пустая строка - если атрибут не найден)
         """
         if len(username) > 0 and self.conn is not None:
@@ -80,5 +80,7 @@ class LdapUtils:
                 )
                 return ''
             if len(users) > 0:
-                return codecs.decode(str(users[0].displayName),  'unicode-escape')
+                if users[0][attribute].value is None:
+                    return ''
+                return users[0][attribute].value
         return ''

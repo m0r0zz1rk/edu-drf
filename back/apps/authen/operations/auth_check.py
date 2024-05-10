@@ -33,8 +33,8 @@ class AuthCheck:
         """
         if self.__user is None:
             return None
-        if self.uu.is_user_in_group('username', self.__user.username, 'Администраторы'):
+        if self.uu.is_user_in_group('username', self.__user[0].username, 'Администраторы'):
             return 'centre'
-        if self.uu.is_user_in_group('username', self.__user.username, 'Сотрудники'):
+        if self.uu.is_user_in_group('username', self.__user[0].username, 'Сотрудники'):
             return 'dep'
         return 'student'
