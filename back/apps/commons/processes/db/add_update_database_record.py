@@ -1,6 +1,7 @@
 from typing import Union
 
 from django.apps import apps
+from django.contrib.auth.models import User
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
@@ -41,6 +42,9 @@ class AddUpdateDataBaseRecord(MainProcessing):
         Проверка на существующую модель в приложении
         :return: true - Модель существует, false - Модель не существует
         """
+        if ((self.process_data['model_info']['app'] == 'django') &
+                (self.process_data['model_info']['model_name'] == 'user')):
+            return True
         model_exist = ModelUtils.is_model_exist_in_app(
             self.process_data['model_info']['app'],
             self.process_data['model_info']['model_name']
@@ -116,13 +120,30 @@ class AddUpdateDataBaseRecord(MainProcessing):
         if not self._check_model_exist():
             self.process_completed = False
             return None
-        self.model = apps.get_model(
-            self.process_data['model_info']['app'],
-            self.process_data['model_info']['model_name']
-        )
+        if ((self.process_data['model_info']['app'] == 'django') &
+                (self.process_data['model_info']['model_name'] == 'user')):
+            self.model = User
+        else:
+            self.model = apps.get_model(
+                self.process_data['model_info']['app'],
+                self.process_data['model_info']['model_name']
+            )
         if self._validate_model_fields():
             try:
-                self.model.objects.update_or_create(**self.process_data['object'])
+                if 'object_id' in self.process_data['object'].keys():
+                    object_id = self.process_data['object']['object_id']
+                    del self.process_data['object']['object_id']
+                    self.model.objects.update_or_create(
+                        object_id=object_id,
+                        defaults=self.process_data['object']
+                    )
+                else:
+                    id = self.process_data['object']['id']
+                    del self.process_data['object']['id']
+                    self.model.objects.update_or_create(
+                        id=id,
+                        defaults=self.process_data['object']
+                    )
                 return None
             except Exception:
                 self._main_process_error(ExceptionHandling.get_traceback())

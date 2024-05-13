@@ -5,6 +5,7 @@ student_profile_model = apps.get_model('authen', 'StudentProfile')
 
 states_model = apps.get_model('guides', 'State')
 
+
 class BaseProfileSerializer(serializers.ModelSerializer):
     """Базовая сериализация данных профиля пользователя"""
     state = serializers.SlugRelatedField(

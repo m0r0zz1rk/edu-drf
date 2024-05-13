@@ -1,21 +1,40 @@
 <template>
+
   <PaginationTable
-      tableTitle="Журнал событий"
+      tableTitle="Пользователи"
       tableWidth="98"
+      :noTab="false"
       :addButton="false"
       :xlsxButton="true"
       getRecsURL="/backend/api/v1/guides/users/"
       :tableHeaders="tableHeaders"
       :fieldsArray="fieldsArray"
+      :itemSelectEvent="userSelect"
   />
+
+  <v-dialog
+    persistent
+    v-model="userDialog"
+  >
+
+    <ProfileForm
+      v-if="userInfoTab === 'profile' && profileUuid.length > 0"
+      :profileUuid="profileUuid"
+      :closeDialogEvent="() => {userDialog = !(userDialog)}"
+    />
+
+  </v-dialog>
+
 </template>
 
 <script>
 import PaginationTable from "@/components/pagination_table/PaginationTable.vue";
+import PaginationTableSearchField from "@/components/pagination_table/PaginationTableSearchField.vue";
+import ProfileForm from "@/components/ProfileForm.vue";
 
 export default {
   name: "GuideUser",
-  components: {PaginationTable},
+  components: {ProfileForm, PaginationTableSearchField, PaginationTable},
   data() {
     return {
       tableHeaders: [
@@ -36,10 +55,6 @@ export default {
           'key': 'patronymic'
         },
         {
-          'title': 'Дата рождения',
-          'key': 'birthday'
-        },
-        {
           'title': 'СНИЛС',
           'key': 'snils',
         },
@@ -50,15 +65,7 @@ export default {
         {
           'title': 'Email',
           'key': 'email',
-        },
-        {
-          'title': 'Преподаватель',
-          'key': 'teacher',
-        },
-        {
-          'title': 'Огр. по здоровью',
-          'key': 'teacher',
-        },
+        }
       ],
       fieldsArray: [
         {
@@ -69,12 +76,51 @@ export default {
         {
           ui: 'input',
           type: 'text',
-          key: 'source',
+          key: 'surname',
           addRequired: false,
         },
-      ]
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'name',
+          addRequired: false,
+        },
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'patronymic',
+          addRequired: false,
+        },
+        {
+          ui: 'snils',
+          key: 'snils',
+          addRequired: false,
+        },
+        {
+          ui: 'phone',
+          key: 'phone',
+          addRequired: false,
+        },
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'email',
+          addRequired: false,
+        }
+      ],
+      userDialog: false,
+      profileUuid: '',
+      userInfoTab: 'profile'
+    }
+  },
+  methods: {
+    userSelect(user) {
+      this.userDialog = !(this.userDialog)
+      this.profileUuid = user.object_id
+      console.log(user.object_id)
     }
   }
+
 }
 </script>
 

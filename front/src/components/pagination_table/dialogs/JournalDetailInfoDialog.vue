@@ -16,8 +16,14 @@
       </p>
     </template>
     <v-card>
-      <v-card-title>
+      <v-card-title class="d-flex justify-space-between align-center">
         <span class="text-h5">Детальная информация</span>
+
+        <v-btn
+          icon="mdi-close"
+          color="coko-blue"
+          @click="dialog = !(dialog)"
+        ></v-btn>
       </v-card-title>
 
       <v-card-text>
@@ -106,14 +112,6 @@
         </v-container>
       </v-card-text>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          @click="dialog = !(dialog)"
-        >
-          Закрыть
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

@@ -1,7 +1,13 @@
 <template>
   <v-card>
-    <v-card-title>
+    <v-card-title class="d-flex justify-space-between align-center">
       Смена пароля
+
+      <v-btn
+        icon="mdi-close"
+        color="coko-blue"
+        @click="closeDialog"
+      ></v-btn>
     </v-card-title>
 
     <v-card-text>
@@ -72,8 +78,8 @@ import {apiRequest} from "@/commons/api_request";
 export default {
   name: "PasswordChange",
   props: {
-    profile: Boolean,
-    closeDialog: Function
+    profileUuid: String, // вариативный параметр UUID профиля
+    closeDialog: Function // Функция закрытия диалогового окна в родительском компоненте
   },
   data() {
     return {
@@ -113,26 +119,30 @@ export default {
       this.passValidation()
       if (this.passValid) {
         this.formLoading = true
-        if (this.profile) {
-          let changePassRequest = await apiRequest(
-            '/backend/api/v1/auth/change_password/',
-            'POST',
-            true,
-            {'password': this.pass1}
-          )
-          if (changePassRequest.error) {
-            this.showPassChangeError(changePassRequest.error)
-          }
-          if (changePassRequest.success) {
-            showAlert(
-              'success',
-              'Смена пароля',
-              changePassRequest.success
-            )
-            this.closeDialog()
-          }
-          this.formLoading = false
+        let changePasswordURL = '/backend/api/v1/auth/change_password/'
+        let body = {'password': this.pass1}
+        if (this.profileUuid) {
+          changePasswordURL = '/backend/api/v1/guides/user/password_change/'
+          body['profile_id'] = this.profileUuid
         }
+        let changePassRequest = await apiRequest(
+          changePasswordURL,
+          'POST',
+          true,
+          body
+        )
+        if (changePassRequest.error) {
+          this.showPassChangeError(changePassRequest.error)
+        }
+        if (changePassRequest.success) {
+          showAlert(
+            'success',
+            'Смена пароля',
+            changePassRequest.success
+          )
+          this.closeDialog()
+        }
+        this.formLoading = false
       }
     }
   }

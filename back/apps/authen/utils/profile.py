@@ -32,6 +32,7 @@ class ProfileUtils:
         'surname',
         'name',
         'patronymic',
+        'curator_groups'
     ]
 
     uu = UserUtils()
@@ -60,7 +61,11 @@ class ProfileUtils:
         Получить профиля или информации по полученному значению атрибута
         :param attribute_name: наименование атрибута (поле модели профиля)
         :param value: значение
-        :param output: profile - получить профиль, username - имя пользователя, display_name - ФИО пользователя
+        :param output:
+            profile - получить профиль,
+            username - имя пользователя,
+            display_name - ФИО пользователя,
+            user_id - ID пользователя Django
         :return: None - профиль не найден, Profile - найденный профиль, str - информация из профиля
         """
         if self.is_profile_exist(attribute_name, value):
@@ -69,11 +74,13 @@ class ProfileUtils:
                 prof = self.student_profile_model.objects.filter(**find).first()
             else:
                 prof = self.coko_profile_model.objects.filter(**find).first()
-            if output in ['profile', 'username', 'display_name']:
+            if output in ['profile', 'username', 'display_name', 'user_id']:
                 if output == 'profile':
                     return prof
                 elif output == 'username':
                    return UserUtils().get_username_by_id(prof.django_user_id)
+                elif output == 'user_id':
+                    return prof.django_user_id
                 else:
                     return prof.get_display_name()
         return None
@@ -117,7 +124,7 @@ class ProfileUtils:
         Запись информации в профиль сотрудника ЦОКО
         :param prof: профиль сотрудника ЦОКО
         :param data: словарь с данными профиля
-        :return: true - информация сохранена, false - данные не прошли валидацию, str - traceback сисетмной ошибки
+        :return: true - информация сохранена, false - данные не прошли валидацию, str - traceback системной ошибки
         """
         if ValidateUtils.validate_data(self.set_coko_profile_fields, data):
             try:
@@ -159,18 +166,13 @@ class ProfileUtils:
         :return: True - значение уникально, False - используется другим пользователей
         """
         if self.is_profile_exist('django_user_id', user_id):
-            prof = self.get_profile_or_info_by_attribute(
-                'django_user_id',
-                user_id,
-                'profile'
-            )
             if attr_name != 'email':
                 if self.is_profile_exist(attr_name, value):
                     if self.get_profile_or_info_by_attribute(
                         attr_name,
                         value,
-                        'profile'
-                    ) != prof:
+                        'user_id'
+                    ) != user_id:
                         return False
                 return True
             else:

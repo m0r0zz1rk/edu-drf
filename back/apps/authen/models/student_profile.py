@@ -74,10 +74,6 @@ class StudentProfile(BaseTable):
         default=False,
         verbose_name='У пользователя имеются ограничения по здоровью'
     )
-    curator_groups = models.BooleanField(
-        default=False,
-        verbose_name='Отображать только учебные группы как куратора'
-    )
 
     def __str__(self):
         try:

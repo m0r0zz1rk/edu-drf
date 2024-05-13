@@ -6,15 +6,15 @@ from apps.commons.pagination import CustomPagination
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
 from apps.guides.filters.state_filter import StateFilter
-from apps.guides.serializers.state_serializer import state_model, StateSerializer
-from apps.journal.consts.journal_modules import JOURNAL, GUIDES
+from apps.guides.serializers.state.state_registration_serializer import state_model, StateRegistrationSerializer
+from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.utils.journal_utils import JournalUtils
 
 
-class StateViewSet(viewsets.ModelViewSet):
+class StateRegistrationViewSet(viewsets.ModelViewSet):
     """Класс эндпоинтов для работы с государствами"""
-    serializer_class = StateSerializer
+    serializer_class = StateRegistrationSerializer
     queryset = state_model.objects.all().order_by('name')
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]
@@ -24,18 +24,22 @@ class StateViewSet(viewsets.ModelViewSet):
     respu = ResponseUtils()
 
     @swagger_auto_schema(
-        tags=['Справочники', ],
+        tags=['Справочник "Государства"', ],
         operation_description="Получение списка государств",
         responses={
             '400': 'Ошибка при получении списка',
-            '200': StateSerializer(many=True)
+            '200': StateRegistrationSerializer(many=True)
         }
     )
     def list(self, request, *args, **kwargs):
         try:
             queryset = self.filter_queryset(self.get_queryset())
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
-            return ResponseUtils.ok_response_dict(serializer.data)
+            return self.respu.ok_response_dict(serializer.data)
         except Exception:
             self.ju.create_journal_rec(
                 {

@@ -4,6 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ViewSet
 
+from apps.authen.operations.update_profile import UpdateProfile
 from apps.authen.serializers.main_pages.student_main_page_serializer import StudentMainPageSerializer
 from apps.authen.serializers.profile_serializer import (ProfileInputSerializer,
                                                         ProfileOutputSerializer, ProfileChangePasswordSerializer)
@@ -118,9 +119,6 @@ class ProfileViewSet(ViewSet):
                 ExceptionHandling.get_traceback()
             )
             return ResponseUtils().sorry_try_again_response()
-
-
-
 
     @swagger_auto_schema(
         tags=['Профиль', ],
@@ -292,26 +290,22 @@ class ProfileViewSet(ViewSet):
                 request.user.id,
                 'profile'
             )
-            save_info_proc = self.pu.set_student_profile_data(
-                prof,
-                serialize.data
+            data = {
+                'object_id': prof.object_id,
+                'django_user': prof.django_user,
+                'date_create': prof.date_create,
+                'teacher': prof.teacher
+            }
+            for k, v in serialize.data.items():
+                data[k] = v
+            update_profile_proc = UpdateProfile(
+                'StudentProfile',
+                data,
+                request
             )
-            if isinstance(save_info_proc, bool):
-                self._endpoint_rec_journal(
-                    request.user.id,
-                    SUCCESS,
-                    'Информация профиля пользователя успешно изменена',
-                    repr(serialize.data)
-                )
+            if update_profile_proc.update_profile_complete:
                 return self.respu.ok_response('Информация успешно обновлена')
             else:
-                self._endpoint_rec_journal(
-                    request.user.id,
-                    ERROR,
-                    'В процессе записи произошла системная ошибка',
-                    repr(serialize.data),
-                    save_info_proc
-                )
                 return self.respu.bad_request_response('Произошла системная ошибка, обратитесь к администратору')
         else:
             self._endpoint_rec_journal(

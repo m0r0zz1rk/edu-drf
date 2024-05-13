@@ -55,9 +55,10 @@
         height: 92vh;
     }
 
-    .adaptive-no-tab-table {
-        height: 100%;
+    .adaptive-dialog-with-tabs-div {
+        height: 60vh;
     }
+
 }
 
 @media screen and (max-width: 2560px) {
@@ -121,6 +122,10 @@
 
     .adaptive-login-button {
         width: 80%;
+    }
+
+    .adaptive-main-card-text-height {
+        height: 350px;
     }
 
     .adaptive-no-tab-table-card-text {

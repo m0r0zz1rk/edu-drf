@@ -8,6 +8,7 @@
           <div style="background-color: white; overflow: auto;" class="adaptive-no-tab-table-card-text">
             <PaginationTable
               tableTitle="Журнал событий"
+              :noTab="true"
               tableWidth="98"
               :addButton="false"
               :xlsxButton="true"

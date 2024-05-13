@@ -13,8 +13,8 @@
               align-tabs="center"
               bg-color="coko-blue"
       >
-        <v-tab class="login-tab" value="student">Обучающийся</v-tab>
-        <v-tab class="login-tab" value="coko">Сотрудник центра</v-tab>
+        <v-tab class="coko-tab" value="student">Обучающийся</v-tab>
+        <v-tab class="coko-tab" value="coko">Сотрудник центра</v-tab>
       </v-tabs>
       <v-tabs-window v-model="loginTab">
         <v-tabs-window-item value="student">
@@ -290,14 +290,6 @@ export default {
 
   .login-tabs {
     width: 100%;
-  }
-
-  .login-tab {
-    color: white;
-  }
-
-  .login-tab:hover {
-    background-color: #FF5722;
   }
 
   .login-radio-label {

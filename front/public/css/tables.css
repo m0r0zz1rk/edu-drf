@@ -1,0 +1,13 @@
+.adaptive-no-tab-table {
+    height: 100%;
+}
+
+.adaptive-tab-table {
+    height: 94%;
+}
+
+.table-row-click:hover {
+    background-color: #FF5722;
+    color: white;
+    cursor: pointer;
+}

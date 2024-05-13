@@ -4,6 +4,29 @@
     <v-text-field
       v-if="field.ui === 'input'"
       :type="field.type"
+      :v-mask="
+        ['phone', 'snils'].includes(field.ui) &&
+          field.ui === 'snils' ?
+            '###-###-### ##'
+            :
+            '+7 (###) ###-##-##'
+      "
+      v-model="localValue"
+      :label="fieldTitle && fieldTitle"
+      @change="e => onChangeEvent(field.key, localValue)"
+    />
+
+    <v-text-field
+      v-if="field.ui === 'phone'"
+      v-mask="'+7 (###) ###-##-##'"
+      v-model="localValue"
+      :label="fieldTitle && fieldTitle"
+      @change="e => onChangeEvent(field.key, localValue)"
+    />
+
+    <v-text-field
+      v-if="field.ui === 'snils'"
+      v-mask="'###-###-### ##'"
       v-model="localValue"
       :label="fieldTitle && fieldTitle"
       @change="e => onChangeEvent(field.key, localValue)"

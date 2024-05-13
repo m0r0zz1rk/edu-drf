@@ -5,17 +5,26 @@
   >
     <JournalModuleBadge :moduleName="item[header.key]" />
   </div>
+
   <div
       v-if="ui === 'journalRecStatus'"
       v-bind:class="{'v-data-table__td-value': mobileDisplay}"
   >
     <JournalRecStatusBadge :recStatus="item[header.key]" />
   </div>
+
   <div
       v-if="ui === 'journalDetailInfo'"
       v-bind:class="{'v-data-table__td-value': mobileDisplay}"
   >
     <JournalDetailInfoDialog :item="item" />
+  </div>
+
+  <div
+    v-if="ui === 'cokoCuratorGroups'"
+    v-bind:class="{'v-data-table__td-value': mobileDisplay}"
+  >
+    <CuratorGroupsField :item="item" />
   </div>
 </template>
 
@@ -23,10 +32,11 @@
 import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusBadge.vue";
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
 import JournalDetailInfoDialog from "@/components/pagination_table/dialogs/JournalDetailInfoDialog.vue";
+import CuratorGroupsField from "@/components/pagination_table/special_fields/sources/CuratorGroupsField.vue";
 
 export default {
   name: "SpecialField",
-  components: {JournalDetailInfoDialog, JournalModuleBadge, JournalRecStatusBadge},
+  components: {CuratorGroupsField, JournalDetailInfoDialog, JournalModuleBadge, JournalRecStatusBadge},
   props: {
     ui: String, // Тип поля,
     header: Object, // Заголовок пагинационной таблицы

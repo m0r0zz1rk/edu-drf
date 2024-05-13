@@ -63,7 +63,6 @@ class MainPageViewSet(viewsets.ViewSet):
     )
     def get_main_page_centre(self, request, *args, **kwargs):
         info = self.mpu.get_information(request)
-        print(info)
         serialize = CentreMainPageSerializer(data=info)
         if serialize.is_valid():
             return self.respu.ok_response_dict(serialize.data)

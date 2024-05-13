@@ -1,7 +1,7 @@
 <template>
   <v-data-table
     sticky
-    class="adaptive-no-tab-table"
+    v-bind:class="{'adaptive-no-tab-table': noTab, 'adaptive-tab-table': !(noTab)}"
     :headers="headers"
     :mobile-breakpoint="960"
     :items="recs"
@@ -34,7 +34,7 @@
             background-color: #373c59;
             color: white;
           "
-        >№</td>
+        ><b>№</b></td>
         <td
           style="
             text-align: center;
@@ -71,8 +71,11 @@
     </template>
 
     <template v-slot:item="{ item, index }">
-      <tr v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay}">
-        <td>
+      <tr
+        v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay, 'table-row-click': itemSelectEvent}"
+        @click="itemSelectEvent && itemSelectEvent(item)"
+      >
+        <td  style="text-align: center;">
           <div v-if="mobileDisplay" class="v-data-table__td-title">№</div>
           <div v-bind:class="{'v-data-table__td-value': mobileDisplay}">
             {{index + ((page-1)*pageRecCount) + 1}}
@@ -146,9 +149,15 @@ import PaginationTableSearchField from "@/components/pagination_table/Pagination
 import {useDisplay} from "vuetify";
 import specialFieldsList from "@/components/pagination_table/special_fields/SpecialFieldsList";
 import SpecialField from "@/components/pagination_table/special_fields/SpecialField.vue";
+import {no} from "vuetify/locale";
 
 export default {
   name: "PaginationTable",
+  computed: {
+    no() {
+      return no
+    }
+  },
   components: {
       SpecialField,
     PaginationTableSearchField,
@@ -160,6 +169,7 @@ export default {
   },
   props: {
     tableTitle: String, // Заголовок таблицы
+    noTab: Boolean, // Отображение таблицы в карточке без верхних табов
     tableWidth: Number, // Ширина таблицы
     addButton: Boolean, //Параметр, отвечающий за отображение кнопки "Добавить"
     xlsxButton: Boolean, // Параметр, отвечающий за отображение кнопки "Скачать"
@@ -190,6 +200,7 @@ export default {
         key - совпадение с alias из tableColumns родительской таблицы для связи заголовка и описания,
         addRequired: Проверка на обязательное заполнение при добавлении/редактировании записи
       }*/
+    itemSelectEvent: Function, // Событие, вызываемое при выборе строки в таблице
   },
   data() {
     return {

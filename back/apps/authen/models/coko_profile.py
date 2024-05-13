@@ -33,6 +33,10 @@ class CokoProfile(BaseTable):
         blank=True,
         verbose_name='Отчество'
     )
+    curator_groups = models.BooleanField(
+        default=False,
+        verbose_name='Отображать только учебные группы как куратора'
+    )
 
     def __str__(self):
         try:

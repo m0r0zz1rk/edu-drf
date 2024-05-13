@@ -11,17 +11,22 @@
                     bg-color="coko-blue"
                     show-arrows
             >
-              <v-tab class="guides-tab" value="user">Пользователи</v-tab>
-              <v-tab class="guides-tab" value="state">Государства</v-tab>
-              <v-tab class="guides-tab" value="mo">МО</v-tab>
-              <v-tab class="guides-tab" value="oo_type">Типы ОО</v-tab>
-              <v-tab class="guides-tab" value="oo">ОО</v-tab>
-              <v-tab class="guides-tab" value="audience_category">Категории слушателей</v-tab>
-              <v-tab class="guides-tab" value="event_type">Типы мероприятий</v-tab>
-              <v-tab class="guides-tab" value="position_category">Категории должностей</v-tab>
-              <v-tab class="guides-tab" value="position">Должности</v-tab>
+              <v-tab class="coko-tab" value="user">Обучающиеся</v-tab>
+              <v-tab class="coko-tab" value="coko">Сотрудники</v-tab>
+              <v-tab class="coko-tab" value="state">Государства</v-tab>
+              <v-tab class="coko-tab" value="mo">МО</v-tab>
+              <v-tab class="coko-tab" value="oo_type">Типы ОО</v-tab>
+              <v-tab class="coko-tab" value="oo">ОО</v-tab>
+              <v-tab class="coko-tab" value="audience_category">Категории слушателей</v-tab>
+              <v-tab class="coko-tab" value="event_type">Типы мероприятий</v-tab>
+              <v-tab class="coko-tab" value="position_category">Категории должностей</v-tab>
+              <v-tab class="coko-tab" value="position">Должности</v-tab>
 
             </v-tabs>
+
+            <GuideUser v-if="guidesTab === 'user'" />
+
+            <GuideCoko v-if="guidesTab === 'coko'" />
           </div>
         </v-card-text>
       </v-card>
@@ -31,10 +36,12 @@
 
 <script>
 import LkPage from "@/components/LkPage.vue";
+import GuideUser from "@/views/administrator/guides/GuideUser.vue";
+import GuideCoko from "@/views/administrator/guides/GuideCoko.vue";
 
 export default {
   name: "Guides",
-  components: {LkPage},
+  components: {GuideCoko, GuideUser, LkPage},
   props: {
     usePreLoader: Function,
   },
@@ -50,11 +57,5 @@ export default {
 </script>
 
 <style scoped>
-.guides-tab {
-  color: white;
-}
 
-.guides-tab:hover {
-  background-color: #FF5722;
-}
 </style>

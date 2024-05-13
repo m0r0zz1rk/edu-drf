@@ -37,7 +37,6 @@ class JournalFilter(filters.FilterSet):
             if display == value:
                 filter_value = source
                 break
-        print(filter_value)
         queryset = queryset.filter(module=filter_value)
         return queryset
 
