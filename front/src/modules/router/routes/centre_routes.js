@@ -3,8 +3,15 @@ import isAuthenticated from "../permissions/is_authenticated.js";
 
 import Journal from "../../../views/administrator/Journal.vue";
 import Guides from "@/views/administrator/Guides.vue";
+import Users from "@/views/administrator/Users.vue";
 
 const centre_routes = [
+    {
+      path: '/centre/users',
+      name: 'Users',
+      component: Users,
+      beforeEnter: [isAuthenticated, isAdministrator]
+    },
     {
         path: '/centre/guides',
         name: 'Guides',

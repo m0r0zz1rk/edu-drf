@@ -28,8 +28,8 @@ class DeleteDataBaseRecord(MainProcessing):
                     if info in self.process_data['model_info'].keys():
                         counter += 1
                 if counter == 2:
-                    if 'object_id' in self.process_data.keys():
-                        if ValidateUtils.validate_uuid(self.process_data['object_id']):
+                    if 'object_id' in self.process_data['object'].keys():
+                        if ValidateUtils.validate_uuid(self.process_data['object']['object_id']):
                             return True
             return False
         except Exception:
@@ -45,7 +45,12 @@ class DeleteDataBaseRecord(MainProcessing):
             self.process_data['model_info']['model_name']
         )
         try:
-            self.model.objects.get(object_id=self.process_data['object']['id']).delete()
+            if 'id' in self.process_data['object']:
+                self.model.objects.get(object_id=self.process_data['object']['id']).delete()
+            elif 'object_id' in self.process_data['object']:
+                self.model.objects.get(object_id=self.process_data['object']['object_id']).delete()
+            else:
+                pass
             return None
         except Exception:
             self._main_process_error(ExceptionHandling.get_traceback())

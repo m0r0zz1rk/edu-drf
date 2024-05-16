@@ -1,0 +1,8 @@
+.alert-visible {
+    z-index: 100;
+}
+
+.alert-hidden {
+    display: none;
+    z-index: 0;
+}

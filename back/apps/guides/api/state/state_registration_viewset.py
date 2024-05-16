@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from apps.commons.pagination import CustomPagination
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
-from apps.guides.filters.state_filter import StateFilter
+from apps.guides.filters.name_field_filter import NameFieldFilter
 from apps.guides.serializers.state.state_registration_serializer import state_model, StateRegistrationSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
@@ -18,13 +18,13 @@ class StateRegistrationViewSet(viewsets.ModelViewSet):
     queryset = state_model.objects.all().order_by('name')
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]
-    filterset_class = StateFilter
+    filterset_class = NameFieldFilter
 
     ju = JournalUtils()
     respu = ResponseUtils()
 
     @swagger_auto_schema(
-        tags=['Справочник "Государства"', ],
+        tags=['Регистрация', ],
         operation_description="Получение списка государств",
         responses={
             '400': 'Ошибка при получении списка',

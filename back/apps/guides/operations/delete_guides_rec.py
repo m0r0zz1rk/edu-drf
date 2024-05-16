@@ -7,4 +7,4 @@ class DeleteGuidesRec(BaseOperationGuide):
 
     def action(self, process_data):
         proc = DeleteDataBaseRecord(process_data)
-        return proc.process_completed
+        self.process_completed = proc.process_completed

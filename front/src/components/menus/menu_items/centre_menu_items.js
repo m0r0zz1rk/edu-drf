@@ -1,5 +1,11 @@
 const centreMenuItems = [
   {
+    'icon': 'mdi-account-group',
+    'title': 'Пользователи',
+    'link': '/centre/users',
+    'value': 'users'
+  },
+  {
     'icon': 'mdi-database',
     'title': 'Справочники',
     'link': '/centre/guides',

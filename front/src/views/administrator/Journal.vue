@@ -59,7 +59,7 @@ export default {
           'key': 'description'
         },
         {
-          'title': 'Детальная информация',
+          'title': 'Подробно',
           'key': 'journalDetailInfo',
         },
       ],

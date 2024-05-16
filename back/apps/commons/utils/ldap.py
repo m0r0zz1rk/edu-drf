@@ -1,8 +1,11 @@
 import codecs
+from typing import Optional
 
+from django.contrib.auth.models import User
 from ldap3 import Server, Connection, SUBTREE
 from ldap3.core.exceptions import LDAPSocketOpenError
 
+from apps.commons.utils.ad.ad_centre import AdCentreUtils
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.settings import SettingsUtils
 from apps.journal.consts.journal_modules import COMMON
@@ -13,6 +16,15 @@ from apps.journal.utils.journal_utils import JournalUtils
 class LdapUtils:
     """Класс методов для получения данных из Active Directory COKO"""
 
+    high_positions = [
+        'Руководитель',
+        'руководитель',
+        'Начальник',
+        'начальник',
+        'Заместитель',
+        'заместитель',
+        'Главный бухгалтер'
+    ]
     su = SettingsUtils()
     ju = JournalUtils()
     AD_SERVER = AD_USER = AD_PASSWORD = AD_SEARCH_TREE = conn = None
@@ -84,3 +96,101 @@ class LdapUtils:
                     return ''
                 return users[0][attribute].value
         return ''
+
+    def set_ad_centres(self):
+        """Получение подразделений уровня Центра из AD COKO"""
+        try:
+            self.conn.bind()
+            self.conn.search(
+                'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
+                '(cn=centre_*)',
+                SUBTREE,
+                attributes=['ObjectGUID', 'DisplayName']
+            )
+            deps = self.conn.entries
+            for dep in deps:
+                AdCentreUtils().add_ad_centre(
+                    {
+                        'display_name': dep.DisplayName,
+                        'object_guid': dep.ObjectGUID
+                    }
+                )
+        except Exception:
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Получение подразделений уровня Центр из AD',
+                    'module': COMMON,
+                    'status': ERROR,
+                    'description': 'Ошибка в процессе получения'
+                },
+                repr({
+                    'AD_SERVER': self.AD_SERVER,
+                    'AD_USER': self.AD_USER,
+                    'AD_PASSWORD': self.AD_PASSWORD,
+                }),
+                ExceptionHandling.get_traceback()
+            )
+
+    def get_ad_user_centre(self, user: User) -> Optional[str]:
+        """
+        Получение подразделения-центра из AD сотрудника ЦОКО и запись в модель AdCentreCokoUser
+        :param user: Пользователь Django
+        :return:
+        """
+        try:
+            self.conn.bind()
+            self.conn.search(
+                self.AD_SEARCH_TREE,
+                f'(sAMAccountName={user.username})',
+                SUBTREE,
+                attributes=['department', 'title', 'manager']
+            )
+            data = self.conn.entries
+            if not any(s in str(data[0].title) for s in self.high_positions):
+                self.conn.search(
+                    self.AD_SEARCH_TREE,
+                    f"(distinguishedName={str(data[0].manager)})",
+                    SUBTREE,
+                    attributes=['manager', 'department', 'title'])
+                data = self.conn.entries
+                if any(s in str(data[0].title) for s in ['Заведующий', 'заведующий']):
+                    self.conn.search(
+                        self.AD_SEARCH_TREE,
+                        f"(distinguishedName={data[0].manager})",
+                        SUBTREE,
+                        attributes=['manager', 'title', 'department']
+                    )
+                    data = self.conn.entries
+                    if not any(s in str(data[0].title) for s in self.high_positions):
+                        self.conn.search(
+                            self.AD_SEARCH_TREE,
+                            f"(distinguishedName={data[0].manager})",
+                            SUBTREE,
+                            attributes=['department']
+                        )
+                        data = self.conn.entries
+            self.conn.search(
+                'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
+                f"(info={data[0].department})",
+                SUBTREE,
+                attributes=['displayName']
+            )
+            data = self.conn.entries
+            return str(data[0].displayName)
+
+        except Exception:
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Получение подразделения сотрудника из AD',
+                    'module': COMMON,
+                    'status': ERROR,
+                    'description': 'Ошибка в процессе получения'
+                },
+                repr({
+                    'AD_SERVER': self.AD_SERVER,
+                    'AD_USER': self.AD_USER,
+                    'AD_PASSWORD': self.AD_PASSWORD,
+                }),
+                ExceptionHandling.get_traceback()
+            )
+

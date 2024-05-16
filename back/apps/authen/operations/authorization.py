@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login
 
 from apps.authen.utils.profile import ProfileUtils
 from apps.commons.abc.main_processing import MainProcessing
+from apps.commons.utils.ad.ad_centre import AdCentreUtils
+from apps.commons.utils.ad.ad_centre_coko_user import AdCentreCokoUserUtils
 from apps.commons.utils.django.user import UserUtils
 from apps.commons.utils.ldap import LdapUtils
 from apps.commons.utils.token import TokenUtils
@@ -26,6 +28,7 @@ class Authorization(MainProcessing):
     uu = UserUtils()
     pu = ProfileUtils()
     lu = LdapUtils()
+    accu = AdCentreCokoUserUtils()
     request = username = auth_error = auth_user = auth_data = None
 
     def _validate_process_data(self) -> Union[bool, str]:
@@ -115,6 +118,11 @@ class Authorization(MainProcessing):
                 self.auth_user.id,
                 'profile'
             )
+            if self.auth_user.is_staff and not self.auth_user.is_superuser:
+                self.accu.add_rec(
+                    self.auth_user,
+                    self.lu.get_ad_user_centre(self.auth_user)
+                )
             if profile.surname == 'Фамилия':
                 self.pu.set_coko_profile_data(
                     profile,

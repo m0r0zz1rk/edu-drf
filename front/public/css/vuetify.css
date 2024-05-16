@@ -1,3 +1,4 @@
-.v-selection-control__wrapper {
-    margin-left: 45%;
+.v-switch .v-selection-control {
+    display: flex;
+    justify-content: center;
 }

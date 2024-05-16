@@ -11,8 +11,7 @@
                     bg-color="coko-blue"
                     show-arrows
             >
-              <v-tab class="coko-tab" value="user">Обучающиеся</v-tab>
-              <v-tab class="coko-tab" value="coko">Сотрудники</v-tab>
+
               <v-tab class="coko-tab" value="state">Государства</v-tab>
               <v-tab class="coko-tab" value="mo">МО</v-tab>
               <v-tab class="coko-tab" value="oo_type">Типы ОО</v-tab>
@@ -24,9 +23,22 @@
 
             </v-tabs>
 
-            <GuideUser v-if="guidesTab === 'user'" />
+            <GuideState v-if="guidesTab === 'state'" />
 
-            <GuideCoko v-if="guidesTab === 'coko'" />
+            <GuideMo v-if="guidesTab === 'mo'" />
+
+            <GuideOoType v-if="guidesTab === 'oo_type'" />
+
+            <GuideOo v-if="guidesTab === 'oo'" />
+
+            <GuideAudienceCategory v-if="guidesTab === 'audience_category'" />
+
+            <GuideEventType v-if="guidesTab === 'event_type'" />
+
+            <GuidePositionCategory v-if="guidesTab === 'position_category'" />
+
+            <GuidePosition v-if="guidesTab === 'position'" />
+
           </div>
         </v-card-text>
       </v-card>
@@ -36,18 +48,27 @@
 
 <script>
 import LkPage from "@/components/LkPage.vue";
-import GuideUser from "@/views/administrator/guides/GuideUser.vue";
-import GuideCoko from "@/views/administrator/guides/GuideCoko.vue";
+import GuideState from "@/views/administrator/guides/GuideState.vue";
+import GuideMo from "@/views/administrator/guides/GuideMo.vue";
+import GuideOoType from "@/views/administrator/guides/GuideOoType.vue";
+import GuideOo from "@/views/administrator/guides/GuideOo.vue";
+import GuideAudienceCategory from "@/views/administrator/guides/GuideAudienceCategory.vue";
+import GuideEventType from "@/views/administrator/guides/GuideEventType.vue";
+import GuidePositionCategory from "@/views/administrator/guides/GuidePositionCategory.vue";
+import GuidePosition from "@/views/administrator/guides/GuidePosition.vue";
 
 export default {
   name: "Guides",
-  components: {GuideCoko, GuideUser, LkPage},
+  components: {
+    GuidePosition,
+    GuidePositionCategory,
+    GuideEventType, GuideAudienceCategory, GuideOo, GuideOoType, GuideMo, GuideState, LkPage},
   props: {
     usePreLoader: Function,
   },
   data() {
     return {
-      guidesTab: 'user'
+      guidesTab: 'state'
     }
   },
   mounted() {

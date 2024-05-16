@@ -7,4 +7,4 @@ class AddUpdateGuidesRec(BaseOperationGuide):
 
     def action(self, process_data):
         proc = AddUpdateDataBaseRecord(process_data)
-        return proc.process_completed
+        self.process_completed = proc.process_completed

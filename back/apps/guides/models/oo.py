@@ -18,7 +18,7 @@ class Oo(BaseTable):
         blank=True,
         null=False,
         default='',
-        verbose_name='Кратное наименование'
+        verbose_name='Краткое наименование'
     )
     full_name = models.CharField(
         max_length=1000,

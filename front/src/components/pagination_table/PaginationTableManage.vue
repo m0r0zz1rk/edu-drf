@@ -5,7 +5,14 @@
   >
     <v-toolbar-title
       bg-color="coko-blue"
-    >{{ tableTitle }}</v-toolbar-title>
+    >
+
+      {{ tableTitle }}
+
+      <template v-if="itemsCount > 0">
+        ({{itemsCount}} эл.)
+      </template>
+    </v-toolbar-title>
 
     <v-spacer></v-spacer>
 
@@ -53,8 +60,10 @@
                                md="4"
                                sm="6"
                         >
-                            <PaginationTableSearchField
+                            <PaginationTableBaseField
+                                    v-if="field.key !== 'actions'"
                                     :useInTableManage="true"
+                                    :checkRequired="false"
                                     :field="field"
                                     :fieldTitle = "tableHeaders.filter((header) => header.key === field.key)[0].title"
                                     :onChangeEvent="onChangeEvent"
@@ -77,6 +86,10 @@
 
     <PaginationTableAddDialog
       v-if="addButton && !(foreignKey)"
+      :tableHeaders="tableHeaders"
+      :fieldsArray="fieldsArray"
+      :addRecURL="addRecURL"
+      :getRecs="getRecs"
       :mobileDisplay="mobileDisplay"
     />
 
@@ -84,7 +97,6 @@
       v-if="foreignKey"
       :icon="mobileDisplay && 'mdi-open-in-new'"
       :prepend-icon="!(mobileDisplay) && 'mdi-open-in-new'"
-      color="coko-blue"
       :text="!(mobileDisplay) && 'Перейти к таблице'"
       @click="nextPage()"
     />
@@ -94,16 +106,19 @@
 
 <script>
 import PaginationTableAddDialog from "@/components/pagination_table/dialogs/PaginationTableAddDialog.vue";
-import PaginationTableSearchField from "@/components/pagination_table/PaginationTableSearchField.vue";
+import PaginationTableBaseField from "@/components/pagination_table/PaginationTableBaseField.vue";
 
 export default {
   name: "PaginationTableManage",
-  components: {PaginationTableSearchField, PaginationTableAddDialog},
+  components: {PaginationTableBaseField, PaginationTableAddDialog},
   props: {
     tableTitle: String, // Заголовок таблицы
+    itemsCount: Number, // Количество записей в базе данных
     foreignKey: String, // FK таблица
     tableTabUrl: String, //URL перехода по кнопку "Перейти к таблице (для FK таблицы)"
     addButton: Boolean, // Параметр, отвечающий за отображение кнопки "Добавить"
+    addRecURL: String, // URL эндпоинта для добавления новой записи
+    getRecs: Function, // Функция для получения записей с backend
     xlsxButton: Boolean, // Параметр, отвечающий за отображение кнопки "Скачать"
     xlsxDownload: Function, // Событий, вызываемое для выгрузки записей таблцы в Excel
     searchShowEvent: Function, // Функция для изменения параметра отображения поисковых полей,

@@ -1,27 +1,25 @@
-from django.urls import path
+from apps.guides.url_patterns.audience_category_urlpatterns import audience_category_urlpatterns
+from apps.guides.url_patterns.coko_urlpatterns import coko_urlpatterns
+from apps.guides.url_patterns.event_type_urlpatterns import event_type_urlpatterns
+from apps.guides.url_patterns.mo_urlpatterns import mo_urlpatterns
+from apps.guides.url_patterns.oo_type_urlpatterns import oo_type_urlpatterns
+from apps.guides.url_patterns.oo_urlpatterns import oo_urlpatterns
+from apps.guides.url_patterns.position_category_urlpatterns import position_category_urlpatterns
+from apps.guides.url_patterns.position_urlpatterns import position_urlpatterns
+from apps.guides.url_patterns.state.state_administrator_urlpatterns import state_administrator_urlpatterns
+from apps.guides.url_patterns.state.state_registration_urlpatterns import state_registration_urlpatterns
+from apps.guides.url_patterns.user_urlpatterns import user_urlpatterns
 
-from apps.guides.api.coko_viewset import CokoViewSet
-from apps.guides.api.state.state_registration_viewset import StateRegistrationViewSet
-from apps.guides.api.user_viewset import UserViewSet
-
-state_urlpatterns = [
-    path('states/', StateRegistrationViewSet.as_view({'get': 'list'}))
-]
-
-user_urlpatterns = [
-    path('users/', UserViewSet.as_view({'get': 'list'})),
-    path('user/<uuid:object_id>/', UserViewSet.as_view({'get': 'retrieve'})),
-    path('user/check_phone/', UserViewSet.as_view({'post': 'check_user_phone'})),
-    path('user/check_email/', UserViewSet.as_view({'post': 'check_user_email'})),
-    path('user/check_snils/', UserViewSet.as_view({'post': 'check_user_snils'})),
-    path('user/update/', UserViewSet.as_view({'post': 'update'})),
-    path('user/password_change/', UserViewSet.as_view({'post': 'change_user_password'})),
-]
-
-coko_urlpatterns = [
-    path('cokos/', CokoViewSet.as_view({'get': 'list'})),
-    path('coko/change_curator_groups/', CokoViewSet.as_view({'post': 'change_curator_groups'})),
-]
-
-urlpatterns = state_urlpatterns + user_urlpatterns + coko_urlpatterns
-
+urlpatterns = (
+        state_registration_urlpatterns +
+        state_administrator_urlpatterns +
+        user_urlpatterns +
+        coko_urlpatterns +
+        mo_urlpatterns +
+        oo_type_urlpatterns +
+        oo_urlpatterns +
+        audience_category_urlpatterns +
+        event_type_urlpatterns +
+        position_category_urlpatterns +
+        position_urlpatterns
+)

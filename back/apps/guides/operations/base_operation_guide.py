@@ -9,7 +9,7 @@ class BaseOperationGuide(ABC):
 
     model_name = ''
     object_data = request = None
-    error = False
+    error = process_completed = False
 
     def __init__(self, model_name: str, object_data: dict, request=None):
         """

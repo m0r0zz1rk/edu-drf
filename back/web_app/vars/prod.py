@@ -19,3 +19,4 @@ DATABASES = {
     }
 }
 
+MEDIA_ROOT = env.str('MEDIA_ROOT')

@@ -1,12 +1,38 @@
+from django.apps import apps
 from django.contrib import admin
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from import_export.fields import Field
+from import_export.widgets import ForeignKeyWidget
 
 from apps.guides.models import Oo
 
+mo_model = apps.get_model('guides', 'Mo')
+
+oo_type_model = apps.get_model('guides', 'OoType')
+
+
+class OoResources(resources.ModelResource):
+    """Класс описания ресурса для загрузки/выгрузки в Excel"""
+    mo = Field(
+        attribute="mo",
+        widget=ForeignKeyWidget(mo_model, "name")
+    )
+    oo_type = Field(
+        attribute="oo_type",
+        widget=ForeignKeyWidget(oo_type_model, "name")
+    )
+
+    class Meta:
+        model = Oo
+        import_id_fields = ['object_id', ]
+        exclude = ['date_create', ]
+
 
 @admin.register(Oo)
-class OoAdmin(admin.ModelAdmin):
+class OoAdmin(ImportExportModelAdmin):
     """Класс для отображения образовательных организаций в административной панели"""
-
+    resource_class = OoResources
     list_display = ('mo_name', 'short_name', 'full_name', 'oo_type_name', 'form')
     list_filter = ('mo', 'oo_type')
     search_fields = ('short_name', 'full_name', 'form')

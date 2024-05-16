@@ -13,9 +13,12 @@
       <PaginationTableManage
         ref="tableManage"
         :tableTitle="tableTitle"
+        :itemsCount="itemsCount"
         :foreignKey="foreignKey"
         :tableTabUrl="tableTabUrl"
         :addButton="addButton"
+        :addRecURL="addRecURL"
+        :getRecs="getRecs"
         :xlsxButton="xlsxButton"
         :xlsxDownload="xlsxDownload"
         :searchShowEvent="changeSearchShow"
@@ -50,12 +53,14 @@
             {{column.title}}
           </b>
 
-          <template v-if="isSorted(column)">
+          <template v-if="column.key !== 'actions' && isSorted(column)">
             <v-icon :icon="getSortIcon(column)"></v-icon>
           </template>
 
-          <PaginationTableSearchField
+          <PaginationTableBaseField
+            v-if="column.key !== 'actions'"
             :ref="'searchField_'+column.key"
+            :checkRequired="false"
             :useInTableManage="false"
             :field="fieldsArray.filter((field) => field.key === column.key)[0]"
             :onChangeEvent="searchRecs"
@@ -82,21 +87,61 @@
           </div>
         </td>
         <td v-for="header in tableHeaders" style="text-align: center;">
-          <div v-if="mobileDisplay" class="v-data-table__td-title">{{header.title}}</div>
-          <div v-if="specialFieldsList.includes(headerUi(header.key))">
-            <SpecialField
-              :ui="headerUi(header.key)"
-              :header="header"
-              :item="item"
-              :mobileDisplay="mobileDisplay"
-            />
-          </div>
-          <div
-            v-if="!(specialFieldsList.includes(headerUi(header.key)))"
-            v-bind:class="{'v-data-table__td-value': mobileDisplay}"
-          >
-            {{ item[header.key] }}
-          </div>
+
+            <div v-if="mobileDisplay" class="v-data-table__td-title">{{header.title}}</div>
+
+          <template v-if="header.key !== 'actions'">
+
+              <div v-if="specialFieldsList.includes(headerUi(header.key))">
+                  <SpecialField
+                          :ui="headerUi(header.key)"
+                          :header="header"
+                          :item="item"
+                          :mobileDisplay="mobileDisplay"
+                  />
+              </div>
+
+              <div
+                      v-if="!(specialFieldsList.includes(headerUi(header.key)))"
+                      v-bind:class="{'v-data-table__td-value': mobileDisplay}"
+              >
+                  <p v-if="mobileDisplay">
+                    {{ item[header.key].slice(0, 30) }}
+                    <template v-if="item[header.key].length > 30">...</template>
+                  </p>
+
+                  <p v-if="!mobileDisplay">
+                    {{ item[header.key] }}
+                  </p>
+              </div>
+
+          </template>
+
+          <template v-if="header.key === 'actions'">
+
+              <div
+                      v-if="!(specialFieldsList.includes(headerUi(header.key)))"
+                      v-bind:class="{'v-data-table__td-value': mobileDisplay}"
+              >
+
+                  <v-icon
+                    icon="mdi-pencil"
+                    color="coko-blue"
+                    @click="showEditDialog(item)"
+                  />
+
+                  &nbsp;&nbsp;
+
+                <v-icon
+                    icon="mdi-delete"
+                    color="coko-blue"
+                    @click="deleteItem(item.object_id)"
+                />
+
+              </div>
+          </template>
+
+
         </td>
       </tr>
     </template>
@@ -134,6 +179,16 @@
     </template>
 
   </v-data-table>
+
+  <PaginationTableEditDialog
+    ref="editDialog"
+    :tableHeaders="tableHeaders"
+    :fieldsArray="fieldsArray"
+    :editRecURL="editRecURL"
+    :getRecs="getRecs"
+    :mobileDisplay="mobileDisplay"
+  />
+
 </template>
 
 <script>
@@ -144,23 +199,20 @@ import {xlsxDownloadFunction} from "@/commons/xlsx";
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
 import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusBadge.vue";
 import PaginationTableAddDialog from "@/components/pagination_table/dialogs/PaginationTableAddDialog.vue";
-import JournalDetailInfoDialog from "@/components/pagination_table/dialogs/JournalDetailInfoDialog.vue";
-import PaginationTableSearchField from "@/components/pagination_table/PaginationTableSearchField.vue";
+import JournalDetailInfoDialog from "@/components/dialogs/JournalDetailInfoDialog.vue";
+import PaginationTableBaseField from "@/components/pagination_table/PaginationTableBaseField.vue";
 import {useDisplay} from "vuetify";
 import specialFieldsList from "@/components/pagination_table/special_fields/SpecialFieldsList";
 import SpecialField from "@/components/pagination_table/special_fields/SpecialField.vue";
 import {no} from "vuetify/locale";
+import PaginationTableEditDialog from "@/components/pagination_table/dialogs/PaginationTableEditDialog.vue";
 
 export default {
   name: "PaginationTable",
-  computed: {
-    no() {
-      return no
-    }
-  },
   components: {
-      SpecialField,
-    PaginationTableSearchField,
+      PaginationTableEditDialog,
+    SpecialField,
+    PaginationTableBaseField,
     JournalDetailInfoDialog,
     PaginationTableAddDialog,
     JournalRecStatusBadge,
@@ -177,7 +229,9 @@ export default {
     openTableEvent: Function, // Событий, вызываемое при выборе записи в FK таблице
     tableTabUrl: String, // URL для перехода по кнопке "Перейти к таблице" в FK таблице
     getRecsURL: String, // URL эндпоинта на получение записей с backend
-    addUpdateRecURL: String, // URL эндпоинта для добавления/обновления записи на backend
+    addRecURL: String, // URL эндпоинта на добавление записи
+    editRecURL: String, // URL эндпоинта на обновление записи
+    delRecURL: String, // URL эндпоинта на удаление записи
     tableHeaders: Array, /* Список заголовков:
       {
         title - Наименование столбца в таблице,
@@ -216,7 +270,8 @@ export default {
       pageRecCount: 0,
       mobileDisplay: useDisplay().smAndDown,
       page: 1,
-      pageTotal: 0
+      pageTotal: 0,
+      itemsCount: 0
     }
   },
   methods: {
@@ -258,7 +313,7 @@ export default {
       this.tableLoading = true
       let start = 0
       if (this.page !== 1) {
-        start = ((this.page-1)*this.pageRecCount)+1
+        start = (this.page-1)*this.pageRecCount
       }
       let url = this.getRecsURL+'?size='+this.pageRecCount+'&start='+start+this.searchString
       if (this.filterString.length > 0) {
@@ -271,6 +326,7 @@ export default {
         null
       )
       if (getRecsRequest.results) {
+        this.itemsCount = getRecsRequest.count
         this.pageTotal = Math.ceil(getRecsRequest.count/this.pageRecCount)
         this.recs = getRecsRequest.results
       } else {
@@ -298,8 +354,39 @@ export default {
     },
     changeSearchShow() {
       this.tableHeaders.map((header) => {
-        this.$refs['searchField_'+header.key][0].showField = !(this.$refs['searchField_'+header.key][0].showField)
+        if (header.key !== 'actions') {
+          this.$refs['searchField_'+header.key][0].showField = !(this.$refs['searchField_'+header.key][0].showField)
+        }
       })
+    },
+    showEditDialog(item) {
+        this.$refs.editDialog.editedItem = item
+        this.$refs.editDialog.editItemDialog = true
+    },
+    async deleteItem(object_id) {
+      if (confirm('Вы уверены, что хотите удалить запись?')) {
+        let deleteRequest = await apiRequest(
+            this.delRecURL+object_id+'/',
+            'DELETE',
+            true,
+            null
+        )
+        if (deleteRequest.error) {
+          showAlert(
+              'error',
+              'Удаление записи',
+              deleteRequest.error
+          )
+        }
+        if (deleteRequest.success) {
+          showAlert(
+              'success',
+              'Удаление записи',
+              deleteRequest.success
+          )
+          this.getRecs()
+        }
+      }
     }
   },
   mounted() {
@@ -318,7 +405,6 @@ export default {
       } else {
         this.page = 1
       }
-
     }
   }
 }

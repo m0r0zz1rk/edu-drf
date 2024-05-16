@@ -31,7 +31,7 @@
 <script>
 import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusBadge.vue";
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
-import JournalDetailInfoDialog from "@/components/pagination_table/dialogs/JournalDetailInfoDialog.vue";
+import JournalDetailInfoDialog from "@/components/dialogs/JournalDetailInfoDialog.vue";
 import CuratorGroupsField from "@/components/pagination_table/special_fields/sources/CuratorGroupsField.vue";
 
 export default {

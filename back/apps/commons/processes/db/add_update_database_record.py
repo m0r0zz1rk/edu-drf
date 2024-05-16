@@ -137,12 +137,16 @@ class AddUpdateDataBaseRecord(MainProcessing):
                         object_id=object_id,
                         defaults=self.process_data['object']
                     )
-                else:
+                elif 'id' in self.process_data['object'].keys():
                     id = self.process_data['object']['id']
                     del self.process_data['object']['id']
                     self.model.objects.update_or_create(
                         id=id,
                         defaults=self.process_data['object']
+                    )
+                else:
+                    self.model.objects.update_or_create(
+                        **self.process_data['object']
                     )
                 return None
             except Exception:
