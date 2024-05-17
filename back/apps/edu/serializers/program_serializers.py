@@ -19,7 +19,7 @@ class ProgramListSerializer(ProgramBaseSerializer):
     order_number = serializers.SerializerMethodField(
         label='Номер приказа'
     )
-    date_number = serializers.SerializerMethodField(
+    order_date = serializers.SerializerMethodField(
         label='Дата приказа'
     )
 
@@ -43,4 +43,4 @@ class ProgramListSerializer(ProgramBaseSerializer):
 
     class Meta:
         model = program_model
-        fields = ProgramBaseSerializer.Meta.fields + ['department', 'order_number', 'date_number']
+        fields = ProgramBaseSerializer.Meta.fields + ['department', 'order_number', 'order_date']

@@ -5,6 +5,7 @@ import { VDateInput } from 'vuetify/labs/VDateInput'
 import {createI18n, useI18n} from "vue-i18n";
 import {createVueI18nAdapter} from "vuetify/locale/adapters/vue-i18n";
 import {ru} from "vuetify/locale";
+import {VNumberInput} from "vuetify/labs/components";
 
 const cokoTheme = {
   dark: false,
@@ -44,6 +45,7 @@ export const vuetify = createVuetify({
   },
   components: {
     VDateInput,
+    VNumberInput,
   },
   theme: {
     defaultTheme: 'cokoTheme',

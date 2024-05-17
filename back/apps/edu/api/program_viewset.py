@@ -8,10 +8,11 @@ from apps.commons.pagination import CustomPagination
 from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
-from apps.guides.filters.coko_filter import CokoFilter
-from apps.guides.serializers.coko_serializers import coko_profile_model, CokoSerializer, \
+from apps.edu.filters.program import ProgramFilter
+from apps.edu.serializers.program_serializers import ProgramListSerializer, program_model
+from apps.guides.serializers.coko_serializers import CokoSerializer, \
     CokoChangeCuratorGroupsSerializer
-from apps.journal.consts.journal_modules import GUIDES
+from apps.journal.consts.journal_modules import GUIDES, EDU
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
 from apps.journal.utils.journal_utils import JournalUtils
 
@@ -23,19 +24,19 @@ class ProgramViewSet(viewsets.ModelViewSet):
     pu = ProfileUtils()
     respu = ResponseUtils()
 
-    queryset = coko_profile_model.objects.all().order_by('surname', 'name', 'patronymic')
-    serializer_class = CokoSerializer
+    queryset = program_model.objects.all().order_by('-date_create')
+    serializer_class = ProgramListSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]
-    filterset_class = CokoFilter
+    filterset_class = ProgramFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Сотрудники"', ],
-        operation_description="Получение списка пользователей",
+        tags=['Учебная часть. ДПП', ],
+        operation_description="Получение списка ДПП",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
             '400': 'Ошибка при получении списка',
-            '200': CokoSerializer(many=True)
+            '200': ProgramListSerializer(many=True)
         }
     )
     def list(self, request, *args, **kwargs):
@@ -51,9 +52,9 @@ class ProgramViewSet(viewsets.ModelViewSet):
             self.ju.create_journal_rec(
                 {
                     'source': 'Внешний запрос',
-                    'module': GUIDES,
+                    'module': EDU,
                     'status': ERROR,
-                    'description': 'Ошибка при получении списка сотрудников'
+                    'description': 'Ошибка при получении списка ДПП'
                 },
                 '-',
                 ExceptionHandling.get_traceback()

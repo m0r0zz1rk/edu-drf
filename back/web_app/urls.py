@@ -14,13 +14,15 @@ media_root = du.get_parameter_from_settings('MEDIA_ROOT')
 urlpatterns = [
     path('backend/admin/', admin.site.urls),
     path('backend/api/v1/admins/', include('apps.admins.urls')),
-    #path('api/v1/applications/', include('apps.applications.urls')),
+    #path('api/v1/applications/', include('apps.applications.url_patterns')),
     path('backend/api/v1/auth/', include('apps.authen.urls')),
+    path('backend/api/v1/commons/', include('apps.commons.urls')),
+    path('backend/api/v1/edu/', include('apps.edu.urls')),
     path('backend/api/v1/guides/', include('apps.guides.urls')),
     path('backend/api/v1/journal/', include('apps.journal.urls')),
-    #path('api/v1/reports/', include('apps.reports.urls')),
-    #path('api/v1/users/', include('apps.users.urls')),
-    #path('api/v1/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    #path('api/v1/reports/', include('apps.reports.url_patterns')),
+    #path('api/v1/users/', include('apps.users.url_patterns')),
+    #path('api/v1/password_reset/', include('django_rest_passwordreset.url_patterns', namespace='password_reset')),
 ]
 
 urlpatterns += static(static_url, document_root=static_root)

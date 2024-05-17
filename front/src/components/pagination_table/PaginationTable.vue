@@ -17,6 +17,7 @@
         :foreignKey="foreignKey"
         :tableTabUrl="tableTabUrl"
         :addButton="addButton"
+        :addSpecialFunction="addSpecialFunction"
         :addRecURL="addRecURL"
         :getRecs="getRecs"
         :xlsxButton="xlsxButton"
@@ -199,7 +200,7 @@ import {xlsxDownloadFunction} from "@/commons/xlsx";
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
 import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusBadge.vue";
 import PaginationTableAddDialog from "@/components/pagination_table/dialogs/PaginationTableAddDialog.vue";
-import JournalDetailInfoDialog from "@/components/dialogs/JournalDetailInfoDialog.vue";
+import JournalDetailInfoDialog from "@/components/dialogs/journal/JournalDetailInfoDialog.vue";
 import PaginationTableBaseField from "@/components/pagination_table/PaginationTableBaseField.vue";
 import {useDisplay} from "vuetify";
 import specialFieldsList from "@/components/pagination_table/special_fields/SpecialFieldsList";
@@ -224,6 +225,7 @@ export default {
     noTab: Boolean, // Отображение таблицы в карточке без верхних табов
     tableWidth: Number, // Ширина таблицы
     addButton: Boolean, //Параметр, отвечающий за отображение кнопки "Добавить"
+    addSpecialFunction: Function, // Событие, вызываемое по нажатию на кнопку "Добавить" (если не подоходит стандартная форма)
     xlsxButton: Boolean, // Параметр, отвечающий за отображение кнопки "Скачать"
     foreignKey: String, // FK-таблица,
     openTableEvent: Function, // Событий, вызываемое при выборе записи в FK таблице

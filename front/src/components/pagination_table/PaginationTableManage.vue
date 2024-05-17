@@ -85,12 +85,20 @@
     />
 
     <PaginationTableAddDialog
-      v-if="addButton && !(foreignKey)"
+      v-if="addButton && !(foreignKey) && !(addSpecialFunction)"
       :tableHeaders="tableHeaders"
       :fieldsArray="fieldsArray"
       :addRecURL="addRecURL"
       :getRecs="getRecs"
       :mobileDisplay="mobileDisplay"
+    />
+
+    <v-btn
+      v-if="addButton && !(foreignKey) && addSpecialFunction"
+      :icon="mobileDisplay && 'mdi-plus'"
+      :prepend-icon="!(mobileDisplay) && 'mdi-plus'"
+      :text="!(mobileDisplay) && 'Добавить'"
+      @click="addSpecialFunction"
     />
 
     <v-btn
@@ -117,6 +125,7 @@ export default {
     foreignKey: String, // FK таблица
     tableTabUrl: String, //URL перехода по кнопку "Перейти к таблице (для FK таблицы)"
     addButton: Boolean, // Параметр, отвечающий за отображение кнопки "Добавить"
+    addSpecialFunction: Function, // Событие, вызываемое по нажатию на кнопку "Добавить" (если не подоходит стандартная форма)
     addRecURL: String, // URL эндпоинта для добавления новой записи
     getRecs: Function, // Функция для получения записей с backend
     xlsxButton: Boolean, // Параметр, отвечающий за отображение кнопки "Скачать"

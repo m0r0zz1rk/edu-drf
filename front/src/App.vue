@@ -65,17 +65,6 @@ export default {
 
 <style scoped>
 
-.alerts {
-  position: absolute;
-  z-index: 100;
-}
+@import "./assets/css/alerts.css";
 
-.alert-visible {
-  z-index: 100;
-}
-
-.alert-hidden {
-  display: none;
-  z-index: 0;
-}
 </style>

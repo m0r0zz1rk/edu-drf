@@ -14,8 +14,8 @@ const centreMenuItems = [
   {
     'icon': 'mdi-bank',
     'title': 'Учебная деятельность',
-    'link': '/centre/study',
-    'value': 'study'
+    'link': '/centre/edu',
+    'value': 'edu'
   },
   {
     'icon': 'mdi-poll',
