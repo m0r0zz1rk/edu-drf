@@ -21,7 +21,7 @@ class Program(BaseTable):
         verbose_name='Наименование программы'
     )
     type = models.CharField(
-        max_length=30,
+        max_length=35,
         null=False,
         blank=False,
         default='Повышение квалификации',
@@ -33,7 +33,7 @@ class Program(BaseTable):
     )
     categories = models.ManyToManyField(
         AudienceCategory,
-       verbose_name='Категории слушателей'
+        verbose_name='Категории слушателей'
     )
     annotation = models.TextField(
         max_length=1500,

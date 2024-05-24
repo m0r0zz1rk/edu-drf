@@ -107,8 +107,15 @@
                       v-bind:class="{'v-data-table__td-value': mobileDisplay}"
               >
                   <p v-if="mobileDisplay">
-                    {{ item[header.key].slice(0, 30) }}
-                    <template v-if="item[header.key].length > 30">...</template>
+
+                    <template v-if="item[header.key].constructor === String ">
+                      {{ item[header.key].slice(0, 25) }}
+                      <template v-if="item[header.key].length > 25">...</template>
+                    </template>
+                    <template v-if="item[header.key].constructor !== String ">
+                      {{ item[header.key] }}
+                    </template>
+
                   </p>
 
                   <p v-if="!mobileDisplay">

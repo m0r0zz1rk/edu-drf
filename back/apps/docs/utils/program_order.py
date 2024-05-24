@@ -15,8 +15,8 @@ class ProgramOrderUtils:
         :param filename: имя файла (получаем из FileField)
         :return: Путь для загрузки
         """
-        fname, file_extension = os.path.splitext(filename)
-        new_file_name = f"{''.join(symb for symb in fname if symb == ' ' or symb.isalnum())}{file_extension}"
+        _, file_extension = os.path.splitext(filename)
+        new_file_name = f"{''.join(symb for symb in instance.number if symb == ' ' or symb.isalnum())}{file_extension}"
         order_path = self.su.get_parameter_from_settings('MEDIA_ROOT')
         for subfolder in ['Приказы', 'ДПП']:
             order_path = os.path.join(order_path, subfolder)

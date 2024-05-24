@@ -1,5 +1,11 @@
+import os
+from urllib.parse import quote
+
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
+
+from apps.commons.utils.file_format import FileFormatUtils
 
 
 class ResponseUtils:
@@ -79,3 +85,17 @@ class ResponseUtils:
     def not_acceptable_response_no_data() -> Response:
         """Генерация пустого ответа с кодом 406"""
         return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+
+    @staticmethod
+    def file_response(file) -> HttpResponse:
+        """
+        Генерация ответа с файлом
+        :param file: файл
+        :return: Response
+        """
+        _, file_extension = os.path.splitext(file.path)
+        _, file_name = os.path.split(file.path)
+        response = HttpResponse(file, content_type=FileFormatUtils().get_format_content_type(file_extension))
+        response['Content-Disposition'] = f"attachment; filename*=UTF-8''{quote(file_name)}"
+        response['Access-Control-Expose-Headers'] = "Content-Disposition"
+        return response

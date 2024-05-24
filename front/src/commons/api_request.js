@@ -7,7 +7,8 @@ export function apiRequest (
     tokenRequired,
     body,
     responseOnly = false,
-    formData = false
+    formData = false,
+    blob = false
 ) {
     // Функция для обращений к backend
     const backendUrl = import.meta.env.VITE_BACKEND_URL
@@ -16,7 +17,7 @@ export function apiRequest (
         'X-CSRFToken': csrfToken
     }
     if (!(formData)) {
-        headers['Content-Type'] = 'application/json;charset=utf-8'
+      headers['Content-Type'] = 'application/json;charset=utf-8'
     }
     if (tokenRequired) {
         headers['Authorization'] = 'Token '+getCookie('cokoToken')
@@ -48,7 +49,11 @@ export function apiRequest (
                     )
                     return false
                 } else {
+                  if (blob) {
+                    return resp.blob()
+                  } else {
                     return resp.json()
+                  }
                 }
             })
             .then(data => (data))

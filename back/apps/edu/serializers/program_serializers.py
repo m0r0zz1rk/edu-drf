@@ -1,14 +1,17 @@
 from django.apps import apps
+from django.core.validators import MinValueValidator
 from rest_framework import serializers
+
 
 program_model = apps.get_model('edu', 'Program')
 
 
 class ProgramBaseSerializer(serializers.ModelSerializer):
     """Базовая сериализация данных при обработке ДПП"""
+
     class Meta:
         model = program_model
-        fields = ['name', 'type', 'duration']
+        fields = ['object_id', 'department', 'name', 'duration']
 
 
 class ProgramListSerializer(ProgramBaseSerializer):
@@ -16,6 +19,7 @@ class ProgramListSerializer(ProgramBaseSerializer):
     department = serializers.SerializerMethodField(
         label='Подразделение'
     )
+
     order_number = serializers.SerializerMethodField(
         label='Номер приказа'
     )
@@ -44,3 +48,86 @@ class ProgramListSerializer(ProgramBaseSerializer):
     class Meta:
         model = program_model
         fields = ProgramBaseSerializer.Meta.fields + ['department', 'order_number', 'order_date']
+
+
+class ProgramBaseAddSerializer(ProgramBaseSerializer):
+    department = serializers.CharField(
+        max_length=300,
+        allow_null=False,
+        allow_blank=False,
+        label='Подразделение'
+    )
+    categories = serializers.CharField(
+        max_length=1000,
+        allow_null=True,
+        allow_blank=True,
+        label='Категории слушателей'
+    )
+
+    class Meta:
+        model = program_model
+        fields = ProgramBaseSerializer.Meta.fields + [
+            'categories',
+            'annotation',
+            'price',
+        ]
+
+
+class ProgramAddSerializer(serializers.Serializer):
+    department = serializers.CharField(
+        max_length=300,
+        allow_null=False,
+        allow_blank=False,
+        label='Подразделение'
+    )
+    name = serializers.CharField(
+        max_length=500,
+        allow_null=False,
+        allow_blank=False,
+        label='Наименование программы'
+    )
+    type = serializers.CharField(
+        max_length=35,
+        allow_null=False,
+        allow_blank=False,
+        label='Тип программы'
+    )
+    duration = serializers.IntegerField(
+        validators=[MinValueValidator(0),],
+        label='Объем программы (часов)'
+    )
+    categories = serializers.CharField(
+        max_length=1000,
+        allow_null=True,
+        allow_blank=True,
+        label='Категории слушателей'
+    )
+    annotation = serializers.CharField(
+        max_length=1500,
+        allow_blank=True,
+        label='Аннотация'
+    )
+    price = serializers.IntegerField(
+        validators=[MinValueValidator(0),],
+        label='Стоимость'
+    )
+    order_number = serializers.CharField(
+        max_length=50,
+        allow_null=False,
+        allow_blank=False,
+        label='Номер приказа'
+    )
+    order_date = serializers.DateField(
+        label='Дата приказа'
+    )
+    order_file = serializers.FileField(
+        label='Скан приказа'
+    )
+
+
+class ProgramGetOrderSerializer(serializers.Serializer):
+    """Сериализация данных для получения приказа ДПП"""
+    object_id = serializers.UUIDField(
+        allow_null=False,
+        label='object_id ДПП'
+    )

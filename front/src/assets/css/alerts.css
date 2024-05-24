@@ -1,3 +1,7 @@
+.alerts {
+    position: absolute;
+}
+
 .alert-visible {
     z-index: 100;
 }

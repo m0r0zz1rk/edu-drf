@@ -32,6 +32,14 @@
 
     <v-card-text>
 
+      <v-alert
+        id="error-profile-form-alert"
+        class="alert-hidden"
+        style="width: 100%"
+        :text="profileFormError"
+        type="error"
+      ></v-alert>
+
       <div style="margin-top: 5px;">
 
         <div v-if="userInfoTab === 'profile'">
@@ -226,13 +234,7 @@
 
           </v-row>
           <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
-          <v-alert
-            id="error-profile-form-alert"
-            class="alert-hidden"
-            style="width: 100%"
-            :text="profileFormError"
-            type="error"
-          ></v-alert>
+
         </div>
 
       </div>

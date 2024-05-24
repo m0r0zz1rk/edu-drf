@@ -2,8 +2,8 @@ const specialFieldsList = [
     'journalModule',
     'journalRecStatus',
     'journalDetailInfo',
-
-    'cokoCuratorGroups'
+    'cokoCuratorGroups',
+    'dppOrder'
 ]
 
 export default specialFieldsList

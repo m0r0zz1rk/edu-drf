@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from django.db import models
 
@@ -28,6 +29,14 @@ class ProgramOrder(BaseTable):
 
     def __str__(self):
         return f'{self.number} от {self.date.strftime("%d.%m.%Y")}'
+
+    def delete(self, *args, **kwargs):
+        """Удаление файла после удаления записи"""
+        path = self.file.path
+        # Удаляем сначала модель ( объект )
+        super(ProgramOrder, self).delete(*args, **kwargs)
+        # Потом удаляем сам файл
+        os.remove(path)
 
     class Meta:
         verbose_name = 'Приказ об утверждении ДПП'

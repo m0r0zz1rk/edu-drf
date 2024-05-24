@@ -2,7 +2,7 @@
   <div v-if="showField">
 
     <v-text-field
-      v-if="field.ui === 'input'"
+      v-if="['input', 'dppOrder'].includes(field.ui)"
       :type="field.type"
       :v-mask="
         ['phone', 'snils'].includes(field.ui) &&

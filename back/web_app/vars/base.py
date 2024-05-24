@@ -1,3 +1,5 @@
+from corsheaders.defaults import default_headers
+
 from ..settings import *
 
 SECRET_KEY = env.str('SECRET_KEY')
@@ -109,3 +111,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = 'media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_EXPOSE_HEADERS = (
+    'Access-Control-Expose-Headers: Content-Disposition, X-Requested-With',
+)

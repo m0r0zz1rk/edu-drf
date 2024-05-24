@@ -8,6 +8,8 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS')
 
+CORS_EXPOSE_HEADERS = env.list('CORS_EXPOSE_HEADERS')
+
 DATABASES = {
     'default': {
         'ENGINE': env.str('DB_ENGINE'),

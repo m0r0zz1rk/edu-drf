@@ -20,6 +20,15 @@
         Регистрация обучающегося
       </v-card-title>
       <v-card-text>
+
+        <v-alert
+          id="error-registration-alert"
+          class="alert-hidden"
+          style="width: 100%"
+          :text="registrationError"
+          type="error"
+        ></v-alert>
+
         <v-row dense>
           <v-col
             cols="12"
@@ -266,13 +275,7 @@
 
         </v-dialog>
         <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
-        <v-alert
-          id="error-registration-alert"
-          class="alert-hidden"
-          style="width: 100%"
-          :text="registrationError"
-          type="error"
-        ></v-alert>
+
       </v-card-text>
 
       <v-divider></v-divider>

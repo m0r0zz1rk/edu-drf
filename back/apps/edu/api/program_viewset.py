@@ -7,12 +7,14 @@ from apps.authen.utils.profile import ProfileUtils
 from apps.commons.pagination import CustomPagination
 from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
+from apps.commons.utils.django.request import RequestUtils
 from apps.commons.utils.django.response import ResponseUtils
 from apps.edu.filters.program import ProgramFilter
-from apps.edu.serializers.program_serializers import ProgramListSerializer, program_model
-from apps.guides.serializers.coko_serializers import CokoSerializer, \
-    CokoChangeCuratorGroupsSerializer
-from apps.journal.consts.journal_modules import GUIDES, EDU
+from apps.edu.operations.program.add_update_program_operation import AddUpdateProgramOperation
+from apps.edu.serializers.program_serializers import ProgramListSerializer, program_model, ProgramAddSerializer, \
+    ProgramGetOrderSerializer
+from apps.edu.utils.program import ProgramUtils
+from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
 from apps.journal.utils.journal_utils import JournalUtils
 
@@ -20,8 +22,10 @@ from apps.journal.utils.journal_utils import JournalUtils
 class ProgramViewSet(viewsets.ModelViewSet):
     """Работа с ДПП"""
     permission_classes = [IsAuthenticated, IsAdministrators]
+    ru = RequestUtils()
     ju = JournalUtils()
     pu = ProfileUtils()
+    pru = ProgramUtils()
     respu = ResponseUtils()
 
     queryset = program_model.objects.all().order_by('-date_create')
@@ -62,93 +66,63 @@ class ProgramViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Сотрудники"', ],
-        operation_description="Изменение параметра отображение только кураторских учебных групп",
-        request_body=CokoChangeCuratorGroupsSerializer,
+        tags=['Учебная часть. ДПП', ],
+        operation_description="Добавление ДПП",
+        request_body=ProgramAddSerializer,
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при изменении параметра',
-            '200': 'Сообщение "Информация успешно обновлена"'
+            '400': 'Ошибка при добавлении ДПП',
+            '200': 'Сообщение "ДПП успешно добавлена"'
         }
     )
-    def change_curator_groups(self, request, *args, **kwargs):
-        serialize = CokoChangeCuratorGroupsSerializer(data=request.data)
+    def create(self, request, *args, **kwargs):
+        serialize = ProgramAddSerializer(data=request.data)
         if serialize.is_valid():
-            prof = self.pu.get_profile_or_info_by_attribute(
-                'object_id',
-                serialize.data['object_id'],
-                'profile'
-            )
-            if not prof:
-                self.ju.create_journal_rec(
-                    {
-                        'source': 'Внешний запрос',
-                        'module': GUIDES,
-                        'status': ERROR,
-                        'description': 'Ошибка при изменении кураторских групп - профиль не найден'
-                    },
-                    serialize.data,
-                    None
-                )
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-            data = {}
-            for key in ['surname', 'name', 'patronymic']:
-                data[key] = getattr(prof, key)
-            data['curator_groups'] = serialize.data['curator_groups']
-            proc = self.pu.set_coko_profile_data(
-                prof,
-                data
-            )
-            if isinstance(proc, bool):
-                if proc:
-                    self.ju.create_journal_rec(
-                        {
-                            'source': self.pu.get_profile_or_info_by_attribute(
-                                'django_user_id',
-                                request.user.id,
-                                'display_name'
-                            ),
-                            'module': GUIDES,
-                            'status': SUCCESS,
-                            'description': 'Параметр отображения кураторских групп успешно изменен'
-                        },
-                        repr(serialize.data),
-                        None
-                    )
-                    return self.respu.ok_response('Информация успешно обновлена')
-                else:
-                    self.ju.create_journal_rec(
-                        {
-                            'source': 'Процесс установки параметров профилю сотрудников',
-                            'module': GUIDES,
-                            'status': ERROR,
-                            'description': 'Ошибка при изменении кураторских групп - данные не прошли валидацию'
-                        },
-                        repr(data),
-                        None
-                    )
-                    return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+            print(serialize.validated_data)
+            process = AddUpdateProgramOperation(dict(serialize.validated_data))
+            if process.process_completed:
+                return self.respu.ok_response('ДПП успешно добавлена')
             else:
-                self.ju.create_journal_rec(
-                    {
-                        'source': 'Процесс установки параметров профилю сотрудников',
-                        'module': GUIDES,
-                        'status': ERROR,
-                        'description': 'Ошибка при изменении кураторских групп - данные не прошли валидацию'
-                    },
-                    repr(data),
-                    None
-                )
                 return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+        else:
+            return self.respu.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=['Учебная часть. ДПП', ],
+        operation_description="Получение файла приказа ДПП",
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при добавлении ДПП',
+            '200': 'Файл приказа ДПП"'
+        }
+    )
+    def get_order_file(self, request, *args, **kwargs):
+        serialize = ProgramGetOrderSerializer(data={'object_id': self.kwargs['order_id']})
+        if serialize.is_valid():
+            file = self.pru.get_order_file(
+                'object_id',
+                serialize.data['object_id']
+            )
+            self.ju.create_journal_rec(
+                {
+                    'source': self.ru.get_source_display_name(request),
+                    'module': EDU,
+                    'status': SUCCESS,
+                    'description': 'Получение приказа ДПП'
+                },
+                serialize.data,
+                None
+            )
+            return self.respu.file_response(file)
         else:
             self.ju.create_journal_rec(
                 {
                     'source': 'Внешний запрос',
-                    'module': GUIDES,
+                    'module': EDU,
                     'status': ERROR,
-                    'description': 'Ошибка при изменении кураторских групп - данные не прошли валидацию'
+                    'description': 'Ошибка при получении файла приказа ДПП - данные не прошли сериализацию'
                 },
-                repr(request.data),
-                repr(serialize.errors)
+                '-',
+                ExceptionHandling.get_traceback()
             )
-        return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+            return self.respu.bad_request_response('Данные не прошли валидацию')

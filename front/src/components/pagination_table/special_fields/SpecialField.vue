@@ -26,6 +26,13 @@
   >
     <CuratorGroupsField :item="item" />
   </div>
+
+  <div
+    v-if="ui === 'dppOrder'"
+    v-bind:class="{'v-data-table__td-value': mobileDisplay}"
+  >
+    <ProgramOrderField :item="item" />
+  </div>
 </template>
 
 <script>
@@ -33,10 +40,11 @@ import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusB
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
 import JournalDetailInfoDialog from "@/components/dialogs/journal/JournalDetailInfoDialog.vue";
 import CuratorGroupsField from "@/components/pagination_table/special_fields/sources/CuratorGroupsField.vue";
+import ProgramOrderField from "@/components/pagination_table/special_fields/sources/ProgramOrderField.vue";
 
 export default {
   name: "SpecialField",
-  components: {CuratorGroupsField, JournalDetailInfoDialog, JournalModuleBadge, JournalRecStatusBadge},
+  components: {ProgramOrderField, CuratorGroupsField, JournalDetailInfoDialog, JournalModuleBadge, JournalRecStatusBadge},
   props: {
     ui: String, // Тип поля,
     header: Object, // Заголовок пагинационной таблицы

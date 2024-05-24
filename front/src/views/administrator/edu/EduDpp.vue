@@ -1,23 +1,26 @@
 <template>
 
   <PaginationTable
+    ref="dppPaginationTable"
     v-if="fieldsArray !== null"
     tableTitle="ДПП"
     tableWidth="98"
     :noTab="false"
     :addButton="true"
-    :addSpecialFunction="testSpecialFunction"
+    :addSpecialFunction="addProgramDetailDialog"
     :xlsxButton="true"
     getRecsURL="/backend/api/v1/edu/programs/"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
   />
 
-  <ProgramDetail
-    ref="programDetail"
-    :audienceCategories="audienceCategories"
-    :adCentres="adCentres"
-  />
+    <ProgramDetail
+      ref="programDetail"
+      :audienceCategories="audienceCategories"
+      :adCentres="adCentres"
+      :getRecs="paginationTableGetRecs"
+    />
+
 </template>
 
 <script>
@@ -39,10 +42,6 @@ export default {
         {
           'title': 'Наименование',
           'key': 'name'
-        },
-        {
-          'title': 'Тип',
-          'key': 'type'
         },
         {
           'title': 'Объем (часов)',
@@ -112,19 +111,12 @@ export default {
           },
           {
             ui: 'input',
-            type: 'text',
-            key: 'type',
-            addRequired: true,
-          },
-          {
-            ui: 'input',
             type: 'number',
             key: 'duration',
             addRequired: true,
           },
           {
-            ui: 'input',
-            type: 'text',
+            ui: 'dppOrder',
             key: 'order_number',
             addRequired: false,
           },
@@ -136,9 +128,11 @@ export default {
         ]
       }
     },
-    testSpecialFunction() {
+    addProgramDetailDialog() {
       this.$refs.programDetail.dialog = true
-      console.log('KEK')
+    },
+    paginationTableGetRecs() {
+      this.$refs.dppPaginationTable.getRecs()
     }
   },
   mounted() {
