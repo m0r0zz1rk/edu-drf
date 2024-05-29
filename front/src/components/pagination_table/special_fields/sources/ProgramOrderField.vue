@@ -37,7 +37,7 @@ export default {
       let url = window.URL.createObjectURL(getBlob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = this.item.order_date+contentTypeFormats[contentType];
+      a.download = this.item.order_number+contentTypeFormats[contentType];
       document.body.appendChild(a);
       a.click();
       a.remove();

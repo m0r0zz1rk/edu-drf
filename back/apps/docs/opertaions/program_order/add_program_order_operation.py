@@ -12,7 +12,6 @@ class AddUpdateProgramOrderOperation(BaseDocOperation):
     required_fields = [
         'number',
         'date',
-        'file'
     ]
 
     def action(self, process_data: dict):
@@ -28,6 +27,7 @@ class AddUpdateProgramOrderOperation(BaseDocOperation):
             if 'object_id' in doc_data.keys():
                 object_id = doc_data['object_id']
                 del doc_data['object_id']
+                print(doc_data)
                 doc, _ = program_order_model.objects.update_or_create(
                     object_id=object_id,
                     defaults=doc_data

@@ -135,7 +135,13 @@
                   <v-icon
                     icon="mdi-pencil"
                     color="coko-blue"
-                    @click="showEditDialog(item)"
+                    @click="() => {
+                      if (this.onEditClick) {
+                        return this.onEditClick(item)
+                      } else {
+                        return showEditDialog(item)
+                      }
+                    }"
                   />
 
                   &nbsp;&nbsp;
@@ -240,6 +246,7 @@ export default {
     getRecsURL: String, // URL эндпоинта на получение записей с backend
     addRecURL: String, // URL эндпоинта на добавление записи
     editRecURL: String, // URL эндпоинта на обновление записи
+    onEditClick: Function, // Событие, вызываемое при нажатии на иконку карандаша для редактирования (ситуативно)
     delRecURL: String, // URL эндпоинта на удаление записи
     tableHeaders: Array, /* Список заголовков:
       {

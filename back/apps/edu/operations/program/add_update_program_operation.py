@@ -27,13 +27,14 @@ class AddUpdateProgramOperation:
     source = 'Добавление/обновление ДПП'
     program_fields = [
         *[f.name for f in program_model._meta.get_fields()
-          if f.name not in ['object_id', 'date_create', 'program_order']],
+          if f.name not in ['date_create', 'program_order']],
+        'order_id',
         'order_number',
         'order_date',
         'order_file'
     ]
 
-    def __init__(self, program_data: dict, request = None):
+    def __init__(self, program_data: dict, request=None):
         """
         Инициализация класса
         :param program_data: словарь с данными о ДПП
@@ -83,7 +84,7 @@ class AddUpdateProgramOperation:
     def _validate_program_data(self) -> bool:
         """Валидация полей данных о ДПП"""
         for field in self.program_fields:
-            if field not in ['object_id', 'date_create', 'program']:
+            if field not in ['object_id', 'date_create', 'program', 'order_file']:
                 if field not in self.program_data.keys():
                     return False
         return True
@@ -107,6 +108,29 @@ class AddUpdateProgramOperation:
             return False
         return proc.doc_id
 
+    def _update_program_order(self) -> bool:
+        """
+        Обновление приказа ДПП
+        :return: True - успешно, False - ошибка
+        """
+        doc_data = {
+                'object_id': self.program_data['order_id'],
+                'number': self.program_data['order_number'],
+                'date': self.program_data['order_date']
+        }
+        if 'order_file' in self.program_data.keys() and \
+                self.program_data['order_file'] not in [None, 'null']:
+            doc_data['file'] = self.program_data['order_file']
+        proc = AddUpdateProgramOrderOperation(
+            doc_data,
+            'ProgramOrder',
+            None
+        )
+        if not proc.process_completed:
+            self._program_operation_error(proc.error_message)
+            return False
+        return True
+
     def _main_action(self):
         try:
             self.program_data['department'] = self.adcu.get_ad_centre(
@@ -122,15 +146,26 @@ class AddUpdateProgramOperation:
                     if self.acu.get_category_object_by_name(cat_name) is not None
                 ]
                 del self.program_data['categories']
-            if self.program_data['order_file'] is not None:
+            if self.program_data['order_id'] in [None, 'null']:
                 add_order_proc = self._add_program_order()
                 if add_order_proc is None:
                     return False
                 del self.program_data['order_number']
                 del self.program_data['order_date']
-                del self.program_data['order_file']
+                if 'order_file' in self.program_data.keys():
+                    del self.program_data['order_file']
                 self.program_data['program_order_id'] = add_order_proc
-            if 'object_id' in self.program_data.keys():
+            else:
+                update_order_proc = self._update_program_order()
+                if update_order_proc is None:
+                    return False
+                del self.program_data['order_number']
+                del self.program_data['order_date']
+                if 'order_file' in self.program_data.keys():
+                    del self.program_data['order_file']
+                self.program_data['program_order_id'] = self.program_data['order_id']
+            del self.program_data['order_id']
+            if self.program_data['object_id'] not in [None, 'null']:
                 object_id = self.program_data['object_id']
                 del self.program_data['object_id']
                 dpp, _ = program_model.objects.update_or_create(
@@ -138,6 +173,7 @@ class AddUpdateProgramOperation:
                     defaults=self.program_data
                 )
             else:
+                del self.program_data['object_id']
                 dpp, _ = program_model.objects.update_or_create(
                     **self.program_data
                 )
@@ -148,4 +184,3 @@ class AddUpdateProgramOperation:
         except Exception:
             self.process_completed = False
             self._program_operation_error(ExceptionHandling.get_traceback())
-

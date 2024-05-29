@@ -10,11 +10,13 @@
     :addSpecialFunction="addProgramDetailDialog"
     :xlsxButton="true"
     getRecsURL="/backend/api/v1/edu/programs/"
+    :onEditClick="setProgramEdit"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
   />
 
     <ProgramDetail
+      :key="programDetailKey"
       ref="programDetail"
       :audienceCategories="audienceCategories"
       :adCentres="adCentres"
@@ -34,6 +36,7 @@ export default {
   components: {ProgramDetail, PaginationTable},
   data() {
     return {
+      programDetailKey: 0,
       tableHeaders: [
         {
           'title': 'Подразделение',
@@ -55,10 +58,14 @@ export default {
           'title': 'Дата приказа',
           'key': 'order_date'
         },
+        {
+          'title': 'Управление',
+          'key': 'actions'
+        }
       ],
       fieldsArray: null,
       audienceCategories: [],
-      adCentres: []
+      adCentres: [],
     }
   },
   methods: {
@@ -125,14 +132,21 @@ export default {
             key: 'order_date',
             addRequired: false,
           },
+          {
+            ui: 'actions',
+            key: 'actions'
+          }
         ]
       }
     },
     addProgramDetailDialog() {
-      this.$refs.programDetail.dialog = true
+      this.$refs.programDetail.setProgramObject(null)
     },
     paginationTableGetRecs() {
       this.$refs.dppPaginationTable.getRecs()
+    },
+    setProgramEdit(item) {
+      this.$refs.programDetail.setProgramObject(item.object_id)
     }
   },
   mounted() {

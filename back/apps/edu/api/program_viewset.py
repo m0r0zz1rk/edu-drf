@@ -11,8 +11,10 @@ from apps.commons.utils.django.request import RequestUtils
 from apps.commons.utils.django.response import ResponseUtils
 from apps.edu.filters.program import ProgramFilter
 from apps.edu.operations.program.add_update_program_operation import AddUpdateProgramOperation
-from apps.edu.serializers.program_serializers import ProgramListSerializer, program_model, ProgramAddSerializer, \
-    ProgramGetOrderSerializer
+from apps.edu.serializers.program_serializers import (ProgramListSerializer,
+                                                      program_model,
+                                                      ProgramRetrieveAddUpdateSerializer,
+                                                      ProgramGetOrderSerializer)
 from apps.edu.utils.program import ProgramUtils
 from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
@@ -29,6 +31,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
     respu = ResponseUtils()
 
     queryset = program_model.objects.all().order_by('-date_create')
+    lookup_field = "object_id"
     serializer_class = ProgramListSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]
@@ -67,21 +70,49 @@ class ProgramViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         tags=['Учебная часть. ДПП', ],
-        operation_description="Добавление ДПП",
-        request_body=ProgramAddSerializer,
+        operation_description="Получение объекта ДПП",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при добавлении ДПП',
-            '200': 'Сообщение "ДПП успешно добавлена"'
+            '400': 'Ошибка при получении объекта',
+            '200': ProgramRetrieveAddUpdateSerializer
         }
     )
-    def create(self, request, *args, **kwargs):
-        serialize = ProgramAddSerializer(data=request.data)
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = ProgramRetrieveAddUpdateSerializer(
+                self.pru.transform_instance_to_serializer(instance)
+            )
+            return self.respu.ok_response_dict(serializer.data)
+        except Exception:
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Внешний запрос',
+                    'module': EDU,
+                    'status': ERROR,
+                    'description': 'Ошибка при получении объекта ДПП'
+                },
+                '-',
+                ExceptionHandling.get_traceback()
+            )
+            return self.respu.bad_request_no_data()
+
+    @swagger_auto_schema(
+        tags=['Учебная часть. ДПП', ],
+        operation_description="Добавление/обновление ДПП",
+        request_body=ProgramRetrieveAddUpdateSerializer,
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при добавлении/обновлении ДПП',
+            '200': 'Сообщение "ДПП успешно добавлена/обновлена"'
+        }
+    )
+    def create_update(self, request, *args, **kwargs):
+        serialize = ProgramRetrieveAddUpdateSerializer(data=request.data)
         if serialize.is_valid():
-            print(serialize.validated_data)
             process = AddUpdateProgramOperation(dict(serialize.validated_data))
             if process.process_completed:
-                return self.respu.ok_response('ДПП успешно добавлена')
+                return self.respu.ok_response('ДПП успешно добавлена/обновлена')
             else:
                 return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
         else:
@@ -97,7 +128,9 @@ class ProgramViewSet(viewsets.ModelViewSet):
         }
     )
     def get_order_file(self, request, *args, **kwargs):
-        serialize = ProgramGetOrderSerializer(data={'object_id': self.kwargs['order_id']})
+        serialize = ProgramGetOrderSerializer(
+            data={'object_id': self.kwargs['order_id']}
+        )
         if serialize.is_valid():
             file = self.pru.get_order_file(
                 'object_id',

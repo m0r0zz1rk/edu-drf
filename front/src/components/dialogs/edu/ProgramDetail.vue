@@ -28,7 +28,7 @@
           </v-tab>
 
           <v-tab
-            v-if="programObjectID"
+            v-if="programObjectID !== null"
             class="coko-tab"
             value="kug"
           >
@@ -192,7 +192,7 @@
                 <v-text-field
                   bg-color="white"
                   variant="solo"
-                  v-model="orderObject.number"
+                  v-model="orderObject.order_number"
                   label="Номер приказа"
                   :loading="loading"
                 />
@@ -204,17 +204,15 @@
                 sm="6"
               >
                 <v-date-input
-                  id="order_date"
+                  id="orderDate"
                   bg-color="white"
                   label="Дата приказа"
+                  v-model="orderObject['order_date']"
                   prepend-icon=""
                   prepend-inner-icon="$calendar"
                   variant="solo"
                   :loading="loading"
                   clearable
-                  @update:modelValue="(e) => {
-                    this.orderObject.date = convertDateToBackend(e)
-                  }"
                 ></v-date-input>
               </v-col>
 
@@ -223,9 +221,22 @@
                 md="12"
                 sm="12"
               >
+                <template
+                  v-if="orderObject.order_id"
+                >
+
+                  Скачать установленный файл:
+                  <v-icon
+                    icon="mdi-tray-arrow-down"
+                    @click="downloadFile()"
+                  />
+                  <br/><br/>
+
+                </template>
+
                 <v-file-input
                   bg-color="white"
-                  v-model="orderObject.file"
+                  v-model="orderObject.order_file"
                   variant="solo"
                   label="Скан файла приказа"
                 />
@@ -234,8 +245,6 @@
             </v-row>
 
           </template>
-
-
 
         </v-container>
         <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
@@ -248,7 +257,7 @@
 
         <v-btn
           color="coko-blue"
-          :text="programObjectID ? 'Сохранить' : 'Добавить'"
+          :text="programObjectID !== null ? 'Сохранить' : 'Добавить'"
           :loading="loading"
           @click="saveProgram()"
         ></v-btn>
@@ -263,37 +272,79 @@
 <script>
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
+import contentTypeFormats from "@/commons/consts/contentTypeFormats";
 import {convertDateToBackend} from "@/commons/date";
 
 export default {
   name: "ProgramDetail",
   props: {
-    programObjectID: String, // object_id ДПП (если редактирование объекта),
     adCentres: Array, // Список подразделений AD,
     audienceCategories: Array, // Список категорий слушателей,
     getRecs: Function // Функция для получения записи в пагинационной таблице
   },
   data() {
     return {
+      programObjectID: '',
       dialog: false,
       loading: true,
       checkDataFill: true,
       programTab: 'info',
-      programObject: null,
+      programObject: {},
       orderObject: {
-        'number': '',
-        'date': '',
-        'file': null,
+        'order_id': null,
+        'order_number': '',
+        'order_date': '',
+        'order_file': null,
       },
       programDetailError: '',
       programTypes: JSON.parse(import.meta.env.VITE_PROGRAM_TYPES)
     }
   },
   methods: {
-    convertDateToBackend,
-    setProgramObject() {
-      if (this.programObjectID) {
-
+    setProgramObject(dppId) {
+      this.orderObject = {
+        'order_id': null,
+        'order_number': '',
+        'order_date': '',
+        'order_file': null,
+      }
+      Object.keys(this.programObject).map((key) => {
+        this.programObject[key] = null
+      })
+      Object.keys(this.orderObject).map((key) => {
+        this.orderObject[key] = null
+      })
+      this.programObjectID = dppId
+      this.dialog = true
+      this.loading = true
+      if (this.programObjectID !== null) {
+        apiRequest(
+          '/backend/api/v1/edu/program/'+this.programObjectID+'/',
+          'GET',
+          true,
+          null
+        )
+          .then((data) => {
+            if (data.error) {
+              this.showProgramError(data.error)
+            } else {
+              console.log(data)
+              Object.keys(data).map((key) => {
+                if (!(Object.keys(this.orderObject).includes(key))) {
+                  this.programObject[key] = data[key]
+                }
+              })
+              this.programObject['categories'] = data['categories'].split(', ')
+              let orderData = {}
+              Object.keys(this.orderObject).map((key) => {
+                if (key !== 'order_file') {
+                  orderData[key] = data[key]
+                }
+              })
+              this.orderObject = orderData
+            }
+            this.loading = false
+          })
       } else {
         this.programObject = {
           'department': '',
@@ -304,6 +355,7 @@ export default {
           'annotation': '',
           'price': 0
         }
+        this.loading = false
       }
     },
     hideProgramError() {
@@ -317,7 +369,14 @@ export default {
     },
     checkDataFilled() {
       Object.keys(this.programObject).map((key) => {
-        if (!(['categories', 'annotation'].includes(key))) {
+        if (!([
+          'categories',
+          'annotation',
+          'object_id',
+          'order_id',
+          'order_number',
+          'order_date',
+          'order_file'].includes(key))) {
           if ((this.programObject[key] === 0) || (this.programObject[key].length === 0)) {
             this.showProgramError('Заполните все обязательные поля формы')
             this.checkDataFill = false
@@ -326,9 +385,9 @@ export default {
       })
       let orderKeys = Object.keys(this.orderObject)
       if (orderKeys.filter((key) =>
-        ['', null, undefined].includes(this.orderObject[key])).length !== 3) {
+        ['', null, undefined].includes(this.orderObject[key])).length !== 4) {
         orderKeys.map((key) => {
-          if (['', null, undefined].includes(this.orderObject[key])) {
+          if ((key !== 'order_id') && (['', null, undefined].includes(this.orderObject[key]))) {
             this.showProgramError('Заполните все поля приказа, либо удалите всю информацию')
             this.checkDataFill = false
           }
@@ -342,25 +401,29 @@ export default {
       if (this.checkDataFill) {
         this.loading = true
         let form = new FormData()
+        console.log(this.programObject)
+        console.log(this.orderObject)
+        if (!(Object.keys(this.programObject).includes('object_id'))) {
+          form.append('object_id', null)
+        }
         Object.keys(this.programObject).map((key) => {
           form.append(key, this.programObject[key])
         })
-        if (!(['', null, undefined].includes(this.orderObject['file']))) {
-          form.append('order_number', this.orderObject['number'])
-          form.append('order_date', this.orderObject['date'])
-          form.append('order_file', this.orderObject['file'])
-        } else {
-          form.append('order_file', null)
-        }
-        let url = '/backend/api/v1/edu/program/create/'
-        let method = 'POST'
-        if (this.programObjectID) {
-          url = '/backend/api/v1/edu/program/update/'
-          method = 'PATCH'
+        Object.keys(this.orderObject).map((key) => {
+          if (this.orderObject[key] instanceof Date) {
+            form.append(key, convertDateToBackend(this.orderObject[key]))
+          } else {
+            if (key !== 'order_file') {
+              form.append(key, this.orderObject[key])
+            }
+          }
+        })
+        if (!(["string", "undefined", "null"].includes(typeof this.orderObject['order_file']))) {
+          form.append('order_file', this.orderObject['order_file'])
         }
         let programRequest = await apiRequest(
-          url,
-          method,
+          '/backend/api/v1/edu/program/create_update/',
+          'POST',
           true,
           form,
           false,
@@ -380,10 +443,34 @@ export default {
         }
         this.loading = false
       }
+    },
+    async downloadFile() {
+      let orderRequest = await apiRequest(
+        '/backend/api/v1/edu/program/order_file/'+this.programObjectID+'/',
+        'GET',
+        true,
+        false,
+        true
+      )
+      let contentType = orderRequest.headers.get('Content-Type')
+      let getBlob = await orderRequest.blob();
+      let url = window.URL.createObjectURL(getBlob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = this.orderObject.order_number+contentTypeFormats[contentType];
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+  },
+  watch: {
+    orderObject: function() {
+      if (this.orderObject['order_date'] !== null) {
+        this.orderObject['order_date'] = new Date(this.orderObject['order_date'])
+      }
     }
   },
   mounted() {
-    this.setProgramObject()
     this.loading = false
   }
 }

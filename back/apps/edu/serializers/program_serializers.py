@@ -73,7 +73,13 @@ class ProgramBaseAddSerializer(ProgramBaseSerializer):
         ]
 
 
-class ProgramAddSerializer(serializers.Serializer):
+class ProgramRetrieveAddUpdateSerializer(serializers.Serializer):
+    """Сериализация данных при получении объекта, добавлении или обновлении ДПП"""
+    object_id = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+        label='object_id ДПП (при редактировании)'
+    )
     department = serializers.CharField(
         max_length=300,
         allow_null=False,
@@ -111,6 +117,11 @@ class ProgramAddSerializer(serializers.Serializer):
         validators=[MinValueValidator(0),],
         label='Стоимость'
     )
+    order_id = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+        label='ID приказа (при редактировании)'
+    )
     order_number = serializers.CharField(
         max_length=50,
         allow_null=False,
@@ -121,6 +132,8 @@ class ProgramAddSerializer(serializers.Serializer):
         label='Дата приказа'
     )
     order_file = serializers.FileField(
+        required=False,
+        use_url=False,
         label='Скан приказа'
     )
 
@@ -131,3 +144,5 @@ class ProgramGetOrderSerializer(serializers.Serializer):
         allow_null=False,
         label='object_id ДПП'
     )
+
+
