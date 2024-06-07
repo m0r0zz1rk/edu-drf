@@ -25,7 +25,7 @@
 
 <script>
 import LkPage from "@/components/LkPage.vue";
-import PaginationTable from "@/components/pagination_table/PaginationTable.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import systemModules from "@/commons/consts/systemModules";
 import journalRecStatuses from "@/commons/consts/journalRecStatuses";
 

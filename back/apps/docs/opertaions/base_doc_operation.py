@@ -14,7 +14,7 @@ class BaseDocOperation(ABC):
     document_data = model = request = success_message = error_message = doc_id = None
     error = process_completed = False
 
-    def _doc_operation_error(self, traceback: str):
+    def _doc_operation_error(self):
         """
         Фиксация ошибки при выполнении действия над документом
         :param traceback: traceback возникшей в процессе ошибки
@@ -28,7 +28,7 @@ class BaseDocOperation(ABC):
                 'description': 'Произошла ошибка в процессе выполнения действия с документом'
             },
             repr(self.document_data),
-            traceback
+            self.error_message
         )
 
     def _doc_operation_success(self):
@@ -69,10 +69,12 @@ class BaseDocOperation(ABC):
         self.document_data = document_data
         self.model = model
         if isinstance(self._check_doc_model_exists(), str):
-            self._doc_operation_error(self._check_doc_model_exists())
+            self.error_message = self._check_doc_model_exists()
+            self._doc_operation_error()
             self.error = True
         elif not self._check_doc_model_exists():
-            self._doc_operation_error('Указанная модель не найдена модуле документов')
+            self.error_message = 'Указанная модель не найдена модуле документов'
+            self._doc_operation_error()
             self.error = True
         else:
             self.request = request
@@ -80,7 +82,7 @@ class BaseDocOperation(ABC):
             if self.process_completed:
                 self._doc_operation_success()
             else:
-                self._doc_operation_error(self.error_message)
+                self._doc_operation_error()
 
     def _process(self):
         """Процесс работы с документом"""

@@ -39,8 +39,8 @@
 import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusBadge.vue";
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
 import JournalDetailInfoDialog from "@/components/dialogs/journal/JournalDetailInfoDialog.vue";
-import CuratorGroupsField from "@/components/pagination_table/special_fields/sources/CuratorGroupsField.vue";
-import ProgramOrderField from "@/components/pagination_table/special_fields/sources/ProgramOrderField.vue";
+import CuratorGroupsField from "@/components/tables/pagination_table/special_fields/sources/CuratorGroupsField.vue";
+import ProgramOrderField from "@/components/tables/pagination_table/special_fields/sources/ProgramOrderField.vue";
 
 export default {
   name: "SpecialField",

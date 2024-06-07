@@ -1,6 +1,6 @@
 from django.db import models
 
-from apps.commons.models import BaseTable, AdCentre
+from apps.commons.models import BaseTable
 from apps.docs.models import ProgramOrder
 from apps.guides.models import AudienceCategory
 
@@ -8,10 +8,17 @@ from apps.guides.models import AudienceCategory
 class Program(BaseTable):
     """Модель дополнительных професиональных программ"""
     department = models.ForeignKey(
-        AdCentre,
+        'commons.AdCentre',
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Подразделение'
+    )
+    kug_edit = models.ForeignKey(
+        'authen.CokoProfile',
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        verbose_name='КУГ на редактировании'
     )
     name = models.CharField(
         max_length=500,

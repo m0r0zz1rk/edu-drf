@@ -208,18 +208,18 @@
 <script>
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
-import PaginationTableManage from "@/components/pagination_table/PaginationTableManage.vue";
+import PaginationTableManage from "@/components/tables/pagination_table/PaginationTableManage.vue";
 import {xlsxDownloadFunction} from "@/commons/xlsx";
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
 import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusBadge.vue";
-import PaginationTableAddDialog from "@/components/pagination_table/dialogs/PaginationTableAddDialog.vue";
+import PaginationTableAddDialog from "@/components/tables/pagination_table/dialogs/PaginationTableAddDialog.vue";
 import JournalDetailInfoDialog from "@/components/dialogs/journal/JournalDetailInfoDialog.vue";
-import PaginationTableBaseField from "@/components/pagination_table/PaginationTableBaseField.vue";
+import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
 import {useDisplay} from "vuetify";
-import specialFieldsList from "@/components/pagination_table/special_fields/SpecialFieldsList";
-import SpecialField from "@/components/pagination_table/special_fields/SpecialField.vue";
+import specialFieldsList from "@/components/tables/pagination_table/special_fields/SpecialFieldsList";
+import SpecialField from "@/components/tables/pagination_table/special_fields/SpecialField.vue";
 import {no} from "vuetify/locale";
-import PaginationTableEditDialog from "@/components/pagination_table/dialogs/PaginationTableEditDialog.vue";
+import PaginationTableEditDialog from "@/components/tables/pagination_table/dialogs/PaginationTableEditDialog.vue";
 
 export default {
   name: "PaginationTable",

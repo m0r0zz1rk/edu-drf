@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import PaginationTable from "@/components/pagination_table/PaginationTable.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 
 export default {
   name: "GuidePositionCategory",

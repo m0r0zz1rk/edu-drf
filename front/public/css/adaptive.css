@@ -69,6 +69,10 @@
         background: white;
     }
 
+    .adaptive-kug-table {
+        height: 55vh;
+    }
+
     .adaptive-alerts {
         font-size: 16px;
         width: 40vw;
@@ -160,6 +164,10 @@
 
     .v-card-text {
         padding: 0 !important;
+    }
+
+    .adaptive-kug-table {
+        height: 80vh;
     }
 
     .adaptive-login-card {

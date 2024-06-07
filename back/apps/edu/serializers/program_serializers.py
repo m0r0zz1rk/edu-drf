@@ -124,14 +124,16 @@ class ProgramRetrieveAddUpdateSerializer(serializers.Serializer):
     )
     order_number = serializers.CharField(
         max_length=50,
-        allow_null=False,
+        allow_null=True,
         allow_blank=False,
         label='Номер приказа'
     )
     order_date = serializers.DateField(
+        allow_null=True,
         label='Дата приказа'
     )
     order_file = serializers.FileField(
+        allow_null=True,
         required=False,
         use_url=False,
         label='Скан приказа'
@@ -144,5 +146,4 @@ class ProgramGetOrderSerializer(serializers.Serializer):
         allow_null=False,
         label='object_id ДПП'
     )
-
 

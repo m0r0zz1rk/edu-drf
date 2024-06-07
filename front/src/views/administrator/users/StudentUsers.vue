@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import PaginationTable from "@/components/pagination_table/PaginationTable.vue";
-import PaginationTableBaseField from "@/components/pagination_table/PaginationTableBaseField.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
+import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
 import ProfileForm from "@/components/ProfileForm.vue";
 
 export default {

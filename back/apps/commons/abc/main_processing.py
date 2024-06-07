@@ -18,6 +18,7 @@ class MainProcessing(ABC):
     ]
     source = module = process_data = None
     process_completed = True
+    ju = JournalUtils()
 
     def __init__(self, income_data: dict):
         """Инициализация класса"""
@@ -25,7 +26,7 @@ class MainProcessing(ABC):
             self._set_data(income_data)
             self._processing()
         else:
-            JournalUtils().create_journal_rec(
+            self.ju.create_journal_rec(
                 {
                     'source': 'Процесс обработки информации',
                     'module': COMMON,
@@ -76,7 +77,7 @@ class MainProcessing(ABC):
         }
         if traceback is not None:
             journal_rec.output = traceback
-        JournalUtils().create_journal_rec(**journal_rec)
+        self.ju.create_journal_rec(**journal_rec)
 
     @abstractmethod
     def _main_process(self):
@@ -90,7 +91,7 @@ class MainProcessing(ABC):
 
     def _process_error(self, traceback: str):
         """Создание записи об ошибки в процессе обработки в журнале событий"""
-        JournalUtils().create_journal_rec(
+        self.ju.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

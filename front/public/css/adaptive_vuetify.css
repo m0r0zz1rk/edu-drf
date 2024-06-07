@@ -1,5 +1,9 @@
 @media screen and (max-width: 6000px) {
 
+    .v-container {
+        max-width: 100% !important;
+    }
+
     .v-data-table-headers--mobile {
         display: none;
     }

@@ -10,6 +10,7 @@
     :addSpecialFunction="addProgramDetailDialog"
     :xlsxButton="true"
     getRecsURL="/backend/api/v1/edu/programs/"
+    delRecURL="/backend/api/v1/edu/program/delete/"
     :onEditClick="setProgramEdit"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
@@ -26,7 +27,7 @@
 </template>
 
 <script>
-import PaginationTable from "@/components/pagination_table/PaginationTable.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import ProgramDetail from "@/components/dialogs/edu/ProgramDetail.vue";

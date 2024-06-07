@@ -11,6 +11,7 @@ from apps.commons.utils.django.request import RequestUtils
 from apps.commons.utils.django.response import ResponseUtils
 from apps.edu.filters.program import ProgramFilter
 from apps.edu.operations.program.add_update_program_operation import AddUpdateProgramOperation
+from apps.edu.operations.program.delete_program_operation import DeleteProgramOperation
 from apps.edu.serializers.program_serializers import (ProgramListSerializer,
                                                       program_model,
                                                       ProgramRetrieveAddUpdateSerializer,
@@ -99,6 +100,69 @@ class ProgramViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         tags=['Учебная часть. ДПП', ],
+        operation_description="Создание копии ДПП",
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при создании копии ДПП',
+            '200': 'Сообщение "Копия ДПП успешно создана"'
+        }
+    )
+    def copy(self, request, *args, **kwargs):
+        try:
+            proc = self.pru.copy_program(
+                self.kwargs['object_id'],
+            )
+            if proc:
+                return self.respu.ok_response('Копия ДПП успешно создана')
+            else:
+                return self.respu.bad_request_response('Ошибка при создании копии, повторите попытку позже')
+        except Exception:
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Внешний запрос',
+                    'module': EDU,
+                    'status': ERROR,
+                    'description': 'Ошибка при создании копии ДПП'
+                },
+                '-',
+                ExceptionHandling.get_traceback()
+            )
+            return self.respu.bad_request_no_data()
+
+    @swagger_auto_schema(
+        tags=['Учебная часть. ДПП', ],
+        operation_description="Изменение пользователя, редактирующего КУГ ДПП",
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при получении объекта',
+            '200': 'Пользователь успешно установлен'
+        }
+    )
+    def set_kug_edit(self, request, *args, **kwargs):
+        try:
+            proc = self.pru.set_kug_edit(
+                self.kwargs['program_id'],
+                request.user.id
+            )
+            if proc:
+                return self.respu.ok_response_no_data()
+            else:
+                return self.respu.bad_request_no_data()
+        except:
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Внешний запрос',
+                    'module': EDU,
+                    'status': ERROR,
+                    'description': 'Системная ошибка при измении пользователя, редактурующего КУГ ДПП'
+                },
+                '-',
+                ExceptionHandling.get_traceback()
+            )
+            return self.respu.bad_request_no_data()
+
+    @swagger_auto_schema(
+        tags=['Учебная часть. ДПП', ],
         operation_description="Добавление/обновление ДПП",
         request_body=ProgramRetrieveAddUpdateSerializer,
         responses={
@@ -108,7 +172,9 @@ class ProgramViewSet(viewsets.ModelViewSet):
         }
     )
     def create_update(self, request, *args, **kwargs):
-        serialize = ProgramRetrieveAddUpdateSerializer(data=request.data)
+        serialize = ProgramRetrieveAddUpdateSerializer(
+            data=self.ru.convert_form_data_data(request.data)
+        )
         if serialize.is_valid():
             process = AddUpdateProgramOperation(dict(serialize.validated_data))
             if process.process_completed:
@@ -124,7 +190,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
             '400': 'Ошибка при добавлении ДПП',
-            '200': 'Файл приказа ДПП"'
+            '200': 'Файл приказа ДПП'
         }
     )
     def get_order_file(self, request, *args, **kwargs):
@@ -159,3 +225,34 @@ class ProgramViewSet(viewsets.ModelViewSet):
                 ExceptionHandling.get_traceback()
             )
             return self.respu.bad_request_response('Данные не прошли валидацию')
+
+    @swagger_auto_schema(
+        tags=['Учебная часть. ДПП', ],
+        operation_description="Удаление ДПП",
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при удалении ДПП',
+            '200': 'Сообщение "ДПП успешно удалена"'
+        }
+    )
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            proc = DeleteProgramOperation(
+                {'object_id': instance.object_id},
+                request
+            )
+            if proc.process_completed:
+                return self.respu.ok_response('ДПП успешно удалена')
+        except Exception:
+            self.ju.create_journal_rec(
+                {
+                    'source': 'Внешний запрос',
+                    'module': EDU,
+                    'status': ERROR,
+                    'description': 'Ошибка при удалении ДПП'
+                },
+                '-',
+                ExceptionHandling.get_traceback()
+            )
+        return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')

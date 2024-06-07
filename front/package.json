@@ -12,6 +12,7 @@
     "@ssibrahimbas/v-mask": "^1.0.0",
     "date-fns": "^3.6.0",
     "roboto-fontface": "*",
+    "uuid": "^9.0.1",
     "vue": "^3.4.0",
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.3.2",

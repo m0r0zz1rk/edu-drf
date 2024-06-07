@@ -113,8 +113,8 @@
 </template>
 
 <script>
-import PaginationTableAddDialog from "@/components/pagination_table/dialogs/PaginationTableAddDialog.vue";
-import PaginationTableBaseField from "@/components/pagination_table/PaginationTableBaseField.vue";
+import PaginationTableAddDialog from "@/components/tables/pagination_table/dialogs/PaginationTableAddDialog.vue";
+import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
 
 export default {
   name: "PaginationTableManage",

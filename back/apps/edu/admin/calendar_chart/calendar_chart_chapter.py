@@ -1,0 +1,19 @@
+from django.apps import apps
+from django.contrib import admin
+
+calendar_chart_chapter_model = apps.get_model('edu', 'CalendarChartChapter')
+
+
+@admin.register(calendar_chart_chapter_model)
+class CalendarChartChapterAdmin(admin.ModelAdmin):
+    """Отображение разделов КУГ в административной панели"""
+    list_display = ('program_name', 'position', 'name')
+    search_fields = ('program__name', 'name')
+
+    def program_name(self, obj):
+        """Отображение наименования ДПП"""
+        if obj.program is not None:
+            return obj.program.name
+        return '-'
+
+    program_name.short_description = 'ДПП'

@@ -41,7 +41,7 @@
           icon="mdi-close"
           color="coko-blue"
           @click="dialog = !(dialog)"
-        ></v-btn>
+        />
       </v-card-title>
 
       <v-card-text>
@@ -246,14 +246,32 @@
 
           </template>
 
+          <template v-if="programTab === 'kug'">
+
+            <KUGTable :programId="programObjectID" />
+
+          </template>
+
         </v-container>
-        <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
+        <small v-if="!(programTab === 'kug')" class="text-caption text-medium-emphasis">
+          * - обязательные для заполнения поля
+        </small>
 
       </v-card-text>
 
-      <v-card-actions style="background-color: white">
+      <v-card-actions
+        v-if="programTab !== 'kug'"
+        style="background-color: white"
+      >
 
         <v-spacer></v-spacer>
+
+        <v-btn
+          color="coko-blue"
+          text="Создать копию"
+          :loading="loading"
+          @click="copyDpp()"
+        ></v-btn>
 
         <v-btn
           color="coko-blue"
@@ -274,9 +292,11 @@ import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import contentTypeFormats from "@/commons/consts/contentTypeFormats";
 import {convertDateToBackend} from "@/commons/date";
+import KUGTable from "@/components/tables/KUGTable.vue";
 
 export default {
   name: "ProgramDetail",
+  components: {KUGTable},
   props: {
     adCentres: Array, // Список подразделений AD,
     audienceCategories: Array, // Список категорий слушателей,
@@ -284,23 +304,33 @@ export default {
   },
   data() {
     return {
+      // object_id ДПП
       programObjectID: '',
+      // Параметр отображения диалогового окна
       dialog: false,
+      // Параметр загрузки данных в поля на форме
       loading: true,
+      // Проверка корректно заполненных данных формы
       checkDataFill: true,
+      // Выбранная вкладка в окне
       programTab: 'info',
+      // Объект ДПП
       programObject: {},
+      // Объект приказа ДПП
       orderObject: {
         'order_id': null,
         'order_number': '',
         'order_date': '',
         'order_file': null,
       },
+      // Текст ошибки в процессе работы с ДПП
       programDetailError: '',
+      // Возможные типы файлов приказов ДПП
       programTypes: JSON.parse(import.meta.env.VITE_PROGRAM_TYPES)
     }
   },
   methods: {
+    // Установка данных по полученному object_id ДПП
     setProgramObject(dppId) {
       this.orderObject = {
         'order_id': null,
@@ -358,15 +388,18 @@ export default {
         this.loading = false
       }
     },
+    // Скрыть оповещение об ошибке в процессе работы с ДПП
     hideProgramError() {
       document.querySelector('#error-program-detail-alert').classList.remove('alert-visible')
       document.querySelector('#error-program-detail-alert').classList.add('alert-hidden')
     },
+    // Показать оповещение об ошибке в процессе работы с ДПП
     showProgramError(message) {
       this.programDetailError = message
       document.querySelector('#error-program-detail-alert').classList.add('alert-visible')
       document.querySelector('#error-program-detail-alert').classList.remove('alert-hidden')
     },
+    // Проверка корректности заполнения формы
     checkDataFilled() {
       Object.keys(this.programObject).map((key) => {
         if (!([
@@ -394,12 +427,13 @@ export default {
         })
       }
     },
+    // Сохранение информации о программе
     async saveProgram() {
       this.hideProgramError()
       this.checkDataFill = true
       this.checkDataFilled()
       if (this.checkDataFill) {
-        this.loading = true
+        //this.loading = true
         let form = new FormData()
         console.log(this.programObject)
         console.log(this.orderObject)
@@ -444,6 +478,7 @@ export default {
         this.loading = false
       }
     },
+    // Скачивание файла приказа ДПП
     async downloadFile() {
       let orderRequest = await apiRequest(
         '/backend/api/v1/edu/program/order_file/'+this.programObjectID+'/',
@@ -461,9 +496,33 @@ export default {
       document.body.appendChild(a);
       a.click();
       a.remove();
+    },
+    // Создание копии ДПП
+    async copyDpp() {
+      this.loading = true
+      let copyDppRequest = await apiRequest(
+        '/backend/api/v1/edu/program/copy/'+this.programObjectID+'/',
+        'GET',
+        true,
+        null
+      )
+      if (copyDppRequest.error) {
+        this.showProgramError(copyDppRequest.error)
+      }
+      if (copyDppRequest.success) {
+        this.dialog = false
+        showAlert(
+          'success',
+          'ДПП',
+          copyDppRequest.success
+        )
+        this.getRecs()
+      }
+      this.loading = false
     }
   },
   watch: {
+    // Преобразование даты форма дд.мм.гггг в объект Date при изменении информации о приказе ДПП
     orderObject: function() {
       if (this.orderObject['order_date'] !== null) {
         this.orderObject['order_date'] = new Date(this.orderObject['order_date'])

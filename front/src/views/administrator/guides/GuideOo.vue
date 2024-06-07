@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import PaginationTable from "@/components/pagination_table/PaginationTable.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 

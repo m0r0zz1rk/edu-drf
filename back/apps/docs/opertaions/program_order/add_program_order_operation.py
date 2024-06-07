@@ -1,3 +1,5 @@
+import uuid
+
 from django.apps import apps
 
 from apps.commons.utils.django.exception import ExceptionHandling
@@ -27,18 +29,20 @@ class AddUpdateProgramOrderOperation(BaseDocOperation):
             if 'object_id' in doc_data.keys():
                 object_id = doc_data['object_id']
                 del doc_data['object_id']
-                print(doc_data)
                 doc, _ = program_order_model.objects.update_or_create(
                     object_id=object_id,
                     defaults=doc_data
                 )
             else:
                 doc, _ = program_order_model.objects.update_or_create(
+                    object_id=uuid.uuid4(),
                     **doc_data
                 )
             self.doc_id = doc.object_id
             self.process_completed = True
             self.success_message = 'Приказ ДПП успешно добавлен/обновлен'
+            self._doc_operation_success()
         except Exception:
             self.error_message = ExceptionHandling.get_traceback()
+            self._doc_operation_error()
             self.process_completed = False
