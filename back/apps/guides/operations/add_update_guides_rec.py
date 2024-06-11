@@ -1,5 +1,5 @@
 from apps.commons.processes.db.add_update_database_record import AddUpdateDataBaseRecord
-from apps.guides.operations.base_operation_guide import BaseOperationGuide
+from apps.guides.operations.base_guide import BaseOperationGuide
 
 
 class AddUpdateGuidesRec(BaseOperationGuide):

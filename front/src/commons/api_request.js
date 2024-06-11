@@ -1,4 +1,4 @@
-import {getCookie} from "./cookie.js";
+import {delCookie, getCookie} from "./cookie.js";
 import {showAlert} from "./alerts.js";
 
 export function apiRequest (
@@ -41,6 +41,15 @@ export function apiRequest (
         return fetch(backendUrl+endpoint, request_parameters)
             .catch(e => {return null})
             .then(resp => {
+                if ([401, 403].includes(resp.status)) {
+                  delCookie('cokoToken')
+                  showAlert(
+                    'error',
+                    'Авторизация',
+                    'Пожалуйста, войдите в систему'
+                  )
+                  window.location.replace('/login')
+                }
                 if(!([200, 201, 202, 204, 400, 401, 403, 404, 409, 500].includes(resp.status))) {
                     showAlert(
                         'error',

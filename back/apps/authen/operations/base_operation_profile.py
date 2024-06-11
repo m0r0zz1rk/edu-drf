@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 
-from apps.authen.utils.profile import ProfileUtils
+from apps.authen.services.profile import ProfileService
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class BaseOperationProfile(ABC):
     """Базовый класс для действий с профилями пользователей и сотрудников"""
 
-    ju = JournalUtils()
-    pu = ProfileUtils()
+    ju = JournalService()
+    pu = ProfileService()
     model_name = source = module = ''
     object_data = request = None
     error = False

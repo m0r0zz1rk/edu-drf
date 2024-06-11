@@ -3,59 +3,18 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from apps.commons.models import BaseTable
+from apps.authen.models.base_profile import BaseProfile
 
 
-class CokoProfile(BaseTable):
+class CokoProfile(BaseProfile):
     """Модель профиля сотрудника ЦОКО"""
-    django_user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='Пользователь Django'
-    )
-    surname = models.CharField(
-        max_length=150,
-        null=False,
-        blank=False,
-        default='Фамилия',
-        verbose_name='Фамилия'
-    )
-    name = models.CharField(
-        max_length=150,
-        null=False,
-        blank=False,
-        default='Имя',
-        verbose_name='Имя'
-    )
-    patronymic = models.CharField(
-        max_length=150,
-        null=False,
-        blank=True,
-        verbose_name='Отчество'
-    )
     curator_groups = models.BooleanField(
         default=False,
         verbose_name='Отображать только учебные группы как куратора'
     )
 
     def __str__(self):
-        try:
-            data = f'{self.surname} {self.name}'
-            if len(str(self.patronymic)) > 0:
-                data = f'{data} {self.patronymic}'
-            return data
-        except Exception:
-            return '(Данные не найдены)'
-
-    def get_display_name(self):
-        """Получение ФИО пользователя"""
-        try:
-            display_name = f'{self.surname} {self.name}'
-            if len(self.patronymic) > 0:
-                display_name += f' {self.patronymic}'
-            return display_name
-        except Exception:
-            return '(Данные не найдены)'
+        return self.display_name
 
     class Meta:
         verbose_name = 'Профиль сотрудника ЦОКО'

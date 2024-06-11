@@ -1,4 +1,4 @@
-from apps.authen.utils.profile import ProfileUtils
+from apps.authen.services.profile import ProfileService
 
 
 class RequestUtils:
@@ -9,7 +9,7 @@ class RequestUtils:
         """Получение наименования источника для журнала событий"""
         if request.user:
             if request.user.is_authenticated:
-                return ProfileUtils().get_profile_or_info_by_attribute(
+                return ProfileService().get_profile_or_info_by_attribute(
                     'django_user_id',
                     request.user.id,
                     'display_name'

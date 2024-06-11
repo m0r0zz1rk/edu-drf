@@ -41,7 +41,6 @@ PROJECT_APPS = [
     'apps.guides',
     'apps.journal',
     'apps.reports',
-    'apps.settings',
     'apps.surveys',
     'apps.users'
 ]

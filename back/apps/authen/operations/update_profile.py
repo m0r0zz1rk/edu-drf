@@ -1,6 +1,6 @@
 from apps.authen.operations.base_operation_profile import BaseOperationProfile
 from apps.commons.processes.db.add_update_database_record import AddUpdateDataBaseRecord
-from apps.guides.utils.state import StateUtils
+from apps.guides.services.state import StateService
 
 
 class UpdateProfile(BaseOperationProfile):
@@ -13,7 +13,7 @@ class UpdateProfile(BaseOperationProfile):
         for k, v in self.object_data.items():
             if k != 'email':
                 if k == 'state':
-                    state = StateUtils().get_state_by_name(v)
+                    state = StateService().get_state_by_name(v)
                     profile_data[k] = state
                 else:
                     profile_data[k] = v

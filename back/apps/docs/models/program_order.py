@@ -4,7 +4,7 @@ import os
 from django.db import models
 
 from apps.commons.models import BaseTable
-from apps.docs.utils.program_order import ProgramOrderUtils
+from apps.docs.services.program_order import ProgramOrderService
 
 
 class ProgramOrder(BaseTable):
@@ -21,7 +21,7 @@ class ProgramOrder(BaseTable):
         verbose_name='Дата приказа'
     )
     file = models.FileField(
-        upload_to=ProgramOrderUtils().get_upload_path,
+        upload_to=ProgramOrderService().get_upload_path,
         null=True,
         max_length=1000,
         verbose_name='Файл приказа'

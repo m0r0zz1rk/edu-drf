@@ -7,7 +7,7 @@ from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import COMMON
 from apps.journal.consts.journal_rec_statuses import SUCCESS, ERROR
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class DeleteDataBaseRecord(MainProcessing):
@@ -62,7 +62,7 @@ class DeleteDataBaseRecord(MainProcessing):
         :param traceback: traceback возникшей в процессе ошибки
         :return:
         """
-        JournalUtils().create_journal_rec(
+        JournalService().create_journal_rec(
             {
                 'source': 'Процесс удаления записи из БД',
                 'module': COMMON,
@@ -78,7 +78,7 @@ class DeleteDataBaseRecord(MainProcessing):
         Фиксация сообщения об успешном удалении записи из БД
         :return:
         """
-        JournalUtils().create_journal_rec(
+        JournalService().create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

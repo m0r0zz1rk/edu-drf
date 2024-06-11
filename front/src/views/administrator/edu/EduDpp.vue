@@ -17,7 +17,6 @@
   />
 
     <ProgramDetail
-      :key="programDetailKey"
       ref="programDetail"
       :audienceCategories="audienceCategories"
       :adCentres="adCentres"
@@ -37,7 +36,6 @@ export default {
   components: {ProgramDetail, PaginationTable},
   data() {
     return {
-      programDetailKey: 0,
       tableHeaders: [
         {
           'title': 'Подразделение',

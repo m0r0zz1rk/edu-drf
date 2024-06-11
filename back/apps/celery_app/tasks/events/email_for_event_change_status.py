@@ -3,7 +3,7 @@ import uuid
 from django.conf import settings
 from django.core.mail import send_mail
 
-from apps.authen.utils.profile import ProfileUtils
+from apps.authen.services.profile import ProfileService
 from apps.celery_app.utils import UserEventEmailsUtils
 from apps.commons.consts.events.event_statuses import EVENT_STATUSES
 from apps.commons.consts.journals.journal_event_results import ERROR
@@ -43,20 +43,20 @@ def email_for_event_change_status_task(event_id: uuid, new_status: EVENT_STATUSE
             if new_status == 'PUBLISHED':
                 for email in eu.get_list_of_potential_user_emails(event.object_id):
                     if not UserEventEmailsUtils.check_event_published(
-                        ProfileUtils.get_user_id_by_email(email),
+                        ProfileService.get_user_id_by_email(email),
                         event_id
                     ):
                         UserEventEmailsUtils.create_rec_event(
-                            ProfileUtils.get_user_id_by_email(email),
+                            ProfileService.get_user_id_by_email(email),
                             event_id,
                             'PUBLISHED'
                         )
-                        profile = ProfileUtils.get_profile_by_user_email(email)
+                        profile = ProfileService.get_profile_by_user_email(email)
                         if profile is not None:
                             appeal = 'Уважаемая'
                             if profile.sex:
                                 appeal = 'Уважаемый'
-                            message = f'{appeal} {profile.get_display_name()}!\n{text}'
+                            message = f'{appeal} {profile.display_name}!\n{text}'
                             send_mail(
                                 subject,
                                 None,

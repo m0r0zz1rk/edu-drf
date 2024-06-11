@@ -433,10 +433,8 @@ export default {
       this.checkDataFill = true
       this.checkDataFilled()
       if (this.checkDataFill) {
-        //this.loading = true
+        this.loading = true
         let form = new FormData()
-        console.log(this.programObject)
-        console.log(this.orderObject)
         if (!(Object.keys(this.programObject).includes('object_id'))) {
           form.append('object_id', null)
         }

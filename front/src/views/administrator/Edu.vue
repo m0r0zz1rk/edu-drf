@@ -25,6 +25,10 @@
 
             <EduDpp v-if="eduTab === 'dpp'" />
 
+            <EduPlanningParameter v-if="eduTab === 'planning'" />
+
+            <EducationService v-if="eduTab === 'ou'" />
+
           </div>
         </v-card-text>
       </v-card>
@@ -35,10 +39,12 @@
 <script>
 import LkPage from "@/components/LkPage.vue";
 import EduDpp from "@/views/administrator/edu/EduDpp.vue";
+import EduPlanningParameter from "@/views/administrator/edu/EduPlanningParameter.vue";
+import EducationService from "@/views/administrator/edu/EducationService.vue";
 
 export default {
   name: "Edu",
-  components: {EduDpp, LkPage},
+  components: {EducationService, EduPlanningParameter, EduDpp, LkPage},
   props: {
     usePreLoader: Function,
   },

@@ -8,7 +8,7 @@ from apps.commons.utils.django.settings import SettingsUtils
 from apps.commons.utils.django.user import UserUtils
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class JWTCredential:
@@ -23,7 +23,7 @@ class JWTCredential:
             в журнал системных событий
         """
         self.du = SettingsUtils()
-        self.ju = JournalUtils()
+        self.ju = JournalService()
         self._token = token
 
     def _journal_error(self, description: str, output: str = None):

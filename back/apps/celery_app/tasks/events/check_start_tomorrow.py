@@ -47,7 +47,7 @@ def check_start_tomorrow_task():
                                 appeal = 'Уважаемая'
                                 if profile.sex:
                                     appeal = 'Уважаемый'
-                                message = f'{appeal} {profile.get_display_name()}!\n{text}'
+                                message = f'{appeal} {profile.display_name}!\n{text}'
                                 send_mail(
                                     subject,
                                     None,

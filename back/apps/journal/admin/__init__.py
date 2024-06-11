@@ -1,3 +1,3 @@
-from .journal_admin import JournalAdmin
-from .payload_admin import PayloadAdmin
-from .output_admin import OutputAdmin
+from .journal import JournalAdmin
+from .payload import PayloadAdmin
+from .output import OutputAdmin

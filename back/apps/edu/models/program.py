@@ -2,7 +2,6 @@ from django.db import models
 
 from apps.commons.models import BaseTable
 from apps.docs.models import ProgramOrder
-from apps.guides.models import AudienceCategory
 
 
 class Program(BaseTable):
@@ -39,7 +38,7 @@ class Program(BaseTable):
         verbose_name='Объем программы (часов)'
     )
     categories = models.ManyToManyField(
-        AudienceCategory,
+        'guides.AudienceCategory',
         verbose_name='Категории слушателей'
     )
     annotation = models.TextField(

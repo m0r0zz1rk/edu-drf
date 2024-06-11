@@ -1,9 +1,10 @@
 from django.urls import path
 
-from apps.edu.api.program_viewset import ProgramViewSet
+from apps.edu.api.program import ProgramViewSet
 
 program_urlpatterns = [
     path('programs/', ProgramViewSet.as_view({'get': 'list'})),
+    path('approved_programs/', ProgramViewSet.as_view({'get': 'approved_list'})),
     path('program/<uuid:object_id>/', ProgramViewSet.as_view({'get': 'retrieve'})),
     path('program/copy/<uuid:object_id>/', ProgramViewSet.as_view({'get': 'copy'})),
     path('program/set_kug_edit/<uuid:program_id>/', ProgramViewSet.as_view({'get': 'set_kug_edit'})),

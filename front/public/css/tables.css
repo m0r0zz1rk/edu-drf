@@ -6,8 +6,12 @@
     height: 94%;
 }
 
-.table-row-click:hover {
+.selected-row, .table-row-click:hover {
     background-color: #FF5722;
     color: white;
     cursor: pointer;
+}
+
+.selected-row {
+    cursor: auto !important;
 }

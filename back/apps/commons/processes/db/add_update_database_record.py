@@ -9,7 +9,7 @@ from apps.commons.utils.django.model import ModelUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class AddUpdateDataBaseRecord(MainProcessing):
@@ -55,7 +55,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
             if isinstance(model_exist, str):
                 description = 'Системная ошибка'
                 output = model_exist
-            JournalUtils().create_journal_rec(
+            JournalService().create_journal_rec(
                 {
                     'source': 'Добавление/обновление записи',
                     'module': self.module,
@@ -84,7 +84,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
         Фиксация ошибки валидации полей модели в журнале событий
         :return:
         """
-        JournalUtils().create_journal_rec(
+        JournalService().create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,
@@ -101,7 +101,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
         :param traceback: traceback возникшей в процессе ошибки
         :return:
         """
-        JournalUtils().create_journal_rec(
+        JournalService().create_journal_rec(
             {
                 'source': 'Процесс добавления/обновления записи в БД',
                 'module': COMMON,
@@ -161,7 +161,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
         Фиксация сообщения об успешном добавлении/обновлении записи в БД
         :return:
         """
-        JournalUtils().create_journal_rec(
+        JournalService().create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

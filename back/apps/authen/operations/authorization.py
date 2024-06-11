@@ -2,7 +2,7 @@ from typing import Union
 
 from django.contrib.auth import authenticate, login
 
-from apps.authen.utils.profile import ProfileUtils
+from apps.authen.services.profile import ProfileService
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.ad.ad_centre import AdCentreUtils
 from apps.commons.utils.ad.ad_centre_coko_user import AdCentreCokoUserUtils
@@ -12,7 +12,7 @@ from apps.commons.utils.token import TokenUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class Authorization(MainProcessing):
@@ -24,9 +24,9 @@ class Authorization(MainProcessing):
         'password',
         'centre_auth'
     ]
-    ju = JournalUtils()
+    ju = JournalService()
     uu = UserUtils()
-    pu = ProfileUtils()
+    pu = ProfileService()
     lu = LdapUtils()
     accu = AdCentreCokoUserUtils()
     request = username = auth_error = auth_user = auth_data = None
@@ -68,7 +68,7 @@ class Authorization(MainProcessing):
         }
         self.ju.create_journal_rec(
             {
-                'source': ProfileUtils().get_profile_or_info_by_attribute(
+                'source': ProfileService().get_profile_or_info_by_attribute(
                     'django_user_id',
                     self.auth_user.id,
                     'display_name'

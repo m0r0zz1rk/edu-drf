@@ -5,7 +5,7 @@ from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES, COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class MainProcessing(ABC):
@@ -16,12 +16,17 @@ class MainProcessing(ABC):
         'module',
         'process_data'
     ]
+
     source = module = process_data = None
     process_completed = True
-    ju = JournalUtils()
+    ju = JournalService()
 
-    def __init__(self, income_data: dict):
-        """Инициализация класса"""
+    def __init__(self, income_data: dict, request=None):
+        """
+        Инициализация класса - установка параметров
+        :param income_data: словарь с входными данными
+        :param request: объект request (при наличии)
+        """
         if self._validate_income_data(income_data):
             self._set_data(income_data)
             self._processing()

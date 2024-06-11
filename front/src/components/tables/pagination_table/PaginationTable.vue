@@ -78,7 +78,11 @@
 
     <template v-slot:item="{ item, index }">
       <tr
-        v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay, 'table-row-click': itemSelectEvent}"
+        v-bind:class="{
+          'v-data-table__tr v-data-table__tr--mobile': mobileDisplay,
+          'table-row-click': itemSelectEvent,
+          'selected-row': itemSelectEvent && selectedItemObjectID === item.object_id
+        }"
         @click="itemSelectEvent && itemSelectEvent(item)"
       >
         <td  style="text-align: center;">
@@ -147,6 +151,7 @@
                   &nbsp;&nbsp;
 
                 <v-icon
+                    v-if="delRecURL"
                     icon="mdi-delete"
                     color="coko-blue"
                     @click="deleteItem(item.object_id)"
@@ -221,6 +226,7 @@ import SpecialField from "@/components/tables/pagination_table/special_fields/Sp
 import {no} from "vuetify/locale";
 import PaginationTableEditDialog from "@/components/tables/pagination_table/dialogs/PaginationTableEditDialog.vue";
 
+// Компонент пагинационной таблицы
 export default {
   name: "PaginationTable",
   components: {
@@ -271,6 +277,7 @@ export default {
         addRequired: Проверка на обязательное заполнение при добавлении/редактировании записи
       }*/
     itemSelectEvent: Function, // Событие, вызываемое при выборе строки в таблице
+    selectedItemObjectID: String, // object_id выбранного объекта для выделения в таблице
   },
   data() {
     return {

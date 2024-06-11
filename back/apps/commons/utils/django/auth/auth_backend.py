@@ -7,13 +7,13 @@ from apps.commons.utils.django.auth.jwt_credential import JWTCredential
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR, JOURNAL_REC_STATUSES, WARNING
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class AuthBackend(authentication.BaseAuthentication):
     """Аутентификация на основе JWT токена"""
 
-    ju = JournalUtils()
+    ju = JournalService()
     auth_header = None
 
     def _journal_rec(

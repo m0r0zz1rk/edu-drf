@@ -1,9 +1,9 @@
 from django.urls import path
 
-from apps.authen.api.authorization_viewset import AuthorizationViewSet
-from apps.authen.api.registration_viewset import RegistrationViewSet
+from apps.authen.api.authorization import AuthorizationViewSet
+from apps.authen.api.registration import RegistrationViewSet
 
-from apps.authen.api.profile_viewset import ProfileViewSet
+from apps.authen.api.profile import ProfileViewSet
 
 authorization_urlpatterns = [
     path('login/', AuthorizationViewSet.as_view({'post': 'user_login'})),

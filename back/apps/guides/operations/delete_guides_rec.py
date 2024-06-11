@@ -1,5 +1,5 @@
 from apps.commons.processes.db.delete_database_record import DeleteDataBaseRecord
-from apps.guides.operations.base_operation_guide import BaseOperationGuide
+from apps.guides.operations.base_guide import BaseOperationGuide
 
 
 class DeleteGuidesRec(BaseOperationGuide):

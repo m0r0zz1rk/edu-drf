@@ -7,7 +7,7 @@ from apps.commons.utils.data_types.date import DateUtils
 from apps.commons.utils.django.settings import SettingsUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES, COMMON
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES, NO_RESULT
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class Journal(BaseTable):
@@ -57,6 +57,6 @@ def journal_house_keeping(sender, **kwargs):
     journal_max = SettingsUtils().get_parameter_from_settings('JOURNAL_MAX_LENGTH')
     if journal_max is None:
         journal_max = 250000
-    ju = JournalUtils()
+    ju = JournalService()
     if ju.get_journal_size() > journal_max:
         ju.journal_older_delete()

@@ -2,7 +2,7 @@ from typing import Union
 
 from django.db import transaction
 
-from apps.authen.utils.profile import ProfileUtils
+from apps.authen.services.profile import ProfileService
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.group import GroupUtils
@@ -10,7 +10,7 @@ from apps.commons.utils.django.user import UserUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class Registration(MainProcessing):
@@ -29,8 +29,8 @@ class Registration(MainProcessing):
         'health',
         'password'
     ]
-    ju = JournalUtils()
-    pu = ProfileUtils()
+    ju = JournalService()
+    pu = ProfileService()
     gu = GroupUtils()
     uu = UserUtils()
     reg_error = None

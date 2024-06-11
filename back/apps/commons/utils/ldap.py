@@ -10,7 +10,7 @@ from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.settings import SettingsUtils
 from apps.journal.consts.journal_modules import COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.utils.journal_utils import JournalUtils
+from apps.journal.services.journal import JournalService
 
 
 class LdapUtils:
@@ -26,7 +26,7 @@ class LdapUtils:
         'Главный бухгалтер'
     ]
     su = SettingsUtils()
-    ju = JournalUtils()
+    ju = JournalService()
     AD_SERVER = AD_USER = AD_PASSWORD = AD_SEARCH_TREE = conn = None
 
     def __init__(self):
