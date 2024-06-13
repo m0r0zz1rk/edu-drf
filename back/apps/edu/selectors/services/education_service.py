@@ -6,7 +6,7 @@ education_service_model = apps.get_model('edu', 'EducationService')
 
 
 def education_service_queryset() -> QuerySet:
-    """Получение queryset с образоватльными услугами (курсами)"""
+    """Получение queryset с образовательными услугами (курсами)"""
     return education_service_model.objects.all().order_by('-date_create')
 
 

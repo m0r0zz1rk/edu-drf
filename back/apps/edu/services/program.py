@@ -4,7 +4,7 @@ from typing import Optional
 from django.apps import apps
 
 from apps.authen.services.profile import ProfileService
-from apps.commons.utils.ad.ad_centre import AdCentreUtils
+from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.edu.models import Program
 from apps.edu.operations.calendar_chart.add_update_calendar_chart_element import AddUpdateCalendarChartElement
 from apps.edu.operations.program.add_update_program import AddUpdateProgramOperation
@@ -151,7 +151,7 @@ class ProgramService:
                     'program_order'
                 ]:
                     data[key] = value
-            dep = AdCentreUtils().get_ad_centre('object_id', instance.department_id)
+            dep = AdCentreService().get_ad_centre('object_id', instance.department_id)
             data['department'] = dep.display_name
             data['order_id'] = None
             data['order_number'] = None
@@ -165,8 +165,8 @@ class ProgramService:
                     data['order_file'] = instance.program_order.file
             categories = ''
             for category in instance.categories.all():
-                categories += f'{category.name}, '
-            data['categories'] = categories[:-2]
+                categories += f'{category.name};; '
+            data['categories'] = categories[:-3]
             return data
         except Exception:
             return None

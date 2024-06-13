@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.contrib.auth.models import User
 
-from apps.commons.utils.ad.ad_centre import AdCentreUtils
+from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.ldap import LdapUtils
 
 ad_centre_coko_user_model = apps.get_model('commons', 'AdCentreCokoUser')
@@ -27,7 +27,7 @@ class AdCentreCokoUserUtils:
         :return:
         """
         if not self.is_ad_centre_coko_user_exists(user):
-            acu = AdCentreUtils()
+            acu = AdCentreService()
             ad_centre = acu.get_ad_centre(
                 'display_name',
                 display_name

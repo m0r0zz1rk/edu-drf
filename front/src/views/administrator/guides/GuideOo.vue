@@ -1,9 +1,8 @@
 <template>
 
-  <v-skeleton-loader
-    v-if="fieldsArray === null"
-    type="card"
-  />
+  <template v-if="fieldsArray === null">
+    <b>Подгружаем данные, подождите...</b>
+  </template>
 
   <PaginationTable
     v-if="fieldsArray !== null"

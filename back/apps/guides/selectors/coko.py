@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from apps.commons.utils.ad.ad_centre_coko_user import AdCentreCokoUserUtils
+from apps.commons.services.ad.ad_centre_coko_user import AdCentreCokoUserUtils
 
 
 class CokoFilter(filters.FilterSet):

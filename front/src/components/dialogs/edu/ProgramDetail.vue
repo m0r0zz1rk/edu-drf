@@ -364,7 +364,7 @@ export default {
                   this.programObject[key] = data[key]
                 }
               })
-              this.programObject['categories'] = data['categories'].split(', ')
+              this.programObject['categories'] = data['categories'].split(';; ')
               let orderData = {}
               Object.keys(this.orderObject).map((key) => {
                 if (key !== 'order_file') {
@@ -439,7 +439,15 @@ export default {
           form.append('object_id', null)
         }
         Object.keys(this.programObject).map((key) => {
-          form.append(key, this.programObject[key])
+          if (key === 'categories') {
+            let cats_str = ''
+            this.programObject['categories'].map((cat) => {
+              cats_str += cat+';;'
+            })
+            form.append(key, cats_str.slice(0, -2))
+          } else {
+            form.append(key, this.programObject[key])
+          }
         })
         Object.keys(this.orderObject).map((key) => {
           if (this.orderObject[key] instanceof Date) {

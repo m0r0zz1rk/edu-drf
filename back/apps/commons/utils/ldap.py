@@ -1,11 +1,10 @@
-import codecs
 from typing import Optional
 
 from django.contrib.auth.models import User
 from ldap3 import Server, Connection, SUBTREE
 from ldap3.core.exceptions import LDAPSocketOpenError
 
-from apps.commons.utils.ad.ad_centre import AdCentreUtils
+from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.settings import SettingsUtils
 from apps.journal.consts.journal_modules import COMMON
@@ -109,7 +108,7 @@ class LdapUtils:
             )
             deps = self.conn.entries
             for dep in deps:
-                AdCentreUtils().add_ad_centre(
+                AdCentreService().add_ad_centre(
                     {
                         'display_name': dep.DisplayName,
                         'object_guid': dep.ObjectGUID

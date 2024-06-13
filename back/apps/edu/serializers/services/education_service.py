@@ -2,31 +2,18 @@ from django.apps import apps
 from rest_framework import serializers
 
 from apps.edu.serializers.program import ProgramEducationServiceSerializer
+from apps.edu.serializers.services.base_service import BaseServiceSerializer
 
 education_service_model = apps.get_model('edu', 'EducationService')
 
 
-class EducationServiceBaseSerializer(serializers.ModelSerializer):
+class EducationServiceBaseSerializer(BaseServiceSerializer):
     """Сериализация базовых данных при работе с образовательной услугой (курсом)"""
-    date_start = serializers.DateField(
-        format='%d.%m.%Y',
-        label='Дата начала обучения'
-    )
-    date_end = serializers.DateField(
-        format='%d.%m.%Y',
-        label='Дата окончания обучения'
-    )
 
     def get_program(self, obj):
         """Получение наименование программы"""
         if obj.program:
             return obj.program.name
-        return '-'
-
-    def get_program_id(self, obj):
-        """Получение наименование программы"""
-        if obj.program:
-            return obj.program.object_id
         return '-'
 
     class Meta:

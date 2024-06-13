@@ -1,7 +1,7 @@
 from django.apps import apps
 from rest_framework import serializers
 
-from apps.commons.utils.ad.ad_centre_coko_user import AdCentreCokoUserUtils
+from apps.commons.services.ad.ad_centre_coko_user import AdCentreCokoUserUtils
 
 coko_profile_model = apps.get_model('authen', 'CokoProfile')
 

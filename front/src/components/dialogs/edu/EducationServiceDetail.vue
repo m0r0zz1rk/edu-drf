@@ -261,7 +261,6 @@ export default {
     }
   },
   methods: {
-    convertBackendDate,
     // Скрыть оповещение об ошибке в процессе работы с образовательной услугой (курсом)
     hideEducationServiceError() {
       document.querySelector('#error-education-service-alert').classList.remove('alert-visible')

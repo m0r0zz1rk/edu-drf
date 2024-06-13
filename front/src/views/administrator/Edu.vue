@@ -29,6 +29,8 @@
 
             <EducationService v-if="eduTab === 'ou'" />
 
+            <EduInformationService v-if="eduTab === 'iku'" />
+
           </div>
         </v-card-text>
       </v-card>
@@ -41,10 +43,11 @@ import LkPage from "@/components/LkPage.vue";
 import EduDpp from "@/views/administrator/edu/EduDpp.vue";
 import EduPlanningParameter from "@/views/administrator/edu/EduPlanningParameter.vue";
 import EducationService from "@/views/administrator/edu/EducationService.vue";
+import EduInformationService from "@/views/administrator/edu/EduInformationService.vue";
 
 export default {
   name: "Edu",
-  components: {EducationService, EduPlanningParameter, EduDpp, LkPage},
+  components: {EduInformationService, EducationService, EduPlanningParameter, EduDpp, LkPage},
   props: {
     usePreLoader: Function,
   },

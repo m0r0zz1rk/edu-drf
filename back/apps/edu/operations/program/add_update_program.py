@@ -3,7 +3,7 @@ from typing import Optional
 
 from django.apps import apps
 
-from apps.commons.utils.ad.ad_centre import AdCentreUtils
+from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.program_order.add_program_order import AddUpdateProgramOrderOperation
 from apps.edu.operations.program.base_program import BaseProgramOperation
@@ -16,7 +16,7 @@ class AddUpdateProgramOperation(BaseProgramOperation):
     """Класс действия для добавления/обновления ДПП"""
 
     acu = AudienceCategoryService()
-    adcu = AdCentreUtils()
+    adcu = AdCentreService()
 
     error_description = 'Произошла ошибка в процессе добавления/обновления ДПП'
     success_description = 'ДПП успешно добавлено/обновлено'
@@ -35,7 +35,6 @@ class AddUpdateProgramOperation(BaseProgramOperation):
         for field in self.program_fields:
             if field not in ['date_create', 'kug_edit', 'program', 'order_file']:
                 if field not in self.program_data.keys():
-                    print(field)
                     return False
         return True
 
@@ -89,7 +88,7 @@ class AddUpdateProgramOperation(BaseProgramOperation):
             )
             cat_obj_list = []
             if len(self.program_data['categories']) > 0:
-                cat_list = self.program_data['categories'].split(',')
+                cat_list = self.program_data['categories'].split(';;')
                 cat_obj_list = [
                     self.acu.get_category_object_by_name(cat_name).object_id
                     for cat_name in cat_list

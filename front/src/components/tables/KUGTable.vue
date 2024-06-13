@@ -60,10 +60,10 @@
                   <template v-for="column in columns">
                       <td
                         style="
-      text-align: center;
-      background-color: #373c59;
-      color: white;
-    "
+                          text-align: center;
+                          background-color: #373c59;
+                          color: white;
+                        "
                         v-if="!(['position', 'actions'].includes(column.key))"
                       >
                           <b
@@ -76,10 +76,10 @@
 
                       <td
                         style="
-      text-align: center;
-      background-color: #373c59;
-      color: white;
-    "
+                          text-align: center;
+                          background-color: #373c59;
+                          color: white;
+                        "
                         v-if="(['position', 'actions'].includes(column.key) && (kugEdit))"
                       >
                           <b

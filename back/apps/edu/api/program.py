@@ -207,7 +207,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
         )
         if serialize.is_valid():
             process = AddUpdateProgramOperation(
-                dict(serialize.validated_data),
+                dict(serialize.data),
                 request
             )
             if process.process_completed:

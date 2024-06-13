@@ -4,8 +4,7 @@ from django.contrib.auth import authenticate, login
 
 from apps.authen.services.profile import ProfileService
 from apps.commons.abc.main_processing import MainProcessing
-from apps.commons.utils.ad.ad_centre import AdCentreUtils
-from apps.commons.utils.ad.ad_centre_coko_user import AdCentreCokoUserUtils
+from apps.commons.services.ad.ad_centre_coko_user import AdCentreCokoUserUtils
 from apps.commons.utils.django.user import UserUtils
 from apps.commons.utils.ldap import LdapUtils
 from apps.commons.utils.token import TokenUtils

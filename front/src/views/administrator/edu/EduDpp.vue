@@ -1,5 +1,9 @@
 <template>
 
+  <template v-if="fieldsArray === null">
+    <b>Подгружаем данные, подождите...</b>
+  </template>
+
   <PaginationTable
     ref="dppPaginationTable"
     v-if="fieldsArray !== null"

@@ -89,8 +89,8 @@ class ProgramEducationServiceSerializer(ProgramBaseSerializer):
         """Получение списка имен категорий"""
         cats = ''
         for cat in obj.categories.all().order_by('name'):
-            cats += cat.name + ', '
-        return cats[:-2]
+            cats += cat.name + ';; '
+        return cats[:-3]
 
     class Meta:
         model = program_model

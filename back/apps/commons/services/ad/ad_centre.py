@@ -7,7 +7,7 @@ from apps.commons.utils.validate import ValidateUtils
 ad_centre_model = apps.get_model('commons', 'AdCentre')
 
 
-class AdCentreUtils:
+class AdCentreService:
     """Класс методов для работы с моделью AdCentre"""
 
     @staticmethod
