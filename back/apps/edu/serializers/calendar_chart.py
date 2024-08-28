@@ -1,8 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-calendar_chart_chapter_model = apps.get_model('edu', 'CalendarChartChapter')
-calendar_chart_theme_model = apps.get_model('edu', 'CalendarChartTheme')
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
 
 
 class CalendarChartElementSerializer(serializers.ModelSerializer):

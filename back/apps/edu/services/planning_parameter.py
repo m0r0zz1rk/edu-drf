@@ -1,8 +1,6 @@
 from typing import Optional
 
-from django.apps import apps
-
-planning_parameter_model = apps.get_model('edu', 'PlanningParameter')
+from apps.edu.selectors.planning_parameter import planning_parameter_model
 
 
 class PlanningParameterService:

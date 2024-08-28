@@ -10,8 +10,9 @@ from apps.commons.utils.django.response import ResponseUtils
 from apps.guides.selectors.name_field import NameFieldFilter
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
 from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
+from apps.guides.selectors.position_category import position_category_queryset
 from apps.guides.serializers.position_category import PositionCategoryListUpdateSerializer, \
-    position_category_model, PositionCategoryBaseSerializer
+    PositionCategoryBaseSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.services.journal import JournalService
@@ -23,7 +24,7 @@ class PositionCategoryViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     respu = ResponseUtils()
 
-    queryset = position_category_model.objects.all().order_by('name')
+    queryset = position_category_queryset()
     serializer_class = PositionCategoryListUpdateSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

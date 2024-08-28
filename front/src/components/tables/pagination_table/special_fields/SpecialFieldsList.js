@@ -3,7 +3,8 @@ const specialFieldsList = [
     'journalRecStatus',
     'journalDetailInfo',
     'cokoCuratorGroups',
-    'dppOrder'
+    'dppOrder',
+    'studentGroupStatus'
 ]
 
 export default specialFieldsList

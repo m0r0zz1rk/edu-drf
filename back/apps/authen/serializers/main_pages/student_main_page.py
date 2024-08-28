@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-student_profile_model = apps.get_model('authen', 'StudentProfile')
+from apps.guides.selectors.user import student_profile_model
 
 
 class StudentMainPageSerializer(serializers.ModelSerializer):

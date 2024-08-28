@@ -9,7 +9,7 @@ from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import JOURNAL
 from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.selectors.journal import JournalFilter
+from apps.journal.selectors.journal import JournalFilter, journal_queryset
 from apps.journal.serializers.journal import JournalSerializer
 from apps.journal.services.journal import JournalService
 
@@ -20,7 +20,7 @@ class JournalViewSet(viewsets.ModelViewSet):
     respu = ResponseUtils()
 
     permission_classes = [IsAuthenticated, IsAdministrators]
-    queryset = ju.journal_model.objects.all().order_by('-date_create')
+    queryset = journal_queryset()
     serializer_class = JournalSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

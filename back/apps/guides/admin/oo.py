@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
@@ -6,10 +5,8 @@ from import_export.fields import Field
 from import_export.widgets import ForeignKeyWidget
 
 from apps.guides.models import Oo
-
-mo_model = apps.get_model('guides', 'Mo')
-
-oo_type_model = apps.get_model('guides', 'OoType')
+from apps.guides.selectors.mo import mo_model
+from apps.guides.selectors.oo_type import oo_type_model
 
 
 class OoResources(resources.ModelResource):

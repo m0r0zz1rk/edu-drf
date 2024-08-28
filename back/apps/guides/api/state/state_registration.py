@@ -6,7 +6,8 @@ from apps.commons.pagination import CustomPagination
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
 from apps.guides.selectors.name_field import NameFieldFilter
-from apps.guides.serializers.state.state_registration import state_model, StateRegistrationSerializer
+from apps.guides.selectors.state import state_queryset
+from apps.guides.serializers.state.state_registration import StateRegistrationSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.services.journal import JournalService
@@ -15,7 +16,7 @@ from apps.journal.services.journal import JournalService
 class StateRegistrationViewSet(viewsets.ModelViewSet):
     """Класс эндпоинтов для работы с государствами"""
     serializer_class = StateRegistrationSerializer
-    queryset = state_model.objects.all().order_by('name')
+    queryset = state_queryset()
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]
     filterset_class = NameFieldFilter

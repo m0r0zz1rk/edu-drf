@@ -1,13 +1,10 @@
 from typing import Union
 
-from django.apps import apps
-
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
+from apps.edu.selectors.services.education_service import education_service_model
+from apps.edu.selectors.services.information_service import information_service_model
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-
-education_service_model = apps.get_model('edu', 'EducationService')
-information_service_model = apps.get_model('edu', 'InformationService')
 
 
 class DeleteService(MainProcessing):

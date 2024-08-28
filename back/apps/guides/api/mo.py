@@ -7,10 +7,11 @@ from apps.commons.pagination import CustomPagination
 from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
+from apps.guides.selectors.mo import mo_queryset
 from apps.guides.selectors.name_field import NameFieldFilter
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
 from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
-from apps.guides.serializers.mo import MoListUpdateSerializer, mo_model, MoBaseSerializer
+from apps.guides.serializers.mo import MoListUpdateSerializer, MoBaseSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.services.journal import JournalService
@@ -22,7 +23,7 @@ class MoViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     respu = ResponseUtils()
 
-    queryset = mo_model.objects.all().order_by('name')
+    queryset = mo_queryset()
     serializer_class = MoListUpdateSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

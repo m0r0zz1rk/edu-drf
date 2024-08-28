@@ -74,7 +74,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
         Валидация полей модели и полей, полученных из данных для процесса обработки
         :return:
         """
-        model_fields = [field.name for field in self.model._meta.get_fields()]
+        model_fields = [field.name for field in self.model._meta.concrete_fields]
         if ValidateUtils.validate_data(model_fields, self.process_data['object']):
             return True
         return False

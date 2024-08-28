@@ -1,9 +1,7 @@
-from django.apps import apps
 from rest_framework import serializers
 
+from apps.edu.selectors.services.information_service import information_service_model
 from apps.edu.serializers.services.base_service import BaseServiceSerializer
-
-information_service_model = apps.get_model('edu', 'InformationService')
 
 
 class InformationServiceListSerializer(BaseServiceSerializer):

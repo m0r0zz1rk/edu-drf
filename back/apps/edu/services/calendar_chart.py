@@ -1,7 +1,6 @@
 import uuid
 from typing import Optional
 
-from django.apps import apps
 from django.db.models import QuerySet
 
 from apps.authen.services.profile import ProfileService
@@ -9,13 +8,12 @@ from apps.commons.utils.django.exception import ExceptionHandling
 from apps.edu.models.calendar_chart.calendar_chart_chapter import CalendarChartChapter
 from apps.edu.operations.calendar_chart.add_update_calendar_chart_element import AddUpdateCalendarChartElement
 from apps.edu.operations.calendar_chart.delete_calendar_chart_element import DeleteCalendarChartElement
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
+from apps.edu.selectors.program import program_model
 from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.services.journal import JournalService
-
-calendar_chart_chapter_model = apps.get_model('edu', 'CalendarChartChapter')
-calendar_chart_theme_model = apps.get_model('edu', 'CalendarChartTheme')
-program_model = apps.get_model('edu', 'Program')
 
 
 class CalendarChartService:
@@ -76,8 +74,8 @@ class CalendarChartService:
                     program_id=program_id
             ).order_by('position')):
                 chapter_obj = {}
-                for field in calendar_chart_chapter_model._meta.get_fields():
-                    if field.name not in ['date_create', 'program', 'calendarcharttheme']:
+                for field in calendar_chart_chapter_model._meta.concrete_fields:
+                    if field.name not in ['date_create', 'program']:
                         chapter_obj[field.name] = getattr(chapter, field.name)
                 chapter_obj['program'] = chapter.program_id
                 themes = []
@@ -85,8 +83,8 @@ class CalendarChartService:
                         chapter_id=chapter.object_id
                 ).order_by('position')):
                     theme_obj = {}
-                    for field in calendar_chart_chapter_model._meta.get_fields():
-                        if field.name not in ['date_create', 'program', 'calendarcharttheme']:
+                    for field in calendar_chart_chapter_model._meta.concrete_fields:
+                        if field.name not in ['date_create', 'program']:
                             theme_obj[field.name] = getattr(theme, field.name)
                     theme_obj['chapter'] = theme.chapter_id
                     themes.append(theme_obj)

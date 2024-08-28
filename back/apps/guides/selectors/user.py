@@ -1,10 +1,15 @@
 import datetime
 
 from django.apps import apps
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django_filters import rest_framework as filters
 
 student_profile_model = apps.get_model('authen', 'StudentProfile')
+
+
+def student_profile_queryset() -> QuerySet:
+    """Получение queryset c профилями обучающихся"""
+    return student_profile_model.objects.all().order_by('surname', 'name', 'patronymic')
 
 
 class UserFilter(filters.FilterSet):

@@ -8,8 +8,8 @@ from apps.commons.pagination import CustomPagination
 from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
-from apps.guides.selectors.coko import CokoFilter
-from apps.guides.serializers.coko import coko_profile_model, CokoSerializer, \
+from apps.guides.selectors.coko import CokoFilter, coko_profile_queryset
+from apps.guides.serializers.coko import CokoSerializer, \
     CokoChangeCuratorGroupsSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
@@ -23,7 +23,7 @@ class CokoViewSet(viewsets.ModelViewSet):
     pu = ProfileService()
     respu = ResponseUtils()
 
-    queryset = coko_profile_model.objects.all().order_by('surname', 'name', 'patronymic')
+    queryset = coko_profile_queryset()
     serializer_class = CokoSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

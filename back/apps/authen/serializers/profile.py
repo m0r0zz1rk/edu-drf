@@ -1,16 +1,14 @@
-from django.apps import apps
 from rest_framework import serializers
 
-student_profile_model = apps.get_model('authen', 'StudentProfile')
-
-states_model = apps.get_model('guides', 'State')
+from apps.guides.selectors.state import state_model
+from apps.guides.selectors.user import student_profile_model
 
 
 class BaseProfileSerializer(serializers.ModelSerializer):
     """Базовая сериализация данных профиля пользователя"""
     state = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=states_model.objects.all(),
+        queryset=state_model.objects.all(),
         label='Государство'
     )
     email = serializers.SerializerMethodField(label='Email')
@@ -69,6 +67,3 @@ class ProfileChangePasswordSerializer(serializers.Serializer):
         allow_null=False,
         label='Пароль'
     )
-
-
-

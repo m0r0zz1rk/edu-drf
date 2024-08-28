@@ -12,11 +12,7 @@
 
 import LkPage from "@/components/LkPage.vue";
 import {apiRequest} from "@/commons/api_request";
-import {showAlert} from "@/commons/alerts";
-import {getCookie, setCookie} from "@/commons/cookie";
-import centreMenuItems from "@/components/menus/menu_items/centre_menu_items";
-import depMenuItems from "@/components/menus/menu_items/dep_menu_items";
-import studentMenuItems from "@/components/menus/menu_items/student_menu_items";
+import {getCookie} from "@/commons/cookie";
 import StudentMainPage from "@/components/main_pages/StudentMainPage.vue";
 import CentreMainPage from "@/components/main_pages/CentreMainPage.vue";
 

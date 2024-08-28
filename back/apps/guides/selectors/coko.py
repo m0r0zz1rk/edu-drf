@@ -1,6 +1,15 @@
+from django.apps import apps
+from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
 from apps.commons.services.ad.ad_centre_coko_user import AdCentreCokoUserUtils
+
+coko_profile_model = apps.get_model('authen', 'CokoProfile')
+
+
+def coko_profile_queryset() -> QuerySet:
+    """Получение queryset с сотрудниками ЦОКО"""
+    return coko_profile_model.objects.all().order_by('surname', 'name', 'patronymic')
 
 
 class CokoFilter(filters.FilterSet):

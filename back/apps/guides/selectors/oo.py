@@ -1,7 +1,13 @@
 from django.apps import apps
+from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
 oo_model = apps.get_model('guides', 'Oo')
+
+
+def oo_queryset() -> QuerySet:
+    """Получение queryset c образовательными организациями"""
+    return oo_model.objects.all().order_by('date_create')
 
 
 class OoFilter(filters.FilterSet):

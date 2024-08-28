@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-audience_category_model = apps.get_model('guides', 'AudienceCategory')
+from apps.guides.selectors.audience_category import audience_category_model
 
 
 class AudienceCategoryBaseSerializer(serializers.ModelSerializer):

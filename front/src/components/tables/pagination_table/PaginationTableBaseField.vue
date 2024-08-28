@@ -63,7 +63,7 @@
     />
 
     <v-select
-      v-if="['select', 'journalModule', 'journalRecStatus'].includes(field.ui)"
+      v-if="['select', 'journalModule', 'journalRecStatus', 'studentGroupStatus'].includes(field.ui)"
       :items="[
         '',
         ...field.items

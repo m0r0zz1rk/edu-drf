@@ -1,10 +1,8 @@
-from django.apps import apps
 from rest_framework import serializers
 
+from apps.edu.selectors.services.education_service import education_service_model
 from apps.edu.serializers.program import ProgramEducationServiceSerializer
 from apps.edu.serializers.services.base_service import BaseServiceSerializer
-
-education_service_model = apps.get_model('edu', 'EducationService')
 
 
 class EducationServiceBaseSerializer(BaseServiceSerializer):

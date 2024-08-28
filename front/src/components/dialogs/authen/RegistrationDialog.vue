@@ -21,259 +21,262 @@
       </v-card-title>
       <v-card-text>
 
-        <v-alert
-          id="error-registration-alert"
-          class="alert-hidden"
-          style="width: 100%"
-          :text="registrationError"
-          type="error"
-        ></v-alert>
+        <DialogContentWithError ref="content-error">
 
-        <v-row dense>
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationSurname"
-              bg-color="white"
-              label="Фамилия*"
-              :rules="[rules.required,]"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
+          <slot>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationName"
-              bg-color="white"
-              label="Имя*"
-              :rules="[rules.required,]"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
+            <v-row dense>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationSurname"
+                  bg-color="white"
+                  label="Фамилия*"
+                  :rules="[rules.required,]"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationPatronymic"
-              bg-color="white"
-              label="Отчество"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationName"
+                  bg-color="white"
+                  label="Имя*"
+                  :rules="[rules.required,]"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationPhone"
-              bg-color="white"
-              v-mask="'+7 (###) ###-##-##'"
-              :rules="[rules.required, rules.phone]"
-              label="Номер телефона*"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationPatronymic"
+                  bg-color="white"
+                  label="Отчество"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationEmail"
-              bg-color="white"
-              :rules="[rules.required, rules.email]"
-              label="Электронная почта*"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationPhone"
+                  bg-color="white"
+                  v-mask="'+7 (###) ###-##-##'"
+                  :rules="[rules.required, rules.phone]"
+                  label="Номер телефона*"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationSnils"
-              bg-color="white"
-              v-mask="'###-###-### ##'"
-              :rules="[rules.required, rules.snils]"
-              label="СНИЛС*"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationEmail"
+                  bg-color="white"
+                  :rules="[rules.required, rules.email]"
+                  label="Электронная почта*"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-select
-              :items="states"
-              id="registrationState"
-              bg-color="white"
-              label="Государство*"
-              :loading="formLoading"
-              :rules="[rules.required,]"
-              variant="solo"
-            ></v-select>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationSnils"
+                  bg-color="white"
+                  v-mask="'###-###-### ##'"
+                  :rules="[rules.required, rules.snils]"
+                  label="СНИЛС*"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-date-input
-              id="registrationBirthday"
-              bg-color="white"
-              :rules="[rules.required,]"
-              label="Дата рождения*"
-              prepend-icon=""
-              prepend-inner-icon="$calendar"
-              variant="solo"
-              :loading="formLoading"
-              clearable
-            ></v-date-input>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-select
+                  :items="states"
+                  id="registrationState"
+                  bg-color="white"
+                  label="Государство*"
+                  :loading="formLoading"
+                  :rules="[rules.required,]"
+                  variant="solo"
+                ></v-select>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-select
-              :items="sex"
-              id="registrationSex"
-              bg-color="white"
-              label="Пол*"
-              :loading="formLoading"
-              :rules="[rules.required,]"
-              variant="solo"
-            ></v-select>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-date-input
+                  id="registrationBirthday"
+                  bg-color="white"
+                  :rules="[rules.required,]"
+                  label="Дата рождения*"
+                  prepend-icon=""
+                  prepend-inner-icon="$calendar"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-date-input>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-select
-              :items="health"
-              id="registrationHealth"
-              bg-color="white"
-              label="Ограничения по здоровью*"
-              :loading="formLoading"
-              :rules="[rules.required,]"
-              variant="solo"
-            ></v-select>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-select
+                  :items="sex"
+                  id="registrationSex"
+                  bg-color="white"
+                  label="Пол*"
+                  :loading="formLoading"
+                  :rules="[rules.required,]"
+                  variant="solo"
+                ></v-select>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationPass1"
-              :append-inner-icon="pass1Visible ? 'mdi-eye-off' : 'mdi-eye'"
-              :type="pass1Visible ? 'text' : 'password'"
-              bg-color="white"
-              label="Пароль*"
-              :rules="[rules.required, rules.password]"
-              variant="solo"
-              @click:append-inner="pass1Visible = !pass1Visible"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-select
+                  :items="health"
+                  id="registrationHealth"
+                  bg-color="white"
+                  label="Ограничения по здоровью*"
+                  :loading="formLoading"
+                  :rules="[rules.required,]"
+                  variant="solo"
+                ></v-select>
+              </v-col>
 
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-            <v-text-field
-              id="registrationPass2"
-              :append-inner-icon="pass2Visible ? 'mdi-eye-off' : 'mdi-eye'"
-              :type="pass2Visible ? 'text' : 'password'"
-              bg-color="white"
-              label="Подтверждение пароля*"
-              :rules="[rules.required, rules.password]"
-              variant="solo"
-              @click:append-inner="pass2Visible = !pass2Visible"
-              :loading="formLoading"
-              clearable
-            ></v-text-field>
-          </v-col>
-        </v-row>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationPass1"
+                  :append-inner-icon="pass1Visible ? 'mdi-eye-off' : 'mdi-eye'"
+                  :type="pass1Visible ? 'text' : 'password'"
+                  bg-color="white"
+                  label="Пароль*"
+                  :rules="[rules.required, rules.password]"
+                  variant="solo"
+                  @click:append-inner="pass1Visible = !pass1Visible"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-        <v-btn
-          color="coko-blue"
-          @click="agreementDialog = true"
-        >Согласие на обработку ПДн</v-btn><br/>
-        <v-dialog v-model="agreementDialog">
-          <v-card>
-            <template v-slot:text>
-              <p style="text-align: justify">
-                Нажимая кнопку «Регистрация» я даю свое согласие Государственному автономному учреждению
-                Иркутской области «Центр оценки профессионального мастерства, квалификаций педагогов и мониторинга
-                качества образования» (далее - ГАУ ИО «ЦОПМКиМКО»), адрес местонахождения: 664023, Иркутская область,
-                город Иркутск, улица Лыткина, дом 75 «а» , на обработку моих персональных данных в автоматизированной
-                информационной системе "Учебный центр" (далее - АИС) в целях регистрации и использования АИС
-                в образовательных целях.<br/>
-                Перечень обрабатываемых персональных данных, передаваемых в АИС:<br/>
-                - Фамилия, имя, отчество;<br/>
-                - Телефон;<br/>
-                - Адрес электронной почты;<br/>
-                - СНИЛС.<br/>
-                Настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО", действует до момента удаления моей учетной записи
-                в АИС, либо до момента прекращения ГАУ ИО "ЦОПМКиМКО" эксплуатации АИС, если иное не предусмотрено
-                законодательством Российской Федерации.<br/>
-                Я уведомлен(а), что вправе отозвать настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО" путем
-                направления мною либо моим представителем соответствующего письменного запроса (заявления) в ГАУ ИО
-                «ЦОПМКиМКО» по адресу: 664023, Иркутская область, город Иркутск, улица Лыткина, дом 75 «а».<br/>
-                Под обработкой персональных данных в целях выдачи настоящего согласия ГАУ ИО "ЦОПМКиМКО" понимается
-                любое действие (операция) или совокупность действий (операций), совершаемых с использованием средств
-                автоматизации или без использования таких средств с персональными данными, включая сбор, запись,
-                систематизацию, накопление, хранение, уточнение (обновление, изменение), извлечение, использование,
-                обезличивание, блокирование, удаление, уничтожение персональных данных.
-              </p>
-              <v-checkbox v-model="agreementCheckbox">
-                <template v-slot:label>
-                  <div>
-                    Я даю свое согласие на обработку персональных данных*
-                  </div>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  id="registrationPass2"
+                  :append-inner-icon="pass2Visible ? 'mdi-eye-off' : 'mdi-eye'"
+                  :type="pass2Visible ? 'text' : 'password'"
+                  bg-color="white"
+                  label="Подтверждение пароля*"
+                  :rules="[rules.required, rules.password]"
+                  variant="solo"
+                  @click:append-inner="pass2Visible = !pass2Visible"
+                  :loading="formLoading"
+                  clearable
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-btn
+              color="coko-blue"
+              @click="agreementDialog = true"
+            >Согласие на обработку ПДн</v-btn><br/>
+
+            <v-dialog v-model="agreementDialog">
+              <v-card>
+                <template v-slot:text>
+                  <p style="text-align: justify">
+                    Нажимая кнопку «Регистрация» я даю свое согласие Государственному автономному учреждению
+                    Иркутской области «Центр оценки профессионального мастерства, квалификаций педагогов и мониторинга
+                    качества образования» (далее - ГАУ ИО «ЦОПМКиМКО»), адрес местонахождения: 664023, Иркутская область,
+                    город Иркутск, улица Лыткина, дом 75 «а» , на обработку моих персональных данных в автоматизированной
+                    информационной системе "Учебный центр" (далее - АИС) в целях регистрации и использования АИС
+                    в образовательных целях.<br/>
+                    Перечень обрабатываемых персональных данных, передаваемых в АИС:<br/>
+                    - Фамилия, имя, отчество;<br/>
+                    - Телефон;<br/>
+                    - Адрес электронной почты;<br/>
+                    - СНИЛС.<br/>
+                    Настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО", действует до момента удаления моей учетной записи
+                    в АИС, либо до момента прекращения ГАУ ИО "ЦОПМКиМКО" эксплуатации АИС, если иное не предусмотрено
+                    законодательством Российской Федерации.<br/>
+                    Я уведомлен(а), что вправе отозвать настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО" путем
+                    направления мною либо моим представителем соответствующего письменного запроса (заявления) в ГАУ ИО
+                    «ЦОПМКиМКО» по адресу: 664023, Иркутская область, город Иркутск, улица Лыткина, дом 75 «а».<br/>
+                    Под обработкой персональных данных в целях выдачи настоящего согласия ГАУ ИО "ЦОПМКиМКО" понимается
+                    любое действие (операция) или совокупность действий (операций), совершаемых с использованием средств
+                    автоматизации или без использования таких средств с персональными данными, включая сбор, запись,
+                    систематизацию, накопление, хранение, уточнение (обновление, изменение), извлечение, использование,
+                    обезличивание, блокирование, удаление, уничтожение персональных данных.
+                  </p>
+                  <v-checkbox v-model="agreementCheckbox">
+                    <template v-slot:label>
+                      <div>
+                        Я даю свое согласие на обработку персональных данных*
+                      </div>
+                    </template>
+                  </v-checkbox>
                 </template>
-              </v-checkbox>
-            </template>
-          </v-card>
+              </v-card>
 
-        </v-dialog>
+            </v-dialog>
+
+          </slot>
+
+        </DialogContentWithError>
+
+
         <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
 
       </v-card-text>
@@ -303,9 +306,11 @@
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import email_pattern from "@/commons/email_pattern";
+import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 
 export default {
   name: 'RegistrationDialog',
+  components: {DialogContentWithError},
   props: {
     usePreLoader: Function
   },
@@ -331,7 +336,6 @@ export default {
       formLoading: false,
       pass1Visible: false,
       pass2Visible: false,
-      registrationError: '',
       rules: {
         required: value => !!value || 'Обязательно для заполнения.',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
@@ -361,78 +365,69 @@ export default {
           this.usePreLoader()
         })
     },
-    hideRegError() {
-      document.querySelector('#error-registration-alert').classList.remove('alert-visible')
-      document.querySelector('#error-registration-alert').classList.add('alert-hidden')
-    },
-    showRegError(message) {
-      this.registrationError = message
-      document.querySelector('#error-registration-alert').classList.add('alert-visible')
-      document.querySelector('#error-registration-alert').classList.remove('alert-hidden')
-    },
     verifyData() {
       let surname = document.querySelector('#registrationSurname').value
       if (surname.length === 0) {
-        this.showRegError('Заполните поле "Фамилия"')
+        this.$refs["content-error"].showContentError('Заполните поле "Фамилия"')
         return null
       }
       let name = document.querySelector('#registrationName').value
       if (name.length === 0) {
-        this.showRegError('Заполните поле "Имя"')
+        this.$refs["content-error"].showContentError('Заполните поле "Имя"')
         return null
       }
       let patronymic = document.querySelector('#registrationPatronymic').value
       let phone = document.querySelector('#registrationPhone').value
       if (phone.length !== 18) {
-        this.showRegError('Задан некорректный номер телефона')
+        this.$refs["content-error"].showContentError('Задан некорректный номер телефона')
         return null
       }
       let email = document.querySelector('#registrationEmail').value
       if (email.value === 0) {
-        this.showRegError('Задан некорректный номер телефона')
+        this.$refs["content-error"].showContentError('Задан некорректный номер телефона')
         return null
       }
       if (!(email_pattern.test(email))) {
-        this.showRegError('Задан некорректный email')
+        this.$refs["content-error"].showContentError('Задан некорректный email')
         return null
       }
       let snils = document.querySelector('#registrationSnils').value
       if (snils.length !== 14) {
-        this.showRegError('Задан некорректный СНИЛС')
+        this.$refs["content-error"].showContentError('Задан некорректный СНИЛС')
         return null
       }
       let state = document.querySelector('#registrationState')._value
       if (state.length === 0) {
-        this.showRegError('Выберите государство')
+        this.$refs["content-error"].showContentError('Выберите государство')
         return null
       }
       let birthday = document.querySelector('#registrationBirthday').value
       if (birthday.length === 0) {
-        this.showRegError('Выберите дату рождения')
+        this.$refs["content-error"].showContentError('Выберите дату рождения')
         return null
       }
       let sex = document.querySelector('#registrationSex')._value
       if (sex.length === 0) {
-        this.showRegError('Выберите пол')
+        this.$refs["content-error"].showContentError('Выберите пол')
         return null
       }
       let health = document.querySelector('#registrationHealth')._value
       if (health.length === 0) {
-        this.showRegError('Укажите, есть ли у Вас ограничения по здоровью')
+        this.$refs["content-error"].showContentError('Укажите, есть ли у Вас ограничения по здоровью')
         return null
       }
       let password = document.querySelector('#registrationPass1').value
       let confirm = document.querySelector('#registrationPass2').value
       if ((password.length < 8) || (confirm.length < 8)) {
-        this.showRegError('Минимальная длина пароля - 8 символов')
+        this.$refs["content-error"].showContentError('Минимальная длина пароля - 8 символов')
         return null
       }
       if (password !== confirm) {
-        this.showRegError('Введенные пароли не совпадают')
+        this.$refs["content-error"].showContentError('Введенные пароли не совпадают')
         return null
       }
       if (!(this.agreementCheckbox)) {
-        this.showRegError('Дайте согласие на обработку ПДн')
+        this.$refs["content-error"].showContentError('Дайте согласие на обработку ПДн')
         return null
       }
       return {
@@ -451,7 +446,7 @@ export default {
     },
     async registration() {
       this.formLoading = true
-      this.hideRegError()
+      this.$refs["content-error"].hideContentError()
       this.uniqFailed = false
       let regData = this.verifyData()
       if (regData !== null) {
@@ -469,7 +464,7 @@ export default {
             )
             if (uniqResp.status === 406) {
               this.uniqFailed = true
-              this.showRegError('Пользователь с указанным '+obj.alias+' уже существует')
+              this.$refs["content-error"].showContentError('Пользователь с указанным '+obj.alias+' уже существует')
             }
           }
         }
@@ -515,12 +510,5 @@ export default {
 </script>
 
 <style scoped>
-.alert-visible {
-  z-index: 100;
-}
 
-.alert-hidden {
-  display: none;
-  z-index: 0;
-}
 </style>

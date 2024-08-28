@@ -44,6 +44,7 @@
             text-align: center;
             background-color: #373c59;
             color: white;
+            white-space: nowrap;
           "
           v-for="column in columns"
         >
@@ -122,7 +123,7 @@
 
                   </p>
 
-                  <p v-if="!mobileDisplay">
+                  <p v-if="!mobileDisplay" v-bind:class="{'one-line-text': header.key === 'code'}">
                     {{ item[header.key] }}
                   </p>
               </div>
@@ -434,5 +435,7 @@ export default {
 </script>
 
 <style scoped>
-
+  .one-line-text {
+    white-space: nowrap;
+  }
 </style>

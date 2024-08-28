@@ -1,7 +1,6 @@
-from django.apps import apps
 from django.contrib import admin
 
-information_service_model = apps.get_model('edu', 'InformationService')
+from apps.edu.selectors.services.information_service import information_service_model
 
 
 @admin.register(information_service_model)

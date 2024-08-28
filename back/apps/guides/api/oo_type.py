@@ -10,7 +10,8 @@ from apps.commons.utils.django.response import ResponseUtils
 from apps.guides.selectors.name_field import NameFieldFilter
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
 from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
-from apps.guides.serializers.oo_type import OoTypeListUpdateSerializer, oo_type_model, OoTypeBaseSerializer
+from apps.guides.selectors.oo_type import oo_type_queryset
+from apps.guides.serializers.oo_type import OoTypeListUpdateSerializer, OoTypeBaseSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.services.journal import JournalService
@@ -22,7 +23,7 @@ class OoTypeViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     respu = ResponseUtils()
 
-    queryset = oo_type_model.objects.all().order_by('name')
+    queryset = oo_type_queryset()
     serializer_class = OoTypeListUpdateSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

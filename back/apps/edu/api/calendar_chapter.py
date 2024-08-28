@@ -17,7 +17,7 @@ from apps.journal.services.journal import JournalService
 class CalendarChartViewSet(viewsets.ViewSet):
     """Работа с КУГ"""
 
-    #permission_classes = [IsAuthenticated, IsAdministrators]
+    permission_classes = [IsAuthenticated, IsAdministrators]
     ru = RequestUtils()
     ju = JournalService()
     pu = ProfileService()

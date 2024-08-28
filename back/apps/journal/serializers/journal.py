@@ -1,10 +1,8 @@
-from django.apps import apps
 from rest_framework import serializers
 
+from apps.journal.selectors.journal import journal_model
 from apps.journal.services.output import OutputService
 from apps.journal.services.payload import PayloadService
-
-journal_model = apps.get_model('journal', 'Journal')
 
 pu = PayloadService()
 ou = OutputService()

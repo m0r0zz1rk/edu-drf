@@ -1,10 +1,8 @@
-from django.apps import apps
 from rest_framework import serializers
 
 from apps.authen.serializers.profile import ProfileOutputSerializer, ProfileInputSerializer, \
     ProfileChangePasswordSerializer
-
-profile_model = apps.get_model('authen', 'StudentProfile')
+from apps.guides.selectors.user import student_profile_model
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.django_user.email
 
     class Meta:
-        model = profile_model
+        model = student_profile_model
         fields = [
             'object_id',
             'date_create',
@@ -37,7 +35,7 @@ class UserRetrieveSerializer(ProfileOutputSerializer):
     teacher = serializers.BooleanField(label='Является преподавателем')
 
     class Meta:
-        model = profile_model
+        model = student_profile_model
         fields = ProfileOutputSerializer.Meta.fields + ['teacher', ]
 
 
@@ -50,7 +48,7 @@ class UserUpdateSerializer(ProfileInputSerializer):
     teacher = serializers.BooleanField(label='Является преподавателем')
 
     class Meta:
-        model = profile_model
+        model = student_profile_model
         fields = ProfileOutputSerializer.Meta.fields + ['teacher', 'object_id']
 
 

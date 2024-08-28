@@ -5,6 +5,7 @@ import Journal from "../../../views/administrator/Journal.vue";
 import Guides from "@/views/administrator/Guides.vue";
 import Users from "@/views/administrator/Users.vue";
 import Edu from "@/views/administrator/Edu.vue";
+import EduDetailStudentGroup from "@/views/administrator/edu/EduDetailStudentGroup.vue";
 
 const centre_routes = [
     {
@@ -23,6 +24,12 @@ const centre_routes = [
       path: '/centre/edu',
       name: 'Edu',
       component: Edu,
+      beforeEnter: [isAuthenticated, isAdministrator]
+    },
+    {
+      path: '/centre/edu/student_group/:groupId',
+      name: 'EduDetailStudentGroup',
+      component: EduDetailStudentGroup,
       beforeEnter: [isAuthenticated, isAdministrator]
     },
     /*{

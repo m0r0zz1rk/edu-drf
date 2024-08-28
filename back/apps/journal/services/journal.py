@@ -1,11 +1,14 @@
 import uuid
 
-from django.apps import apps
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from apps.commons.utils.django.exception import ExceptionHandling
+from apps.commons.utils.django.settings import SettingsUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR
+from apps.journal.selectors.journal import journal_model
 from apps.journal.services.output import OutputService
 from apps.journal.services.payload import PayloadService
 
@@ -14,12 +17,10 @@ class JournalService:
     """Класс методов для работы с журналом событий"""
 
     fields = []
-    journal_model = None
 
     def __init__(self):
         """Инициализация класса - получение списка полей модели для валидации данных"""
-        self.journal_model = apps.get_model('journal', 'Journal')
-        self.fields = [field.name for field in self.journal_model._meta.get_fields()]
+        self.fields = [field.name for field in journal_model._meta.get_fields()]
 
     def is_journal_rec_exist(self, rec_id: uuid) -> bool:
         """
@@ -27,14 +28,14 @@ class JournalService:
         :param rec_id: object_id записи
         :return: true - запись существует, false - запись не существует
         """
-        return self.journal_model.objects.filter(object_id=rec_id).exists()
+        return journal_model.objects.filter(object_id=rec_id).exists()
 
     def get_journal_size(self) -> int:
         """
         Получение текущего размера журнала
         :return: количество записей в таблице Journal
         """
-        return self.journal_model.objects.count()
+        return journal_model.objects.count()
 
     def create_journal_rec(self, data: dict, payload: str = None, output: str = None):
         """
@@ -48,7 +49,7 @@ class JournalService:
             payload_utils = PayloadService()
             output_utils = OutputService()
             try:
-                new_rec = self.journal_model(**data)
+                new_rec = journal_model(**data)
                 new_rec.save()
                 if payload is not None or output is not None:
                     if self.is_journal_rec_exist(new_rec.object_id):
@@ -72,7 +73,7 @@ class JournalService:
                         new_rec.description = description
                         new_rec.save()
             except Exception:
-                error_rec = self.journal_model(
+                error_rec = journal_model(
                     source='Процесс создания записи в журнале событий',
                     module=COMMON,
                     status=ERROR,
@@ -98,4 +99,15 @@ class JournalService:
 
     def journal_older_delete(self):
         """Удаление самой старой записи в журнале событий"""
-        self.journal_model.objects.order_by('date_create').first().delete()
+        journal_model.objects.order_by('date_create').first().delete()
+
+
+@receiver(post_save, sender=journal_model)
+def journal_house_keeping(sender, **kwargs):
+    """Удаление записей из журнала событий при превышении размера журнала"""
+    journal_max = SettingsUtils().get_parameter_from_settings('JOURNAL_MAX_LENGTH')
+    if journal_max is None:
+        journal_max = 250000
+    ju = JournalService()
+    if ju.get_journal_size() > journal_max:
+        ju.journal_older_delete()

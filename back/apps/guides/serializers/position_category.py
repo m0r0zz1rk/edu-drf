@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-position_category_model = apps.get_model('guides', 'PositionCategory')
+from apps.guides.selectors.position_category import position_category_model
 
 
 class PositionCategoryBaseSerializer(serializers.ModelSerializer):

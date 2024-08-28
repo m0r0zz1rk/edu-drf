@@ -12,7 +12,7 @@ from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
 from apps.commons.utils.django.user import UserUtils
-from apps.guides.selectors.user import UserFilter
+from apps.guides.selectors.user import UserFilter, student_profile_queryset
 from apps.guides.serializers.user import UserSerializer, UserRetrieveSerializer, UserUniquePhoneSerializer, \
     UserUniqueEmailSerializer, UserUniqueSnilsSerializer, UserUpdateSerializer, UserChangePasswordSerializer
 from apps.journal.consts.journal_modules import GUIDES
@@ -28,7 +28,7 @@ class UserViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     respu = ResponseUtils()
 
-    queryset = pu.student_profile_model.objects.all().order_by('surname', 'name', 'patronymic')
+    queryset = student_profile_queryset()
     serializer_class = UserSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

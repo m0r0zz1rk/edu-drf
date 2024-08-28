@@ -6,10 +6,10 @@
       >
         <v-card-text>
           <div style="background-color: white; overflow: auto;" class="adaptive-no-tab-table-card-text">
-            <v-tabs class="guides-tabs"
-                    v-model="guidesTab"
-                    bg-color="coko-blue"
-                    show-arrows
+            <v-tabs
+              v-model="guidesTab"
+              bg-color="coko-blue"
+              show-arrows
             >
 
               <v-tab class="coko-tab" value="state">Государства</v-tab>

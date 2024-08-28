@@ -1,8 +1,6 @@
 from typing import Union
 
-from django.apps import apps
-
-oo_type_model = apps.get_model('guides', 'OoType')
+from apps.guides.selectors.oo_type import oo_type_model
 
 
 class OoTypeService:

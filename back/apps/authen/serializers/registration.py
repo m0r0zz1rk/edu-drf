@@ -1,12 +1,8 @@
-from django.apps import apps
 from django.core.validators import MinLengthValidator
 from rest_framework import serializers
 
-from apps.guides.services.state import StateService
-
-student_profile_model = apps.get_model('authen', 'StudentProfile')
-
-state_model = apps.get_model('guides', 'State')
+from apps.guides.selectors.state import state_model
+from apps.guides.selectors.user import student_profile_model
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

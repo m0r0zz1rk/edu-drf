@@ -8,7 +8,8 @@ from apps.commons.utils.django.response import ResponseUtils
 from apps.guides.selectors.name_field import NameFieldFilter
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
 from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
-from apps.guides.serializers.state.state_administrator import state_model, StateAdministratorSerializer, \
+from apps.guides.selectors.state import state_queryset
+from apps.guides.serializers.state.state_administrator import StateAdministratorSerializer, \
     StateAdministratorCreateSerializer, StateAdministratorUpdateSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
@@ -20,7 +21,7 @@ class StateAdministratorViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     respu = ResponseUtils()
 
-    queryset = state_model.objects.all().order_by('name')
+    queryset = state_queryset()
     serializer_class = StateAdministratorSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

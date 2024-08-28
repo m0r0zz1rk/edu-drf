@@ -1,13 +1,18 @@
 import datetime
 
 from django.apps import apps
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django_filters import rest_framework as filters
 
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES
 
 journal_model = apps.get_model('journal', 'Journal')
+
+
+def journal_queryset() -> QuerySet:
+    """Получение queryset с записями журнала"""
+    return journal_model.objects.all().order_by('-date_create')
 
 
 class JournalFilter(filters.FilterSet):

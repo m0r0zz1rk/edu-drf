@@ -21,15 +21,9 @@
 
       <v-card-text>
 
-        <v-alert
-          id="error-information-service-alert"
-          class="alert-hidden"
-          style="width: 100%"
-          :text="informationServiceError"
-          type="error"
-        ></v-alert>
+        <DialogContentWithError ref="content-error">
 
-        <v-container>
+          <slot>
 
             <v-row
               v-if="informationService"
@@ -183,7 +177,10 @@
 
             </v-row>
 
-        </v-container>
+          </slot>
+
+        </DialogContentWithError>
+
         <small class="text-caption text-medium-emphasis">
           * - обязательные для заполнения поля
         </small>
@@ -215,11 +212,12 @@ import PaginationTable from "@/components/tables/pagination_table/PaginationTabl
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
+import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 
 // Компонент для работы с объектом мероприятия (просмотр, добавление и редактирование ИКУ)
 export default {
   name: "InformationServiceDetail",
-  components: {PaginationTable},
+  components: {DialogContentWithError, PaginationTable},
   props: {
     adCentres: Array, // Список наименований подразделений ЦОКО,
     ikuTypes: Array, // Список типов мероприятий (ИКУ)
@@ -231,22 +229,10 @@ export default {
       informationServiceID: null, // object_id объекта мероприятия (при редактировании)
       dialog: false, // Параметр отображения диалогового окна
       loading: false, // Параметр отобажения индикатора загрузки на компонентах формы
-      informationServiceError: '', // Текст ошибки, возникшей в процессе добавления/редактирования мероприятия
       informationService: null, // установленный объект мероприятия
     }
   },
   methods: {
-    // Скрыть оповещение об ошибке в процессе работы с ИКУ (мероприятием)
-    hideInformationServiceError() {
-      document.querySelector('#error-information-service-alert').classList.remove('alert-visible')
-      document.querySelector('#error-information-service-alert').classList.add('alert-hidden')
-    },
-    // Показать оповещение об ошибке в процессе работы с ИКУ (мероприятием)
-    showInformationServiceError(message) {
-      this.informationServiceError = message
-      document.querySelector('#error-information-service-alert').classList.add('alert-visible')
-      document.querySelector('#error-information-service-alert').classList.remove('alert-hidden')
-    },
     // Смена object_id ИКУ
     changeServiceID(object_id) {
       if (object_id === this.informationServiceID) {
@@ -266,7 +252,7 @@ export default {
           null
         )
         if (informationServiceRequest.error) {
-          this.showInformationServiceError(informationServiceRequest.error)
+          this.$refs["content-error"].showContentError(informationServiceRequest.error)
         } else {
           this.informationService = informationServiceRequest
           this.informationService['categories'] = informationServiceRequest['categories'].split(';; ')
@@ -290,14 +276,14 @@ export default {
     },
     // Сохранение/добавление ИКУ
     async saveInformationService() {
-      this.hideInformationServiceError()
+      this.$refs["content-error"].hideContentError()
       let checkData = true
       Object.keys(this.informationService).map((key) => {
         if ((key !== 'object_id') && (
           ([undefined, null].includes(this.informationService[key]) ||
             (this.informationService[key].length === 0)))
         ) {
-          this.showInformationServiceError('Проверьте заполнение всех полей формы')
+          this.$refs["content-error"].showContentError('Проверьте заполнение всех полей формы')
           checkData = false
         }
       })
@@ -326,7 +312,7 @@ export default {
         body
       )
       if (addUpdateRequest.error) {
-        this.showInformationServiceError(addUpdateRequest.error)
+        this.$refs["content-error"].showContentError(addUpdateRequest.error)
       } else {
         showAlert(
           'success',

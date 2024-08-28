@@ -4,7 +4,7 @@ import os
 from django.db import models
 
 from apps.commons.models import BaseTable
-from apps.docs.services.program_order import ProgramOrderService
+from apps.docs.services.edu.program_order import ProgramOrderService
 
 
 class ProgramOrder(BaseTable):

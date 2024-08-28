@@ -30,7 +30,7 @@
 <script>
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
-import ProfileForm from "@/components/ProfileForm.vue";
+import ProfileForm from "@/components/forms/ProfileForm.vue";
 
 export default {
   name: "StudentUsers",

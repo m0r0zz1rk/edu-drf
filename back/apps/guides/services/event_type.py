@@ -1,8 +1,6 @@
 from typing import Union
 
-from django.apps import apps
-
-event_type_model = apps.get_model('guides', 'EventType')
+from apps.guides.selectors.event_type import event_type_model
 
 
 class EventTypeService:

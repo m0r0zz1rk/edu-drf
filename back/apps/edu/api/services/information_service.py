@@ -9,13 +9,13 @@ from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.request import RequestUtils
 from apps.commons.utils.django.response import ResponseUtils
-from apps.edu.operations.services.add_update import AddUpdateService
-from apps.edu.operations.services.delete import DeleteService
+from apps.edu.operations.service.add_update import AddUpdateService
+from apps.edu.operations.service.delete import DeleteService
 from apps.edu.selectors.services.information_service import information_service_queryset, InformationServiceFilter
 
 from apps.edu.serializers.services.information_service import InformationServiceListSerializer, \
     InformationServiceRetrieveAddUpdateSerializer
-from apps.edu.services.information_service import InformationServiceService
+from apps.edu.services.service.information_service import InformationServiceService
 from apps.edu.services.program import ProgramService
 from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR

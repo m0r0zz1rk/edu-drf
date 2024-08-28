@@ -1,9 +1,7 @@
-from django.apps import apps
 from django.core.validators import MinValueValidator
 from rest_framework import serializers
 
-
-program_model = apps.get_model('edu', 'Program')
+from apps.edu.selectors.program import program_model
 
 
 class ProgramBaseSerializer(serializers.ModelSerializer):

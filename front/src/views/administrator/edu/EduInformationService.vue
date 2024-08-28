@@ -7,7 +7,7 @@
   <PaginationTable
     v-if="fieldsArray !== null"
     ref="informationServiceTable"
-    tableTitle="Курсы (ОУ)"
+    tableTitle="Мероприятия (ИКУ)"
     tableWidth="98"
     :noTab="false"
     :addButton="true"

@@ -7,10 +7,10 @@
 
     <v-card class="lk-full-page-card">
       <v-card-title class="d-flex justify-space-between align-center">
-        <v-tabs class="guides-tabs"
-                v-model="educationServiceTab"
-                bg-color="coko-blue"
-                show-arrows
+        <v-tabs
+          v-model="educationServiceTab"
+          bg-color="coko-blue"
+          show-arrows
         >
 
           <v-tab
@@ -48,106 +48,114 @@
 
         <v-container>
 
-          <template v-if="educationServiceTab === 'dpp'">
+          <DialogContentWithError ref="content-error">
 
-            <div v-if="educationService && educationService.program">
-              <b>Выбранная программа: </b><br/>
-              <v-expansion-panels>
-                <v-expansion-panel>
-                  <v-expansion-panel-title
-                    color="coko-blue"
-                  >{{educationService.program.name}}</v-expansion-panel-title>
-                  <v-expansion-panel-text>
-                    <b>Подразделение:</b><br/>
-                    {{educationService.program.department}}<br/><br/>
-                    <b>Объем часов:</b><br/>
-                    {{educationService.program.duration}}<br/><br/>
-                    <b>Категории слушателей:</b><br/>
-                    {{educationService.program.categories}}<br/><br/>
-                    <b>Аннотация:</b><br/>
-                    {{educationService.program.annotation}}<br/><br/>
-                    <b>Стоимость:</b><br/>
-                    {{educationService.program.price}}<br/><br/>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </div><br/>
+            <slot>
 
-            <PaginationTable
-              tableTitle="ДПП"
-              tableWidth="98"
-              :noTab="false"
-              :addButton="false"
-              :xlsxButton="false"
-              getRecsURL="/backend/api/v1/edu/approved_programs/"
-              :tableHeaders="programTableHeaders"
-              :fieldsArray="programFieldsArray"
-              :itemSelectEvent="changeDpp"
-              :selectedItemObjectID="educationService.program && educationService.program.object_id"
-            />
+              <template v-if="educationServiceTab === 'dpp'">
 
-          </template>
+                <div v-if="educationService && educationService.program">
+                  <b>Выбранная программа: </b><br/>
+                  <v-expansion-panels>
+                    <v-expansion-panel>
+                      <v-expansion-panel-title
+                        color="coko-blue"
+                      >{{educationService.program.name}}</v-expansion-panel-title>
+                      <v-expansion-panel-text>
+                        <b>Подразделение:</b><br/>
+                        {{educationService.program.department}}<br/><br/>
+                        <b>Объем часов:</b><br/>
+                        {{educationService.program.duration}}<br/><br/>
+                        <b>Категории слушателей:</b><br/>
+                        {{educationService.program.categories}}<br/><br/>
+                        <b>Аннотация:</b><br/>
+                        {{educationService.program.annotation}}<br/><br/>
+                        <b>Стоимость:</b><br/>
+                        {{educationService.program.price}}<br/><br/>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
+                </div><br/>
 
-          <template v-if="educationServiceTab === 'info'">
-
-            <v-row
-              v-if="educationService"
-              dense
-            >
-
-              <v-col
-                cols="12"
-                md="4"
-                sm="6"
-              >
-                <v-text-field
-                  bg-color="white"
-                  variant="solo"
-                  v-model="educationService.location"
-                  label="Место проведения*"
-                  :loading="loading"
+                <PaginationTable
+                  tableTitle="ДПП"
+                  tableWidth="98"
+                  :noTab="false"
+                  :addButton="false"
+                  :xlsxButton="false"
+                  getRecsURL="/backend/api/v1/edu/approved_programs/"
+                  :tableHeaders="programTableHeaders"
+                  :fieldsArray="programFieldsArray"
+                  :itemSelectEvent="changeDpp"
+                  :selectedItemObjectID="educationService.program && educationService.program.object_id"
                 />
-              </v-col>
 
-              <v-col
-                cols="12"
-                md="4"
-                sm="6"
-              >
-                <v-date-input
-                  id="orderDate"
-                  bg-color="white"
-                  label="Дата начала проведения*"
-                  v-model="educationService.date_start"
-                  prepend-icon=""
-                  prepend-inner-icon="$calendar"
-                  variant="solo"
-                  :loading="loading"
-                  clearable
-                ></v-date-input>
-              </v-col>
+              </template>
 
-              <v-col
-                cols="12"
-                md="4"
-                sm="6"
-              >
-                <v-date-input
-                  id="orderDate"
-                  bg-color="white"
-                  label="Дата окончания проведения*"
-                  v-model="educationService.date_end"
-                  prepend-icon=""
-                  prepend-inner-icon="$calendar"
-                  variant="solo"
-                  :loading="loading"
-                  clearable
-                ></v-date-input>
-              </v-col>
+              <template v-if="educationServiceTab === 'info'">
 
-            </v-row>
+                <v-row
+                  v-if="educationService"
+                  dense
+                >
 
-          </template>
+                  <v-col
+                    cols="12"
+                    md="4"
+                    sm="6"
+                  >
+                    <v-text-field
+                      bg-color="white"
+                      variant="solo"
+                      v-model="educationService.location"
+                      label="Место проведения*"
+                      :loading="loading"
+                    />
+                  </v-col>
+
+                  <v-col
+                    cols="12"
+                    md="4"
+                    sm="6"
+                  >
+                    <v-date-input
+                      id="orderDate"
+                      bg-color="white"
+                      label="Дата начала проведения*"
+                      v-model="educationService.date_start"
+                      prepend-icon=""
+                      prepend-inner-icon="$calendar"
+                      variant="solo"
+                      :loading="loading"
+                      clearable
+                    ></v-date-input>
+                  </v-col>
+
+                  <v-col
+                    cols="12"
+                    md="4"
+                    sm="6"
+                  >
+                    <v-date-input
+                      id="orderDate"
+                      bg-color="white"
+                      label="Дата окончания проведения*"
+                      v-model="educationService.date_end"
+                      prepend-icon=""
+                      prepend-inner-icon="$calendar"
+                      variant="solo"
+                      :loading="loading"
+                      clearable
+                    ></v-date-input>
+                  </v-col>
+
+                </v-row>
+
+              </template>
+
+            </slot>
+
+          </DialogContentWithError>
 
         </v-container>
         <small v-if="educationServiceTab === 'info'" class="text-caption text-medium-emphasis">
@@ -182,11 +190,12 @@ import PaginationTable from "@/components/tables/pagination_table/PaginationTabl
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
+import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 
 // Компонент для добавления/изменения образовательной услуги (курса)
 export default {
   name: "EducationServiceDetail",
-  components: {PaginationTable, KUGTable},
+  components: {DialogContentWithError, PaginationTable, KUGTable},
   props: {
     getRecsFunction: Function, // функция для получения записей в родительской пагинационной таблицы
                                // после добавления/обновления курса
@@ -197,7 +206,6 @@ export default {
       dialog: false, // Параметр отображения диалогового окна
       loading: true, // Параметр отображения загрузки элемент формы в диалоговом окне
       educationServiceTab: 'dpp', // Выбранная вкладка в диалоговом окне
-      educationServiceError: '', // Ошибка при выполнении операций
       educationService: {
         "object_id": null,
         "program": null,
@@ -261,17 +269,6 @@ export default {
     }
   },
   methods: {
-    // Скрыть оповещение об ошибке в процессе работы с образовательной услугой (курсом)
-    hideEducationServiceError() {
-      document.querySelector('#error-education-service-alert').classList.remove('alert-visible')
-      document.querySelector('#error-education-service-alert').classList.add('alert-hidden')
-    },
-    // Показать оповещение об ошибке в процессе работы с образовательной услугой (курсом)
-    showEducationServiceError(message) {
-      this.educationServiceError = message
-      document.querySelector('#error-education-service-alert').classList.add('alert-visible')
-      document.querySelector('#error-education-service-alert').classList.remove('alert-hidden')
-    },
     // Смена object_id образовательной услуги
     changeServiceID(object_id) {
       if (object_id === this.educationServiceID) {
@@ -291,7 +288,7 @@ export default {
           null
         )
         if (educationServiceRequest.error) {
-          this.showEducationServiceError(educationServiceRequest.error)
+          this.$refs["content-error"].showContentError(educationServiceRequest.error)
         } else {
           this.educationService = educationServiceRequest
         }
@@ -329,14 +326,14 @@ export default {
     },
     // Сохранение/добавление образовательной услуги
     async saveEducationService() {
-      this.hideEducationServiceError()
+      this.$refs["content-error"].hideContentError()
       let checkData = true
       Object.keys(this.educationService).map((key) => {
         if ((key !== 'object_id') && (
           ([undefined, null].includes(this.educationService[key]) ||
           (this.educationService[key].length === 0)))
         ) {
-          this.showEducationServiceError('Не выбрано ДПП или заполнены не все поля формы')
+          this.$refs["content-error"].showContentError('Не выбрано ДПП или заполнены не все поля формы')
           checkData = false
         }
       })
@@ -361,7 +358,7 @@ export default {
         body
       )
       if (addUpdateRequest.error) {
-        this.showEducationServiceError(addUpdateRequest.error)
+        this.$refs["content-error"].showContentError(addUpdateRequest.error)
       } else {
         showAlert(
           'success',

@@ -7,11 +7,12 @@ from apps.commons.pagination import CustomPagination
 from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
+from apps.guides.selectors.audience_category import audience_category_queryset
 from apps.guides.selectors.name_field import NameFieldFilter
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
 from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
 from apps.guides.serializers.audience_category import AudienceCategoryListUpdateSerializer, \
-    audience_category_model, AudienceCategoryBaseSerializer
+    AudienceCategoryBaseSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.services.journal import JournalService
@@ -23,7 +24,7 @@ class AudienceCategoryViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     respu = ResponseUtils()
 
-    queryset = audience_category_model.objects.all().order_by('name')
+    queryset = audience_category_queryset()
     serializer_class = AudienceCategoryListUpdateSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

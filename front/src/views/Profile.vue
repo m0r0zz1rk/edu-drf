@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import ProfileForm from "@/components/ProfileForm.vue";
+import ProfileForm from "@/components/forms/ProfileForm.vue";
 import LkPage from "@/components/LkPage.vue";
 
 export default {

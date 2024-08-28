@@ -1,8 +1,6 @@
 from typing import Union
 
-from django.apps import apps
-
-mo_model = apps.get_model('guides', 'Mo')
+from apps.guides.selectors.mo import mo_model
 
 
 class MoService:

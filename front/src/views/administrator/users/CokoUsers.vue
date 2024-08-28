@@ -43,11 +43,6 @@ export default {
       ],
       fieldsArray: [
         {
-          ui: 'date',
-          key: 'date_create',
-          addRequired: false,
-        },
-        {
           ui: 'input',
           type: 'text',
           key: 'surname',

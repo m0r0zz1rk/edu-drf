@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-mo_model = apps.get_model('guides', 'Mo')
+from apps.guides.selectors.mo import mo_model
 
 
 class MoBaseSerializer(serializers.ModelSerializer):

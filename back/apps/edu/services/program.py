@@ -1,17 +1,14 @@
 import uuid
 from typing import Optional
 
-from django.apps import apps
-
 from apps.authen.services.profile import ProfileService
 from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.edu.models import Program
 from apps.edu.operations.calendar_chart.add_update_calendar_chart_element import AddUpdateCalendarChartElement
 from apps.edu.operations.program.add_update_program import AddUpdateProgramOperation
+from apps.edu.selectors.program import program_model
 from apps.edu.services.calendar_chart import CalendarChartService
 from apps.journal.consts.journal_modules import EDU
-
-program_model = apps.get_model('edu', 'Program')
 
 
 class ProgramService:
@@ -53,8 +50,8 @@ class ProgramService:
             program = self.get_program('object_id', program_id)
             if program is None:
                 return False
-            fields = [f.name for f in program_model._meta.get_fields()
-                        if f.name not in ['calendarchartchapter', 'object_id', 'date_create', 'program_order']]
+            fields = [f.name for f in program_model._meta.concrete_fields
+                        if f.name not in ['object_id', 'date_create', 'program_order']]
             new_program = {
                 'object_id': None
             }

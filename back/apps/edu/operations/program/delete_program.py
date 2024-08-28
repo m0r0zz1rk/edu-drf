@@ -1,10 +1,7 @@
-from django.apps import apps
-
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.program_order.delete_program_order import DeleteProgramOrderOperation
 from apps.edu.operations.program.base_program import BaseProgramOperation
-
-program_model = apps.get_model('edu', 'Program')
+from apps.edu.selectors.program import program_model
 
 
 class DeleteProgramOperation(BaseProgramOperation):

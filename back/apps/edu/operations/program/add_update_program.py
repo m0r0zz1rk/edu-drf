@@ -7,9 +7,8 @@ from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.program_order.add_program_order import AddUpdateProgramOrderOperation
 from apps.edu.operations.program.base_program import BaseProgramOperation
+from apps.edu.selectors.program import program_model
 from apps.guides.services.audience_category import AudienceCategoryService
-
-program_model = apps.get_model('edu', 'Program')
 
 
 class AddUpdateProgramOperation(BaseProgramOperation):
@@ -21,8 +20,8 @@ class AddUpdateProgramOperation(BaseProgramOperation):
     error_description = 'Произошла ошибка в процессе добавления/обновления ДПП'
     success_description = 'ДПП успешно добавлено/обновлено'
     program_fields = [
-        *[f.name for f in program_model._meta.get_fields()
-          if f.name not in ['date_create', 'calendarchartchapter', 'educationservice', 'program_order']],
+        *[f.name for f in program_model._meta.concrete_fields
+          if f.name not in ['date_create', 'educationservice', 'program_order']],
         'order_id',
         'order_number',
         'order_date',

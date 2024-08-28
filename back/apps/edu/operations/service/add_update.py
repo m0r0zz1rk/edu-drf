@@ -1,16 +1,13 @@
 from typing import Union
 
-from django.apps import apps
-
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.django.exception import ExceptionHandling
+from apps.edu.selectors.services.education_service import education_service_model
+from apps.edu.selectors.services.information_service import information_service_model
 from apps.guides.services.audience_category import AudienceCategoryService
 from apps.guides.services.event_type import EventTypeService
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-
-education_service_model = apps.get_model('edu', 'EducationService')
-information_service_model = apps.get_model('edu', 'InformationService')
 
 
 class AddUpdateService(MainProcessing):
@@ -30,13 +27,13 @@ class AddUpdateService(MainProcessing):
         self.service_type = service_type
         if self.service_type == 'edu':
             self.service_required_keys = [
-                *[f.name for f in education_service_model._meta.get_fields()
+                *[f.name for f in education_service_model._meta.concrete_fields
                   if f.name not in ['date_create', 'program_id']],
                 'program'
             ]
         else:
             self.service_required_keys = [
-                f.name for f in information_service_model._meta.get_fields()
+                f.name for f in information_service_model._meta.concrete_fields
                 if f.name != 'date_create'
             ]
         super(AddUpdateService, self).__init__(income_data, request)

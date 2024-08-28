@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-oo_model = apps.get_model('guides', 'Oo')
+from apps.guides.selectors.oo import oo_model
 
 
 class OoBaseSerializer(serializers.ModelSerializer):

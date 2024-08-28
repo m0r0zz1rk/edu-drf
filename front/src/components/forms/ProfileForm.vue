@@ -11,7 +11,6 @@
 
       <v-tabs
         v-if="profileUuid"
-        class="guides-tabs"
         v-model="userInfoTab"
         bg-color="coko-blue"
         show-arrows
@@ -32,212 +31,208 @@
 
     <v-card-text>
 
-      <v-alert
-        id="error-profile-form-alert"
-        class="alert-hidden"
-        style="width: 100%"
-        :text="profileFormError"
-        type="error"
-      ></v-alert>
+      <DialogContentWithError ref="content-error">
 
-      <div style="margin-top: 5px;">
+        <slot>
 
-        <div v-if="userInfoTab === 'profile'">
-          <v-row dense>
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-text-field
-                bg-color="white"
-                label="Фамилия*"
-                v-model="profileData['surname']"
-                :rules="[rules.required,]"
-                variant="solo"
-                :loading="formLoading"
-                @change="e => profileData['surname'] = e.target.value"
-                clearable
-              ></v-text-field>
-            </v-col>
+          <div v-if="userInfoTab === 'profile'">
+            <v-row dense>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  bg-color="white"
+                  label="Фамилия*"
+                  v-model="profileData['surname']"
+                  :rules="[rules.required,]"
+                  variant="solo"
+                  :loading="formLoading"
+                  @change="e => profileData['surname'] = e.target.value"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-text-field
-                bg-color="white"
-                label="Имя*"
-                v-model="profileData['name']"
-                :rules="[rules.required,]"
-                variant="solo"
-                :loading="formLoading"
-                @change="e => profileData['name'] = e.target.value"
-                clearable
-              ></v-text-field>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  bg-color="white"
+                  label="Имя*"
+                  v-model="profileData['name']"
+                  :rules="[rules.required,]"
+                  variant="solo"
+                  :loading="formLoading"
+                  @change="e => profileData['name'] = e.target.value"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-text-field
-                bg-color="white"
-                label="Отчество"
-                v-model="profileData['patronymic']"
-                variant="solo"
-                :loading="formLoading"
-                @change="e => profileData['patronymic'] = e.target.value"
-                clearable
-              ></v-text-field>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  bg-color="white"
+                  label="Отчество"
+                  v-model="profileData['patronymic']"
+                  variant="solo"
+                  :loading="formLoading"
+                  @change="e => profileData['patronymic'] = e.target.value"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-text-field
-                bg-color="white"
-                v-mask="'+7 (###) ###-##-##'"
-                :rules="[rules.required, rules.phone]"
-                label="Номер телефона*"
-                v-model="profileData['phone']"
-                variant="solo"
-                :loading="formLoading"
-                @change="e => profileData['phone'] = e.target.value"
-                clearable
-              ></v-text-field>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  bg-color="white"
+                  v-mask="'+7 (###) ###-##-##'"
+                  :rules="[rules.required, rules.phone]"
+                  label="Номер телефона*"
+                  v-model="profileData['phone']"
+                  variant="solo"
+                  :loading="formLoading"
+                  @change="e => profileData['phone'] = e.target.value"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-text-field
-                bg-color="white"
-                :rules="[rules.required, rules.email]"
-                label="Электронная почта*"
-                v-model="profileData['email']"
-                variant="solo"
-                :loading="formLoading"
-                @change="e => profileData['email'] = e.target.value"
-                clearable
-              ></v-text-field>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  bg-color="white"
+                  :rules="[rules.required, rules.email]"
+                  label="Электронная почта*"
+                  v-model="profileData['email']"
+                  variant="solo"
+                  :loading="formLoading"
+                  @change="e => profileData['email'] = e.target.value"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-text-field
-                bg-color="white"
-                v-mask="'###-###-### ##'"
-                :rules="[rules.required, rules.snils]"
-                label="СНИЛС*"
-                v-model="profileData['snils']"
-                variant="solo"
-                :loading="formLoading"
-                @change="e => profileData['snils'] = e.target.value"
-                clearable
-              ></v-text-field>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-text-field
+                  bg-color="white"
+                  v-mask="'###-###-### ##'"
+                  :rules="[rules.required, rules.snils]"
+                  label="СНИЛС*"
+                  v-model="profileData['snils']"
+                  variant="solo"
+                  :loading="formLoading"
+                  @change="e => profileData['snils'] = e.target.value"
+                  clearable
+                ></v-text-field>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-select
-                :items="states"
-                bg-color="white"
-                label="Государство*"
-                v-model="profileData['state']"
-                variant="solo"
-                :loading="formLoading"
-                @update:modelValue="e => profileData['state'] = e"
-                :rules="[rules.required,]"
-              ></v-select>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-select
+                  :items="states"
+                  bg-color="white"
+                  label="Государство*"
+                  v-model="profileData['state']"
+                  variant="solo"
+                  :loading="formLoading"
+                  @update:modelValue="e => profileData['state'] = e"
+                  :rules="[rules.required,]"
+                ></v-select>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-date-input
-                bg-color="white"
-                label="Дата рождения*"
-                v-model="profileData['birthday']"
-                prepend-icon=""
-                prepend-inner-icon="$calendar"
-                variant="solo"
-                :loading="formLoading"
-                clearable
-              ></v-date-input>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-date-input
+                  bg-color="white"
+                  label="Дата рождения*"
+                  v-model="profileData['birthday']"
+                  prepend-icon=""
+                  prepend-inner-icon="$calendar"
+                  variant="solo"
+                  :loading="formLoading"
+                  clearable
+                ></v-date-input>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-select
-                :items="sex"
-                bg-color="white"
-                label="Пол*"
-                v-model="profileData['sex']"
-                :loading="formLoading"
-                :rules="[rules.required,]"
-                @update:modelValue="e => profileData['sex'] = e"
-                variant="solo"
-              ></v-select>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-select
+                  :items="sex"
+                  bg-color="white"
+                  label="Пол*"
+                  v-model="profileData['sex']"
+                  :loading="formLoading"
+                  :rules="[rules.required,]"
+                  @update:modelValue="e => profileData['sex'] = e"
+                  variant="solo"
+                ></v-select>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-select
-                :items="health"
-                bg-color="white"
-                label="Ограничения по здоровью*"
-                v-model="profileData['health']"
-                :loading="formLoading"
-                :rules="[rules.required,]"
-                @update:modelValue="e => profileData['health'] = e"
-                variant="solo"
-              ></v-select>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-select
+                  :items="health"
+                  bg-color="white"
+                  label="Ограничения по здоровью*"
+                  v-model="profileData['health']"
+                  :loading="formLoading"
+                  :rules="[rules.required,]"
+                  @update:modelValue="e => profileData['health'] = e"
+                  variant="solo"
+                ></v-select>
+              </v-col>
 
-            <v-col
-              cols="12"
-              md="4"
-              sm="6"
-            >
-              <v-select
-                v-if="profileUuid"
-                :items="teacher"
-                bg-color="white"
-                label="Является преподавателем"
-                v-model="profileData['teacher']"
-                :loading="formLoading"
-                @update:modelValue="e => profileData['teacher'] = e"
-                variant="solo"
-              ></v-select>
-            </v-col>
+              <v-col
+                cols="12"
+                md="4"
+                sm="6"
+              >
+                <v-select
+                  v-if="profileUuid"
+                  :items="teacher"
+                  bg-color="white"
+                  label="Является преподавателем"
+                  v-model="profileData['teacher']"
+                  :loading="formLoading"
+                  @update:modelValue="e => profileData['teacher'] = e"
+                  variant="solo"
+                ></v-select>
+              </v-col>
 
-          </v-row>
-          <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
+            </v-row>
+            <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
 
-        </div>
+          </div>
 
-      </div>
+        </slot>
+
+      </DialogContentWithError>
 
     </v-card-text>
 
@@ -284,10 +279,11 @@ import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import email_pattern from "@/commons/email_pattern";
 import PasswordChange from "@/components/PasswordChange.vue";
+import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 
 export default {
   name: "ProfileForm",
-  components: {PasswordChange},
+  components: {DialogContentWithError, PasswordChange},
   props: {
     profileUuid: String, // Вариативный параметр, object_id профиля пользователя,
     closeDialogEvent: Function, // Событие для закрытия диалогового окна (для просмотра профиля из справочников)
@@ -332,16 +328,10 @@ export default {
       },
       dataValid: false,
       passwordDialog: false,
-      userInfoTab: 'profile',
-      profileFormError: ''
+      userInfoTab: 'profile'
     }
   },
   methods: {
-    showProfileFormError(message) {
-      this.profileFormError = message
-      document.querySelector('#error-profile-form-alert').classList.add('alert-visible')
-      document.querySelector('#error-profile-form-alert').classList.remove('alert-hidden')
-    },
     async setData() {
       let statesRequest = await apiRequest(
         '/backend/api/v1/guides/states/',
@@ -364,7 +354,7 @@ export default {
         null,
       )
       if (profileRequest.error) {
-        this.showProfileFormError(profileRequest.error)
+        this.$refs["content-error"].showContentError(profileRequest.error)
       } else {
         this.profileData = profileRequest
       }
@@ -374,27 +364,27 @@ export default {
       Object.keys(this.profileData).map((key) => {
         if (key === 'phone') {
           if (this.profileData[key] === null || this.profileData[key].length < 18) {
-            this.showProfileFormError('Введите корректный номер телефона')
+            this.$refs["content-error"].showContentError('Введите корректный номер телефона')
             this.dataValid = false
             return false
           }
         }
         if (key === 'email') {
           if (this.profileData[key] === null || !(email_pattern.test(this.profileData[key]))) {
-            this.showProfileFormError('Введите корректный email')
+            this.$refs["content-error"].showContentError('Введите корректный email')
             this.dataValid = false
             return false
           }
         }
         if (key === 'snils') {
           if (this.profileData[key] === null || this.profileData[key].length < 14) {
-            this.showProfileFormError('Введите корректный СНИЛС')
+            this.$refs["content-error"].showContentError('Введите корректный СНИЛС')
             this.dataValid = false
             return false
           }
         }
         if (this.profileData[key] === null || this.profileData[key].length === 0) {
-          this.showProfileFormError('Заполните все обязательные поля формы')
+          this.$refs["content-error"].showContentError('Заполните все обязательные поля формы')
           this.dataValid = false
           return false
         }
@@ -420,7 +410,7 @@ export default {
         )
         if (checkPhone.status !== 200) {
           let json = await checkPhone.json()
-          this.showProfileFormError(json.error)
+          this.$refs["content-error"].showContentError(json.error)
           this.formLoading = false
           return false
         }
@@ -439,7 +429,7 @@ export default {
         )
         if (checkEmail.status !== 200) {
           let json = await checkEmail.json()
-          this.showProfileFormError(json.error)
+          this.$refs["content-error"].showContentError(json.error)
           this.formLoading = false
           return false
         }
@@ -458,7 +448,7 @@ export default {
         )
         if (checkSnils.status !== 200) {
           let json = await checkSnils.json()
-          this.showProfileFormError(json.error)
+          this.$refs["content-error"].showContentError(json.error)
           this.formLoading = false
           return false
         }
@@ -501,7 +491,7 @@ export default {
           this.closeDialogEvent()
         }
         if (dataSaveRequest.error) {
-          this.showProfileFormError(dataSaveRequest.error)
+          this.$refs["content-error"].showContentError(dataSaveRequest.error)
         }
         this.formLoading = false
       }
@@ -509,7 +499,6 @@ export default {
   },
   watch: {
     profileData: function() {
-      // Your function here, for example:
       if (this.profileData['sex']) {
         this.profileData['sex'] = 'Мужской'
       } else {
@@ -538,12 +527,5 @@ export default {
 
 
 <style scoped>
-.alert-visible {
-  z-index: 100;
-}
 
-.alert-hidden {
-  display: none;
-  z-index: 0;
-}
 </style>

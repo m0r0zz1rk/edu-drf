@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ViewSet
 
 from apps.authen.operations.update_profile import UpdateProfile
-from apps.authen.serializers.main_pages.student_main_pager import StudentMainPageSerializer
+from apps.authen.serializers.main_pages.student_main_page import StudentMainPageSerializer
 from apps.authen.serializers.profile import (ProfileInputSerializer,
                                              ProfileOutputSerializer, ProfileChangePasswordSerializer)
 from apps.authen.serializers.registration import RegistrationUniquePhoneSerializer, \

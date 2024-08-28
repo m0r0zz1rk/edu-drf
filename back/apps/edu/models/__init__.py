@@ -8,3 +8,7 @@ from .program import Program
 
 from .service.education_service import EducationService
 from .service.information_service import InformationService
+
+from .schedule import Schedule
+
+from .student_group import StudentGroup

@@ -1,7 +1,6 @@
-from django.apps import apps
 from django.contrib import admin
 
-planning_parameter_model = apps.get_model('edu', 'PlanningParameter')
+from apps.edu.selectors.planning_parameter import planning_parameter_model
 
 
 @admin.register(planning_parameter_model)

@@ -1,19 +1,16 @@
 from typing import Union, Optional
-
-from django.apps import apps
 from django.contrib.auth.models import User
 
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.user import UserUtils
 from apps.commons.utils.validate import ValidateUtils
+from apps.guides.selectors.coko import coko_profile_model
+from apps.guides.selectors.state import state_model
+from apps.guides.selectors.user import student_profile_model
 
 
 class ProfileService:
     """Класс методов для работы с профилями пользователей"""
-
-    student_profile_model = apps.get_model('authen', 'StudentProfile')
-    coko_profile_model = apps.get_model('authen', 'CokoProfile')
-    state_model = apps.get_model('guides', 'State')
 
     set_student_profile_fields = [
         'surname',
@@ -46,8 +43,8 @@ class ProfileService:
         """
         data = {attribute_name: value}
         try:
-            return (self.student_profile_model.objects.filter(**data).exists() or
-                    self.coko_profile_model.objects.filter(**data).exists())
+            return (student_profile_model.objects.filter(**data).exists() or
+                    coko_profile_model.objects.filter(**data).exists())
         except Exception:
             return False
 
@@ -70,10 +67,10 @@ class ProfileService:
         """
         if self.is_profile_exist(attribute_name, value):
             find = {attribute_name: value}
-            if self.student_profile_model.objects.filter(**find).exists():
-                prof = self.student_profile_model.objects.filter(**find).first()
+            if student_profile_model.objects.filter(**find).exists():
+                prof = student_profile_model.objects.filter(**find).first()
             else:
-                prof = self.coko_profile_model.objects.filter(**find).first()
+                prof = coko_profile_model.objects.filter(**find).first()
             if output in ['profile', 'username', 'display_name', 'user_id']:
                 if output == 'profile':
                     return prof
@@ -100,7 +97,7 @@ class ProfileService:
             try:
                 for key, value in data.items():
                     if key == 'state':
-                        state = self.state_model.objects.filter(name=value).first()
+                        state = state_model.objects.filter(name=value).first()
                         setattr(prof, key, state)
                     elif key == 'email':
                         user = User.objects.get(id=prof.django_user_id)

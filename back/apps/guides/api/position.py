@@ -10,7 +10,8 @@ from apps.commons.utils.django.response import ResponseUtils
 from apps.guides.selectors.name_field import NameFieldFilter
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
 from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
-from apps.guides.serializers.position import PositionListUpdateSerializer, position_model, \
+from apps.guides.selectors.position import position_queryset
+from apps.guides.serializers.position import PositionListUpdateSerializer, \
     PositionBaseSerializer
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR
@@ -23,7 +24,7 @@ class PositionViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     respu = ResponseUtils()
 
-    queryset = position_model.objects.all().order_by('name')
+    queryset = position_queryset()
     serializer_class = PositionListUpdateSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]

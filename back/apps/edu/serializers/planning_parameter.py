@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-planning_parameter_model = apps.get_model('edu', 'PlanningParameter')
+from apps.edu.selectors.planning_parameter import planning_parameter_model
 
 
 class PlanningParameterSerializer(serializers.ModelSerializer):

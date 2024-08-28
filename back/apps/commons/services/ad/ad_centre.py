@@ -33,7 +33,8 @@ class AdCentreService:
             return ad_centre_model.objects.filter(**find).first()
         return None
 
-    def add_ad_centre(self, ad_centre_data: dict):
+    @staticmethod
+    def add_ad_centre(ad_centre_data: dict):
         """
         Добавление нового подразделения-центра AD в БД
         :param ad_centre_data: Словарь с данными о новом подразделении

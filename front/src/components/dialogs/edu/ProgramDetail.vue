@@ -7,10 +7,10 @@
 
     <v-card class="lk-full-page-card">
       <v-card-title class="d-flex justify-space-between align-center">
-        <v-tabs class="guides-tabs"
-                v-model="programTab"
-                bg-color="coko-blue"
-                show-arrows
+        <v-tabs
+          v-model="programTab"
+          bg-color="coko-blue"
+          show-arrows
         >
 
           <v-tab
@@ -54,205 +54,210 @@
           type="error"
         ></v-alert>
 
-        <v-container>
+        <DialogContentWithError ref="content-error">
 
-          <template v-if="programTab === 'info'">
+          <slot>
 
-            <v-row
-              dense
-            >
+            <template v-if="programTab === 'info'">
 
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
+              <v-row
+                dense
               >
-                <v-select
-                  bg-color="white"
-                  variant="solo"
-                  :items="adCentres"
-                  v-model="programObject.department"
-                  label="Подразделение*"
-                  :loading="loading"
-                />
-              </v-col>
 
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
-              >
-                <v-select
-                  bg-color="white"
-                  variant="solo"
-                  :items="programTypes"
-                  v-model="programObject.type"
-                  label="Тип*"
-                  :loading="loading"
-                />
-              </v-col>
-
-              <v-col
-                cols="12"
-                md="12"
-                sm="12"
-              >
-                <v-textarea
-                  bg-color="white"
-                  variant="solo"
-                  v-model="programObject.name"
-                  label="Наименование*"
-                  :loading="loading"
-                />
-              </v-col>
-
-
-
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
-              >
-                <v-number-input
-                  bg-color="white"
-                  variant="solo"
-                  controlVariant="split"
-                  label="Объем (часов)*"
-                  :min="0"
-                  v-model="programObject.duration"
-                  :loading="loading"
-                />
-              </v-col>
-
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
-              >
-                <v-number-input
-                  bg-color="white"
-                  variant="solo"
-                  controlVariant="split"
-                  label="Цена (рублей)*"
-                  :min="0"
-                  :step="500"
-                  v-model="programObject.price"
-                  :loading="loading"
-                />
-              </v-col>
-
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
-              >
-                <v-textarea
-                  bg-color="white"
-                  variant="solo"
-                  label="Аннотация"
-                  v-model="programObject.annotation"
-                  clearable
-                  :loading="loading"
-                />
-              </v-col>
-
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
-              >
-                <v-select
-                  bg-color="white"
-                  variant="solo"
-                  clearable
-                  chips
-                  multiple
-                  label="Категории слушателей"
-                  :items="audienceCategories"
-                  v-model="programObject.categories"
-                  :loading="loading"
-                />
-              </v-col>
-
-            </v-row>
-
-          </template>
-
-          <template v-if="programTab === 'order'">
-
-            <v-row
-              dense
-            >
-
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
-              >
-                <v-text-field
-                  bg-color="white"
-                  variant="solo"
-                  v-model="orderObject.order_number"
-                  label="Номер приказа"
-                  :loading="loading"
-                />
-              </v-col>
-
-              <v-col
-                cols="12"
-                md="6"
-                sm="6"
-              >
-                <v-date-input
-                  id="orderDate"
-                  bg-color="white"
-                  label="Дата приказа"
-                  v-model="orderObject['order_date']"
-                  prepend-icon=""
-                  prepend-inner-icon="$calendar"
-                  variant="solo"
-                  :loading="loading"
-                  clearable
-                ></v-date-input>
-              </v-col>
-
-              <v-col
-                cols="12"
-                md="12"
-                sm="12"
-              >
-                <template
-                  v-if="orderObject.order_id"
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
                 >
-
-                  Скачать установленный файл:
-                  <v-icon
-                    icon="mdi-tray-arrow-down"
-                    @click="downloadFile()"
+                  <v-select
+                    bg-color="white"
+                    variant="solo"
+                    :items="adCentres"
+                    v-model="programObject.department"
+                    label="Подразделение*"
+                    :loading="loading"
                   />
-                  <br/><br/>
+                </v-col>
 
-                </template>
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
+                >
+                  <v-select
+                    bg-color="white"
+                    variant="solo"
+                    :items="programTypes"
+                    v-model="programObject.type"
+                    label="Тип*"
+                    :loading="loading"
+                  />
+                </v-col>
 
-                <v-file-input
-                  bg-color="white"
-                  v-model="orderObject.order_file"
-                  variant="solo"
-                  label="Скан файла приказа"
-                />
-              </v-col>
+                <v-col
+                  cols="12"
+                  md="12"
+                  sm="12"
+                >
+                  <v-textarea
+                    bg-color="white"
+                    variant="solo"
+                    v-model="programObject.name"
+                    label="Наименование*"
+                    :loading="loading"
+                  />
+                </v-col>
 
-            </v-row>
 
-          </template>
 
-          <template v-if="programTab === 'kug'">
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
+                >
+                  <v-number-input
+                    bg-color="white"
+                    variant="solo"
+                    controlVariant="split"
+                    label="Объем (часов)*"
+                    :min="0"
+                    v-model="programObject.duration"
+                    :loading="loading"
+                  />
+                </v-col>
 
-            <KUGTable :programId="programObjectID" />
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
+                >
+                  <v-number-input
+                    bg-color="white"
+                    variant="solo"
+                    controlVariant="split"
+                    label="Цена (рублей)*"
+                    :min="0"
+                    :step="500"
+                    v-model="programObject.price"
+                    :loading="loading"
+                  />
+                </v-col>
 
-          </template>
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
+                >
+                  <v-textarea
+                    bg-color="white"
+                    variant="solo"
+                    label="Аннотация"
+                    v-model="programObject.annotation"
+                    clearable
+                    :loading="loading"
+                  />
+                </v-col>
 
-        </v-container>
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
+                >
+                  <v-select
+                    bg-color="white"
+                    variant="solo"
+                    clearable
+                    chips
+                    multiple
+                    label="Категории слушателей"
+                    :items="audienceCategories"
+                    v-model="programObject.categories"
+                    :loading="loading"
+                  />
+                </v-col>
+
+              </v-row>
+
+            </template>
+
+            <template v-if="programTab === 'order'">
+
+              <v-row
+                dense
+              >
+
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
+                >
+                  <v-text-field
+                    bg-color="white"
+                    variant="solo"
+                    v-model="orderObject.order_number"
+                    label="Номер приказа"
+                    :loading="loading"
+                  />
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="6"
+                  sm="6"
+                >
+                  <v-date-input
+                    id="orderDate"
+                    bg-color="white"
+                    label="Дата приказа"
+                    v-model="orderObject['order_date']"
+                    prepend-icon=""
+                    prepend-inner-icon="$calendar"
+                    variant="solo"
+                    :loading="loading"
+                    clearable
+                  ></v-date-input>
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="12"
+                  sm="12"
+                >
+                  <template
+                    v-if="orderObject.order_id"
+                  >
+
+                    Скачать установленный файл:
+                    <v-icon
+                      icon="mdi-tray-arrow-down"
+                      @click="downloadFile()"
+                    />
+                    <br/><br/>
+
+                  </template>
+
+                  <v-file-input
+                    bg-color="white"
+                    v-model="orderObject.order_file"
+                    variant="solo"
+                    label="Скан файла приказа"
+                  />
+                </v-col>
+
+              </v-row>
+
+            </template>
+
+            <template v-if="programTab === 'kug'">
+
+              <KUGTable :programId="programObjectID" />
+
+            </template>
+
+          </slot>
+
+        </DialogContentWithError>
+
         <small v-if="!(programTab === 'kug')" class="text-caption text-medium-emphasis">
           * - обязательные для заполнения поля
         </small>
@@ -293,10 +298,11 @@ import {showAlert} from "@/commons/alerts";
 import contentTypeFormats from "@/commons/consts/contentTypeFormats";
 import {convertDateToBackend} from "@/commons/date";
 import KUGTable from "@/components/tables/KUGTable.vue";
+import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 
 export default {
   name: "ProgramDetail",
-  components: {KUGTable},
+  components: {DialogContentWithError, KUGTable},
   props: {
     adCentres: Array, // Список подразделений AD,
     audienceCategories: Array, // Список категорий слушателей,
@@ -323,8 +329,6 @@ export default {
         'order_date': '',
         'order_file': null,
       },
-      // Текст ошибки в процессе работы с ДПП
-      programDetailError: '',
       // Возможные типы файлов приказов ДПП
       programTypes: JSON.parse(import.meta.env.VITE_PROGRAM_TYPES)
     }
@@ -356,7 +360,7 @@ export default {
         )
           .then((data) => {
             if (data.error) {
-              this.showProgramError(data.error)
+              this.$refs["content-error"].showContentError(data.error)
             } else {
               console.log(data)
               Object.keys(data).map((key) => {
@@ -388,17 +392,6 @@ export default {
         this.loading = false
       }
     },
-    // Скрыть оповещение об ошибке в процессе работы с ДПП
-    hideProgramError() {
-      document.querySelector('#error-program-detail-alert').classList.remove('alert-visible')
-      document.querySelector('#error-program-detail-alert').classList.add('alert-hidden')
-    },
-    // Показать оповещение об ошибке в процессе работы с ДПП
-    showProgramError(message) {
-      this.programDetailError = message
-      document.querySelector('#error-program-detail-alert').classList.add('alert-visible')
-      document.querySelector('#error-program-detail-alert').classList.remove('alert-hidden')
-    },
     // Проверка корректности заполнения формы
     checkDataFilled() {
       Object.keys(this.programObject).map((key) => {
@@ -411,7 +404,7 @@ export default {
           'order_date',
           'order_file'].includes(key))) {
           if ((this.programObject[key] === 0) || (this.programObject[key].length === 0)) {
-            this.showProgramError('Заполните все обязательные поля формы')
+            this.$refs["content-error"].showContentError('Заполните все обязательные поля формы')
             this.checkDataFill = false
           }
         }
@@ -421,7 +414,7 @@ export default {
         ['', null, undefined].includes(this.orderObject[key])).length !== 4) {
         orderKeys.map((key) => {
           if ((key !== 'order_id') && (['', null, undefined].includes(this.orderObject[key]))) {
-            this.showProgramError('Заполните все поля приказа, либо удалите всю информацию')
+            this.$refs["content-error"].showContentError('Заполните все поля приказа, либо удалите всю информацию')
             this.checkDataFill = false
           }
         })
@@ -429,7 +422,7 @@ export default {
     },
     // Сохранение информации о программе
     async saveProgram() {
-      this.hideProgramError()
+      this.$refs["content-error"].hideContentError()
       this.checkDataFill = true
       this.checkDataFilled()
       if (this.checkDataFill) {
@@ -470,7 +463,7 @@ export default {
           true
         )
         if (programRequest.error) {
-          this.showProgramError(programRequest.error)
+          this.$refs["content-error"].showContentError(programRequest.error)
         }
         if (programRequest.success) {
           this.dialog = false
@@ -513,7 +506,7 @@ export default {
         null
       )
       if (copyDppRequest.error) {
-        this.showProgramError(copyDppRequest.error)
+        this.$refs["content-error"].showContentError(copyDppRequest.error)
       }
       if (copyDppRequest.success) {
         this.dialog = false

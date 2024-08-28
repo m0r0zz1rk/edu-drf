@@ -1,13 +1,9 @@
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from apps.commons.models import BaseTable
 from apps.commons.utils.data_types.date import DateUtils
-from apps.commons.utils.django.settings import SettingsUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES, COMMON
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES, NO_RESULT
-from apps.journal.services.journal import JournalService
 
 
 class Journal(BaseTable):
@@ -49,14 +45,3 @@ class Journal(BaseTable):
     class Meta:
         verbose_name = 'Запись журнала событий'
         verbose_name_plural = 'Записи журнала событий'
-
-
-@receiver(post_save, sender=Journal)
-def journal_house_keeping(sender, **kwargs):
-    """Удаление записей из журнала событий при превышении размера журнала"""
-    journal_max = SettingsUtils().get_parameter_from_settings('JOURNAL_MAX_LENGTH')
-    if journal_max is None:
-        journal_max = 250000
-    ju = JournalService()
-    if ju.get_journal_size() > journal_max:
-        ju.journal_older_delete()

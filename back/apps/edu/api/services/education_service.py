@@ -9,8 +9,8 @@ from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.request import RequestUtils
 from apps.commons.utils.django.response import ResponseUtils
-from apps.edu.operations.services.add_update import AddUpdateService
-from apps.edu.operations.services.delete import DeleteService
+from apps.edu.operations.service.add_update import AddUpdateService
+from apps.edu.operations.service.delete import DeleteService
 from apps.edu.selectors.services.education_service import education_service_queryset, EducationServiceFilter
 
 from apps.edu.serializers.services.education_service import EducationServiceListSerializer, \

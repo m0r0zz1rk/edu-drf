@@ -32,8 +32,8 @@
               <v-col
                 v-if="column.key !== 'actions'"
                 cols="12"
-                md="4"
-                sm="6"
+                md="12"
+                sm="12"
               >
 
                 <PaginationTableBaseField

@@ -1,7 +1,6 @@
-from django.apps import apps
 from django.contrib import admin
 
-program_model = apps.get_model('edu', 'Program')
+from apps.edu.selectors.program import program_model
 
 
 @admin.register(program_model)

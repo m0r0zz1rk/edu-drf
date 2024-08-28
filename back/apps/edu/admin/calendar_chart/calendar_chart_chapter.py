@@ -1,7 +1,6 @@
-from django.apps import apps
 from django.contrib import admin
 
-calendar_chart_chapter_model = apps.get_model('edu', 'CalendarChartChapter')
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
 
 
 @admin.register(calendar_chart_chapter_model)

@@ -1,0 +1,85 @@
+from typing import Union
+
+from apps.commons.abc.main_processing import MainProcessing
+from apps.commons.utils.django.exception import ExceptionHandling
+from apps.edu.selectors.student_group import student_group_model
+from apps.edu.services.service.education_service import EducationServiceService
+from apps.edu.services.service.information_service import InformationServiceService
+from apps.edu.services.student_group import StudentGroupService
+from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+
+
+class AddStudentGroup(MainProcessing):
+    """Добавление учебной группы"""
+    sgs = StudentGroupService()
+    ess = EducationServiceService()
+    iss = InformationServiceService()
+
+    required_keys = ['type', 'service_id', 'plan_seats_number']
+
+    def _validate_process_data(self) -> Union[bool, str]:
+        """
+        Валидация данных для добавления учебной группы
+        :return: true - данные валидны, false - данные не валидны, str - traceback
+        """
+        try:
+            for key in self.required_keys:
+                if key not in self.process_data.keys():
+                    return False
+            return True
+        except:
+            return ExceptionHandling.get_traceback()
+
+    def _main_process(self):
+        """Добавление учебной группы"""
+        try:
+            department = ''
+            if self.process_data['type'] == 'ou':
+                self.process_data['ou_id'] = self.process_data['service_id']
+                dep = self.ess.get_info_by_service(
+                    'object_id',
+                    self.process_data['service_id'],
+                    'dep_name'
+                )
+            else:
+                self.process_data['iku_id'] = self.process_data['service_id']
+                dep = self.iss.get_info_by_service(
+                    'object_id',
+                    self.process_data['service_id'],
+                    'dep_name'
+                )
+            if dep is not None:
+                department = dep
+            del self.process_data['service_id']
+            self.process_data['code'] = self.sgs.generate_group_code(
+                department,
+                self.process_data['type']
+            )
+            del self.process_data['type']
+            group, _ = student_group_model.objects.update_or_create(**self.process_data)
+            self.process_completed = True
+        except Exception as e:
+            self.ju.create_journal_rec(
+                {
+                    'source': self.source,
+                    'module': self.module,
+                    'status': ERROR,
+                    'description': f'Ошибка в процессе добавления учебной группы'
+                },
+                repr(self.process_data),
+                ExceptionHandling.get_traceback()
+            )
+            self.process_completed = False
+
+    def _process_success(self):
+        """Фиксация сообщения об успешном добавлении учебной группы"""
+        self.ju.create_journal_rec(
+            {
+                'source': self.source,
+                'module': self.module,
+                'status': SUCCESS,
+                'description': f'Учебная группа успешно добавлена'
+            },
+            repr(self.process_data),
+            None
+        )

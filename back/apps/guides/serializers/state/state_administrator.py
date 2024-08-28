@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-state_model = apps.get_model(app_label='guides', model_name='State')
+from apps.guides.selectors.state import state_model
 
 
 class StateAdministratorSerializer(serializers.ModelSerializer):

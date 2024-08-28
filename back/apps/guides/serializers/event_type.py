@@ -1,7 +1,6 @@
-from django.apps import apps
 from rest_framework import serializers
 
-event_type_model = apps.get_model('guides', 'EventType')
+from apps.guides.selectors.event_type import event_type_model
 
 
 class EventTypeBaseSerializer(serializers.ModelSerializer):

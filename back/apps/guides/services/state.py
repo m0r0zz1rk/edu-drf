@@ -1,8 +1,7 @@
 from typing import Optional
 
-from django.apps import apps
-
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
+from apps.guides.selectors.state import state_model
 
 default_states = [
     'Россия',
@@ -10,8 +9,6 @@ default_states = [
     'Беларусь',
     'Казахстан'
 ]
-
-state_model = apps.get_model('guides', 'State')
 
 
 class StateService:

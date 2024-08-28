@@ -1,13 +1,10 @@
 from typing import Union
 
-from django.apps import apps
-
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-
-calendar_chart_chapter_model = apps.get_model('edu', 'CalendarChartChapter')
-calendar_chart_theme_model = apps.get_model('edu', 'CalendarChartTheme')
 
 
 class AddUpdateCalendarChartElement(MainProcessing):

@@ -1,14 +1,16 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from apps.commons.pagination import CustomPagination
+from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
-from apps.guides.selectors.oo import OoFilter
+from apps.guides.selectors.oo import OoFilter, oo_queryset
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
 from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
-from apps.guides.serializers.oo import oo_model, OoListSerializer, OoCreateSerializer, \
+from apps.guides.serializers.oo import OoListSerializer, OoCreateSerializer, \
     OoUpdateSerializer
 from apps.guides.services.mo import MoService
 from apps.guides.services.oo_type import OoTypeService
@@ -19,12 +21,13 @@ from apps.journal.services.journal import JournalService
 
 class OoViewSet(viewsets.ModelViewSet):
     """Работа с ОО в модуле Справочников"""
+    permission_classes = [IsAuthenticated, IsAdministrators]
     ju = JournalService()
     respu = ResponseUtils()
     mu = MoService()
     otu = OoTypeService()
 
-    queryset = oo_model.objects.all().order_by('date_create')
+    queryset = oo_queryset()
     serializer_class = OoListSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, ]
