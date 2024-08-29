@@ -264,6 +264,8 @@
 
       </v-card-text>
 
+      <v-divider></v-divider>
+
       <v-card-actions
         v-if="programTab !== 'kug'"
         style="background-color: white"

@@ -13,7 +13,7 @@
       />
 
     </template>
-    <v-card>
+    <v-card class="lk-full-page-card">
       <v-card-title class="d-flex justify-space-between align-center">
         <span class="text-h5">Новая запись</span>
         <v-btn
