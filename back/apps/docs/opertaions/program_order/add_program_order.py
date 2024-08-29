@@ -30,7 +30,7 @@ class AddUpdateProgramOrderOperation(BaseDocOperation):
             if 'object_id' in doc_data.keys():
                 object_id = doc_data['object_id']
                 del doc_data['object_id']
-                if type(doc_data['file']) is str:
+                if 'file' in doc_data.keys() and type(doc_data['file']) is str:
                     path = doc_data['file']
                     del doc_data['file']
                     doc, _ = program_order_model.objects.update_or_create(

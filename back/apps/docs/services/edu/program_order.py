@@ -22,4 +22,5 @@ class ProgramOrderService:
             order_path = os.path.join(order_path, subfolder)
             if not os.path.exists(order_path):
                 os.makedirs(order_path)
+        print(order_path)
         return os.path.join(order_path, new_file_name)

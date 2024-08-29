@@ -206,8 +206,12 @@ class ProgramViewSet(viewsets.ModelViewSet):
             data=self.ru.convert_form_data_data(request.data)
         )
         if serialize.is_valid():
+            form_data = dict(serialize.data)
+            if form_data['order_file'] is not None:
+                del form_data['order_file']
+                form_data['order_file'] = request.FILES['order_file']
             process = AddUpdateProgramOperation(
-                dict(serialize.data),
+                form_data,
                 request
             )
             if process.process_completed:
