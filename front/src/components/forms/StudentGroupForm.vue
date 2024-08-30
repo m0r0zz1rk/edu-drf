@@ -2,6 +2,7 @@
 
     <v-card
       variant="outlined"
+      class="lk-full-page-card"
     >
 
       <v-card-title class="d-flex justify-space-between align-center">
@@ -11,7 +12,7 @@
       <v-card-text class="adaptive-tab-table-card-text" style="padding: 0;">
 
         <v-tabs
-          style="width: 100%;"
+          style="width: 100%; top: 0; z-index: 10; position: sticky"
           v-model="groupTab"
           bg-color="coko-blue"
           show-arrows
@@ -79,16 +80,22 @@
           :serviceType="serviceType"
         />
 
+        <StudentGroupSchedule
+            v-if="groupTab === 'schedule'"
+            :groupId="groupId"
+        />
+
       </v-card-text>
 
       <v-card-actions
-        v-if="groupTab === 'manage'"
+
         style="background-color: white"
       >
 
         <v-spacer></v-spacer>
 
         <v-btn
+          v-if="groupTab === 'manage'"
           color="coko-blue"
           text="Сохранить"
           :loading="loading"
@@ -109,10 +116,11 @@ import {hideAlert, showAlert} from "@/commons/alerts";
 import studentGroupStatuses from "@/commons/consts/studentGroupStatuses";
 import StudentGroupDocs from "@/components/forms/student_group/StudentGroupDocs.vue";
 import studyForms from "@/commons/consts/studyForms";
+import StudentGroupSchedule from "@/components/forms/student_group/StudentGroupSchedule.vue";
 
 export default {
   name: "StudentGroupForm",
-  components: {StudentGroupDocs, StudentGroupManage, StudentGroupInfo, LkPage},
+  components: {StudentGroupSchedule, StudentGroupDocs, StudentGroupManage, StudentGroupInfo, LkPage},
   props: {
     groupId: String, // object_id учебной группы
   },

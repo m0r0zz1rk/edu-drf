@@ -130,34 +130,44 @@
     <v-expansion-panel
       v-if="serviceType === 'ou'"
       color="coko-blue"
-      title="Приказ о зачислении"
+      title="Приказы"
     >
 
       <v-expansion-panel-text>
 
-        <v-btn
-          color="coko-blue"
+        <v-row
+            dense
         >
-          Сформировать
-        </v-btn>
 
-      </v-expansion-panel-text>
+          <v-col
+              cols="12"
+              md="4"
+              sm="6"
+          >
 
-    </v-expansion-panel>
+            <v-btn
+              color="coko-blue"
+            >
+              О зачислении
+            </v-btn>
 
-    <v-expansion-panel
-      v-if="serviceType === 'ou'"
-      color="coko-blue"
-      title="Приказ об отчислении"
-    >
+          </v-col>
 
-      <v-expansion-panel-text>
+          <v-col
+              cols="12"
+              md="4"
+              sm="6"
+          >
 
-        <v-btn
-          color="coko-blue"
-        >
-          Сформировать
-        </v-btn>
+            <v-btn
+                color="coko-blue"
+            >
+              Об отчислении
+            </v-btn>
+
+          </v-col>
+
+        </v-row>
 
       </v-expansion-panel-text>
 

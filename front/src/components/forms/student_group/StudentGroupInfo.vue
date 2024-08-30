@@ -2,7 +2,7 @@
 
   <v-row
     dense
-    style="padding: 10px;"
+    style="padding: 10px;width: 98%"
   >
 
     <v-col

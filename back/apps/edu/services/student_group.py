@@ -1,6 +1,8 @@
 import datetime
 import re
+from typing import Optional
 
+from apps.edu.exceptions.generate_code_error import GenerateCodeError
 from apps.edu.selectors.student_group import student_group_model
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
@@ -19,6 +21,18 @@ class StudentGroupService:
         """
         find = {attribute_name: value}
         return student_group_model.objects.filter(**find).exists()
+
+    def get_student_group(self, attribute_name: str, value: str) -> Optional[student_group_model]:
+        """
+        Получение объекта учебной группы
+        :param attribute_name: атрибута модели StudentGroup
+        :param value: значение атрибута
+        :return: StudentGroup или None если группа не найдена
+        """
+        if self.is_group_exists(attribute_name, value):
+            find = {attribute_name: value}
+            return student_group_model.objects.filter(**find).first()
+        return None
 
     def generate_group_code(self, department: str, service_type: str) -> str:
         """
@@ -49,6 +63,6 @@ class StudentGroupService:
             if self.is_group_exists('code', code):
                 count = student_group_model.objects.filter(code=code).count()
                 code += '-' + str(count)
-        except:
+        except GenerateCodeError:
             pass
         return code
