@@ -250,7 +250,9 @@
 
             <template v-if="programTab === 'kug'">
 
-              <KUGTable :programId="programObjectID" />
+              <KUGTable
+                  :programId="programObjectID"
+              />
 
             </template>
 
@@ -267,7 +269,6 @@
       <v-divider></v-divider>
 
       <v-card-actions
-        v-if="programTab !== 'kug'"
         style="background-color: white"
       >
 
@@ -281,6 +282,7 @@
         ></v-btn>
 
         <v-btn
+          v-if="programTab !== 'kug'"
           color="coko-blue"
           :text="programObjectID !== null ? 'Сохранить' : 'Добавить'"
           :loading="loading"
@@ -332,7 +334,9 @@ export default {
         'order_file': null,
       },
       // Возможные типы файлов приказов ДПП
-      programTypes: JSON.parse(import.meta.env.VITE_PROGRAM_TYPES)
+      programTypes: JSON.parse(import.meta.env.VITE_PROGRAM_TYPES),
+      // Объект разделов КУГ (для сохранения данных при изменении вкладки)
+      chapters: null
     }
   },
   methods: {
