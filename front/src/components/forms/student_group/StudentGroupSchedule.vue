@@ -4,15 +4,14 @@
     style="padding: 10px; width: 98%"
   >
 
-    <v-progress-circular
-        v-if="schedule === null"
-        color="coko-blue"
-        indeterminate
-    />
+    <div v-if="schedule === null">
+      <b>Подождите, идет загрузка данных ...</b>
+    </div>
 
     <div v-if="schedule !== null">
 
       <v-btn
+          v-if="days !== null"
           prepend-icon="mdi-plus"
           :loading="tableLoading"
           style="margin-bottom: 15px; margin-right: 15px"
@@ -21,16 +20,14 @@
           :text="!(mobileDisplay) && 'Добавить'"
       />
 
-      <v-btn
-          prepend-icon="mdi-creation"
-          :loading="tableLoading"
-          style="margin-bottom: 15px; margin-right: 15px"
-          color="coko-blue"
-          @click="showGenerationDialog=!showGenerationDialog"
-          :text="!(mobileDisplay) && 'Сгененрировать'"
+      <ScheduleGenerateDialog
+        v-if="days !== null"
+        :days="days"
       />
 
+
       <v-btn
+          v-if="days !== null"
           prepend-icon="mdi-file-excel"
           :loading="tableLoading"
           style="margin-bottom: 15px;"
@@ -48,7 +45,7 @@
         <v-expansion-panel
             v-for="studyDay in schedule"
             color="coko-blue"
-            :title="studyDay.day"
+            :title="studyDay.day+' ('+getDayOfWeek(studyDay.day)+')'"
         >
 
           <div
@@ -72,11 +69,13 @@
 
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
-import {convertBackendDate, convertDateToBackend} from "@/commons/date";
+import {convertBackendDate, convertDateToBackend, getDayOfWeek} from "@/commons/date";
 import {useDisplay} from "vuetify";
+import ScheduleGenerateDialog from "@/components/dialogs/edu/student_group/schedule/ScheduleGenerateDialog.vue";
 
 export default {
   name: 'StudentGroupSchedule',
+  components: {ScheduleGenerateDialog},
   props: {
     groupId: String, // object_id учбеной группы
   },
@@ -92,9 +91,11 @@ export default {
       }, // Объект с редактируемыми параметрами учебной группы
       schedule: [], // Расписание занятий по дням
       scheduleOpenedPanel: [], // Массив, содержащий параметры раскрытия панелей по дням
+      days: null, //Массив учебных дней
     }
   },
   methods: {
+    getDayOfWeek,
     // Получение расписания учебной группы
     async getSchedule() {
       let scheduleRequest = await apiRequest(
@@ -109,10 +110,14 @@ export default {
       } else {
         this.schedule = scheduleRequest
         let panel = []
+        let days = []
         for (let i=0;i<scheduleRequest.length;i++) {
           panel.push(i)
+          days.push(scheduleRequest[i].day)
         }
+        console.log(days)
         this.scheduleOpenedPanel = panel
+        this.days = days
       }
       this.loading = false
     },

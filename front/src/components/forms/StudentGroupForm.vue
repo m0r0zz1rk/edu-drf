@@ -6,7 +6,9 @@
     >
 
       <v-card-title class="d-flex justify-space-between align-center">
-        Управление учебной группой
+
+          Управление учебной группой {{code}}
+
       </v-card-title>
 
       <v-card-text class="adaptive-tab-table-card-text" style="padding: 0;">
@@ -65,6 +67,7 @@
 
         <StudentGroupInfo
           v-if="groupTab === 'info'"
+          :setCode="setCode"
           :groupId="groupId"
         />
 
@@ -128,6 +131,7 @@ export default {
     return {
       groupTab: 'info', // Выбранная вкладка на форме
       loading: false, // Параметр отображения анимации загрузки на элементах формы
+      code: '', // Код учебной группы
       serviceType: '', // Тип услуги учебной группы
     }
   },
@@ -181,6 +185,10 @@ export default {
       } else {
         this.serviceType = serviceTypeRequest.service_type
       }
+    },
+    // Установить код учебной группы для отображения в шапке формы
+    setCode(code) {
+      this.code = code
     }
   },
   mounted() {

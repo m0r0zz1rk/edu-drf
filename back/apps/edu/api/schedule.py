@@ -9,6 +9,7 @@ from apps.edu.services.schedule import ScheduleService
 from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.decorators.journal_api import journal_api
+from apps.journal.exceptions.api_process_error import APIProcessError
 
 
 class ScheduleViewSet(viewsets.ViewSet):
@@ -30,9 +31,13 @@ class ScheduleViewSet(viewsets.ViewSet):
         'Внешний запрос',
         EDU,
         ERROR,
-        'Ошибка при получении расписания занятий для учебной группы'
+        'Ошибка при получении расписания занятий для учебной группы',
+        'Произошла ошибка при получении расписания занятий учебной группы'
     )
     def get_group_schedule(self, request, *args, **kwargs):
-        schedule = ScheduleService(self.kwargs['group_id']).get_group_schedule()
-        serializer = ScheduleListSerializer(schedule, many=True)
-        return self.__response_utils.ok_response_dict(serializer.data)
+        try:
+            schedule = ScheduleService(self.kwargs['group_id']).get_group_schedule()
+            serializer = ScheduleListSerializer(schedule, many=True)
+            return self.__response_utils.ok_response_dict(serializer.data)
+        except:
+            raise APIProcessError

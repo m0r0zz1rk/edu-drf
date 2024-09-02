@@ -2,7 +2,8 @@ import datetime
 import re
 from typing import Optional
 
-from apps.edu.exceptions.generate_code_error import GenerateCodeError
+from apps.edu.exceptions.student_group.generate_code_error import GenerateCodeError
+from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.selectors.student_group import student_group_model
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
@@ -63,6 +64,6 @@ class StudentGroupService:
             if self.is_group_exists('code', code):
                 count = student_group_model.objects.filter(code=code).count()
                 code += '-' + str(count)
-        except GenerateCodeError:
-            pass
+        except RuntimeError:
+            raise GenerateCodeError
         return code

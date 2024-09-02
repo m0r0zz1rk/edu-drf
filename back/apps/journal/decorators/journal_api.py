@@ -16,7 +16,8 @@ def journal_api(
         source: str,
         module: JOURNAL_MODULES,
         status: JOURNAL_REC_STATUSES,
-        description: str
+        description: str,
+        error_text: str
 ):
     """Декоратор для внесения ошибок в журнал событий в случае их возникновения при работе с endpoint"""
     def inner_decorator(func):
@@ -35,6 +36,6 @@ def journal_api(
                     '-',
                     ExceptionHandling.get_traceback()
                 )
-                return response_utils.bad_request_no_data()
+                return response_utils.bad_request_response(error_text)
         return wrapper
     return inner_decorator

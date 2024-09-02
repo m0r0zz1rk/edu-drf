@@ -96,6 +96,8 @@
 
               <tr v-if="mobileDisplay" style="position: sticky; top: 0; z-index: 5">
 
+
+
               </tr>
 
           </template>
@@ -469,7 +471,7 @@ export default {
   data() {
     return {
       tableLoading: true, // Отображение индикатора загрузки в таблице
-      tableKey: 0,
+      tableKey: 0, // Параметр для перерисовки таблицы
       mobileDisplay: useDisplay().smAndDown, // Проверка на дисплей мобильного устройства
       headers: [
         {

@@ -130,6 +130,7 @@ export default {
   components: {StudentGroupStatusBadge},
   props: {
     groupId: String, // object_id учебной группы
+    setCode: Function, // Функция установки кода учебной группы
   },
   data() {
     return {
@@ -161,6 +162,7 @@ export default {
         Object.keys(this.studentGroup).map((key) => {
           this.studentGroup[key] = infoRequest[key]
         })
+        this.setCode(infoRequest['code'])
       }
     }
   },

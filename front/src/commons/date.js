@@ -1,4 +1,8 @@
+
+
 //Преобразовантие даты из текстового формата ДД.ММ.ГГГГ в объект Date
+import daysOfWeek from "@/commons/consts/daysOfWeek";
+
 export function convertBackendDate(backendDate) {
   let arr = backendDate.split('.')
   return new Date(arr[2], arr[1]-1, arr[0])
@@ -15,4 +19,13 @@ export function convertDateToBackend(frontDate) {
     month = String('0'+month)
   }
   return day + '.' + month + '.' + frontDate.getFullYear()
+}
+
+// Получение дня недели для полученной даты
+export function getDayOfWeek(date) {
+  let internal = date
+  if (!(Object.prototype.toString.call(date) === '[object Date]')) {
+    internal = convertBackendDate(date)
+  }
+  return daysOfWeek[internal.getDay()]
 }

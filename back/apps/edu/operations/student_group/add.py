@@ -2,6 +2,7 @@ from typing import Union
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
+from apps.edu.exceptions.student_group.generate_code_error import GenerateCodeError
 from apps.edu.selectors.student_group import student_group_model
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
@@ -58,6 +59,18 @@ class AddStudentGroup(MainProcessing):
             del self.process_data['type']
             group, _ = student_group_model.objects.update_or_create(**self.process_data)
             self.process_completed = True
+        except GenerateCodeError:
+            self.ju.create_journal_rec(
+                {
+                    'source': self.source,
+                    'module': self.module,
+                    'status': ERROR,
+                    'description': f'Ошибка в процессе генерации кода учебной группы'
+                },
+                repr(self.process_data),
+                ExceptionHandling.get_traceback()
+            )
+            self.process_completed = False
         except Exception as e:
             self.ju.create_journal_rec(
                 {
