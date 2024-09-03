@@ -110,7 +110,7 @@
 
                     </template>
 
-                    <template v-if="header.key === 'start_time'">
+                    <template v-if="header.key === 'time_start'">
 
                       <v-text-field
                         v-model="item[header.key]"
@@ -196,13 +196,17 @@
 
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 import {useDisplay} from "vuetify";
-import {getDayOfWeek} from "../../../../../commons/date";
+import {getDayOfWeek} from "@/commons/date";
+import {apiRequest} from "@/commons/api_request";
+import {showAlert} from "@/commons/alerts";
 
 export default {
   name: 'ScheduleGenerateDialog',
   components: {DialogContentWithError},
   props: {
+    groupId: String, // object_id учебной группы
     days: Array, // Список учебных дней
+    getSchedule: Function, // Функция получения расписания в родительском компоненте
   },
   data() {
     return {
@@ -219,11 +223,11 @@ export default {
           'key': 'study_day'
         },
         {
-          'title': 'Время начала первого занятия',
-          'key': 'start_time'
+          'title': 'Начало занятий',
+          'key': 'time_start'
         },
         {
-          'title': 'Количество академических часов',
+          'title': 'Кол-во часов',
           'key': 'hours_count'
         },
       ], // Заголовки таблицы
@@ -242,7 +246,7 @@ export default {
         temp.push({
           'day': day,
           'study_day': true,
-          'start_time': '09:00',
+          'time_start': '09:00',
           'hours_count': 4
         })
         tsd.push({
@@ -250,12 +254,34 @@ export default {
           'open': false
         })
       })
+      console.log(temp)
       this.template = temp
       this.timePickerDialogs = tsd
     },
     // Процесс генерации шаблона расписания учебной группы
-    generateSchedule() {
-
+    async generateSchedule() {
+      this.loading = true
+      let scheduleGenerateRequest = await apiRequest(
+          '/backend/api/v1/edu/generate_schedule/',
+          'POST',
+          true,
+          {
+            'group_id': this.groupId,
+            'generate': this.template
+          }
+      )
+      if (scheduleGenerateRequest.error) {
+        showAlert('error', 'Генерация расписания', scheduleGenerateRequest.error)
+      } else {
+        this.dialog = false
+        showAlert(
+            'success',
+            'Генерация расписания',
+            scheduleGenerateRequest.success
+        )
+        this.getSchedule()
+      }
+      this.loading = false
     }
   },
   mounted() {

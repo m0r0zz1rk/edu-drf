@@ -1,5 +1,9 @@
 import datetime
+import re
+import time
 from typing import Optional
+
+from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeFormatError
 
 
 class DateUtils:
@@ -78,3 +82,28 @@ class DateUtils:
         if first_dr_dates[0] >= second_dr_dates[0] or first_dr_dates[1] >= second_dr_dates[0]:
             return True
         return False
+
+    @staticmethod
+    def convert_time_string_to_seconds(time_string: str) -> int:
+        """
+        Преобразование времени в формате ЧЧ:ММ в количество секунд
+        :param time_string: время в формате ЧЧ:ММ
+        :return: количество секунд
+        """
+        print(time_string)
+        pattern = re.compile("[0-9]{2}:[0-9]{2}")
+        if not pattern.match(time_string):
+            raise IncorrectTimeFormatError
+        hours, minutes = time_string.split(':')[0], time_string.split(':')[1]
+        return int(hours) * 60 * 60 + int(minutes) * 60
+
+    @staticmethod
+    def convert_seconds_to_time_string(seconds: int) -> str:
+        """
+        Преобразование количества секунд в текстовый формат времени: ЧЧ:ММ
+        :param seconds: количество секунд
+        :return: время в формате ЧЧ:ММ
+        """
+        return time.strftime('%H:%M', time.localtime(seconds))
+
+
