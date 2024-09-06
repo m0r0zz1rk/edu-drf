@@ -1,5 +1,3 @@
-
-
 //Преобразовантие даты из текстового формата ДД.ММ.ГГГГ в объект Date
 import daysOfWeek from "@/commons/consts/daysOfWeek";
 

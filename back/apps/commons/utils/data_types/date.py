@@ -90,7 +90,6 @@ class DateUtils:
         :param time_string: время в формате ЧЧ:ММ
         :return: количество секунд
         """
-        print(time_string)
         pattern = re.compile("[0-9]{2}:[0-9]{2}")
         if not pattern.match(time_string):
             raise IncorrectTimeFormatError
@@ -104,6 +103,6 @@ class DateUtils:
         :param seconds: количество секунд
         :return: время в формате ЧЧ:ММ
         """
-        return time.strftime('%H:%M', time.localtime(seconds))
+        return time.strftime('%H:%M', time.gmtime(seconds))
 
 

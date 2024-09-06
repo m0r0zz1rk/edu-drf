@@ -7,7 +7,7 @@
 
       <v-card-title class="d-flex justify-space-between align-center">
 
-          Управление учебной группой {{code}}
+          Управление группой {{code}}
 
       </v-card-title>
 
@@ -86,6 +86,7 @@
         <StudentGroupSchedule
             v-if="groupTab === 'schedule'"
             :groupId="groupId"
+            :serviceType="serviceType"
         />
 
       </v-card-text>
@@ -116,9 +117,9 @@ import StudentGroupInfo from "@/components/forms/student_group/StudentGroupInfo.
 import StudentGroupManage from "@/components/forms/student_group/StudentGroupManage.vue";
 import {apiRequest} from "@/commons/api_request";
 import {hideAlert, showAlert} from "@/commons/alerts";
-import studentGroupStatuses from "@/commons/consts/studentGroupStatuses";
+import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
 import StudentGroupDocs from "@/components/forms/student_group/StudentGroupDocs.vue";
-import studyForms from "@/commons/consts/studyForms";
+import studyForms from "@/commons/consts/edu/studyForms";
 import StudentGroupSchedule from "@/components/forms/student_group/StudentGroupSchedule.vue";
 
 export default {

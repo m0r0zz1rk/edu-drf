@@ -4,7 +4,7 @@ from django.apps import apps
 from django.db.models import QuerySet, Q
 from django_filters import rest_framework as filters
 
-from apps.edu.consts.student_group_statuses import STUDENT_GROUP_STATUSES
+from apps.edu.consts.student_group.student_group_statuses import STUDENT_GROUP_STATUSES
 
 student_group_model = apps.get_model('edu', 'StudentGroup')
 

@@ -30,7 +30,6 @@ class ScheduleViewSet(viewsets.ViewSet):
         }
     )
     @journal_api(
-        'Внешний запрос',
         EDU,
         ERROR,
         'Ошибка при получении расписания занятий для учебной группы',
@@ -55,7 +54,6 @@ class ScheduleViewSet(viewsets.ViewSet):
         }
     )
     @journal_api(
-        'Внешний запрос',
         EDU,
         ERROR,
         'Ошибка при генерации расписания занятий',

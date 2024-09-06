@@ -736,7 +736,7 @@ export default {
         'chapters': this.chapters
       }
       let saveKugRequest = await apiRequest(
-        '/backend/api/v1/edu/kug_update/',
+        '/backend/api/v1/edu/kug/update/',
         'POST',
         true,
         body

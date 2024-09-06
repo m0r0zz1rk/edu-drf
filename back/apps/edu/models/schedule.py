@@ -4,6 +4,7 @@ from django.db import models
 
 from apps.commons.models import BaseTable
 from apps.commons.utils.lesson_time import LessonTimeUtils
+from apps.edu.consts.lesson_types import LESSON_TYPES
 
 
 class Schedule(BaseTable):
@@ -25,6 +26,13 @@ class Schedule(BaseTable):
         default=0,
         verbose_name='Время окончания занятия (в секундах)'
     )
+    kug_theme = models.ForeignKey(
+        'edu.CalendarChartTheme',
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        verbose_name='Тема из КУГ (для групп по курсам)'
+    )
     theme = models.CharField(
         max_length=500,
         null=False,
@@ -32,21 +40,13 @@ class Schedule(BaseTable):
         default='Тема',
         verbose_name='Тема занятия'
     )
-    lecture_hours = models.PositiveIntegerField(
-        default=0,
-        verbose_name='Количество лекционных часов'
-    )
-    practice_hours = models.PositiveIntegerField(
-        default=0,
-        verbose_name='Количество часов практики'
-    )
-    trainee_hours = models.PositiveIntegerField(
-        default=0,
-        verbose_name='Количество часов стажировок'
-    )
-    individual_hours = models.PositiveIntegerField(
-        default=0,
-        verbose_name='Количество часов самостоятельной работы'
+    type = models.CharField(
+        max_length=25,
+        choices=LESSON_TYPES,
+        default='lecture',
+        null=False,
+        blank=False,
+        verbose_name='Тип занятия'
     )
     teacher = models.UUIDField(
         null=True,

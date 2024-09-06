@@ -5,6 +5,7 @@ from datetime import datetime as dt
 
 from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeFormatError
 from apps.commons.utils.data_types.date import DateUtils
+from apps.edu.exceptions.calendar_chart.incorrect_theme_dict_format import IncorrectThemeDictFormat
 from apps.edu.exceptions.schedule.schedule_generate_error import ScheduleGenerateError
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.selectors.schedule import schedule_model
@@ -25,9 +26,9 @@ class ScheduleService:
 
     __lesson_template = {
         'group_id': None,
-        'date': None,
-        'time_start': None,
-        'time_end': None,
+        'date': datetime.date.today(),
+        'time_start': 0,
+        'time_end': 0,
     }
 
     def __init__(self, group_id: uuid):
@@ -96,18 +97,23 @@ class ScheduleService:
         """
         lessons = []
         for lesson in schedule_model.objects.filter(
-            date=day
+                date=day
         ).filter(
             group_id=self.__group.object_id
         ).order_by('time_start'):
-            voc = dict()
+            voc = dict({
+                'kug_theme_id': lesson.kug_theme_id
+            })
             for field in schedule_model._meta.get_fields():
                 if field.name in ['object_id', 'date_create', 'group', 'date']:
                     continue
                 else:
                     voc[field.name] = getattr(lesson, field.name)
             lessons.append(voc)
-        del voc
+        try:
+            del voc
+        except:
+            pass
         return lessons
 
     def get_group_schedule(self) -> list:
@@ -141,7 +147,11 @@ class ScheduleService:
         if not self.__group:
             raise StudentGroupNotFound
         if self.check_day_lessons(day):
-            for lesson in self.get_lessons_for_day(day):
+            for lesson in schedule_model.objects.filter(
+                    date=day
+            ).filter(
+                group_id=self.__group.object_id
+            ):
                 lesson.delete()
 
     def generate_schedule(self, generate_days: list):
@@ -160,22 +170,42 @@ class ScheduleService:
                         raise ScheduleGenerateError
                     self.__lesson_template['group_id'] = self.__group.object_id
                     self.__lesson_template['date'] = dt_day
-                    ts = self.__date_utils.convert_time_string_to_seconds(
-                        day['time_start']
-                    )
-                    self.__lesson_template['time_start'] = ts
-                    self.__lesson_template['time_end'] = ts + (45 * 60)
+                    self.__lesson_template['time_start'] = time_start
+                    self.__lesson_template['time_end'] = time_start + (45 * 60)
                     schedule_model.objects.create(**self.__lesson_template)
                     if int(day['hours_count']) > 1:
-                        for index in range(2, int(day['hours_count'])):
-                            ts = time_start + (75 * 60) * (index - 1)  # Обеденный перерыв после 4-го занятия - 30 минут
-                            if index != 5:
+                        for index in range(2, int(day['hours_count']) + 1):
+                            if index == 5:
+                                time_start += (75 * 60)  # Обеденный перерыв после 4-го занятия - 30 минут
+                            else:
                                 if index % 2 == 0:
-                                    ts = time_start + (45 * 60) * (index - 1) #  Второе занятие начинается сразу
+                                    time_start += 45 * 60  # Второе занятие начинается сразу
                                 else:
-                                    ts = time_start + (55 * 60) * (index - 1) # Между парами перерыв 10 минут
-                            self.__lesson_template['time_start'], self.__lesson_template['time_end'] = (ts, ts +
-                                                                                                        (45 * 60))
+                                    time_start += 55 * 60  # Между парами перерыв 10 минут
+                            self.__lesson_template['time_start'] = time_start
+                            self.__lesson_template['time_end'] = time_start + (45 * 60)
                             schedule_model.objects.create(**self.__lesson_template)
         except RuntimeError:
             raise ScheduleGenerateError
+
+    def get_remain_hours_for_kug_theme(self, theme: dict) -> dict:
+        """
+        Получить словарь с остаточным количеством часов по теме КУГ
+        :param theme: Словарь с часами темы КУГ
+        :return: Словарь с остаточными часами в расписании учебной группы
+        """
+        remain_hours = {}
+        keys = ['theme_id', 'lecture', 'practice', 'trainee', 'individual']
+        for key, value in theme.items():
+            if key not in keys:
+                raise IncorrectThemeDictFormat
+            else:
+                if key != 'theme_id':
+                    remain_hours[key] = value
+        schedule = self.get_group_schedule()
+        for day in schedule:
+            for lesson in day['lessons']:
+                if lesson['kug_theme_id'] == theme['theme_id']:
+                    remain_hours[lesson['type']] -= 1
+        return remain_hours
+

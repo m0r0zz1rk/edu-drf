@@ -67,3 +67,32 @@ class CalendarChartUpdateSerializer(serializers.Serializer):
         many=True,
         label='Разделы'
     )
+
+
+class CalendarChartThemeRemainHours(serializers.Serializer):
+    """Сериализация объекта с информацией по оставшимся для расписания часам темы КУГ"""
+    theme_id = serializers.UUIDField(
+        allow_null=False,
+        label='object_id темы КУГ'
+    )
+    lecture = serializers.IntegerField(
+        min_value=0,
+        label='Лекционные часы'
+    )
+    practice = serializers.IntegerField(
+        min_value=0,
+        label='Часы практики'
+    )
+    trainee = serializers.IntegerField(
+        min_value=0,
+        label='Часы стажировки'
+    )
+    individual = serializers.IntegerField(
+        min_value=0,
+        label='Часы самостоятельной работы'
+    )
+
+
+class CalendarChartRemainHours(serializers.Serializer):
+    """Сериализация списка оставшихся для расписания часов КУГ"""
+    kug_remain = CalendarChartThemeRemainHours(many=True, read_only=True)

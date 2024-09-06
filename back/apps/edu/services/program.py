@@ -3,12 +3,8 @@ from typing import Optional
 
 from apps.authen.services.profile import ProfileService
 from apps.commons.services.ad.ad_centre import AdCentreService
-from apps.edu.models import Program
-from apps.edu.operations.calendar_chart.add_update_calendar_chart_element import AddUpdateCalendarChartElement
 from apps.edu.operations.program.add_update_program import AddUpdateProgramOperation
 from apps.edu.selectors.program import program_model
-from apps.edu.services.calendar_chart import CalendarChartService
-from apps.journal.consts.journal_modules import EDU
 
 
 class ProgramService:
@@ -28,7 +24,7 @@ class ProgramService:
         except:
             return False
 
-    def get_program(self, attribute_name: str, value: str) -> Optional[Program]:
+    def get_program(self, attribute_name: str, value: str) -> Optional[program_model]:
         """
         Получение ДПП
         :param attribute_name: имя поля модели Program
@@ -40,11 +36,11 @@ class ProgramService:
             return program_model.objects.filter(**find).first()
         return None
 
-    def copy_program(self, program_id: uuid) -> bool:
+    def copy_program(self, program_id: uuid) -> Optional[str]:
         """
         Создание копии ДПП
         :param program_id: uuid оригинальной ДПП
-        :return: true - Копия создания, false - ошибка при создании копии
+        :return: object_id новой ДПП или None
         """
         try:
             program = self.get_program('object_id', program_id)
@@ -60,12 +56,11 @@ class ProgramService:
                     new_program[field] = getattr(program, field)
                     if field == 'name':
                         new_program[field] += '_Копия'
-                else:
-                    cats = ''
-                    for cat in program.categories.all():
-                        cats += cat.name+','
-                    cats = cats[:-1]
-                    new_program[field] = cats
+            cats = ''
+            for cat in program.categories.all():
+                cats += cat.name+','
+            cats = cats[:-1]
+            new_program['categories'] = cats
             new_program['order_id'] = None
             new_program['order_number'] = None
             new_program['order_date'] = None
@@ -76,43 +71,11 @@ class ProgramService:
                 new_program['order_file'] = program.program_order.file.path
             proc = AddUpdateProgramOperation(new_program)
             if proc.process_completed:
-                ccu = CalendarChartService()
-                kug_chapters = ccu.get_chapters_for_program(program_id)
-                if kug_chapters:
-                    keys = AddUpdateCalendarChartElement.calendar_chart_required_keys
-                    for chapter in kug_chapters:
-                        new_chapter_object_id = uuid.uuid4()
-                        new_chapter = {
-                            'object_id': new_chapter_object_id
-                        }
-                        for key in keys:
-                            if key != 'object_id':
-                                new_chapter[key] = getattr(chapter, key)
-                        new_chapter['program_id'] = proc.dpp.object_id
-                        AddUpdateCalendarChartElement({
-                            'source': 'Процесс создания копии ДПП',
-                            'module': EDU,
-                            'process_data': new_chapter
-                        })
-                        chapter_themes = ccu.get_themes_for_kug_chapter(chapter.object_id)
-                        for theme in chapter_themes:
-                            new_theme = {}
-                            for key in keys:
-                                if key == 'object_id':
-                                    new_theme[key] = uuid.uuid4()
-                                else:
-                                    new_theme[key] = getattr(theme, key)
-                            new_theme['chapter_id'] = new_chapter_object_id
-                            AddUpdateCalendarChartElement({
-                                'source': 'Процесс создания копии ДПП',
-                                'module': EDU,
-                                'process_data': new_theme
-                            })
-                return True
+                return proc.dpp.object_id
             else:
-                return False
+                return None
         except:
-            return False
+            return None
 
     def get_order_file(self, attribute_name: str, value: str):
         """

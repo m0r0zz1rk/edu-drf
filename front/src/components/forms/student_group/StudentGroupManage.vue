@@ -158,9 +158,9 @@
 // Компонент для управления учебной группой
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
-import studentGroupStatuses from "@/commons/consts/studentGroupStatuses";
+import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import studyForms from "@/commons/consts/studyForms";
+import studyForms from "@/commons/consts/edu/studyForms";
 
 export default {
   name: "StudentGroupManage",

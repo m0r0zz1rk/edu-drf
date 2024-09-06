@@ -15,6 +15,7 @@ from apps.edu.operations.program.delete_program import DeleteProgramOperation
 from apps.edu.serializers.program import (ProgramListSerializer,
                                           ProgramRetrieveAddUpdateSerializer,
                                           ProgramGetOrderSerializer)
+from apps.edu.services.calendar_chart import CalendarChartService
 from apps.edu.services.program import ProgramService
 from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
@@ -28,6 +29,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
     ju = JournalService()
     pu = ProfileService()
     pru = ProgramService()
+    __calendar_chart_service = CalendarChartService()
     respu = ResponseUtils()
 
     queryset = program_queryset()
@@ -142,10 +144,15 @@ class ProgramViewSet(viewsets.ModelViewSet):
             proc = self.pru.copy_program(
                 self.kwargs['object_id'],
             )
-            if proc:
-                return self.respu.ok_response('Копия ДПП успешно создана')
-            else:
-                return self.respu.bad_request_response('Ошибка при создании копии, повторите попытку позже')
+            if proc is not None:
+                proc = self.__calendar_chart_service.copy_calendar_chart(
+                    self.kwargs['object_id'],
+                    proc
+                )
+                if proc:
+                    return self.respu.ok_response('Копия ДПП успешно создана')
+                return self.respu.bad_request_response('Ошибка при создании копии КУГ ДПП, повторите попытку позже')
+            return self.respu.bad_request_response('Ошибка при создании копии ДПП, повторите попытку позже')
         except Exception:
             self.ju.create_journal_rec(
                 {

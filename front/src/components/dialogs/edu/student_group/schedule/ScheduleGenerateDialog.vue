@@ -219,7 +219,7 @@ export default {
           'key': 'day'
         },
         {
-          'title': 'Наличие занятий',
+          'title': 'Сгенерировать',
           'key': 'study_day'
         },
         {

@@ -1,5 +1,6 @@
 from functools import wraps
 
+from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
@@ -13,29 +14,29 @@ exception_handling = ExceptionHandling()
 
 
 def journal_api(
-        source: str,
         module: JOURNAL_MODULES,
         status: JOURNAL_REC_STATUSES,
         description: str,
         error_text: str
 ):
     """Декоратор для внесения ошибок в журнал событий в случае их возникновения при работе с endpoint"""
+    _journal_request_builder = JournalRequestBuilder()
+
     def inner_decorator(func):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
             try:
                 return func(request, *args, **kwargs)
             except APIProcessError:
-                journal_service.create_journal_rec(
-                    {
-                        'source': source,
-                        'module': module,
-                        'status': status,
-                        'description': description
-                    },
-                    '-',
-                    ExceptionHandling.get_traceback()
+                journal_request = JournalRequest(
+                    _journal_request_builder
+                    .set_module(module)
+                    .set_status(status)
+                    .set_description(description)
+                    .set_payload('-')
+                    .set_output(ExceptionHandling.get_traceback())
+                    .set_response_message(error_text)
                 )
-                return response_utils.bad_request_response(error_text)
+                return journal_request.create_response()
         return wrapper
     return inner_decorator

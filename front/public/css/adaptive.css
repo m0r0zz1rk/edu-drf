@@ -81,6 +81,10 @@
         height: 58vh;
     }
 
+    .adaptive-schedule-manage-table {
+        height: 56vh
+    }
+
     .adaptive-alerts {
         font-size: 16px;
         width: 40vw;
@@ -140,6 +144,10 @@
         height: 48vh;
     }
 
+    .adaptive-schedule-manage-table {
+        height: 46vh
+    }
+
     .adaptive-login-card-text{
         height: 68vh;
     }
@@ -196,6 +204,10 @@
 
     .adaptive-schedule-table {
         height: 83vh;
+    }
+
+    .adaptive-schedule-manage-table {
+        height: 81vh
     }
 
     .adaptive-login-card {

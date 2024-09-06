@@ -56,11 +56,10 @@
                 cols="2"
               >
 
-                <v-btn
-                  color="coko-red"
-                  prepend-icon="mdi-pencil"
-                  @click.native.stop="console.log('KEK')"
-                  text="Изменить"
+                <ScheduleDayManage
+                  :groupId="groupId"
+                  :serviceType="serviceType"
+                  :dayInfo="studyDay"
                 />
 
               </v-col>
@@ -87,7 +86,7 @@
                   style="overflow: auto;"
                   :headers="headers"
                   :mobile-breakpoint="960"
-                  :items="studyDay.lessons"
+                  :items="studyDay.lessons.sort((a, b) => convertTimeStrToSeconds(a.time_start_str) - convertTimeStrToSeconds(b.time_start_str))"
                   :loading="loading"
                   loading-text="Подождите, идет загрузка данных..."
                   hide-default-footer
@@ -138,15 +137,27 @@
 
                         </div>
 
-                        <div v-if="header.key === 'distance'">
+                        <template
+                            v-if="['distance', 'type'].includes(header.key)"
+                        >
 
                           <BooleanBadge
-                            :bool="item[header.key]"
+                              v-if="header.key === 'distance'"
+                              :bool="item[header.key]"
                           />
 
-                        </div>
+                          <p
+                            v-if="header.key === 'type'"
+                          >
+                            {{ lTypes.filter((t) => t.key === item[header.key])[0].name }}
+                          </p>
 
-                        <div v-if="header.key !== 'distance'">
+                        </template>
+
+
+                        <div
+                            v-if="!(['distance', 'type'].includes(header.key))"
+                        >
 
                           {{item[header.key]}}
 
@@ -185,16 +196,20 @@
 
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
-import {convertBackendDate, convertDateToBackend, getDayOfWeek} from "@/commons/date";
+import {getDayOfWeek} from "@/commons/date";
 import {useDisplay} from "vuetify";
 import ScheduleGenerateDialog from "@/components/dialogs/edu/student_group/schedule/ScheduleGenerateDialog.vue";
 import BooleanBadge from "@/components/badges/BooleanBadge.vue";
+import ScheduleDayManage from "@/components/dialogs/edu/student_group/schedule/ScheduleDayManage.vue";
+import lessonTypes from "../../../commons/consts/edu/lessonTypes";
+import {convertTimeStrToSeconds} from "@/commons/time";
 
 export default {
   name: 'StudentGroupSchedule',
-  components: {BooleanBadge, ScheduleGenerateDialog},
+  components: {ScheduleDayManage, BooleanBadge, ScheduleGenerateDialog},
   props: {
     groupId: String, // object_id учбеной группы
+    serviceType: String, // Тип услуги учебной группы (ou или iku)
   },
   data() {
     return {
@@ -206,6 +221,7 @@ export default {
         date_start: null,
         date_end: null,
       }, // Объект с редактируемыми параметрами учебной группы
+      lTypes: lessonTypes, // Типы учебных занятий
       schedule: [], // Расписание занятий по дням
       scheduleOpenedPanel: [], // Массив, содержащий параметры раскрытия панелей по дням
       days: null, //Массив учебных дней
@@ -223,20 +239,8 @@ export default {
           'key': 'theme'
         },
         {
-          'title': 'Лекция',
-          'key': 'lecture_hours'
-        },
-        {
-          'title': 'Практика',
-          'key': 'practice_hours'
-        },
-        {
-          'title': 'Стажировка',
-          'key': 'trainee_hours'
-        },
-        {
-          'title': 'Сам. работа',
-          'key': 'individual_hours'
+          'title': 'Тип занятия',
+          'key': 'type'
         },
         {
           'title': 'Преподаватель',
@@ -254,6 +258,7 @@ export default {
     }
   },
   methods: {
+    convertTimeStrToSeconds,
     getDayOfWeek,
     // Получение расписания учебной группы
     async getSchedule() {

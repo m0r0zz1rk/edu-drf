@@ -26,7 +26,7 @@
 <script>
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import StudentGroupCreateDialog from "@/components/dialogs/edu/student_group/StudentGroupCreateDialog.vue";
-import studentGroupStatuses from "@/commons/consts/studentGroupStatuses";
+import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
 
 // Компонент для просмотра списка учебных групп
 export default {

@@ -37,11 +37,9 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = (
             'time_start_str',
             'time_end_str',
+            'kug_theme_id',
             'theme',
-            'lecture_hours',
-            'practice_hours',
-            'trainee_hours',
-            'individual_hours',
+            'type',
             'teacher_fio',
             'distance',
             'control'
