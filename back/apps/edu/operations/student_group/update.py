@@ -20,7 +20,7 @@ class UpdateStudentGroup(MainProcessing):
                 if key not in self.process_data.keys():
                     return False
             return True
-        except:
+        except Exception:
             return ExceptionHandling.get_traceback()
 
     def _main_process(self):
@@ -33,13 +33,13 @@ class UpdateStudentGroup(MainProcessing):
                 defaults=self.process_data
             )
             self.process_completed = True
-        except Exception as e:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
                     'status': ERROR,
-                    'description': f'Ошибка в процессе обновления учебной группы'
+                    'description': 'Ошибка в процессе обновления учебной группы'
                 },
                 repr(self.process_data),
                 ExceptionHandling.get_traceback()
@@ -53,7 +53,7 @@ class UpdateStudentGroup(MainProcessing):
                 'source': self.source,
                 'module': self.module,
                 'status': SUCCESS,
-                'description': f'Учебная группа успешно обновлена'
+                'description': 'Учебная группа успешно обновлена'
             },
             repr(self.process_data),
             None

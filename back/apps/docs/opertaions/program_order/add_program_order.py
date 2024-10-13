@@ -5,8 +5,7 @@ from django.core.files import File
 
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.base_doc import BaseDocOperation
-
-program_order_model = apps.get_model('docs', 'ProgramOrder')
+from apps.docs.selectors.program_order import program_order_model
 
 
 class AddUpdateProgramOrderOperation(BaseDocOperation):

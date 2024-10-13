@@ -12,6 +12,8 @@ class Schedule(BaseTable):
     group = models.ForeignKey(
         'edu.StudentGroup',
         on_delete=models.CASCADE,
+        null=True,
+        default=None,
         verbose_name='Учебная группа'
     )
     date = models.DateField(
@@ -59,13 +61,13 @@ class Schedule(BaseTable):
     )
     control = models.CharField(
         max_length=150,
-        null=True,
-        default=None,
+        blank=True,
+        default='',
         verbose_name='Контрольное занятие'
     )
 
     def __str__(self):
-        return (f'Занятие группы {self.group.code} {self.data.strftime("%d.%m.%Y")} в '
+        return (f'Занятие группы {self.group.code} {self.date.strftime("%d.%m.%Y")} в '
                 f'{LessonTimeUtils.convert_seconds_to_time(self.time_start)}')
 
     class Meta:

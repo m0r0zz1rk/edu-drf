@@ -2,9 +2,9 @@ class ListUtils:
     """Методы и валиадаторы при работе со списками"""
 
     @staticmethod
-    def is_list_empty(l: list) -> bool:
+    def is_list_empty(check: list) -> bool:
         """Проверка на пустоту листа"""
-        if l is not None and len(l) == 0:
+        if check is not None and len(check) == 0:
             return True
         return False
 
@@ -17,6 +17,6 @@ class ListUtils:
         return True
 
     @staticmethod
-    def is_el_in_list(l: list, el: object) -> bool:
+    def is_el_in_list(check: list, el: object) -> bool:
         """Проверка на наличие объекта в списке"""
-        return el in l
+        return el in check

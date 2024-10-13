@@ -46,7 +46,7 @@ class DeleteCalendarChartElement(MainProcessing):
             if not check_parent:
                 return False
             return True
-        except:
+        except Exception:
             return ExceptionHandling.get_traceback()
 
     def _main_process(self):
@@ -65,7 +65,7 @@ class DeleteCalendarChartElement(MainProcessing):
                         object_id=self.process_data['object_id']
                     ).first().delete()
             self.process_completed = True
-        except Exception as e:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': self.source,

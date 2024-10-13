@@ -229,7 +229,7 @@ class CalendarChartService:
             program.kug_edit = None
             program.save()
             return True
-        except:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': 'Система',
@@ -264,19 +264,24 @@ class CalendarChartService:
         kug = self.get_program_calendar_chart(group.ou.program_id, 0)
         ss = ScheduleService(group_id)
         hour_types = ('lecture', 'practice', 'trainee', 'individual')
-        for chapter in kug['chapters']:
-            remain_themes = []
+        for number, chapter in enumerate(kug['chapters'], start=1):
+            chapter_info = {
+                'chapter': f'Раздел {number}. {chapter["name"]}'
+            }
+            themes = []
             for theme in chapter['themes']:
                 theme_info = {
+                    'chapter': chapter['name'],
+                    'theme': theme['name'],
                     'theme_id': theme['object_id']
                 }
                 for ht in hour_types:
-                    theme_info[ht] = theme[ht+'_hours']
+                    theme_info[ht] = theme[ht + '_hours']
                 try:
-                    remain_themes.append(
-                        ss.get_remain_hours_for_kug_theme(theme_info)
-                    )
+                    theme_info = ss.get_remain_hours_for_kug_theme(theme_info)
                 except IncorrectThemeDictFormat:
                     raise GetKugRemainsError
-            kug_remains.append(remain_themes)
+                themes.append(theme_info)
+            chapter_info['themes'] = themes
+            kug_remains.append(chapter_info)
         return kug_remains

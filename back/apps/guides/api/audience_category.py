@@ -31,7 +31,7 @@ class AudienceCategoryViewSet(viewsets.ModelViewSet):
     filterset_class = NameFieldFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории слушателей"', ],
+        tags=['Cправочники. Категории слушателей', ],
         operation_description="Получение списка категорий слушателей",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -62,7 +62,7 @@ class AudienceCategoryViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории слушателей"', ],
+        tags=['Cправочники. Категории слушателей"', ],
         operation_description="Добавление категории слушателей",
         request_body=AudienceCategoryBaseSerializer,
         responses={
@@ -96,7 +96,7 @@ class AudienceCategoryViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории слушателей"', ],
+        tags=['Cправочники. Категории слушателей', ],
         operation_description="Обновление категории слушателей",
         request_body=AudienceCategoryListUpdateSerializer,
         responses={
@@ -130,7 +130,7 @@ class AudienceCategoryViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории слушателей"', ],
+        tags=['Cправочники. Категории слушателей', ],
         operation_description="Удаление категории слушателей",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',

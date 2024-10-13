@@ -15,7 +15,6 @@ class JournalOutput(BaseTable):
     )
     output = models.TextField(
         max_length=100000,
-        null=True,
         blank=True,
         default=None,
         verbose_name='Результат/Выходные данные'

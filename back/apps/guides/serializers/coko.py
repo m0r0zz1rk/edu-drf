@@ -15,7 +15,7 @@ class CokoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = coko_profile_model
-        fields = ['object_id', 'surname', 'name', 'patronymic', 'department', 'curator_groups']
+        fields = ['object_id', 'surname', 'name', 'patronymic', 'department', 'internal_phone', 'curator_groups']
 
 
 class CokoChangeCuratorGroupsSerializer(serializers.ModelSerializer):

@@ -90,7 +90,7 @@ class ProfileViewSet(ViewSet):
             return serialize.errors
 
     @swagger_auto_schema(
-        tags=['Профиль', ],
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
         operation_description="Получение информации для главной страницы (для обучающихся)",
         responses={
             '400': 'Сообщение "Повторите попытку позже"',
@@ -121,7 +121,7 @@ class ProfileViewSet(ViewSet):
             return ResponseUtils().sorry_try_again_response()
 
     @swagger_auto_schema(
-        tags=['Профиль', ],
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
         operation_description="Просмотр профиля пользователя",
         responses={
             '400': 'Сообщение "Повторите попытку позже"',
@@ -164,14 +164,14 @@ class ProfileViewSet(ViewSet):
             return ResponseUtils().sorry_try_again_response()
 
     @swagger_auto_schema(
-            tags=['Профиль', ],
-            operation_description="Проверка на возможность смены номера телефона",
-            request_body=RegistrationUniquePhoneSerializer,
-            responses={
-                '403': 'Пользователь не авторизован',
-                '400': 'Проверка не пройдена - указанный номер телефона уже используется',
-                '200': 'Проверка пройдена - указанный номер телефона не используется'
-            }
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
+        operation_description="Проверка на возможность смены номера телефона",
+        request_body=RegistrationUniquePhoneSerializer,
+        responses={
+            '403': 'Пользователь не авторизован',
+            '400': 'Проверка не пройдена - указанный номер телефона уже используется',
+            '200': 'Проверка пройдена - указанный номер телефона не используется'
+        }
     )
     def check_profile_phone(self, request, *args, **kwargs):
         """
@@ -200,7 +200,7 @@ class ProfileViewSet(ViewSet):
             return ResponseUtils().bad_request_response('Произошла системная ошибка при проверке номера телефона')
 
     @swagger_auto_schema(
-        tags=['Профиль', ],
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
         operation_description="Проверка на возможность смены email",
         request_body=RegistrationUniqueEmailSerializer,
         responses={
@@ -236,7 +236,7 @@ class ProfileViewSet(ViewSet):
             return ResponseUtils().bad_request_response('Произошла системная ошибка при проверке email')
 
     @swagger_auto_schema(
-        tags=['Профиль', ],
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
         operation_description="Проверка на возможность смены СНИЛС",
         request_body=RegistrationUniqueSnilsSerializer,
         responses={
@@ -272,7 +272,7 @@ class ProfileViewSet(ViewSet):
             return ResponseUtils().bad_request_response('Произошла системная ошибка при проверке СНИЛС')
 
     @swagger_auto_schema(
-        tags=['Профиль', ],
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
         operation_description="Сохранение информации в профиль",
         request_body=ProfileInputSerializer,
         responses={
@@ -320,7 +320,7 @@ class ProfileViewSet(ViewSet):
             )
 
     @swagger_auto_schema(
-        tags=['Профиль', ],
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
         operation_description="Смена пароля пользователя",
         request_body=ProfileChangePasswordSerializer,
         responses={

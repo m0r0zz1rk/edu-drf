@@ -41,6 +41,15 @@
     <StudentGroupStatusBadge :studentGroupStatus="item.status" />
   </div>
 
+  <div
+    v-if="ui === 'file'"
+  >
+    <FileField
+      :file="item.file"
+      :fileName="item.doc_name"
+    />
+  </div>
+
 </template>
 
 <script>
@@ -50,10 +59,13 @@ import JournalDetailInfoDialog from "@/components/dialogs/journal/JournalDetailI
 import CuratorGroupsField from "@/components/tables/pagination_table/special_fields/sources/CuratorGroupsField.vue";
 import ProgramOrderField from "@/components/tables/pagination_table/special_fields/sources/ProgramOrderField.vue";
 import StudentGroupStatusBadge from "@/components/badges/edu/StudentGroupStatusBadge.vue";
+import fileContentTypes from "@/commons/consts/fileContentTypes";
+import FileField from "@/components/tables/pagination_table/special_fields/sources/FileField.vue";
 
 export default {
   name: "SpecialField",
   components: {
+    FileField,
     StudentGroupStatusBadge,
     ProgramOrderField, CuratorGroupsField, JournalDetailInfoDialog, JournalModuleBadge, JournalRecStatusBadge},
   props: {
@@ -61,6 +73,12 @@ export default {
     header: Object, // Заголовок пагинационной таблицы
     item: Object, // Запись таблицы,
     mobileDisplay: Boolean, // Отображение на экране мобильного устройства
+  },
+  data() {
+    return {
+      // Список соответствий расширения файла и MIME типа
+      fileContentTypes: fileContentTypes
+    }
   }
 }
 </script>

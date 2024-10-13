@@ -27,7 +27,7 @@ class DeleteService(MainProcessing):
             if 'object_id' not in self.process_data.keys():
                 return False
             return True
-        except:
+        except Exception:
             return ExceptionHandling.get_traceback()
 
     def _main_process(self):
@@ -38,7 +38,7 @@ class DeleteService(MainProcessing):
                 service_model = education_service_model
             service_model.objects.filter(object_id=self.process_data['object_id']).first().delete()
             self.process_completed = True
-        except Exception as e:
+        except Exception:
             description = 'информационно-консультационной услуги (мероприятия)'
             if self.service_type == 'edu':
                 description = 'образовательной услуги (курса)'

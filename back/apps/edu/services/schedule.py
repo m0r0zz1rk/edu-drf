@@ -3,9 +3,12 @@ import uuid
 from datetime import timedelta
 from datetime import datetime as dt
 
+from apps.authen.services.profile import ProfileService
 from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeFormatError
 from apps.commons.utils.data_types.date import DateUtils
+from apps.edu.consts.lesson_types import LESSON_TYPES
 from apps.edu.exceptions.calendar_chart.incorrect_theme_dict_format import IncorrectThemeDictFormat
+from apps.edu.exceptions.schedule.day_info_validate_error import DayInfoValidateError
 from apps.edu.exceptions.schedule.schedule_generate_error import ScheduleGenerateError
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.selectors.schedule import schedule_model
@@ -30,6 +33,24 @@ class ScheduleService:
         'time_start': 0,
         'time_end': 0,
     }
+
+    __lesson_keys = [
+        "time_start_str",
+        "time_end_str",
+        "kug_theme_id",
+        "theme",
+        "type",
+        "teacher_fio",
+        "teacher",
+        "distance",
+        "control"
+    ]
+
+    __day_info_keys = [
+        'day',
+        'group_id',
+        'lessons'
+    ]
 
     def __init__(self, group_id: uuid):
         """
@@ -112,7 +133,7 @@ class ScheduleService:
             lessons.append(voc)
         try:
             del voc
-        except:
+        except Exception:
             pass
         return lessons
 
@@ -195,13 +216,20 @@ class ScheduleService:
         :return: Словарь с остаточными часами в расписании учебной группы
         """
         remain_hours = {}
-        keys = ['theme_id', 'lecture', 'practice', 'trainee', 'individual']
+        keys = [
+            'chapter',
+            'theme',
+            'theme_id',
+            'lecture',
+            'practice',
+            'trainee',
+            'individual'
+        ]
         for key, value in theme.items():
             if key not in keys:
                 raise IncorrectThemeDictFormat
             else:
-                if key != 'theme_id':
-                    remain_hours[key] = value
+                remain_hours[key] = value
         schedule = self.get_group_schedule()
         for day in schedule:
             for lesson in day['lessons']:
@@ -209,3 +237,96 @@ class ScheduleService:
                     remain_hours[lesson['type']] -= 1
         return remain_hours
 
+    def validate_day_info(self, day_info_object: dict):
+        """
+        Валидация информации об учебном дне
+        """
+        for key in day_info_object:
+            if key not in self.__day_info_keys:
+                print(key)
+                raise DayInfoValidateError
+        for lesson in day_info_object['lessons']:
+            for key in lesson:
+                if key not in self.__lesson_keys:
+                    print(key)
+                    raise DayInfoValidateError
+
+    def save_lesson(
+            self,
+            lesson_info: dict,
+            day: datetime.date
+    ):
+        """
+        Сохранение занятия в расписание
+        :param lesson_info: объект с информацией по занятию
+        :param day: учебный день
+        """
+        time_start = self.__date_utils.convert_time_string_to_seconds(lesson_info['time_start_str'])
+        time_end = self.__date_utils.convert_time_string_to_seconds(lesson_info['time_end_str'])
+        del lesson_info['time_start_str']
+        del lesson_info['time_end_str']
+        lesson_object = {
+            'group_id': self.__group.object_id,
+            'date': day,
+            'time_start': time_start,
+            'time_end': time_end,
+            **lesson_info
+        }
+        schedule_model.objects.create(**lesson_object)
+
+    def save_day_info(self, day_info_object: dict):
+        """
+        Сохранение информации по занятиям учебного дня
+        :param day_info_object: объект учебного дня
+        """
+        del day_info_object['group_id']
+        self.validate_day_info(day_info_object)
+        self.delete_day_lessons(
+            datetime.datetime.strptime(day_info_object['day'], '%Y-%m-%d')
+        )
+        for lesson in day_info_object['lessons']:
+            self.save_lesson(
+                lesson,
+                day_info_object['day']
+            )
+
+    def get_personal_schedule(self, user_id: int):
+        """
+        Получение личного расписания преподавателя
+        :param user_id: ID пользователя Django
+        """
+        profile = ProfileService().get_profile_or_info_by_attribute(
+            'django_user_id',
+            user_id,
+            'profile'
+        )
+        days = {lesson.date for lesson in schedule_model.objects.filter(teacher=profile.object_id)
+                if lesson.date > datetime.date.today()}
+        schedule = []
+        for day in days:
+            day_lessons = schedule_model.objects.filter(
+                date=day,
+                teacher=profile.object_id
+            ).order_by('date_create')
+            lessons = []
+            for lesson in day_lessons:
+                obj = {
+                    'group_code': lesson.group.code,
+                    'time_start_str': self.__date_utils.convert_seconds_to_time_string(lesson.time_start),
+                    'time_end_str': self.__date_utils.convert_seconds_to_time_string(lesson.time_end),
+                    'distance': lesson.distance,
+                    'control': lesson.control
+                }
+                for t in LESSON_TYPES:
+                    if t[0] == lesson.type:
+                        obj['type'] = t[1]
+                if lesson.kug_theme:
+                    obj['lesson_theme'] = lesson.kug_theme.name
+                else:
+                    obj['lesson_theme'] = lesson.theme
+                lessons.append(obj)
+            schedule.append({
+                'date': day.strftime('%d.%m.%Y'),
+                'lessons': lessons
+            })
+        return schedule

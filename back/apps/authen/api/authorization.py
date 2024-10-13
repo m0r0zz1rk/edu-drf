@@ -18,7 +18,7 @@ class AuthorizationViewSet(viewsets.ViewSet):
     ru = ResponseUtils()
 
     @swagger_auto_schema(
-        tags=['Авторизация/Аутентификация', ],
+        tags=['Приложение авторизации/аутентификации. Авторизация', ],
         operation_description="Проверка на авторизованного пользователя",
         security=[
             {
@@ -41,7 +41,7 @@ class AuthorizationViewSet(viewsets.ViewSet):
             return self.ru.unauthorized_no_data()
 
     @swagger_auto_schema(
-        tags=['Авторизация/Аутентификация', ],
+        tags=['Приложение авторизации/аутентификации. Авторизация', ],
         operation_description="Получение роли пользователя",
         security=[
             {
@@ -65,7 +65,7 @@ class AuthorizationViewSet(viewsets.ViewSet):
         )
 
     @swagger_auto_schema(
-        tags=['Авторизация/Аутентификация', ],
+        tags=['Приложение авторизации/аутентификации. Авторизация', ],
         operation_description="Авторизация пользователя",
         request_body=AuthSerializer,
         responses={'401': 'Ошибка в процессе авторизации',

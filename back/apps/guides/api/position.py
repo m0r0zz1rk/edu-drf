@@ -31,7 +31,7 @@ class PositionViewSet(viewsets.ModelViewSet):
     filterset_class = NameFieldFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Должности"', ],
+        tags=['Cправочники. Должности', ],
         operation_description="Получение списка должностей",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -62,7 +62,7 @@ class PositionViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Должности"', ],
+        tags=['Cправочники. Должности', ],
         operation_description="Добавление должности",
         request_body=PositionBaseSerializer,
         responses={
@@ -96,7 +96,7 @@ class PositionViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Должности"', ],
+        tags=['Cправочники. Должности', ],
         operation_description="Обновление должности",
         request_body=PositionListUpdateSerializer,
         responses={
@@ -130,7 +130,7 @@ class PositionViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Должности"', ],
+        tags=['Cправочники. Должности', ],
         operation_description="Удаление должности",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',

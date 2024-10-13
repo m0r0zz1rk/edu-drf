@@ -48,7 +48,7 @@ class AddUpdateService(MainProcessing):
                 if key not in self.process_data.keys():
                     return False
             return True
-        except:
+        except Exception:
             return ExceptionHandling.get_traceback()
 
     def _main_process(self):
@@ -83,7 +83,7 @@ class AddUpdateService(MainProcessing):
                 service.categories.clear()
                 service.categories.add(*cat_obj_list)
             self.process_completed = True
-        except Exception as e:
+        except Exception:
             description = 'информационно-консультационной услуги (мероприятия)'
             if self.service_type == 'edu':
                 description = 'образовательной услуги (курса)'

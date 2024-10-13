@@ -48,7 +48,7 @@ class PlanningParameterViewSet(viewsets.ModelViewSet):
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
             return self.respu.ok_response_dict(serializer.data)
-        except:
+        except Exception:
             self.js.create_journal_rec(
                 {
                     'source': 'Внешний запрос',
@@ -107,7 +107,7 @@ class PlanningParameterViewSet(viewsets.ModelViewSet):
                 '-'
             )
             return self.respu.bad_request_response('Ошибка сериализации данных, повторите попытку позже')
-        except:
+        except Exception:
             self.js.create_journal_rec(
                 {
                     'source': 'Внешний запрос',

@@ -21,5 +21,3 @@ class MoListUpdateSerializer(MoBaseSerializer):
     class Meta:
         model = mo_model
         fields = MoBaseSerializer.Meta.fields + ['object_id', ]
-
-

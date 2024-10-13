@@ -68,4 +68,3 @@ class InformationServiceRetrieveAddUpdateSerializer(BaseServiceSerializer):
             'duration',
             'price'
         )
-

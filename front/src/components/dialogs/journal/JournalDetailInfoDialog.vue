@@ -26,7 +26,7 @@
         ></v-btn>
       </v-card-title>
 
-      <v-card-text>
+      <v-card-text style="overflow: auto">
         <v-container>
           <v-row no-gutters>
 

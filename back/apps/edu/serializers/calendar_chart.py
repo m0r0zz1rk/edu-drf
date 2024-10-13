@@ -69,11 +69,17 @@ class CalendarChartUpdateSerializer(serializers.Serializer):
     )
 
 
-class CalendarChartThemeRemainHours(serializers.Serializer):
+class CalendarChartThemeRemainHoursSerializer(serializers.Serializer):
     """Сериализация объекта с информацией по оставшимся для расписания часам темы КУГ"""
+    theme = serializers.CharField(
+        max_length=500,
+        allow_null=False,
+        allow_blank=False,
+        label='Тема'
+    )
     theme_id = serializers.UUIDField(
         allow_null=False,
-        label='object_id темы КУГ'
+        label='object_id темы'
     )
     lecture = serializers.IntegerField(
         min_value=0,
@@ -93,6 +99,23 @@ class CalendarChartThemeRemainHours(serializers.Serializer):
     )
 
 
-class CalendarChartRemainHours(serializers.Serializer):
+class CalendarChartChapterRemainHoursSerializer(serializers.Serializer):
+    """Сериализация объекта с информацией об остаточных часах раздела КУГ"""
+    chapter = serializers.CharField(
+        max_length=500,
+        allow_blank=False,
+        allow_null=False,
+        label='Наименование раздела КУГ'
+    )
+    themes = CalendarChartThemeRemainHoursSerializer(
+        many=True,
+        label='Информация об остаточных часах тем раздела'
+    )
+
+
+class CalendarChartRemainHoursSerializer(serializers.Serializer):
     """Сериализация списка оставшихся для расписания часов КУГ"""
-    kug_remain = CalendarChartThemeRemainHours(many=True, read_only=True)
+    kug_remain = CalendarChartChapterRemainHoursSerializer(
+        many=True,
+        label='Информация об остаточных часах разделов КУГ'
+    )

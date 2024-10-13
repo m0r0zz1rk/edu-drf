@@ -5,18 +5,32 @@
   >
     <v-card-title class="d-flex justify-space-between align-center">
 
-      <span v-if="!(profileUuid)">
-        Профиль пользователя
-      </span>
-
       <v-tabs
-        v-if="profileUuid"
         v-model="userInfoTab"
         bg-color="coko-blue"
         show-arrows
       >
-        <v-tab class="coko-tab" value="profile">Профиль</v-tab>
-        <v-tab class="coko-tab" value="apps">Заявки</v-tab>
+        <v-tab
+            class="coko-tab"
+            value="profile"
+        >
+          Профиль
+        </v-tab>
+
+        <v-tab
+            class="coko-tab"
+            value="docs"
+        >
+          Документы
+        </v-tab>
+
+        <v-tab
+            v-if="profileUuid"
+            class="coko-tab"
+            value="apps"
+        >
+          Заявки
+        </v-tab>
 
       </v-tabs>
 
@@ -36,7 +50,10 @@
         <slot>
 
           <div v-if="userInfoTab === 'profile'">
-            <v-row dense>
+            <v-row
+                style="margin-top: 15px"
+                dense
+            >
               <v-col
                 cols="12"
                 md="4"
@@ -230,6 +247,24 @@
 
           </div>
 
+          <div v-if="userInfoTab === 'docs'">
+            <br/>
+            <PaginationTable
+                tableTitle="Документы обучающегося"
+                tableWidth="100"
+                :noTab="false"
+                :addButton="true"
+                :xlsxButton="false"
+                getRecsURL="/backend/api/v1/docs/student_docs/"
+                addRecURL="/backend/api/v1/docs/upload_student_doc/"
+                editRecURL="/backend/api/v1/docs/student_doc/"
+                delRecURL="/backend/api/v1/docs/student_doc/"
+                :tableHeaders="tableHeaders"
+                :fieldsArray="fieldsArray"
+                :onlyDelete="true"
+            />
+          </div>
+
         </slot>
 
       </DialogContentWithError>
@@ -238,18 +273,20 @@
 
     <v-divider></v-divider>
 
-    <v-card-actions style="background-color: white">
+    <v-card-actions
+        style="background-color: white"
+    >
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        color="coko-blue"
-        text="Смена пароля"
-        :loading="formLoading"
-        @click="passwordDialog = true"
-      ></v-btn>
+      <PasswordChange
+          v-if="userInfoTab === 'profile'"
+          :profileUuid="profileUuid"
+          :closeDialog="() => {passwordDialog = false}"
+      />
 
       <v-btn
+        v-if="userInfoTab === 'profile'"
         color="coko-blue"
         text="Сохранить"
         :loading="formLoading"
@@ -259,18 +296,6 @@
 
   </v-card>
 
-  <v-dialog
-    persistent
-    class="adaptive-change-pass-dialog"
-    v-model="passwordDialog"
-  >
-
-    <PasswordChange
-      :profileUuid="profileUuid"
-      :closeDialog="() => {passwordDialog = false}"
-    />
-
-  </v-dialog>
 </template>
 
 <script>
@@ -280,16 +305,20 @@ import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import email_pattern from "@/commons/email_pattern";
 import PasswordChange from "@/components/PasswordChange.vue";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
+import studentDocTypes from "@/commons/consts/docs/studentDocTypes";
 
 export default {
   name: "ProfileForm",
-  components: {DialogContentWithError, PasswordChange},
+  components: {PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
   props: {
     profileUuid: String, // Вариативный параметр, object_id профиля пользователя,
     closeDialogEvent: Function, // Событие для закрытия диалогового окна (для просмотра профиля из справочников)
   },
   data() {
     return {
+      // Информация о профиле пользователя
       profileData: {
         'surname': '',
         'name': '',
@@ -303,35 +332,86 @@ export default {
         'health': '',
         'teacher': ''
       },
+      // Список доступных государств
       states: [],
+      // Список полов
       sex: [
         'Мужской',
         'Женский'
       ],
+      // Список возможных значений поля "Ограничение по здоровью"
       health: [
         'Да',
         'Нет'
       ],
+      // Список возможных значений поля "Является преподавателем"
       teacher: [
         'Да',
         'Нет'
       ],
+      // Параметр оторбражения анимации загрузки на элеметнах формы
       formLoading: true,
+      // Параметр отображения пароля в первом поле
       pass1Visible: false,
+      // Параметр отображения пароль в поле подтверждения
       pass2Visible: false,
+      // Текст ошибки, возникщей при регистрации
       registrationError: '',
+      // Правила обработки значений полей формы
       rules: {
         required: value => !!value || 'Обязательно для заполнения.',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
         email: value => email_pattern.test(value) || 'Некорректный e-mail.'
       },
+      // Параметр валидности полученных данных
       dataValid: false,
+      // Параметр отображения диалогового окна для смены пароля
       passwordDialog: false,
-      userInfoTab: 'profile'
+      // Выбранная вкладка
+      userInfoTab: 'profile',
+      // Список возожных типов документов
+      studentDocTypes: studentDocTypes,
+      // Список столбцов таблицы документов обучающегося
+      tableHeaders: [
+        {
+          'title': 'Дата добавления',
+          'key': 'date_create'
+        },
+        {
+          'title': 'Тип документа',
+          'key': 'doc_type'
+        },
+        {
+          'title': 'Документ',
+          'key': 'file'
+        }
+      ],
+      fieldsArray: [
+        {
+          ui: 'date',
+          key: 'date_create',
+          readOnly: true,
+          addRequired: false,
+        },
+        {
+          ui: 'select',
+          items:studentDocTypes,
+          key: 'doc_type',
+          addRequired: true,
+        },
+        {
+          ui: 'file',
+          key: 'file',
+          addRequired: true
+        }
+      ]
     }
   },
   methods: {
+    openDocs() {
+
+    },
     async setData() {
       let statesRequest = await apiRequest(
         '/backend/api/v1/guides/states/',
@@ -471,7 +551,6 @@ export default {
         if (this.profileUuid) {
           body['object_id'] = this.profileUuid
         }
-        console.log(body)
         let saveProfileURL = '/backend/api/v1/auth/save_profile/'
         if (this.profileUuid) {
           saveProfileURL = '/backend/api/v1/guides/user/update/'
@@ -488,12 +567,13 @@ export default {
             'Изменение профиля',
             dataSaveRequest.success
           )
+          this.formLoading = false
           this.closeDialogEvent()
         }
         if (dataSaveRequest.error) {
           this.$refs["content-error"].showContentError(dataSaveRequest.error)
+          this.formLoading = false
         }
-        this.formLoading = false
       }
     }
   },

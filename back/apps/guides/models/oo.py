@@ -1,13 +1,12 @@
 from django.db import models
 
 from apps.commons.models import BaseTable
-from apps.guides.models import Mo, OoType
 
 
 class Oo(BaseTable):
     """Модель образовательных организаций"""
     mo = models.ForeignKey(
-        Mo,
+        'guides.Mo',
         on_delete=models.SET_NULL,
         null=True,
         default=None,
@@ -28,7 +27,7 @@ class Oo(BaseTable):
         verbose_name='Полное наименование'
     )
     oo_type = models.ForeignKey(
-        OoType,
+        'guides.OoType',
         on_delete=models.SET_NULL,
         null=True,
         default=None,

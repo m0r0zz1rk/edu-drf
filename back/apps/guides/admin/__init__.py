@@ -5,4 +5,5 @@ from .oo import OoAdmin
 from .oo_type import OoTypeAdmin
 from .position import PositionAdmin
 from .position_category import PositionCategoryAdmin
+from .region import RegionAdmin
 from .state import StateAdmin

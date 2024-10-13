@@ -8,12 +8,21 @@ ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': env.str('DEV_DB_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': env.str('DEV_DB_NAME', 'db.sqlite3'),
+        'USER': env.str('DEV_DB_USER', ''),
+        'PASSWORD': env.str('DEV_DB_PASSWORD', ''),
+        'HOST': env.str('DEV_DB_HOST', ''),
+        'PORT': env.str('DEV_DB_PORT', ''),
+        'ATOMIC_REQUEST': True,
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'connect_timeout': 120,
+        }
     }
 }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = env.str('DEV_MEDIA_ROOT', os.path.join(BASE_DIR, 'media'))
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 

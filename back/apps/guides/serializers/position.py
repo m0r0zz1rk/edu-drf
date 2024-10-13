@@ -21,4 +21,3 @@ class PositionListUpdateSerializer(PositionBaseSerializer):
     class Meta:
         model = position_model
         fields = PositionBaseSerializer.Meta.fields + ['object_id']
-

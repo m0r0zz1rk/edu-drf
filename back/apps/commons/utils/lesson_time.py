@@ -18,6 +18,7 @@ class LessonTimeUtils:
             time += f'0{hours}'
         else:
             time += f'{hours}'
+        time += ':'
         if minutes < 10:
             time += f'0{minutes}'
         else:

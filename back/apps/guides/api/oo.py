@@ -21,7 +21,7 @@ from apps.journal.services.journal import JournalService
 
 class OoViewSet(viewsets.ModelViewSet):
     """Работа с ОО в модуле Справочников"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
+    #permission_classes = [IsAuthenticated, IsAdministrators]
     ju = JournalService()
     respu = ResponseUtils()
     mu = MoService()
@@ -34,7 +34,7 @@ class OoViewSet(viewsets.ModelViewSet):
     filterset_class = OoFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "ОО"', ],
+        tags=['Cправочники. ОО', ],
         operation_description="Получение списка ОО",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -65,7 +65,7 @@ class OoViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "ОО"', ],
+        tags=['Cправочники. ОО', ],
         operation_description="Добавление ОО",
         request_body=OoCreateSerializer,
         responses={
@@ -105,7 +105,7 @@ class OoViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "ОО"', ],
+        tags=['Cправочники. ОО', ],
         operation_description="Обновление ОО",
         request_body=OoUpdateSerializer,
         responses={
@@ -145,7 +145,7 @@ class OoViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "ОО"', ],
+        tags=['Cправочники. ОО', ],
         operation_description="Удаление ОО",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -177,3 +177,7 @@ class OoViewSet(viewsets.ModelViewSet):
                 ExceptionHandling.get_traceback()
             )
             return self.respu.bad_request_response('Произошла системная ошибка')
+
+    def delete_all(self, request, *args, **kwargs):
+        for oo in oo_queryset():
+            oo.delete()

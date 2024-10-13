@@ -99,3 +99,8 @@ class ResponseUtils:
         response['Content-Disposition'] = f"attachment; filename*=UTF-8''{quote(file_name)}"
         response['Access-Control-Expose-Headers'] = "Content-Disposition"
         return response
+
+    @staticmethod
+    def locked_response() -> Response:
+        """Генерация пустого ответа с кодом 423"""
+        return Response(status=status.HTTP_423_LOCKED)

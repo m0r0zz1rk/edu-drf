@@ -11,6 +11,10 @@ class BaseTable(models.Model):
         editable=False,
         verbose_name='ID объекта'
     )
+    old_id = models.PositiveIntegerField(
+        default=0,
+        verbose_name='ID объекта из олдовой БД edu'
+    )
     date_create = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Время создания'
@@ -19,4 +23,5 @@ class BaseTable(models.Model):
     objects = models.Manager()
 
     class Meta:
+        db_table = "[schema].[table]"
         abstract = True

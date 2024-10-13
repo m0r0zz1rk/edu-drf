@@ -15,7 +15,6 @@ class JournalPayload(BaseTable):
     )
     payload = models.TextField(
         max_length=100000,
-        null=True,
         blank=True,
         default=None,
         verbose_name='Полезная нагрузка'

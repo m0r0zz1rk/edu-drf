@@ -22,7 +22,7 @@
 
 <script>
 import LkPage from "@/components/LkPage.vue";
-import StudentGroupForm from "@/components/forms/StudentGroupForm.vue";
+import StudentGroupForm from "@/components/forms/edu/StudentGroupForm.vue";
 
 // Страница управления учебной группой
 export default {

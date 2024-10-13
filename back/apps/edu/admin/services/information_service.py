@@ -20,4 +20,3 @@ class InformationServiceAdmin(admin.ModelAdmin):
         'name',
         'location'
     )
-

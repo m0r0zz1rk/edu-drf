@@ -1,37 +1,27 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    class="adaptive-registration-dialog"
-    persistent
+
+  <CokoDialog
+    ref="registrationDialog"
+    :cardActions="true"
   >
-    <template v-slot:activator="{ props: activatorProps }">
-      <v-btn
-        style="margin-top: 5px;"
-        class="login-button adaptive-login-button"
-        color="coko-blue"
-        text="Регистрация"
-        v-bind="activatorProps"
-        :loading="formLoading"
-      ></v-btn>
+
+    <template v-slot:title>
+      Регистрация обучающегося
     </template>
 
-    <v-card>
-      <v-card-title>
-        Регистрация обучающегося
-      </v-card-title>
-      <v-card-text>
+    <template v-slot:text>
 
-        <DialogContentWithError ref="content-error">
+      <DialogContentWithError ref="content-error">
 
-          <slot>
+        <slot>
 
-            <v-row dense>
-              <v-col
+          <v-row dense>
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationSurname"
                   bg-color="white"
                   label="Фамилия*"
@@ -39,15 +29,15 @@
                   variant="solo"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
+              ></v-text-field>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationName"
                   bg-color="white"
                   label="Имя*"
@@ -55,30 +45,30 @@
                   variant="solo"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
+              ></v-text-field>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationPatronymic"
                   bg-color="white"
                   label="Отчество"
                   variant="solo"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
+              ></v-text-field>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationPhone"
                   bg-color="white"
                   v-mask="'+7 (###) ###-##-##'"
@@ -87,15 +77,15 @@
                   variant="solo"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
+              ></v-text-field>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationEmail"
                   bg-color="white"
                   :rules="[rules.required, rules.email]"
@@ -103,15 +93,15 @@
                   variant="solo"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
+              ></v-text-field>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationSnils"
                   bg-color="white"
                   v-mask="'###-###-### ##'"
@@ -120,15 +110,15 @@
                   variant="solo"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
+              ></v-text-field>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-select
+            >
+              <v-select
                   :items="states"
                   id="registrationState"
                   bg-color="white"
@@ -136,15 +126,15 @@
                   :loading="formLoading"
                   :rules="[rules.required,]"
                   variant="solo"
-                ></v-select>
-              </v-col>
+              ></v-select>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-date-input
+            >
+              <v-date-input
                   id="registrationBirthday"
                   bg-color="white"
                   :rules="[rules.required,]"
@@ -154,15 +144,15 @@
                   variant="solo"
                   :loading="formLoading"
                   clearable
-                ></v-date-input>
-              </v-col>
+              ></v-date-input>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-select
+            >
+              <v-select
                   :items="sex"
                   id="registrationSex"
                   bg-color="white"
@@ -170,15 +160,15 @@
                   :loading="formLoading"
                   :rules="[rules.required,]"
                   variant="solo"
-                ></v-select>
-              </v-col>
+              ></v-select>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-select
+            >
+              <v-select
                   :items="health"
                   id="registrationHealth"
                   bg-color="white"
@@ -186,15 +176,15 @@
                   :loading="formLoading"
                   :rules="[rules.required,]"
                   variant="solo"
-                ></v-select>
-              </v-col>
+              ></v-select>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationPass1"
                   :append-inner-icon="pass1Visible ? 'mdi-eye-off' : 'mdi-eye'"
                   :type="pass1Visible ? 'text' : 'password'"
@@ -205,15 +195,15 @@
                   @click:append-inner="pass1Visible = !pass1Visible"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
+              ></v-text-field>
+            </v-col>
 
-              <v-col
+            <v-col
                 cols="12"
                 md="4"
                 sm="6"
-              >
-                <v-text-field
+            >
+              <v-text-field
                   id="registrationPass2"
                   :append-inner-icon="pass2Visible ? 'mdi-eye-off' : 'mdi-eye'"
                   :type="pass2Visible ? 'text' : 'password'"
@@ -224,81 +214,78 @@
                   @click:append-inner="pass2Visible = !pass2Visible"
                   :loading="formLoading"
                   clearable
-                ></v-text-field>
-              </v-col>
-            </v-row>
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-            <v-btn
+          <v-btn
               color="coko-blue"
-              @click="agreementDialog = true"
-            >Согласие на обработку ПДн</v-btn><br/>
+              @click="$refs.agreementDialog.dialog = true"
+          >Согласие на обработку ПДн</v-btn><br/>
 
-            <v-dialog v-model="agreementDialog">
-              <v-card>
-                <template v-slot:text>
-                  <p style="text-align: justify">
-                    Нажимая кнопку «Регистрация» я даю свое согласие Государственному автономному учреждению
-                    Иркутской области «Центр оценки профессионального мастерства, квалификаций педагогов и мониторинга
-                    качества образования» (далее - ГАУ ИО «ЦОПМКиМКО»), адрес местонахождения: 664023, Иркутская область,
-                    город Иркутск, улица Лыткина, дом 75 «а» , на обработку моих персональных данных в автоматизированной
-                    информационной системе "Учебный центр" (далее - АИС) в целях регистрации и использования АИС
-                    в образовательных целях.<br/>
-                    Перечень обрабатываемых персональных данных, передаваемых в АИС:<br/>
-                    - Фамилия, имя, отчество;<br/>
-                    - Телефон;<br/>
-                    - Адрес электронной почты;<br/>
-                    - СНИЛС.<br/>
-                    Настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО", действует до момента удаления моей учетной записи
-                    в АИС, либо до момента прекращения ГАУ ИО "ЦОПМКиМКО" эксплуатации АИС, если иное не предусмотрено
-                    законодательством Российской Федерации.<br/>
-                    Я уведомлен(а), что вправе отозвать настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО" путем
-                    направления мною либо моим представителем соответствующего письменного запроса (заявления) в ГАУ ИО
-                    «ЦОПМКиМКО» по адресу: 664023, Иркутская область, город Иркутск, улица Лыткина, дом 75 «а».<br/>
-                    Под обработкой персональных данных в целях выдачи настоящего согласия ГАУ ИО "ЦОПМКиМКО" понимается
-                    любое действие (операция) или совокупность действий (операций), совершаемых с использованием средств
-                    автоматизации или без использования таких средств с персональными данными, включая сбор, запись,
-                    систематизацию, накопление, хранение, уточнение (обновление, изменение), извлечение, использование,
-                    обезличивание, блокирование, удаление, уничтожение персональных данных.
-                  </p>
-                  <v-checkbox v-model="agreementCheckbox">
-                    <template v-slot:label>
-                      <div>
-                        Я даю свое согласие на обработку персональных данных*
-                      </div>
-                    </template>
-                  </v-checkbox>
+          <CokoDialog
+            ref="agreementDialog"
+          >
+
+            <template v-slot:title>
+              Согласие на обработку ПДН
+            </template>
+
+            <template v-slot:text>
+              <p>
+                Нажимая кнопку «Регистрация» я даю свое согласие Государственному автономному учреждению
+                Иркутской области «Центр оценки профессионального мастерства, квалификаций педагогов и мониторинга
+                качества образования» (далее - ГАУ ИО «ЦОПМКиМКО»), адрес местонахождения: 664023, Иркутская область,
+                город Иркутск, улица Лыткина, дом 75 «а» , на обработку моих персональных данных в автоматизированной
+                информационной системе "Учебный центр" (далее - АИС) в целях регистрации и использования АИС
+                в образовательных целях.<br/>
+                Перечень обрабатываемых персональных данных, передаваемых в АИС:<br/>
+                - Фамилия, имя, отчество;<br/>
+                - Телефон;<br/>
+                - Адрес электронной почты;<br/>
+                - СНИЛС.<br/>
+                Настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО", действует до момента удаления моей учетной записи
+                в АИС, либо до момента прекращения ГАУ ИО "ЦОПМКиМКО" эксплуатации АИС, если иное не предусмотрено
+                законодательством Российской Федерации.<br/>
+                Я уведомлен(а), что вправе отозвать настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО" путем
+                направления мною либо моим представителем соответствующего письменного запроса (заявления) в ГАУ ИО
+                «ЦОПМКиМКО» по адресу: 664023, Иркутская область, город Иркутск, улица Лыткина, дом 75 «а».<br/>
+                Под обработкой персональных данных в целях выдачи настоящего согласия ГАУ ИО "ЦОПМКиМКО" понимается
+                любое действие (операция) или совокупность действий (операций), совершаемых с использованием средств
+                автоматизации или без использования таких средств с персональными данными, включая сбор, запись,
+                систематизацию, накопление, хранение, уточнение (обновление, изменение), извлечение, использование,
+                обезличивание, блокирование, удаление, уничтожение персональных данных.
+              </p>
+              <v-checkbox v-model="agreementCheckbox">
+                <template v-slot:label>
+                  <div>
+                    Я даю свое согласие на обработку персональных данных*
+                  </div>
                 </template>
-              </v-card>
+              </v-checkbox>
+            </template>
 
-            </v-dialog>
+          </CokoDialog>
 
-          </slot>
+        </slot>
 
-        </DialogContentWithError>
+      </DialogContentWithError>
 
+      <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
 
-        <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
+    </template>
 
-      </v-card-text>
+    <template v-slot:actions>
 
-      <v-divider></v-divider>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn
-          text="Отмена"
-          @click="dialog = false"
-        ></v-btn>
-
-        <v-btn
+      <v-btn
           color="coko-blue"
           text="Регистрация"
           @click="registration()"
-        ></v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      ></v-btn>
+
+    </template>
+
+  </CokoDialog>
 </template>
 
 <script>
@@ -307,15 +294,19 @@ import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import email_pattern from "@/commons/email_pattern";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
+import {useDisplay} from "vuetify";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: 'RegistrationDialog',
-  components: {DialogContentWithError},
+  components: {CokoDialog, DialogContentWithError},
   props: {
     usePreLoader: Function
   },
   data() {
     return {
+      // Проверка на мобильное устройство
+      mobileDisplay: useDisplay().smAndDown,
       agreementDialog: false,
       dialog: false,
       uniqFailed: false,
@@ -350,6 +341,10 @@ export default {
     }
   },
   methods: {
+    // Отркыть диалоговое окно
+    openDialog() {
+      this.$refs.registrationDialog.dialog = true
+    },
     async getStates() {
       apiRequest(
         '/backend/api/v1/guides/states/',
@@ -483,6 +478,7 @@ export default {
                   'Регистрация обучающегося',
                   data.success
                 )
+                this.$refs.registrationDialog.dialog = false
               } else {
                 showAlert(
                   'error',
@@ -498,6 +494,8 @@ export default {
         }
       }
       else {
+        // Прокрутить блок страницы вверх
+        this.$refs.registrationDialog.scrollTextToTop()
         this.formLoading = false
       }
     }

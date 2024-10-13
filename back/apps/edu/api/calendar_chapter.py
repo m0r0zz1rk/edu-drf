@@ -13,7 +13,7 @@ from apps.edu.exceptions.calendar_chart.kug_not_found import KugNotFound
 from apps.edu.exceptions.student_group.student_group_incorrect_service import StudentGroupIncorrectService
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.serializers.calendar_chart import CalendarChartGetSerializer, CalendarChartUpdateSerializer, \
-    CalendarChartRemainHours
+    CalendarChartRemainHoursSerializer
 from apps.edu.services.calendar_chart import CalendarChartService
 from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR
@@ -65,7 +65,7 @@ class CalendarChartViewSet(viewsets.ViewSet):
                 return self.respu.bad_request_response(
                     f'Ошибка сериализации: {repr(serialize.errors)}'
                 )
-        except:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': 'Внешний запрос',
@@ -118,7 +118,7 @@ class CalendarChartViewSet(viewsets.ViewSet):
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
             '400': 'Сообщение об ошибке при обновлении КУГ ДПП',
-            '200': CalendarChartRemainHours
+            '200': CalendarChartRemainHoursSerializer
         }
     )
     @journal_api(
@@ -141,7 +141,7 @@ class CalendarChartViewSet(viewsets.ViewSet):
                     .set_description('Ошибка при получении остаточных часов КУГ ДПП')
                     .set_payload(repr(request.data))
                     .set_output('Не найдена учебная группа')
-                    .set_response_message(f'Ошибка получения остаточных часов КУГ: не найдена учебная группа')
+                    .set_response_message('Ошибка получения остаточных часов КУГ: не найдена учебная группа')
                 )
                 return journal_request.create_response()
             except StudentGroupIncorrectService:
@@ -152,8 +152,8 @@ class CalendarChartViewSet(viewsets.ViewSet):
                     .set_description('Ошибка при получении остаточных часов КУГ ДПП')
                     .set_payload(repr(request.data))
                     .set_output('Неверный тип услуги учебной группы')
-                    .set_response_message(f'Ошибка получения остаточных часов КУГ: '
-                                          f'получить часы можно только для групп курсов')
+                    .set_response_message('Ошибка получения остаточных часов КУГ: '
+                                          'получить часы можно только для групп курсов')
                 )
                 return journal_request.create_response()
             except KugNotFound:
@@ -164,8 +164,8 @@ class CalendarChartViewSet(viewsets.ViewSet):
                     .set_description('Ошибка при получении остаточных часов КУГ ДПП')
                     .set_payload(repr(request.data))
                     .set_output('Не найден КУГ')
-                    .set_response_message(f'Ошибка получения остаточных часов КУГ: '
-                                          f'не найден КУГ ДПП')
+                    .set_response_message('Ошибка получения остаточных часов КУГ: '
+                                          'не найден КУГ ДПП')
                 )
                 return journal_request.create_response()
             except GetKugRemainsError:
@@ -179,7 +179,7 @@ class CalendarChartViewSet(viewsets.ViewSet):
                     .set_response_message('Системная ошибка при получении остаточных часов КУГ')
                 )
                 return journal_request.create_response()
-            serialize = CalendarChartRemainHours(
+            serialize = CalendarChartRemainHoursSerializer(
                 data={'kug_remain': kug_remain}
             )
             if serialize.is_valid():

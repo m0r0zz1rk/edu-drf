@@ -20,6 +20,7 @@ class StudentGroupFilter(filters.FilterSet):
     service_name = filters.CharFilter(method="filter_service_name")
     date_start = filters.CharFilter(method="filter_date_start")
     date_end = filters.CharFilter(method='filter_date_end')
+    month = filters.CharFilter(method="filter_month")
     curator = filters.CharFilter(method='filter_curator')
     apps_count = filters.CharFilter(method='filter_apps_count')
     status = filters.CharFilter(method='filter_status')
@@ -43,6 +44,17 @@ class StudentGroupFilter(filters.FilterSet):
         return queryset.filter(
             Q(ou__date_end=datetime.strptime(value, '%d.%m.%Y').date()) |
             Q(iku__date_end=datetime.strptime(value, '%d.%m.%Y').date())
+        )
+
+    def filter_month(self, queryset, name, value):
+        """Фильтрация по месяцу (для отчета ФИС ФРДО)"""
+        print(value)
+        int_value = int(value)
+        if int_value == 0:
+            return queryset
+        return queryset.filter(
+            Q(ou__date_start__month=int_value) |
+            Q(iku__date_start__month=int_value)
         )
 
     def filter_curator(self, queryset, name, value):

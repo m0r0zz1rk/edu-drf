@@ -1,0 +1,672 @@
+<template>
+
+  <template
+    v-if="internalApp !== null"
+  >
+
+    <v-select
+        color="coko-blue"
+        v-model="internalApp.region_object_id"
+        :items="regions"
+        item-title="name"
+        item-value="object_id"
+        label="Регион*"
+        :disabled="disabled"
+        :loading="loading"
+    />
+
+    <v-select
+        v-if="internalApp.region_name === 'Иркутская область'"
+        color="coko-blue"
+        v-model="internalApp.mo_object_id"
+        :items="mos"
+        item-title="name"
+        item-value="object_id"
+        label="МО*"
+        :disabled="disabled"
+        :loading="loading"
+    />
+
+    <v-select
+        color="coko-blue"
+        v-model="internalApp.work_less"
+        :items="booleanOptions"
+        item-title="title"
+        item-value="key"
+        label="Безработный*"
+        :disabled="disabled"
+        :loading="loading"
+    />
+
+    <template
+      v-if="!(internalApp.work_less)"
+    >
+
+      Образовательная организация:<br/>
+      <v-btn
+        color="coko-blue"
+        v-if="(internalApp.region_name === 'Иркутская область') && (internalApp.mo_object_id !== null)"
+        text="Справочник"
+        @click="$refs.ooSelectDialog.dialog = true"
+        :disabled="disabled"
+        :loading="loading"
+      />
+      <v-textarea
+        color="coko-blue"
+        v-model="oo"
+        :label="
+            internalApp.region_name === 'Иркутская область' ?
+              internalApp.mo_object_id === null ?
+                'Введите название ОО (для выбора из справочника выберите МО)*'
+                :
+                'Введите название ОО или выберите из справочника*'
+              :
+              'Введите название ОО*'
+        "
+        :disabled="disabled"
+        :loading="loading"
+      />
+      <v-select
+          color="coko-blue"
+          v-model="internalApp.position_category_object_id"
+          :items="positionCategories"
+          item-title="name"
+          item-value="object_id"
+          label="Категория должности*"
+          :disabled="disabled"
+          :loading="loading"
+      />
+      <v-select
+          color="coko-blue"
+          v-model="internalApp.position_object_id"
+          :items="positions"
+          item-title="name"
+          item-value="object_id"
+          label="Должность*"
+          :disabled="disabled"
+          :loading="loading"
+      />
+
+    </template>
+
+    <v-select
+        color="coko-blue"
+        v-model="internalApp.education_level"
+        :items="educationLevels"
+        item-title="title"
+        item-value="key"
+        label="Уровень образования*"
+        :disabled="disabled"
+        :loading="loading"
+    />
+
+    <v-select
+        v-if="internalApp.education_level === 'student'"
+        color="coko-blue"
+        v-model="internalApp.education_category"
+        :items="educationCategories"
+        item-title="title"
+        item-value="key"
+        label="Категория получаемого образования*"
+        :disabled="disabled"
+        :loading="loading"
+    />
+
+    <p
+      v-if="internalApp.education_level !== 'student'"
+    >
+      Диплом об образовании <b style="color:red">(НЕ О ПРОФЕССИОНАЛЬНОЙ ПЕРЕПОДГОТОВКЕ)</b>:
+    </p>
+
+    <p
+      v-if="internalApp.education_level === 'student'"
+    >
+      Справка об обучении:
+    </p>
+    <template
+      v-if="internalApp.education_doc_object_id !== null"
+    >
+      <FileField
+          :file="internalApp.education_doc_file"
+          :fileName="internalApp.education_doc_name"
+      />
+      <br/>
+    </template>
+
+    <p
+      v-if="internalApp.education_doc_object_id === null"
+    >
+      <b>(Не выбран)</b>
+    </p>
+    <v-btn
+        color="coko-blue"
+        text="Выбрать"
+        @click="$refs.educationDocSelectDialog.dialog = true"
+        :disabled="disabled"
+        :loading="loading"
+    />
+    <br/><br/>
+    <template
+      v-if="internalApp.education_level !== 'student'"
+    >
+
+      <v-text-field
+          color="coko-blue"
+          v-model="internalApp.diploma_surname"
+          label="Фамиилия в дипломе*"
+          :disabled="disabled"
+          :loading="loading"
+      />
+
+      <template
+        v-if="internalApp.diploma_surname !== internalApp.profile_surname"
+      >
+
+        Документ о смене фамилии:<br/>
+        <template
+          v-if="internalApp.surname_doc_object_id !== null"
+        >
+          <FileField
+              :file="internalApp.surname_doc_file"
+              :fileName="internalApp.surname_doc_name"
+          />
+          <br/>
+        </template>
+
+        <p
+          v-if="internalApp.surname_doc_object_id === null"
+        >
+          <b>(Не выбран)</b>
+        </p>
+        <v-btn
+            color="coko-blue"
+            text="Выбрать"
+            @click="$refs.surnameDocSelectDialog.dialog = true"
+            :disabled="disabled"
+            :loading="loading"
+        />
+        <br/><br/>
+
+      </template>
+
+      <v-text-field
+          color="coko-blue"
+          v-model="internalApp.education_serial"
+          :rules="[rules.education_serial,]"
+          label="Серия диплома*"
+          :disabled="disabled"
+          :loading="loading"
+      />
+
+      <v-text-field
+          color="coko-blue"
+          v-model="internalApp.education_number"
+          :rules="[rules.education_number,]"
+          label="Номер диплома*"
+          :disabled="disabled"
+          :loading="loading"
+      />
+
+      <v-date-input
+          color="coko-blue"
+          v-model="internalApp.education_date"
+          label="Дата выдачи диплома*"
+          prepend-icon=""
+          prepend-inner-icon="$calendar"
+          variant="solo"
+          :disabled="disabled"
+          :loading="loading"
+          clearable
+      />
+
+      <v-select
+          color="coko-blue"
+          v-model="internalApp.physical"
+          :items="booleanOptions"
+          item-title="title"
+          item-value="key"
+          label="Физическое лицо*"
+          :disabled="disabled"
+          :loading="loading"
+      />
+
+      <v-select
+          color="coko-blue"
+          v-model="internalApp.certificate_mail"
+          :items="booleanOptions"
+          item-title="title"
+          item-value="key"
+          label="Отправка удостоверения почтой*"
+          :disabled="disabled"
+          :loading="loading"
+      />
+
+      <v-textarea
+          v-if="internalApp.certificate_mail"
+          color="coko-blue"
+          v-model="internalApp.mail_address"
+          label="Почтовый адрес для отправки удостоверения"
+          :disabled="disabled"
+          :loading="loading"
+      />
+
+    </template>
+
+
+  </template>
+
+  <CokoDialog
+    ref="ooSelectDialog"
+    :cardActions="false"
+  >
+
+    <template v-slot:title>
+      Справочник ОО
+    </template>
+
+    <template v-slot:text>
+      <PaginationTable
+          v-if="ooFieldsArray !== null"
+          tableTitle="ОО"
+          tableWidth="100"
+          :noTab="false"
+          :addButton="false"
+          :xlsxButton="false"
+          :getRecsURL="'/backend/api/v1/users/oos/'+internalApp.mo_object_id+'/'"
+          :tableHeaders="ooTableHeaders"
+          :fieldsArray="ooFieldsArray"
+          :itemSelectEvent="selectOo"
+      />
+    </template>
+
+  </CokoDialog>
+
+  <CokoDialog
+      ref="educationDocSelectDialog"
+      :cardActions="false"
+  >
+
+    <template v-slot:title>
+      Документы обучающегося
+    </template>
+
+    <template v-slot:text>
+      <PaginationTable
+          :tableTitle="
+            internalApp.education_level === 'student' ? 'Справки об обучении' : 'Дипломы'
+          "
+          tableWidth="100"
+          :noTab="false"
+          :hideSearchButton="true"
+          :addButton="true"
+          :xlsxButton="false"
+          :getRecsURL="
+            internalApp.education_level === 'student' ?
+              '/backend/api/v1/docs/student_docs/?doc_type=training_certificate'
+              :
+              '/backend/api/v1/docs/student_docs/?doc_type=diploma'
+          "
+          addRecURL="/backend/api/v1/docs/upload_student_doc/"
+          :tableHeaders="docTableHeaders"
+          :fieldsArray="docFieldsArray"
+          :itemSelectEvent="selectEduDoc"
+          :defaultBody="{
+            'doc_type': internalApp.education_level === 'student' ? 'training_certificate' : 'diploma'
+          }"
+      />
+    </template>
+
+  </CokoDialog>
+
+  <CokoDialog
+      ref="surnameDocSelectDialog"
+      :cardActions="false"
+  >
+
+    <template v-slot:title>
+      Документы обучающегося
+    </template>
+
+    <template v-slot:text>
+      <PaginationTable
+          tableTitle="Документ о смене фамилии"
+          tableWidth="100"
+          :noTab="false"
+          :hideSearchButton="true"
+          :addButton="true"
+          :xlsxButton="false"
+          getRecsURL="/backend/api/v1/docs/student_docs/?doc_type=change_surname"
+          addRecURL="/backend/api/v1/docs/upload_student_doc/"
+          :tableHeaders="docTableHeaders"
+          :fieldsArray="docFieldsArray"
+          :itemSelectEvent="selectSurnameDoc"
+          :defaultBody="{
+            'doc_type': 'change_surname'
+          }"
+      />
+    </template>
+
+  </CokoDialog>
+
+</template>
+
+<script>
+
+// Форма для просмотра и редактирования анкеты заявки обучающегося
+import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
+import {apiRequest} from "@/commons/api_request";
+import {showAlert} from "@/commons/alerts";
+import educationLevels from "@/commons/consts/apps/educationLevels";
+import educationCategories from "@/commons/consts/apps/educationCategories";
+import FileField from "@/components/tables/pagination_table/special_fields/sources/FileField.vue";
+import {convertBackendDate, convertDateToBackend} from "@/commons/date";
+
+export default {
+  name: 'AppForm',
+  components: {FileField, PaginationTable, CokoDialog, AppStatusBadge},
+  props: {
+    // Только для чтения
+    disabled: Boolean,
+    // Объект заявки обучающегося
+    studentApp: Object,
+    // Функция изменения атрибутов объекта заявки в родительском компоненте
+    changeAppAttribute: Function,
+    // Список регионов РФ
+    regions: Array,
+    // Список МО
+    mos: Array,
+    // Список категорий должностей
+    positionCategories: Array,
+    // Список должностей
+    positions: Array
+  },
+  data() {
+    return {
+      // Параметр отображения анимации загрузки на элементах формы
+      loading: false,
+      // Варианты для выпадающего списка "Безработный" и "Физическое лицо"
+      booleanOptions: [
+        {
+          key: true,
+          title: 'Да'
+        },
+        {
+          key: false,
+          title: 'Нет'
+        },
+      ],
+      // Внутренний объект заявки
+      internalApp: null,
+      // Выбранная ОО
+      oo: '',
+      // Список столбцов для таблицы справочника ОО
+      ooTableHeaders: [
+        {
+          'title': 'Краткое наименование',
+          'key': 'short_name'
+        },
+        {
+          'title': 'Полное наименование',
+          'key': 'full_name'
+        },
+        {
+          'title': 'Тип ОО',
+          'key': 'oo_type'
+        }
+      ],
+      // Список описаний столбцов таблицы справочника ОО
+      ooFieldsArray: null,
+      // Уровни образования
+      educationLevels: educationLevels,
+      // Категории получаемого образования
+      educationCategories: educationCategories,
+      // Наименование выбранного документа об образовании/справки об обучении
+      eduDoc: '',
+      // Список столбцов таблицы выбора документа об образовании / документа о смене фамилии
+      docTableHeaders: [
+        {
+          'title': 'Дата добавления',
+          'key': 'date_create'
+        },
+        {
+          'title': 'Документ',
+          'key': 'file'
+        }
+      ],
+      // Список описаний столбцов таблицы выбора документа об образовании / документа о смене фамилии
+      docFieldsArray: [
+        {
+          ui: 'date',
+          key: 'date_create',
+          readOnly: true,
+          addRequired: false,
+        },
+        {
+          ui: 'file',
+          key: 'file',
+          addRequired: true
+        }
+      ],
+      // Регулярное выражение для серии диплома
+      educationSerialRegEx: /^[а-яА-ЯёЁ0-9]+$/,
+      // Регулярное выражение для номера диплома
+      educationNumberRegEx: /^[0-9]+$/,
+      // Правила заполнения для полей "Серия диплома" и "Номер диплома"
+      rules: {
+        education_serial: value => this.educationSerialRegEx.test(value) || 'Некорректная серия диплома.',
+        education_number: value => this.educationNumberRegEx.test(value) || 'Некорректный номер диплома.',
+      }
+    }
+  },
+  methods: {
+    // Установка внутреннего объекта заявки
+    setInternalApp() {
+      this.internalApp = this.studentApp
+      this.oo = this.studentApp.oo_name
+      try {
+        this.internalApp.education_date = convertBackendDate(this.internalApp.education_date)
+      } catch (e) {}
+      if (this.studentApp.diploma_surname === '') {
+        this.internalApp.diploma_surname = this.internalApp.profile_surname
+      }
+    },
+    // Получение списка типов ОО и установка списка описаний столбцов таблицы справочника ОО
+    async getOoTypes() {
+      let ooTypeListRequest = await apiRequest(
+          '/backend/api/v1/users/oo_types/',
+          'GET',
+          true,
+          null
+      )
+      if (ooTypeListRequest.error) {
+        showAlert(
+            'error',
+            'Получение списка типов ОО',
+            ooTypeListRequest.error
+        )
+        return false
+      }
+      let oo_types = []
+      ooTypeListRequest.map((oo_type) => {
+        oo_types.push(oo_type.name)
+      })
+      this.ooFieldsArray = [
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'short_name',
+          addRequired: true,
+        },
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'full_name',
+          addRequired: true,
+        },
+        {
+          ui: 'select',
+          items: oo_types,
+          key: 'oo_type',
+          addRequired: true
+        }
+      ]
+    },
+    // Установить ОО, выбранную из справочника
+    selectOo(oo) {
+      this.internalApp.oo_object_id = oo.object_id
+      this.internalApp.oo_name = oo.full_name
+      this.oo = oo.full_name
+      this.$refs.ooSelectDialog.dialog = false
+    },
+    // Установить выбранный документ об образовании
+    selectEduDoc(doc) {
+      this.internalApp.education_doc_name = doc.doc_name
+      this.internalApp.education_doc_file = doc.file
+      this.internalApp.education_doc_object_id = doc.object_id
+      this.$refs.educationDocSelectDialog.dialog = false
+    },
+    // Установить выбранный документ о смене фамилии
+    selectSurnameDoc(doc) {
+      this.internalApp.surname_doc_name = doc.doc_name
+      this.internalApp.surname_doc_file = doc.file
+      this.internalApp.surname_doc_object_id = doc.object_id
+      this.$refs.surnameDocSelectDialog.dialog = false
+    },
+  },
+  watch: {
+    'internalApp.region_object_id': function (newValue, oldValue) {
+      if (oldValue !== null) {
+        let new_reg_name = this.regions.filter((reg) => reg.object_id === newValue)[0].name
+        this.internalApp.region_name = new_reg_name
+        this.changeAppAttribute(
+            'region_object_id',
+            newValue
+        )
+        this.changeAppAttribute(
+            'region_name',
+            new_reg_name
+        )
+        if (new_reg_name !== 'Иркутская область') {
+          this.changeAppAttribute(
+              'mo_object_id',
+              null
+          )
+          this.changeAppAttribute(
+              'mo_name',
+              ''
+          )
+        }
+      }
+    },
+    'internalApp.work_less': function(newValue, oldValue) {
+      if (oldValue !== null) {
+        this.changeAppAttribute('work_less', newValue)
+        if (newValue === true) {
+          this.changeAppAttribute(
+              'oo_object_id',
+              null
+          )
+          this.changeAppAttribute(
+              'oo_name',
+              ''
+          )
+          this.changeAppAttribute(
+              'oo_new',
+              ''
+          )
+          this.changeAppAttribute(
+              'position_category_object_id',
+              null
+          )
+          this.changeAppAttribute(
+              'position_category_name',
+              ''
+          )
+          this.changeAppAttribute(
+              'position_object_id',
+              null
+          )
+          this.changeAppAttribute(
+              'position_name',
+              ''
+          )
+        }
+      }
+    },
+    'oo': function(newValue, oldValue) {
+      if (this.oo === this.internalApp.oo_name) {
+        this.changeAppAttribute('oo_object_id', this.internalApp.oo_object_id)
+        this.changeAppAttribute('oo_name', this.internalApp.oo_name)
+        this.changeAppAttribute('oo_new', '')
+      } else {
+        this.changeAppAttribute('oo_object_id', null)
+        this.changeAppAttribute('oo_name', '')
+        this.changeAppAttribute('oo_new', newValue)
+      }
+    },
+    'internalApp.position_category_object_id': function(newValue, oldValue) {
+        let name = this.positionCategories.filter((pc) => pc.object_id === newValue)[0].name
+        this.internalApp.position_category_name = name
+        this.changeAppAttribute('position_category_object_id', newValue)
+        this.changeAppAttribute('position_category_name', name)
+    },
+    'internalApp.position_object_id': function(newValue, oldValue) {
+        let name = this.positions.filter((pc) => pc.object_id === newValue)[0].name
+        this.internalApp.position_name = name
+        this.changeAppAttribute('position_object_id', newValue)
+        this.changeAppAttribute('position_name', name)
+    },
+    'internalApp.education_level': function(newValue, oldValue) {
+        this.changeAppAttribute('education_level', newValue)
+    },
+    'internalApp.education_category': function(newValue, oldValue) {
+      this.changeAppAttribute('education_category', newValue)
+    },
+    'internalApp.education_doc_object_id': function (newValue, oldValue) {
+      this.changeAppAttribute('education_doc_object_id', newValue)
+      this.changeAppAttribute('education_doc_name', this.internalApp.education_doc_name)
+      this.changeAppAttribute('education_doc_file', this.internalApp.education_doc_file)
+    },
+    'internalApp.diploma_surname': function (newValue, oldValue) {
+      this.changeAppAttribute('diploma_surname', newValue)
+    },
+    'internalApp.surname_doc_object_id': function (newValue, oldValue) {
+      this.changeAppAttribute('surname_doc_object_id', newValue)
+      this.changeAppAttribute('surname_doc_name', this.internalApp.surname_doc_name)
+      this.changeAppAttribute('surname_doc_file', this.internalApp.surname_doc_file)
+    },
+    'internalApp.education_serial': function (newValue, oldValue) {
+      this.changeAppAttribute('education_serial', newValue)
+    },
+    'internalApp.education_number': function (newValue, oldValue) {
+      this.changeAppAttribute('education_number', newValue)
+    },
+    'internalApp.education_date': function (newValue, oldValue) {
+      console.log(newValue)
+      console.log(oldValue)
+      if (!(newValue instanceof Date)) {
+        this.changeAppAttribute('education_date', convertDateToBackend(newValue))
+      }
+    },
+    'internalApp.certificate_mail': function (newValue, oldValue) {
+      this.changeAppAttribute('certificate_mail', newValue)
+    },
+    'internalApp.mail_address': function(newValue, oldValue) {
+      this.changeAppAttribute('mail_address', newValue)
+    }
+  },
+  mounted() {
+    this.setInternalApp()
+    this.getOoTypes()
+  }
+}
+
+</script>
+
+<style scoped>
+
+</style>
+<script setup>
+</script>

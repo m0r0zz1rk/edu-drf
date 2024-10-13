@@ -23,6 +23,7 @@
               :
               ''
       "
+      :disabled="field.readOnly"
       @change="e => onChangeEvent(field.key, localValue)"
     />
 
@@ -41,6 +42,7 @@
               :
               ''
       "
+      :disabled="field.readOnly"
       @change="e => onChangeEvent(field.key, localValue)"
     />
 
@@ -59,6 +61,7 @@
               :
               ''
       "
+      :disabled="field.readOnly"
       @change="e => onChangeEvent(field.key, localValue)"
     />
 
@@ -80,7 +83,12 @@
               :
               ''
       "
-      @update:modelValue="e => onChangeEvent(field.key, localValue)"
+      :disabled="field.readOnly"
+      @update:modelValue="e => {
+        try {
+          onChangeEvent(field.key, localValue)
+        } catch (e) {}
+      }"
     />
 
     <v-date-input
@@ -97,6 +105,7 @@
               :
               ''
       "
+      :disabled="field.readOnly"
       prepend-icon=""
       prepend-inner-icon="$calendar"
       @update:modelValue="e => {
@@ -107,37 +116,62 @@
       @click:clear="e => {this.localValue = null; onChangeEvent(field.key, '')}"
       clearable
     ></v-date-input>
+
+    <v-file-input
+      v-if="field.ui === 'file'"
+      :accept="acceptExt"
+      label="Выберите документ"
+      id="addDialogFileInput"
+      :disabled="field.readOnly"
+      v-model="localValue"
+    />
   </div>
 </template>
 
 <script>
 import {convertDateToBackend} from "@/commons/date";
+import fileContentTypes from "@/commons/consts/fileContentTypes";
 
 export default {
   name: "PaginationTableBaseField",
   props: {
     useInTableManage: Boolean, // Параметр вызова компонента из PaginationTableManage
     checkRequired: Boolean, // Параметр, отображющий необходимость проверки обязательного заполнения
-    field: Object, // Объекта fieldsArray
+    field: Object, // Объект fieldsArray
     value: String, // Значение (при редактировании записи)
     fieldTitle: String, // Наименование поля
     onChangeEvent: Function, //Функция, вызываемая при изменении
   },
   data() {
     return {
+      // Список разрешенных расширений файлов (для file)
+      acceptExt: '',
       localValue: '',
       showField: false,
     }
   },
   methods: {
+    // Формирование строки с разрешенными расширениями файлов
+    createAcceptExt() {
+      let str = ''
+      fileContentTypes.map((fct) => {
+        str += fct.mime+', '
+      })
+      this.acceptExt = str.substring(0, str.length-2)
+    },
     convertDateToBackend,
     checkUiDate() {
-      if (this.field.ui === 'date') {
-        this.localValue = null
+      try {
+        if (this.field.ui === 'date') {
+          this.localValue = null
+        }
+      } catch(e) {
+        console.log(e)
       }
     },
   },
   mounted() {
+    this.createAcceptExt()
     if (this.value) {
         this.localValue = this.value
     }

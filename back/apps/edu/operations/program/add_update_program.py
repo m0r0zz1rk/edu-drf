@@ -1,8 +1,6 @@
 import uuid
 from typing import Optional
 
-from django.apps import apps
-
 from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.program_order.add_program_order import AddUpdateProgramOrderOperation
@@ -62,9 +60,9 @@ class AddUpdateProgramOperation(BaseProgramOperation):
         :return: True - успешно, False - ошибка
         """
         doc_data = {
-                'object_id': self.program_data['order_id'],
-                'number': self.program_data['order_number'],
-                'date': self.program_data['order_date']
+            'object_id': self.program_data['order_id'],
+            'number': self.program_data['order_number'],
+            'date': self.program_data['order_date']
         }
         if 'order_file' in self.program_data.keys() and \
                 self.program_data['order_file'] not in [None, 'null']:

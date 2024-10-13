@@ -1,6 +1,4 @@
-from corsheaders.defaults import default_headers
-
-from ..settings import *
+from ..settings import env, BASE_DIR, os
 
 SECRET_KEY = env.str('SECRET_KEY')
 

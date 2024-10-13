@@ -34,4 +34,3 @@ class GroupUtils:
         if not self.is_group_exist(name):
             self.create_group(name)
         return Group.objects.get(name=name)
-

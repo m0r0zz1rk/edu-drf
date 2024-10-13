@@ -13,6 +13,7 @@
             >
 
               <v-tab class="coko-tab" value="state">Государства</v-tab>
+              <v-tab class="coko-tab" value="region">Регионы</v-tab>
               <v-tab class="coko-tab" value="mo">МО</v-tab>
               <v-tab class="coko-tab" value="oo_type">Типы ОО</v-tab>
               <v-tab class="coko-tab" value="oo">ОО</v-tab>
@@ -24,6 +25,8 @@
             </v-tabs>
 
             <GuideState v-if="guidesTab === 'state'" />
+
+            <GuideRegion v-if="guidesTab === 'region'" />
 
             <GuideMo v-if="guidesTab === 'mo'" />
 
@@ -56,10 +59,12 @@ import GuideAudienceCategory from "@/views/administrator/guides/GuideAudienceCat
 import GuideEventType from "@/views/administrator/guides/GuideEventType.vue";
 import GuidePositionCategory from "@/views/administrator/guides/GuidePositionCategory.vue";
 import GuidePosition from "@/views/administrator/guides/GuidePosition.vue";
+import GuideRegion from "@/views/administrator/guides/GuideRegion.vue";
 
 export default {
   name: "Guides",
   components: {
+    GuideRegion,
     GuidePosition,
     GuidePositionCategory,
     GuideEventType, GuideAudienceCategory, GuideOo, GuideOoType, GuideMo, GuideState, LkPage},

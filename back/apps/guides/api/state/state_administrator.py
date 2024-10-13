@@ -28,7 +28,7 @@ class StateAdministratorViewSet(viewsets.ModelViewSet):
     filterset_class = NameFieldFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Государства"', ],
+        tags=['Cправочники. Государства', ],
         operation_description="Получение списка государств",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -59,7 +59,7 @@ class StateAdministratorViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Государства"', ],
+        tags=['Cправочники. Государства', ],
         operation_description="Добавление государства",
         request_body=StateAdministratorCreateSerializer,
         responses={
@@ -93,7 +93,7 @@ class StateAdministratorViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Государства"', ],
+        tags=['Cправочники. Государства', ],
         operation_description="Обновление государства",
         request_body=StateAdministratorUpdateSerializer,
         responses={
@@ -127,7 +127,7 @@ class StateAdministratorViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Государства"', ],
+        tags=['Cправочники. Государства', ],
         operation_description="Удаление государства",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',

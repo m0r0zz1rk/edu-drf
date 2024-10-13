@@ -42,7 +42,7 @@ class DateUtils:
         else:
             try:
                 return datetime.date(obj).strftime("%d.%m.%Y")
-            except:
+            except Exception:
                 return None
 
     @staticmethod
@@ -104,5 +104,3 @@ class DateUtils:
         :return: время в формате ЧЧ:ММ
         """
         return time.strftime('%H:%M', time.gmtime(seconds))
-
-

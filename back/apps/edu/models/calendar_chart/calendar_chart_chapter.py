@@ -16,8 +16,8 @@ class CalendarChartChapter(CalendarChartElement):
     def __str__(self):
         try:
             return f'Раздел № {self.position} "{self.name}" (ДПП: {self.program.name}) '
-        except:
-            return 'Раздел КУГаДПП'
+        except Exception:
+            return 'Раздел КУГа ДПП'
 
     class Meta:
         verbose_name = 'Раздел КУГа'

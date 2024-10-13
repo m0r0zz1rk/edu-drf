@@ -11,6 +11,8 @@ class StudentGroupOffer(BaseTable):
     student_group = models.ForeignKey(
         'edu.StudentGroup',
         on_delete=models.CASCADE,
+        null=True,
+        default=None,
         verbose_name='Учебная группа'
     )
     file = models.FileField(

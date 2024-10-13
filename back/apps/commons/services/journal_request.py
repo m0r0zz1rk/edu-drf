@@ -1,6 +1,6 @@
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
-from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES
+from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES, ERROR
 from apps.journal.services.journal import JournalService
 
 
@@ -9,6 +9,7 @@ class JournalRequestBuilder:
 
     _module = _status = None
     _payload = _output = _description = _response_message = ''
+    _source = 'Внешний запрос'
 
     def set_module(self, module: JOURNAL_MODULES):
         """Установить модуль журнала"""
@@ -40,12 +41,18 @@ class JournalRequestBuilder:
         self._response_message = response_message
         return self
 
+    def set_source(self, source: str):
+        """Установить источник дейтвия"""
+        self._source = source
+        return self
+
 
 class JournalRequest:
     """Класс для добавления записи в журнал событий и отправки ответа response"""
 
     _module = _status = None
     _payload = _output = _description = _response_message = ''
+    _source = 'Внешний запрос'
     _journal_service = JournalService()
     _response_utils = ResponseUtils()
 
@@ -59,7 +66,7 @@ class JournalRequest:
         """Добавление записи в журнал"""
         self._journal_service.create_journal_rec(
             {
-                'source': 'Внешний запрос',
+                'source': self._source,
                 'module': self._module,
                 'status': self._status,
                 'description': self._description
@@ -70,4 +77,6 @@ class JournalRequest:
 
     def create_response(self):
         """Создание объекта response"""
-        return self._response_utils.bad_request_response(self._response_message)
+        if self._status == ERROR:
+            return self._response_utils.bad_request_response(self._response_message)
+        return self._response_utils.ok_response(self._response_message)

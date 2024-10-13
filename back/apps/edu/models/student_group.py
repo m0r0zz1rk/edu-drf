@@ -58,10 +58,9 @@ class StudentGroup(BaseTable):
         verbose_name='Форма обучения'
     )
     event_url = models.URLField(
-        max_length=5000,
-        null=True,
+        max_length=3000,
         blank=True,
-        default=None,
+        default='https://coko38.ru/',
         verbose_name='Ссылка на мероприятие'
     )
     survey_show = models.BooleanField(
@@ -83,15 +82,13 @@ class StudentGroup(BaseTable):
     )
     enroll_number = models.CharField(
         max_length=50,
-        null=True,
-        default=None,
+        default='',
         blank=True,
         verbose_name='Номер приказа о зачислении'
     )
     exp_number = models.CharField(
         max_length=50,
-        null=True,
-        default=None,
+        default='',
         blank=True,
         verbose_name='Номер приказа об отчислении'
     )

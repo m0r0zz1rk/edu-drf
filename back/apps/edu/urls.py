@@ -5,6 +5,7 @@ from apps.edu.url_patterns.schedule import schedule_urlpatterns
 from apps.edu.url_patterns.services.education_service import education_service_urlpatterns
 from apps.edu.url_patterns.services.information_service import information_service_urlpatterns
 from apps.edu.url_patterns.student_group import student_group_urlpatterns
+from apps.edu.url_patterns.teacher import teacher_urlpatterns
 
 urlpatterns = (program_urlpatterns +
                calendar_chart_urlpatterns +
@@ -12,4 +13,5 @@ urlpatterns = (program_urlpatterns +
                education_service_urlpatterns +
                information_service_urlpatterns +
                student_group_urlpatterns +
-               schedule_urlpatterns)
+               schedule_urlpatterns +
+               teacher_urlpatterns)

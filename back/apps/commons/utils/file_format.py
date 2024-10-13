@@ -1,4 +1,3 @@
-import os
 from typing import Optional
 
 
@@ -23,5 +22,5 @@ class FileFormatUtils:
             if extension in self.format_content_type.keys():
                 return self.format_content_type[extension]
             return None
-        except:
+        except Exception:
             return None

@@ -1,0 +1,5 @@
+from apps.commons.drf.routers.list_create_update_delete_router import ListCreateUpdateDeleteRouter
+from apps.surveys.api.survey_question import SurveyQuestionViewSet
+
+survey_question_router = ListCreateUpdateDeleteRouter(trailing_slash=True)
+survey_question_router.register('survey_questions', SurveyQuestionViewSet)

@@ -28,7 +28,7 @@ class AddStudentGroup(MainProcessing):
                 if key not in self.process_data.keys():
                     return False
             return True
-        except:
+        except Exception:
             return ExceptionHandling.get_traceback()
 
     def _main_process(self):
@@ -65,19 +65,19 @@ class AddStudentGroup(MainProcessing):
                     'source': self.source,
                     'module': self.module,
                     'status': ERROR,
-                    'description': f'Ошибка в процессе генерации кода учебной группы'
+                    'description': 'Ошибка в процессе генерации кода учебной группы'
                 },
                 repr(self.process_data),
                 ExceptionHandling.get_traceback()
             )
             self.process_completed = False
-        except Exception as e:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
                     'status': ERROR,
-                    'description': f'Ошибка в процессе добавления учебной группы'
+                    'description': 'Ошибка в процессе добавления учебной группы'
                 },
                 repr(self.process_data),
                 ExceptionHandling.get_traceback()
@@ -91,7 +91,7 @@ class AddStudentGroup(MainProcessing):
                 'source': self.source,
                 'module': self.module,
                 'status': SUCCESS,
-                'description': f'Учебная группа успешно добавлена'
+                'description': 'Учебная группа успешно добавлена'
             },
             repr(self.process_data),
             None

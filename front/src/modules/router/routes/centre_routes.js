@@ -6,6 +6,9 @@ import Guides from "@/views/administrator/Guides.vue";
 import Users from "@/views/administrator/Users.vue";
 import Edu from "@/views/administrator/Edu.vue";
 import EduDetailStudentGroup from "@/views/administrator/edu/EduDetailStudentGroup.vue";
+import Surveys from "@/views/administrator/Surveys.vue";
+import Reports from "@/views/administrator/Reports.vue";
+import PersonalSchedule from "@/views/administrator/PersonalSchedule.vue";
 
 const centre_routes = [
     {
@@ -32,42 +35,24 @@ const centre_routes = [
       component: EduDetailStudentGroup,
       beforeEnter: [isAuthenticated, isAdministrator]
     },
-    /*{
-        path: '/users',
-        name: 'Users',
-        component: Users,
+    {
+        path: '/centre/surveys',
+        name: 'Surveys',
+        component: Surveys,
         beforeEnter: [isAuthenticated, isAdministrator]
     },
     {
-        path: '/admin_events/view',
-        name: 'AdminEventsView',
-        component: AdminEventsView,
-        beforeEnter: [isAuthenticated, isAdministrator]
-    },
-    {
-        path: '/admin_events/manage',
-        name: 'AdminEventsManage',
-        component: AdminEventsManage,
-        beforeEnter: [isAuthenticated, isAdministrator]
-    },
-    {
-        path: '/admin_apps/',
-        name: 'AdminApps',
-        component: AdminApps,
-        beforeEnter: [isAuthenticated, isAdministrator]
-    },
-    {
-        path: '/apps/admin_app_detail/:appId',
-        name: 'AdminAppView',
-        component: AdminAppView,
-        beforeEnter: [isAuthenticated, ]
-    },
-    {
-        path: '/reports',
+        path: '/centre/reports',
         name: 'Reports',
         component: Reports,
         beforeEnter: [isAuthenticated, isAdministrator]
-    },*/
+    },
+    {
+        path: '/centre/personal_schedule',
+        name: 'PersonalSchedule',
+        component: PersonalSchedule,
+        beforeEnter: [isAuthenticated, isAdministrator]
+    },
     {
         path: '/centre/journal',
         name: 'Journal',

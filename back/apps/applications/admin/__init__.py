@@ -1,0 +1,2 @@
+from .course_application import CourseApplicationAdmin
+from .event_application import EventApplicationAdmin

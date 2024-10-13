@@ -1,16 +1,23 @@
 <template>
-  <v-card>
-    <v-card-title class="d-flex justify-space-between align-center">
+
+  <v-btn
+      color="coko-blue"
+      text="Смена пароля"
+      :loading="formLoading"
+      @click="this.$refs.passwordDialog.dialog = true"
+  ></v-btn>
+
+  <CokoDialog
+    ref="passwordDialog"
+    :cardActions="true"
+  >
+
+    <template v-slot:title>
       Смена пароля
+    </template>
 
-      <v-btn
-        icon="mdi-close"
-        color="coko-blue"
-        @click="closeDialog"
-      ></v-btn>
-    </v-card-title>
+    <template v-slot:text>
 
-    <v-card-text>
       <v-row dense>
         <v-col
           cols="12"
@@ -50,33 +57,28 @@
           ></v-text-field>
         </v-col>
       </v-row>
-      <v-alert
-        id="error-pass-change-alert"
-        class="alert-hidden"
-        style="width: 100%"
-        :text="passChangeError"
-        type="error"
-      ></v-alert>
-    </v-card-text>
 
-    <v-divider></v-divider>
+    </template>
 
-    <v-card-actions>
+    <template v-slot:actions>
       <v-btn
-        color="coko-blue"
-        text="Изменить"
-        @click="changePassword()"
+          color="coko-blue"
+          text="Изменить"
+          @click="changePassword()"
       ></v-btn>
-    </v-card-actions>
-  </v-card>
+    </template>
+
+  </CokoDialog>
 </template>
 
 <script>
 import {showAlert} from "@/commons/alerts";
 import {apiRequest} from "@/commons/api_request";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: "PasswordChange",
+  components: {CokoDialog},
   props: {
     profileUuid: String, // вариативный параметр UUID профиля
     closeDialog: Function // Функция закрытия диалогового окна в родительском компоненте
@@ -140,7 +142,7 @@ export default {
             'Смена пароля',
             changePassRequest.success
           )
-          this.closeDialog()
+          this.$refs.passwordDialog.dialog = false
         }
         this.formLoading = false
       }
@@ -159,4 +161,3 @@ export default {
   z-index: 0;
 }
 </style>
-

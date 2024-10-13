@@ -28,6 +28,8 @@ profile_urlpatterns = [
     path('change_password/', ProfileViewSet.as_view({'post': 'change_user_password'}))
 ]
 
-urlpatterns = authorization_urlpatterns + \
-              registration_urlpatterns + \
-              profile_urlpatterns
+urlpatterns = (
+    authorization_urlpatterns +
+    registration_urlpatterns +
+    profile_urlpatterns
+)

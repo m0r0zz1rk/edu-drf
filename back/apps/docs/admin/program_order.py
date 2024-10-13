@@ -1,7 +1,6 @@
-from django.apps import apps
 from django.contrib import admin
 
-program_order_model = apps.get_model('docs', 'ProgramOrder')
+from apps.docs.selectors.program_order import program_order_model
 
 
 @admin.register(program_order_model)

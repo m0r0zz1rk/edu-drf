@@ -8,7 +8,7 @@
     type="error"
   ></v-alert>
 
-  <v-container>
+  <v-container style="padding: 0;">
 
     <slot></slot>
 

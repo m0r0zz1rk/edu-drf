@@ -64,7 +64,13 @@ class LastAppSerializer(serializers.Serializer):
 
 class CentreMainPageSerializer(serializers.Serializer):
     """Сериализация информации для главной страницы администратора АИС"""
-    user_info = UserInfoSerializer(label='Информация о пользователе')
-    study_info = StudyInfoSerializer(label='Информация по учебному процессу в АИС')
-    last_apps = LastAppSerializer(label='Информация по последним заявкам', many=True)
-
+    user_info = UserInfoSerializer(
+        label='Информация о пользователе'
+    )
+    study_info = StudyInfoSerializer(
+        label='Информация по учебному процессу в АИС'
+    )
+    last_apps = LastAppSerializer(
+        label='Информация по последним заявкам',
+        many=True
+    )

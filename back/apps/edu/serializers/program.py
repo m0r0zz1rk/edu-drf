@@ -172,4 +172,3 @@ class ProgramGetOrderSerializer(serializers.Serializer):
         allow_null=False,
         label='object_id ДПП'
     )
-

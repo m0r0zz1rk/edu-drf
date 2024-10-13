@@ -31,7 +31,7 @@ class PositionCategoryViewSet(viewsets.ModelViewSet):
     filterset_class = NameFieldFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории должностей"', ],
+        tags=['Cправочники. Категории должностей', ],
         operation_description="Получение списка категорий должностей",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -62,7 +62,7 @@ class PositionCategoryViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории должностей"', ],
+        tags=['Cправочники. Категории должностей', ],
         operation_description="Добавление категории должностей",
         request_body=PositionCategoryBaseSerializer,
         responses={
@@ -96,7 +96,7 @@ class PositionCategoryViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории должностей"', ],
+        tags=['Cправочники. Категории должностей', ],
         operation_description="Обновление категории должностей",
         request_body=PositionCategoryListUpdateSerializer,
         responses={
@@ -130,7 +130,7 @@ class PositionCategoryViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Категории должностей"', ],
+        tags=['Cправочники. Категории должностей', ],
         operation_description="Удаление категории должностей",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',

@@ -83,6 +83,7 @@ export default {
     editRecURL: String, // URL эндпоинта для редактирования записи
     getRecs: Function, // Функция для получения записей с backend
     mobileDisplay: Boolean, // Отображение на мобильном устройстве
+    defaultBody: Object, // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
   },
   data() {
     return {
@@ -120,6 +121,11 @@ export default {
         this.loading = true
         let body = {
           'object_id': this.editedItem.object_id
+        }
+        if (this.defaultBody) {
+          Object.keys(this.defaultBody).map((key) => {
+            body[key] = this.defaultBody[key]
+          })
         }
         this.tableHeaders.map((column) => {
           if (column.key !== 'actions') {

@@ -8,4 +8,3 @@ class EducationServiceAdmin(admin.ModelAdmin):
     """Отображение образовательных услуг (курсов) в административной панели"""
     list_display = ('program', 'location', 'date_start', 'date_end')
     search_fields = ('program__name', 'location')
-

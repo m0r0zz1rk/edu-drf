@@ -33,6 +33,10 @@ export default {
           'key': 'patronymic'
         },
         {
+          'title': 'Вн. телефон',
+          'key': 'internal_phone'
+        },
+        {
           'title': 'Подразделение',
           'key': 'department'
         },
@@ -58,6 +62,12 @@ export default {
           ui: 'input',
           type: 'text',
           key: 'patronymic',
+          addRequired: false,
+        },
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'internal_phone',
           addRequired: false,
         },
         {

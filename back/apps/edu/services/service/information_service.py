@@ -17,10 +17,10 @@ class InformationServiceService:
         """
         return information_service_model.objects. \
             filter(
-            department__display_name=department
-        ).filter(
-            date_start__year=datetime.datetime.now().year
-        ).count()
+                department__display_name=department
+            ).filter(
+                date_start__year=datetime.datetime.now().year
+            ).count()
 
     @staticmethod
     def is_service_exists(attribute_name: str, value: str) -> bool:
@@ -72,5 +72,5 @@ class InformationServiceService:
                 res['categories'] = cats_str[:-3]
                 return res
             return None
-        except:
+        except Exception:
             return None

@@ -6,7 +6,7 @@
       style="margin-bottom: 15px; margin-right: 15px"
       color="coko-blue"
       @click="dialog=!dialog"
-      :text="!(mobileDisplay) && 'Сгененрировать'"
+      :text="!(mobileDisplay) && 'Сгенерировать'"
   />
 
   <v-dialog
@@ -116,7 +116,7 @@
                         v-model="item[header.key]"
                         :active="timePickerDialogs.filter((rec) => rec.day === item['day'])[0].open"
                         :focused="timePickerDialogs.filter((rec) => rec.day === item['day'])[0].open"
-                        prepend-icon="mdi-clock-time-four-outline"
+                        append-inner-icon="mdi-clock-time-four-outline"
                         :disabled="!(item['study_day'])"
                         readonly
                       >
@@ -262,7 +262,7 @@ export default {
     async generateSchedule() {
       this.loading = true
       let scheduleGenerateRequest = await apiRequest(
-          '/backend/api/v1/edu/generate_schedule/',
+          '/backend/api/v1/edu/schedule/generate/',
           'POST',
           true,
           {

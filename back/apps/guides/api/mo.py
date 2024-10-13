@@ -30,7 +30,7 @@ class MoViewSet(viewsets.ModelViewSet):
     filterset_class = NameFieldFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "МО"', ],
+        tags=['Cправочники. МО', ],
         operation_description="Получение списка МО",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -61,7 +61,7 @@ class MoViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "МО"', ],
+        tags=['Cправочники. МО', ],
         operation_description="Добавление МО",
         request_body=MoBaseSerializer,
         responses={
@@ -95,7 +95,7 @@ class MoViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "МО"', ],
+        tags=['Cправочники. МО', ],
         operation_description="Обновление МО",
         request_body=MoListUpdateSerializer,
         responses={
@@ -129,7 +129,7 @@ class MoViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "МО"', ],
+        tags=['Cправочники. МО', ],
         operation_description="Удаление МО",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',

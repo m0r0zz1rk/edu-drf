@@ -2,3 +2,10 @@
     display: flex;
     justify-content: center;
 }
+
+.v-table > .v-table__wrapper > table > tbody > .v-data-table__tr, .v-data-table__tr--mobile > td,
+.v-table > .v-table__wrapper > table > thead > .v-data-table__tr, .v-data-table__tr--mobile > td,
+.v-table > .v-table__wrapper > table > tfoot > .v-data-table__tr, .v-data-table__tr--mobile > td {
+    min-height: 30px !important;
+    height: auto !important;
+}

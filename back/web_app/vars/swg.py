@@ -13,10 +13,10 @@ SWAGGER_SETTINGS = {
         'drf_yasg.inspectors.StringDefaultFieldInspector',
     ],
     'SECURITY_DEFINITIONS': {
-      'Token': {
+        'Token': {
             'type': 'apiKey',
             'name': 'Авторизация по токену (шаблон: Token (JWT-токен)',
             'in': 'header'
-      }
+        }
     }
 }

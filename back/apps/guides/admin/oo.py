@@ -4,8 +4,8 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.fields import Field
 from import_export.widgets import ForeignKeyWidget
 
-from apps.guides.models import Oo
 from apps.guides.selectors.mo import mo_model
+from apps.guides.selectors.oo import oo_model
 from apps.guides.selectors.oo_type import oo_type_model
 
 
@@ -21,12 +21,12 @@ class OoResources(resources.ModelResource):
     )
 
     class Meta:
-        model = Oo
+        model = oo_model
         import_id_fields = ['object_id', ]
         exclude = ['date_create', ]
 
 
-@admin.register(Oo)
+@admin.register(oo_model)
 class OoAdmin(ImportExportModelAdmin):
     """Класс для отображения образовательных организаций в административной панели"""
     resource_class = OoResources

@@ -14,8 +14,15 @@
           Информация о пользователе
         </v-card-title>
         <v-card-text>
-          <div style="background-color: white"
-               class="adaptive-main-card-text-height">
+          <v-skeleton-loader
+            v-if="loading"
+            type="paragraph"
+          />
+          <div
+              v-if="!(loading)"
+              style="background-color: white"
+              class="adaptive-main-card-text-height"
+          >
             <b>Пользователь:</b><br/>
             {{ mainPageInfo['user_info']['display_name'] }}<br/><br/>
             <b>Роль:</b><br/>
@@ -42,8 +49,15 @@
           Учебный процесс
         </v-card-title>
         <v-card-text>
-          <div style="background-color: white"
-               class="adaptive-main-card-text-height">
+          <v-skeleton-loader
+              v-if="loading"
+              type="paragraph"
+          />
+          <div
+              v-if="!(loading)"
+              style="background-color: white"
+              class="adaptive-main-card-text-height"
+          >
             <b>Пользователей в АИС:</b><br/>
             {{ mainPageInfo['study_info']['user_count'] }}<br/><br/>
             <b>Заявок в АИС:</b><br/>
@@ -72,8 +86,15 @@
           Последние заявки
         </v-card-title>
         <v-card-text>
-          <div style="background-color: white"
-               class="adaptive-main-card-text-height">
+          <v-skeleton-loader
+              v-if="loading"
+              type="paragraph"
+          />
+          <div
+              v-if="!(loading)"
+              style="background-color: white"
+              class="adaptive-main-card-text-height"
+          >
             <v-list >
               <template v-for="app in mainPageInfo['last_apps']">
                 <v-list-item
@@ -133,6 +154,8 @@ export default {
           }
         ]
       },
+      // Параметр отображения загрузки данных для формы
+      loading: true
     }
   },
   methods: {
@@ -151,6 +174,7 @@ export default {
         )
       } else {
         this.mainPageInfo = mainPageRequest
+        this.loading = false
       }
     }
   },

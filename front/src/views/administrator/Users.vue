@@ -38,6 +38,7 @@ export default {
   name: "Users",
   components: {CokoUsers, LkPage, StudentUsers},
   props: {
+    // Функция для запуска анимации загрузки
     usePreLoader: Function,
   },
   data() {

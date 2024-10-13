@@ -21,4 +21,3 @@ class BaseServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = education_service_model
         fields = ('object_id', 'location', 'date_start', 'date_end')
-

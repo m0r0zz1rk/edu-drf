@@ -30,7 +30,7 @@ class CokoViewSet(viewsets.ModelViewSet):
     filterset_class = CokoFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Сотрудники"', ],
+        tags=['Cправочники. Сотрудники ЦОКО', ],
         operation_description="Получение списка пользователей",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -61,7 +61,7 @@ class CokoViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Сотрудники"', ],
+        tags=['Cправочники. Сотрудники ЦОКО', ],
         operation_description="Изменение параметра отображение только кураторских учебных групп",
         request_body=CokoChangeCuratorGroupsSerializer,
         responses={

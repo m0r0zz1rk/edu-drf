@@ -17,7 +17,7 @@ from apps.edu.serializers.student_group import StudentGroupListSerializer, Stude
     StudentGroupUpdateSerializer, StudentGroupServiceTypeSerializer
 from apps.edu.services.program import ProgramService
 from apps.journal.consts.journal_modules import EDU
-from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.services.journal import JournalService
 
 

@@ -1,6 +1,7 @@
 <template>
   <v-data-table
     sticky
+    v-model="itemsList"
     v-bind:class="{'adaptive-no-tab-table': noTab, 'adaptive-tab-table': !(noTab)}"
     :headers="headers"
     :mobile-breakpoint="960"
@@ -8,6 +9,7 @@
     :loading="tableLoading"
     loading-text="Подождите, идет загрузка данных..."
     :items-per-page="pageRecCount"
+    :show-select="selection"
   >
     <template v-slot:top>
       <PaginationTableManage
@@ -20,6 +22,7 @@
         :addSpecialFunction="addSpecialFunction"
         :addRecURL="addRecURL"
         :getRecs="getRecs"
+        :hideSearchButton="hideSearchButton"
         :xlsxButton="xlsxButton"
         :xlsxDownload="xlsxDownload"
         :searchShowEvent="changeSearchShow"
@@ -27,6 +30,7 @@
         :tableHeaders="tableHeaders"
         :fieldsArray="fieldsArray"
         :onChangeEvent="searchRecs"
+        :defaultBody="defaultBody"
       />
     </template>
 
@@ -40,38 +44,67 @@
           "
         ><b>№</b></td>
         <td
+          v-if="tableHeaders.filter((h) => h.key === 'checkbox').length > 0"
           style="
             text-align: center;
             background-color: #373c59;
             color: white;
-            white-space: nowrap;
           "
-          v-for="column in columns"
         >
-          <b
-            style="cursor: pointer"
-            @click="() => {toggleSort(column)}"
-          >
-            {{column.title}}
-          </b>
-
-          <template v-if="column.key !== 'actions' && isSorted(column)">
-            <v-icon :icon="getSortIcon(column)"></v-icon>
-          </template>
-
-          <PaginationTableBaseField
-            v-if="column.key !== 'actions'"
-            :ref="'searchField_'+column.key"
-            :checkRequired="false"
-            :useInTableManage="false"
-            :field="fieldsArray.filter((field) => field.key === column.key)[0]"
-            :onChangeEvent="searchRecs"
+          <v-checkbox
+              :model-value="itemsList.length === recs.length"
+              @click="itemAddOrDeleteInList('all')"
           />
-
         </td>
+        <template
+            v-for="column in columns"
+        >
+
+          <td
+            v-if="column.key !== 'checkbox'"
+            style="
+              text-align: center;
+              background-color: #373c59;
+              color: white;
+              white-space: nowrap;
+            "
+          >
+
+            <b
+              style="cursor: pointer"
+              @click="() => {toggleSort(column)}"
+            >
+              {{column.title}}
+            </b>
+
+            <template
+                v-if="column.key !== 'actions'"
+            >
+
+              <template v-if="isSorted(column)">
+                <v-icon :icon="getSortIcon(column)"></v-icon>
+              </template>
+
+              <PaginationTableBaseField
+                  :ref="'searchField_'+column.key"
+                  :checkRequired="false"
+                  :useInTableManage="false"
+                  :field="fieldsArray.filter((field) => field.key === column.key)[0]"
+                  :onChangeEvent="searchRecs"
+              />
+
+            </template>
+
+          </td>
+
+        </template>
+
       </tr>
 
-      <tr v-if="mobileDisplay" style="position: sticky; top: 0; z-index: 5">
+      <tr
+          v-if="mobileDisplay"
+          style="position: sticky; top: 0; z-index: 5"
+      >
 
       </tr>
 
@@ -86,58 +119,116 @@
         }"
         @click="itemSelectEvent && itemSelectEvent(item)"
       >
-        <td  style="text-align: center;">
-          <div v-if="mobileDisplay" class="v-data-table__td-title">№</div>
-          <div v-bind:class="{'v-data-table__td-value': mobileDisplay}">
+        <td
+            style="text-align: center;"
+        >
+          <div
+              v-if="mobileDisplay"
+              class="v-data-table__td-title"
+          >
+            №
+          </div>
+          <div
+              v-bind:class="{'v-data-table__td-value': mobileDisplay}"
+          >
             {{index + ((page-1)*pageRecCount) + 1}}
           </div>
         </td>
-        <td v-for="header in tableHeaders" style="text-align: center;">
+        <td
+            v-for="header in tableHeaders"
+            style="text-align: center;"
+        >
 
-            <div v-if="mobileDisplay" class="v-data-table__td-title">{{header.title}}</div>
+          <div
+              v-if="mobileDisplay"
+              class="v-data-table__td-title"
+          >
+            {{header.title}}
+          </div>
 
-          <template v-if="header.key !== 'actions'">
+          <template
+              v-if="!(['actions', 'checkbox'].includes(header.key))"
+          >
 
               <div v-if="specialFieldsList.includes(headerUi(header.key))">
                   <SpecialField
-                          :ui="headerUi(header.key)"
-                          :header="header"
-                          :item="item"
-                          :mobileDisplay="mobileDisplay"
+                      :ui="headerUi(header.key)"
+                      :header="header"
+                      :item="item"
+                      :mobileDisplay="mobileDisplay"
                   />
               </div>
 
               <div
-                      v-if="!(specialFieldsList.includes(headerUi(header.key)))"
-                      v-bind:class="{'v-data-table__td-value': mobileDisplay}"
+                  v-if="!(specialFieldsList.includes(headerUi(header.key)))"
+                  v-bind:class="{'v-data-table__td-value': mobileDisplay}"
               >
                   <p v-if="mobileDisplay">
 
-                    <template v-if="item[header.key].constructor === String ">
-                      {{ item[header.key].slice(0, 25) }}
-                      <template v-if="item[header.key].length > 25">...</template>
+                    <template
+                        v-if="item[header.key].constructor === String "
+                    >
+
+                      <template
+                        v-if="header.key !== 'short_name'"
+                      >
+
+                        {{ item[header.key].slice(0, 25) }}
+
+                        <template
+                            v-if="item[header.key].length > 25"
+                        >
+
+                          ...
+
+                        </template>
+
+                      </template>
+
+                      <template
+                        v-if="header.key === 'short_name'"
+                      >
+                        {{ item[header.key] }}
+                      </template>
+
                     </template>
-                    <template v-if="item[header.key].constructor !== String ">
+
+                    <template
+                        v-if="item[header.key].constructor !== String"
+                    >
                       {{ item[header.key] }}
                     </template>
 
                   </p>
 
-                  <p v-if="!mobileDisplay" v-bind:class="{'one-line-text': header.key === 'code'}">
+                  <p
+                      v-if="!mobileDisplay"
+                      v-bind:class="{'one-line-text': header.key === 'code'}"
+                  >
                     {{ item[header.key] }}
                   </p>
               </div>
 
           </template>
 
+          <template
+              v-if="header.key === 'checkbox'"
+          >
+            <v-checkbox
+                :model-value="itemsList.includes(item.object_id)"
+                @click="itemAddOrDeleteInList(item.object_id)"
+            />
+          </template>
+
           <template v-if="header.key === 'actions'">
 
               <div
-                      v-if="!(specialFieldsList.includes(headerUi(header.key)))"
-                      v-bind:class="{'v-data-table__td-value': mobileDisplay}"
+                v-if="!(specialFieldsList.includes(headerUi(header.key)))"
+                v-bind:class="{'v-data-table__td-value': mobileDisplay}"
               >
 
                   <v-icon
+                    v-if="!(onlyDelete)"
                     icon="mdi-pencil"
                     color="coko-blue"
                     @click="() => {
@@ -241,12 +332,15 @@ export default {
     PaginationTableManage
   },
   props: {
+    // Возможность выборки нескольких строк таблицы (checkbox)
+    selection: Boolean,
     tableTitle: String, // Заголовок таблицы
     noTab: Boolean, // Отображение таблицы в карточке без верхних табов
     tableWidth: Number, // Ширина таблицы
     addButton: Boolean, //Параметр, отвечающий за отображение кнопки "Добавить"
     addSpecialFunction: Function, // Событие, вызываемое по нажатию на кнопку "Добавить" (если не подоходит стандартная форма)
     xlsxButton: Boolean, // Параметр, отвечающий за отображение кнопки "Скачать"
+    hideSearchButton: Boolean, // Параметр, отвечающий за отображение кнопки поиска
     foreignKey: String, // FK-таблица,
     openTableEvent: Function, // Событий, вызываемое при выборе записи в FK таблице
     tableTabUrl: String, // URL для перехода по кнопке "Перейти к таблице" в FK таблице
@@ -279,9 +373,14 @@ export default {
       }*/
     itemSelectEvent: Function, // Событие, вызываемое при выборе строки в таблице
     selectedItemObjectID: String, // object_id выбранного объекта для выделения в таблице
+    defaultBody: Object, // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
+    // Параметр отображение только удаления записи в поле Управление
+    onlyDelete: Boolean,
   },
   data() {
     return {
+      // Список выбранных строк таблицы (для selection)
+      itemsList: [],
       specialFieldsList: specialFieldsList,
       searchValues: [],
       searchString: '',
@@ -299,6 +398,34 @@ export default {
     }
   },
   methods: {
+    // Добавление или удаление элементах из списка выбранных (для checkbox)
+    itemAddOrDeleteInList(item) {
+      if (item === 'all') {
+        if (this.itemsList.length === 0) {
+          this.recs.map((rec) => {
+            if (!(this.itemsList.includes(rec.object_id))) {
+              this.itemsList.push(rec.object_id)
+            }
+          })
+        } else {
+          if (this.itemsList.length === this.recs.length) {
+            this.itemsList = []
+          } else {
+            this.recs.map((rec) => {
+              if (!(this.itemsList.includes(rec.object_id))) {
+                this.itemsList.push(rec.object_id)
+              }
+            })
+          }
+        }
+      } else {
+        if (this.itemsList.includes(item)) {
+          this.itemsList = this.itemsList.filter((it) => it !== item)
+        } else {
+          this.itemsList.push(item)
+        }
+      }
+    },
     initSearchValues() {
       this.fieldsArray.map((field) => {
         this.searchValues[field.key] = ''
@@ -339,7 +466,12 @@ export default {
       if (this.page !== 1) {
         start = (this.page-1)*this.pageRecCount
       }
-      let url = this.getRecsURL+'?size='+this.pageRecCount+'&start='+start+this.searchString
+      let url = this.getRecsURL
+      if (this.getRecsURL.indexOf('?') !== -1) {
+        url += '&size='+this.pageRecCount+'&start='+start+this.searchString
+      } else {
+        url += '?size='+this.pageRecCount+'&start='+start+this.searchString
+      }
       if (this.filterString.length > 0) {
         url += '&' + this.filterString
       }
@@ -378,7 +510,7 @@ export default {
     },
     changeSearchShow() {
       this.tableHeaders.map((header) => {
-        if (header.key !== 'actions') {
+        if (!((['checkbox', 'actions'].includes(header.key)))) {
           this.$refs['searchField_'+header.key][0].showField = !(this.$refs['searchField_'+header.key][0].showField)
         }
       })

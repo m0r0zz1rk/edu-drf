@@ -11,8 +11,8 @@
         height: calc(100vh - 85px);
     }
 
-    .lk-full-page-card .v-card-text {
-        height: calc(100vh - 205px);
+    .lk-full-page-card .v-card-text:not(.internal-card-text) {
+        height: calc(99vh - 205px);
         overflow: auto;
         background: white;
     }
@@ -39,8 +39,9 @@
         width: 55%;
     }
 
-    .adaptive-registration-dialog{
+    .adaptive-dialog .v-card{
         max-width: 80%;
+        max-height: 60%;
     }
 
     .adaptive-main-card-text-height {
@@ -52,11 +53,12 @@
     }
 
     .adaptive-no-tab-table-card-text {
-        height: 92vh;
+        height: 91vh;
     }
 
     .adaptive-tab-table-card-text {
         height: 85vh;
+        color: black;
     }
 
     .adaptive-dialog-with-tabs-div {
@@ -67,10 +69,11 @@
 
 @media screen and (max-width: 2560px) {
 
-    .lk-full-page-card .v-card-text {
-        height: calc(100vh - 200px);
+    .lk-full-page-card .v-card-text:not(.internal-card-text) {
+        height: calc(99vh - 200px);
         overflow: auto;
         background: white;
+        color: black;
     }
 
     .adaptive-kug-table {
@@ -112,19 +115,20 @@
     }
 
     .adaptive-no-tab-table-card-text {
-        height: 90vh;
+        height: 88vh;
     }
 
     .adaptive-tab-table-card-text {
         height: 83vh;
+        color: black;
     }
 
 }
 
 @media screen and (max-width: 1920px) {
 
-    .lk-full-page-card .v-card-text {
-        height: calc(100vh - 180px);
+    .lk-full-page-card .v-card-text:not(.internal-card-text) {
+        height: calc(99vh - 180px);
         overflow: auto;
         background: white;
     }
@@ -166,6 +170,7 @@
 
     .adaptive-tab-table-card-text {
         height: 81vh;
+        color: black;
     }
 
 }
@@ -187,8 +192,10 @@
         width: 95%;
     }
 
-    .adaptive-registration-dialog{
-        max-width: 100%;
+    .adaptive-dialog v-card v-card-title v-card-text{
+        overflow: auto;
+        width: 100vw;
+        height: 100vh;
     }
 }
 
@@ -230,11 +237,12 @@
     }
 
     .adaptive-no-tab-table-card-text {
-        height: 91vh;
+        height: 90vh;
     }
 
     .adaptive-tab-table-card-text {
         height: 84vh;
+        color: black;
     }
 }
 
@@ -253,10 +261,11 @@
     .lk-full-page-card {
         width: 100%;
         height: calc(100vh - 45px);
+        color: black;
     }
 
-    .lk-full-page-card .v-card-text {
-        height: calc(100vh - 150px);
+    .lk-full-page-card .v-card-text:not(.internal-card-text) {
+        height: calc(99vh - 150px);
         overflow: auto;
         background: white;
     }
@@ -283,11 +292,12 @@
     }
 
     .adaptive-no-tab-table-card-text {
-        height: 94vh;
+        height: 93vh;
     }
 
     .adaptive-tab-table-card-text {
         height: 87vh;
+        color: black;
     }
 
 }

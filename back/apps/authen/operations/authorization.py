@@ -32,8 +32,8 @@ class Authorization(MainProcessing):
 
     def _validate_process_data(self) -> Union[bool, str]:
         return ValidateUtils.validate_data(
-                self.required_auth_keys,
-                self.process_data
+            self.required_auth_keys,
+            self.process_data
         )
 
     def _auth_error(self, error_type: bool):
@@ -129,6 +129,7 @@ class Authorization(MainProcessing):
                         'surname': self.lu.get_ad_attribute_coko_user('sn', self.auth_user.username),
                         'name': self.lu.get_ad_attribute_coko_user('GivenName', self.auth_user.username),
                         'patronymic': self.lu.get_ad_attribute_coko_user('middleName', self.auth_user.username),
+                        'internal_phone': self.lu.get_ad_attribute_coko_user('telephoneNumber', self.auth_user.username)
                     }
                 )
                 if self.auth_user.is_staff:

@@ -17,7 +17,7 @@ class CalendarChartTheme(CalendarChartElement):
         try:
             return (f'Тема № {self.position} "{self.name}" для раздела "{self.chapter.name}" КУГа '
                     f'ДПП "{self.chapter.program.name}"')
-        except:
+        except Exception:
             return 'Тема раздела КУГа ДПП'
 
     class Meta:

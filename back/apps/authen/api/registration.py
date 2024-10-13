@@ -26,7 +26,7 @@ class RegistrationViewSet(viewsets.ViewSet):
     uu = UserUtils()
 
     @swagger_auto_schema(
-        tags=['Регистрация', ],
+        tags=['Приложение авторизации/аутентификации. Регистрация', ],
         operation_description="Проверка на уникальность номера телефона",
         request_body=RegistrationUniquePhoneSerializer,
         responses={
@@ -72,7 +72,7 @@ class RegistrationViewSet(viewsets.ViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Регистрация', ],
+        tags=['Приложение авторизации/аутентификации. Регистрация', ],
         operation_description="Проверка на уникальность СНИЛС",
         request_body=RegistrationUniqueSnilsSerializer,
         responses={
@@ -118,7 +118,7 @@ class RegistrationViewSet(viewsets.ViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Регистрация', ],
+        tags=['Приложение авторизации/аутентификации. Регистрация', ],
         operation_description="Проверка на уникальность email",
         request_body=RegistrationUniqueEmailSerializer,
         responses={
@@ -150,7 +150,7 @@ class RegistrationViewSet(viewsets.ViewSet):
                 return self.respu.ok_response_no_data()
             else:
                 return self.respu.not_acceptable_response_no_data()
-        except Exception as e:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': 'Внешний запрос',
@@ -164,7 +164,7 @@ class RegistrationViewSet(viewsets.ViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Регистрация', ],
+        tags=['Приложение авторизации/аутентификации. Регистрация', ],
         request_body=RegistrationSerializer,
         operation_description="Регистрация пользователя",
         responses={'400': 'Произошла ошибка в процессе регистрации (error в ответе)',

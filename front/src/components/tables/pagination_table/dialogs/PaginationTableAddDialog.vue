@@ -49,7 +49,6 @@
 
             </template>
 
-
           </v-row>
           <v-alert
             id="error-add-item-alert"
@@ -82,6 +81,8 @@
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
+import {getBase64} from "@/commons/files";
+import fileContentTypes from "@/commons/consts/fileContentTypes";
 
 export default {
   name: "PaginationTableAddDialog",
@@ -92,9 +93,11 @@ export default {
     addRecURL: String, // URL эндпоинта для добавления новой записи
     getRecs: Function, // Функция для получения записей с backend
     mobileDisplay: Boolean, // Отображение на мобильном устройстве
+    defaultBody: Object // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
   },
   data() {
     return {
+
       newItemDialog: false,
       errorMessage: '',
       requiredValid: false,
@@ -127,11 +130,23 @@ export default {
       if (this.requiredValid) {
         this.loading = true
         let body = {}
+        if (this.defaultBody) {
+          Object.keys(this.defaultBody).map((key) => {
+            body[key] = this.defaultBody[key]
+          })
+        }
+        if (this.fieldsArray.filter((fa) => fa.ui === 'file').length > 0) {
+          body[this.fieldsArray.filter((fa) => fa.ui === 'file')[0].key] =
+              await getBase64(document.querySelector('#addDialogFileInput').files[0])
+        }
         this.tableHeaders.map((column) => {
           if (column.key !== 'actions') {
-            body[column.key] = this.$refs['addField_'+column.key][0].localValue
+            if (this.fieldsArray.filter((fa) => fa.key === column.key)[0].ui !== 'file') {
+              body[column.key] = this.$refs['addField_' + column.key][0].localValue
+            }
           }
         })
+        console.log(body)
         let addItemRequest = await apiRequest(
           this.addRecURL,
           'POST',

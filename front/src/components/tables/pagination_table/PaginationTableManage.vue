@@ -23,7 +23,7 @@
     ></v-divider>
 
     <v-btn
-      v-if="!(mobileDisplay)"
+      v-if="!(hideSearchButton) && (!(mobileDisplay) && !(hideSearchButton))"
       prepend-icon="mdi-magnify"
       text="Поиск"
       @click="searchShowEvent()"
@@ -55,27 +55,30 @@
             <v-card-text>
                 <v-container>
                     <v-row>
-                        <v-col v-for="field in fieldsArray"
-                               cols="12"
-                               md="4"
-                               sm="6"
+                      <template
+                        v-for="field in fieldsArray"
+                      >
+                        <v-col
+                            v-if="(field.key !== 'actions') && (field.ui !== 'file')"
+                            cols="12"
+                            md="4"
+                            sm="6"
                         >
-                            <PaginationTableBaseField
-                                    v-if="field.key !== 'actions'"
-                                    :useInTableManage="true"
-                                    :checkRequired="false"
-                                    :field="field"
-                                    :fieldTitle = "tableHeaders.filter((header) => header.key === field.key)[0].title"
-                                    :onChangeEvent="onChangeEvent"
-                            />
+                          <PaginationTableBaseField
+                              :useInTableManage="true"
+                              :checkRequired="false"
+                              :field="field"
+                              :fieldTitle = "tableHeaders.filter((header) => header.key === field.key)[0].title"
+                              :onChangeEvent="onChangeEvent"
+                          />
                         </v-col>
+                      </template>
                     </v-row>
                 </v-container>
             </v-card-text>
         </v-card>
 
     </v-dialog>
-
 
     <v-btn v-if="xlsxButton && !(foreignKey)"
       :icon="mobileDisplay && 'mdi-file-excel'"
@@ -91,6 +94,7 @@
       :addRecURL="addRecURL"
       :getRecs="getRecs"
       :mobileDisplay="mobileDisplay"
+      :defaultBody="defaultBody"
     />
 
     <v-btn
@@ -128,13 +132,16 @@ export default {
     addSpecialFunction: Function, // Событие, вызываемое по нажатию на кнопку "Добавить" (если не подоходит стандартная форма)
     addRecURL: String, // URL эндпоинта для добавления новой записи
     getRecs: Function, // Функция для получения записей с backend
+    // Параметр, отвечающий за отображение кнопки поиска
+    hideSearchButton: Boolean,
     xlsxButton: Boolean, // Параметр, отвечающий за отображение кнопки "Скачать"
     xlsxDownload: Function, // Событий, вызываемое для выгрузки записей таблцы в Excel
     searchShowEvent: Function, // Функция для изменения параметра отображения поисковых полей,
     mobileDisplay: Boolean, // Отображение на дисплее мобильного устройства
     tableHeaders: Array, // Объект fieldsArray из пагинационной таблицы (для диалогового окна поиска записей)
     fieldsArray: Array, // Объект fieldsArray из пагинационной таблицы (для диалогового окна поиска записей)
-    onChangeEvent: Function // Функция для вызова поиска записей
+    onChangeEvent: Function, // Функция для вызова поиска записей
+    defaultBody: Object // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
   },
   data() {
     return {

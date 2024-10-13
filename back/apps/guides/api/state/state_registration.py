@@ -25,7 +25,7 @@ class StateRegistrationViewSet(viewsets.ModelViewSet):
     respu = ResponseUtils()
 
     @swagger_auto_schema(
-        tags=['Регистрация', ],
+        tags=['Cправочники. Государства', ],
         operation_description="Получение списка государств",
         responses={
             '400': 'Ошибка при получении списка',
@@ -53,4 +53,3 @@ class StateRegistrationViewSet(viewsets.ModelViewSet):
                 ExceptionHandling.get_traceback()
             )
             return self.respu.bad_request_no_data()
-

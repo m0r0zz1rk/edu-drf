@@ -29,6 +29,7 @@ class ProfileService:
         'surname',
         'name',
         'patronymic',
+        'internal_phone',
         'curator_groups'
     ]
 
@@ -62,7 +63,9 @@ class ProfileService:
             profile - получить профиль,
             username - имя пользователя,
             display_name - ФИО пользователя,
-            user_id - ID пользователя Django
+            email - Email пользователя,
+            user_id - ID пользователя Django,
+            phone - Телефон пользователя
         :return: None - профиль не найден, Profile - найденный профиль, str - информация из профиля
         """
         if self.is_profile_exist(attribute_name, value):
@@ -71,13 +74,17 @@ class ProfileService:
                 prof = student_profile_model.objects.filter(**find).first()
             else:
                 prof = coko_profile_model.objects.filter(**find).first()
-            if output in ['profile', 'username', 'display_name', 'user_id']:
+            if output in ['profile', 'username', 'display_name', 'email', 'phone', 'user_id']:
                 if output == 'profile':
                     return prof
                 elif output == 'username':
-                   return UserUtils().get_username_by_id(prof.django_user_id)
+                    return UserUtils().get_username_by_id(prof.django_user_id)
                 elif output == 'user_id':
                     return prof.django_user_id
+                elif output == 'email':
+                    return prof.django_user.email
+                elif output == 'phone':
+                    return prof.internal_phone
                 else:
                     return prof.display_name
         return None

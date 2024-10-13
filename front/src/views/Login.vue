@@ -85,7 +85,18 @@
                 type="submit"
               >Войти</v-btn>
             </v-form>
-            <RegistrationDialog ref="regDialog" :usePreLoader="usePreLoader" />
+            <v-btn
+                style="margin-top: 5px;"
+                class="login-button adaptive-login-button"
+                color="coko-blue"
+                text="Регистрация"
+                @click="$refs.regDialog.openDialog()"
+                :loading="formLoading"
+            ></v-btn>
+            <RegistrationDialog
+                ref="regDialog"
+                :usePreLoader="usePreLoader"
+            />
             <v-btn
               style="margin-top: 5px;"
               class="login-button adaptive-login-button"

@@ -10,16 +10,26 @@ date_utils = DateUtils()
 
 class LessonSerializer(serializers.ModelSerializer):
     """Сериализация данных для одного занятия учебной группы"""
-    teacher_fio = serializers.SerializerMethodField()
-    time_start_str = serializers.SerializerMethodField()
-    time_end_str = serializers.SerializerMethodField()
+    teacher = serializers.UUIDField(
+        allow_null=True,
+        label='uuid преподавателя (при наличии)'
+    )
+    teacher_fio = serializers.SerializerMethodField(
+        label='ФИО преподавателя (при наличии)'
+    )
+    time_start_str = serializers.SerializerMethodField(
+        label='Строковое представление ЧЧ:ММ начала занятия'
+    )
+    time_end_str = serializers.SerializerMethodField(
+        label='Строковое представление ЧЧ:ММ окончания занятия'
+    )
 
     def get_teacher_fio(self, obj):
         """Получение ФИО преподавателя занятия"""
         if obj['teacher']:
             return profile_service.get_profile_or_info_by_attribute(
                 'object_id',
-                obj.teacher,
+                obj['teacher'],
                 'display_name'
             )
         return '-'
@@ -40,6 +50,7 @@ class LessonSerializer(serializers.ModelSerializer):
             'kug_theme_id',
             'theme',
             'type',
+            'teacher',
             'teacher_fio',
             'distance',
             'control'
@@ -48,13 +59,66 @@ class LessonSerializer(serializers.ModelSerializer):
 
 class ScheduleListSerializer(serializers.Serializer):
     """Сериализация данных при получении расписания занятий учебной группы"""
-    day = serializers.RegexField(
-        '[0-9]{2}.[0-9]{2}.[0-9]{4}',
+    day = serializers.DateField(
+        input_formats=['%d.%m.%Y'],
         label='Учебный день'
     )
     lessons = LessonSerializer(
         many=True,
         label='Занятия'
+    )
+
+
+class LessonInfoSerializer(serializers.Serializer):
+    """Сериализация данных одного занятия при сохранении информации об учебном дне"""
+    time_start_str = serializers.RegexField(
+        '[0-2][0-9]:[0-5][0-9]',
+        label='Время начала занятия'
+    )
+    time_end_str = serializers.RegexField(
+        '[0-2][0-9]:[0-5][0-9]',
+        label='Время окончания занятия'
+    )
+    kug_theme_id = serializers.UUIDField(
+        allow_null=True,
+        label='object_id темы раздела КУГ'
+    )
+    theme = serializers.CharField(
+        max_length=500,
+        label='Тема'
+    )
+    type = serializers.CharField(
+        max_length=25,
+        label='Тип занятия'
+    )
+    teacher = serializers.UUIDField(
+        allow_null=True,
+        label='object_id профиля сотрудника ЦОКО или внешнего пользователя преподавателя'
+    )
+    distance = serializers.BooleanField(
+        label='Дистанционное занятие'
+    )
+    control = serializers.CharField(
+        max_length=150,
+        allow_null=True,
+        allow_blank=True,
+        label='Форма контроля'
+    )
+
+
+class DayInfoSerializer(serializers.Serializer):
+    """Сериализация данных при сохранения расписания учебного дня"""
+    group_id = serializers.UUIDField(
+        allow_null=False,
+        label='object_id учбеной группы'
+    )
+    day = serializers.DateField(
+        input_formats=['%d.%m.%Y'],
+        label='Учебный день'
+    )
+    lessons = LessonInfoSerializer(
+        many=True,
+        label='Информация по занятиям'
     )
 
 
@@ -87,4 +151,49 @@ class GenerateScheduleSerializer(serializers.Serializer):
     generate = GenerateDaySerializer(
         many=True,
         label='Параметры генерации'
+    )
+
+
+class PersonalDayScheduleSerializer(serializers.Serializer):
+    """Сериализация данных при получении личного расписания преподавателя за один день"""
+
+    group_code = serializers.CharField(
+        max_length=50,
+        label='Шифр учебной группы'
+    )
+    time_start_str = serializers.CharField(
+        max_length=5,
+        label='Время начала занятия'
+    )
+    time_end_str = serializers.CharField(
+        max_length=5,
+        label='Время окончания занятия'
+    )
+    lesson_theme = serializers.CharField(
+        max_length=1000,
+        label='Тема занятия'
+    )
+    type = serializers.CharField(
+        max_length=15,
+        label='Тип занятия'
+    )
+    distance = serializers.BooleanField(
+        label='Дистант'
+    )
+    control = serializers.CharField(
+        max_length=150,
+        allow_null=True,
+        label='Форма контроля'
+    )
+
+
+class PersonalScheduleSerializer(serializers.Serializer):
+    """Сериализация данных при получении личного расписания преподавателя"""
+    date = serializers.DateField(
+        format=['%d.%m.%Y',],
+        label='Дата занятий'
+    )
+    lessons = PersonalDayScheduleSerializer(
+        many=True,
+        label='Занятия'
     )

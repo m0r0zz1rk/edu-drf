@@ -87,6 +87,7 @@ export default {
   },
   mounted() {
     this.sideMenu = !(this.$vuetify.display.xs)
+    this.usePreLoader(true)
   }
 }
 

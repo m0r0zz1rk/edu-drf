@@ -31,7 +31,7 @@ class EventTypeViewSet(viewsets.ModelViewSet):
     filterset_class = NameFieldFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы мероприятий"', ],
+        tags=['Cправочники. Типы мероприятий', ],
         operation_description="Получение списка типов мероприятий",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -62,7 +62,7 @@ class EventTypeViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы мероприятий"', ],
+        tags=['Cправочники. Типы мероприятий', ],
         operation_description="Добавление типа мероприятий",
         request_body=EventTypeBaseSerializer,
         responses={
@@ -96,7 +96,7 @@ class EventTypeViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы мероприятий"', ],
+        tags=['Cправочники. Типы мероприятий', ],
         operation_description="Обновление типа мероприятий",
         request_body=EventTypeListUpdateSerializer,
         responses={
@@ -130,7 +130,7 @@ class EventTypeViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы мероприятий"', ],
+        tags=['Cправочники. Типы мероприятий', ],
         operation_description="Удаление типа мероприятий",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',

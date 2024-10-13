@@ -30,7 +30,7 @@ class OoTypeViewSet(viewsets.ModelViewSet):
     filterset_class = NameFieldFilter
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы ОО"', ],
+        tags=['Cправочники. Типы ОО', ],
         operation_description="Получение списка типов ОО",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -61,7 +61,7 @@ class OoTypeViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы ОО"', ],
+        tags=['Cправочники. Типы ОО', ],
         operation_description="Добавление типа ОО",
         request_body=OoTypeBaseSerializer,
         responses={
@@ -95,7 +95,7 @@ class OoTypeViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы ОО"', ],
+        tags=['Cправочники. Типы ОО', ],
         operation_description="Обновление типа ОО",
         request_body=OoTypeListUpdateSerializer,
         responses={
@@ -129,7 +129,7 @@ class OoTypeViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Типы ОО"', ],
+        tags=['Cправочники. Типы ОО', ],
         operation_description="Удаление типа ОО",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',

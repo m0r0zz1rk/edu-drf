@@ -24,7 +24,6 @@ class StudentProfile(BaseProfile):
     )
     snils = models.CharField(
         max_length=15,
-        unique=True,
         null=False,
         blank=False,
         verbose_name='СНИЛС'
@@ -37,7 +36,6 @@ class StudentProfile(BaseProfile):
         max_length=25,
         null=False,
         blank=False,
-        unique=True,
         default='+7 (999) 999-99-99',
         verbose_name='Номер телефона'
     )

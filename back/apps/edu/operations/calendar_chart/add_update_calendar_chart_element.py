@@ -41,7 +41,7 @@ class AddUpdateCalendarChartElement(MainProcessing):
             if not check_parent:
                 return False
             return True
-        except:
+        except Exception:
             return ExceptionHandling.get_traceback()
 
     def _main_process(self):
@@ -63,7 +63,7 @@ class AddUpdateCalendarChartElement(MainProcessing):
                     defaults=self.process_data
                 )
             self.process_completed = True
-        except Exception as e:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': self.source,

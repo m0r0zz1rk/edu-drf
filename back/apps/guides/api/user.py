@@ -1,5 +1,3 @@
-from typing import Union
-
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
@@ -15,6 +13,7 @@ from apps.commons.utils.django.user import UserUtils
 from apps.guides.selectors.user import UserFilter, student_profile_queryset
 from apps.guides.serializers.user import UserSerializer, UserRetrieveSerializer, UserUniquePhoneSerializer, \
     UserUniqueEmailSerializer, UserUniqueSnilsSerializer, UserUpdateSerializer, UserChangePasswordSerializer
+from apps.guides.services.user import UserService
 from apps.journal.consts.journal_modules import GUIDES
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
 from apps.journal.services.journal import JournalService
@@ -25,6 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdministrators]
     pu = ProfileService()
     uu = UserUtils()
+    us = UserService()
     ju = JournalService()
     respu = ResponseUtils()
 
@@ -35,39 +35,8 @@ class UserViewSet(viewsets.ModelViewSet):
     filterset_class = UserFilter
     lookup_field = 'object_id'
 
-    def _check_unique_data(
-        self,
-        request_data: dict,
-        serializer,
-        attr_name: str,
-    ) -> Union[str, bool]:
-        """
-        Проверка на уникальность полученного значения среди всех
-        профилей пользователей АИС (кроме полученного по user_id)
-        :param request_data: полученные данные из request
-        :param serializer: сериализатор для обработки входящих данных из request
-        :param attr_name: имя атрибута профиля на проверку
-        :return: True - значение уникально,
-                 False - значение используется другим пользователем,
-                 str - ошибки сериализации
-        """
-        serialize = serializer(data=request_data)
-        if serialize.is_valid():
-            check = self.pu.check_unique_data_for_profile(
-                self.pu.get_profile_or_info_by_attribute(
-                    'object_id',
-                    serialize.data['profile_id'],
-                    'user_id'
-                ),
-                attr_name,
-                serialize.data[attr_name]
-            )
-            return check
-        else:
-            return serialize.errors
-
     @swagger_auto_schema(
-        tags=['Cправочник "Пользователи"', ],
+        tags=['Cправочники. Обучающиеся', ],
         operation_description="Получение списка пользователей",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -98,7 +67,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Пользователи"', ],
+        tags=['Cправочники. Обучающиеся', ],
         operation_description="Получение информации о пользователе",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -125,7 +94,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Cправочник "Пользователи"', ],
+        tags=['Cправочники. Обучающиеся', ],
         operation_description="Проверка на возможность смены номера телефона пользователя",
         request_body=UserUniquePhoneSerializer,
         responses={
@@ -138,7 +107,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Проверка уникальности предложенного номера телефона
         """
-        proc = self._check_unique_data(
+        proc = self.us.check_unique_data(
             request.data,
             UserUniquePhoneSerializer,
             'phone'
@@ -162,7 +131,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return ResponseUtils().bad_request_response('Произошла системная ошибка при проверке номера телефона')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Пользователи"', ],
+        tags=['Cправочники. Обучающиеся', ],
         operation_description="Проверка на возможность смены email пользователя",
         request_body=UserUniqueEmailSerializer,
         responses={
@@ -175,7 +144,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Проверка уникальности предложенного email
         """
-        proc = self._check_unique_data(
+        proc = self.us.check_unique_data(
             request.data,
             UserUniqueEmailSerializer,
             'email'
@@ -199,7 +168,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return ResponseUtils().bad_request_response('Произошла системная ошибка при проверке email')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Пользователи"', ],
+        tags=['Cправочники. Обучающиеся', ],
         operation_description="Проверка на возможность смены СНИЛС пользователя",
         request_body=UserUniqueSnilsSerializer,
         responses={
@@ -212,7 +181,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Проверка уникальности предложенного СНИЛС
         """
-        proc = self._check_unique_data(
+        proc = self.us.check_unique_data(
             request.data,
             UserUniqueSnilsSerializer,
             'snils'
@@ -236,7 +205,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return ResponseUtils().bad_request_response('Произошла системная ошибка при проверке СНИЛС')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Пользователи"', ],
+        tags=['Cправочники. Обучающиеся', ],
         operation_description="Обновление информации о пользователе",
         request_body=UserUpdateSerializer,
         responses={
@@ -295,7 +264,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.respu.bad_request_response('Произошла системная ошибка, обратитесь к администратору')
 
     @swagger_auto_schema(
-        tags=['Cправочник "Пользователи"', ],
+        tags=['Cправочники. Обучающиеся', ],
         operation_description="Смена пароля пользователя",
         request_body=UserChangePasswordSerializer,
         responses={

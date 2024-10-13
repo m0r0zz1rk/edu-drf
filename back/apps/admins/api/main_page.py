@@ -8,7 +8,8 @@ from apps.authen.services.profile import ProfileService
 from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import ADMINS
-from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES, ERROR
+from apps.journal.consts.journal_rec_statuses import (JOURNAL_REC_STATUSES,
+                                                      ERROR)
 from apps.journal.services.journal import JournalService
 
 
@@ -55,10 +56,13 @@ class MainPageViewSet(viewsets.ViewSet):
 
     @swagger_auto_schema(
         tags=['Администраторы', ],
-        operation_description="Получение информации для главной страницы (для администраторов)",
+        operation_description="Получение информации для "
+                              "главной страницы "
+                              "(для администраторов)",
         responses={
             '400': 'Сообщение "Повторите попытку позже"',
-            '403': 'Пользователь не авторизован или не является администратором',
+            '403': 'Пользователь не авторизован или не '
+                   'является администратором',
             '200': CentreMainPageSerializer}
     )
     def get_main_page_centre(self, request, *args, **kwargs):
@@ -70,7 +74,8 @@ class MainPageViewSet(viewsets.ViewSet):
             self._endpoint_rec_journal(
                 request.user.id,
                 ERROR,
-                'Ошибка при получении данных для главной страницы - данные не прошли валидацию',
+                'Ошибка при получении данных для '
+                'главной страницы - данные не прошли валидацию',
                 repr(info),
                 repr(serialize.errors)
             )

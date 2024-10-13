@@ -21,7 +21,7 @@ class ProgramService:
         try:
             find = {attribute_name: value}
             return program_model.objects.filter(**find).exists()
-        except:
+        except Exception:
             return False
 
     def get_program(self, attribute_name: str, value: str) -> Optional[program_model]:
@@ -47,7 +47,7 @@ class ProgramService:
             if program is None:
                 return False
             fields = [f.name for f in program_model._meta.concrete_fields
-                        if f.name not in ['object_id', 'date_create', 'program_order']]
+                      if f.name not in ['object_id', 'date_create', 'program_order']]
             new_program = {
                 'object_id': None
             }
@@ -58,7 +58,7 @@ class ProgramService:
                         new_program[field] += '_Копия'
             cats = ''
             for cat in program.categories.all():
-                cats += cat.name+','
+                cats += cat.name + ','
             cats = cats[:-1]
             new_program['categories'] = cats
             new_program['order_id'] = None
@@ -74,7 +74,7 @@ class ProgramService:
                 return proc.dpp.object_id
             else:
                 return None
-        except:
+        except Exception:
             return None
 
     def get_order_file(self, attribute_name: str, value: str):
@@ -90,7 +90,7 @@ class ProgramService:
                 if program.program_order is not None:
                     return program.program_order.file
             return None
-        except:
+        except Exception:
             return None
 
     @staticmethod

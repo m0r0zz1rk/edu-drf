@@ -14,7 +14,7 @@ const studentMenuItems = [
   {
     'icon': 'mdi-file-document-multiple',
     'title': 'Заявки',
-    'link': '/student/apps',
+    'link': '/student/active_apps',
     'value': 'apps'
   },
   {

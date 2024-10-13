@@ -8,6 +8,10 @@ from apps.authen.models.base_profile import BaseProfile
 
 class CokoProfile(BaseProfile):
     """Модель профиля сотрудника ЦОКО"""
+    internal_phone = models.PositiveIntegerField(
+        default=100,
+        verbose_name='Внутренний номер телефона'
+    )
     curator_groups = models.BooleanField(
         default=False,
         verbose_name='Отображать только учебные группы как куратора'

@@ -89,7 +89,7 @@ class DictUtils:
         if self.exist_key_in_dict(key, data):
             value = data[key]
             if value is not None:
-                if type(value) == date:
+                if type(value) is date:
                     return value
                 else:
                     try:

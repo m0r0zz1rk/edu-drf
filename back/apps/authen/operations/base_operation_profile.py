@@ -60,7 +60,6 @@ class BaseOperationProfile(ABC):
             )
             self.error = False
 
-
     @abstractmethod
     def action(self):
         """Действие"""

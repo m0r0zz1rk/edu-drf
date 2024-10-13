@@ -185,7 +185,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
                 return self.respu.ok_response_no_data()
             else:
                 return self.respu.bad_request_no_data()
-        except:
+        except Exception:
             self.ju.create_journal_rec(
                 {
                     'source': 'Внешний запрос',

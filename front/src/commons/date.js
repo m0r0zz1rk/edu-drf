@@ -1,9 +1,13 @@
-//Преобразовантие даты из текстового формата ДД.ММ.ГГГГ в объект Date
 import daysOfWeek from "@/commons/consts/daysOfWeek";
 
+//Преобразовантие даты из текстового формата ДД.ММ.ГГГГ в объект Date
 export function convertBackendDate(backendDate) {
-  let arr = backendDate.split('.')
-  return new Date(arr[2], arr[1]-1, arr[0])
+  try{
+    let arr = backendDate.split('.')
+    return new Date(arr[2], arr[1]-1, arr[0])
+  } catch (e) {
+    return backendDate
+  }
 }
 
 //Преобразование объекта Date в текстовый формат даты: ДД.ММ.ГГГГ

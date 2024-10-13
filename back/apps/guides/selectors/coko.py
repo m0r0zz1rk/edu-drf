@@ -17,6 +17,7 @@ class CokoFilter(filters.FilterSet):
     surname = filters.CharFilter(lookup_expr='icontains')
     name = filters.CharFilter(lookup_expr='icontains')
     patronymic = filters.CharFilter(lookup_expr='icontains')
+    internal_phone = filters.NumberFilter()
     curator_groups = filters.BooleanFilter()
     department = filters.CharFilter(method='filter_department')
 
