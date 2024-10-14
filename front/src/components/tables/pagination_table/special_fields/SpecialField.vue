@@ -50,6 +50,54 @@
     />
   </div>
 
+  <AppStudentInfo
+    v-if="ui === 'appStudentInfo'"
+    :studentInfo="item[header.key]"
+  />
+
+  <AppStatusBadge
+    v-if="ui === 'appStatus'"
+    :appStatus="item[header.key]"
+  />
+
+  <BooleanBadge
+    v-if="ui === 'appOoCheck'"
+    :bool="item.oo_new === ''"
+  />
+
+  <div
+    v-if="ui === 'appEducationCheck'"
+  >
+    <BooleanBadge
+        :bool="item.education_check"
+    /><br/>
+    <FileField
+      v-if="item.education_doc !== null"
+      :fileName="item.education_doc_name"
+      :file="item.education_doc"
+    />
+
+  </div>
+
+  <div
+      v-if="ui === 'appPayCheck'"
+  >
+    <BooleanBadge
+        :bool="item.status in ['pay', 'study', 'study_complete', 'archive']"
+    /><br/>
+    <FileField
+        v-if="item.pay_doc !== null"
+        :fileName="item.pay_doc_name"
+        :file="item.pay_doc"
+    />
+
+  </div>
+
+  <BooleanBadge
+    v-if="ui === 'appSurveyCheck'"
+    :bool="item[header.key]"
+  />
+
 </template>
 
 <script>
@@ -61,10 +109,16 @@ import ProgramOrderField from "@/components/tables/pagination_table/special_fiel
 import StudentGroupStatusBadge from "@/components/badges/edu/StudentGroupStatusBadge.vue";
 import fileContentTypes from "@/commons/consts/fileContentTypes";
 import FileField from "@/components/tables/pagination_table/special_fields/sources/FileField.vue";
+import AppStudentInfo from "@/components/tables/pagination_table/special_fields/sources/AppStudentInfo.vue";
+import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
+import BooleanBadge from "@/components/badges/BooleanBadge.vue";
 
 export default {
   name: "SpecialField",
   components: {
+    BooleanBadge,
+    AppStatusBadge,
+    AppStudentInfo,
     FileField,
     StudentGroupStatusBadge,
     ProgramOrderField, CuratorGroupsField, JournalDetailInfoDialog, JournalModuleBadge, JournalRecStatusBadge},

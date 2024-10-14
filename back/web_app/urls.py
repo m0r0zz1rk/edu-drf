@@ -14,7 +14,7 @@ media_root = du.get_parameter_from_settings('MEDIA_ROOT')
 urlpatterns = [
     path('backend/admin/', admin.site.urls),
     path('backend/api/v1/admins/', include('apps.admins.urls')),
-    # path('api/v1/applications/', include('apps.applications.urls')),
+    path('backend/api/v1/applications/', include('apps.applications.urls')),
     path('backend/api/v1/auth/', include('apps.authen.urls')),
     path('backend/api/v1/commons/', include('apps.commons.urls')),
     path('backend/api/v1/docs/', include('apps.docs.urls')),

@@ -6,6 +6,7 @@ from apps.applications.consts.application_statuses import ARCHIVE
 from apps.applications.selectors.course_application import course_application_model
 from apps.authen.services.profile import ProfileService
 from apps.commons.services.ad.ad_centre import AdCentreService
+from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.selectors.program import program_queryset
 from apps.edu.selectors.student_group import student_group_queryset
 

@@ -23,6 +23,8 @@ class SurveyTarget(BaseTable):
         'edu.StudentGroup',
         on_delete=models.SET_NULL,
         null=True,
+        default=None,
+        blank=True,
         related_name='survey_target',
         verbose_name='Учебная группа'
     )

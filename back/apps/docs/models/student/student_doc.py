@@ -22,8 +22,18 @@ def get_student_doc_upload_path(instance, filename) -> str:
     for dt in STUDENT_DOC_TYPES:
         if dt[0] == instance.doc_type:
             doc_type_folder = dt[1]
-    spl = instance.profile.display_name.spli(' ')
-    user_folder = f'{spl[0]} {spl[1][1]}.{spl[2][1]}'
+    spl = instance.profile.display_name.split(' ')
+    user_folder = spl[0]
+    if len(spl) > 1:
+        try:
+            user_folder += f' {spl[1][0]}'
+        except Exception:
+            pass
+    if len(spl) > 2:
+        try:
+            user_folder += f' {spl[2][0]}'
+        except Exception:
+            pass
     for subfolder in ['Документы пользователей', doc_type_folder, user_folder]:
         doc_path = os.path.join(doc_path, subfolder)
         if not os.path.exists(doc_path):

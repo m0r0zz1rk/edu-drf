@@ -9,6 +9,13 @@ class EducationServiceService:
     """Класс методов для работы с ОУ (курсами)"""
 
     @staticmethod
+    def get_count() -> int:
+        """
+        Получение общего количества курсов в АИС
+        """
+        return education_service_model.objects.count()
+
+    @staticmethod
     def is_service_exists(attribute_name: str, value: str) -> bool:
         """
         Проверка на существующую ОУ (курс)

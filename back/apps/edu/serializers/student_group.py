@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.applications.services.base_application import BaseApplicationService
 from apps.authen.services.profile import ProfileService
 from apps.edu.selectors.student_group import student_group_model
 from apps.edu.services.service.education_service import EducationServiceService
@@ -76,7 +77,10 @@ class StudentGroupListSerializer(serializers.ModelSerializer):
         return '-'
 
     def get_apps_count(self, obj):
-        return 0
+        return BaseApplicationService.get_app_count_for_group(
+            obj.object_id,
+            obj.ou
+        )
 
     class Meta:
         model = student_group_model

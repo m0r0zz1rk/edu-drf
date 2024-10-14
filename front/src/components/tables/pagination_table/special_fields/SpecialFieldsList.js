@@ -5,7 +5,13 @@ const specialFieldsList = [
     'cokoCuratorGroups',
     'dppOrder',
     'studentGroupStatus',
-    'file'
+    'file',
+    'appStudentInfo',
+    'appStatus',
+    'appOoCheck',
+    'appEducationCheck',
+    'appPayCheck',
+    'appSurveyCheck'
 ]
 
 export default specialFieldsList

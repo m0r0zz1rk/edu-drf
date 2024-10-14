@@ -1,5 +1,12 @@
+from django.contrib.auth.models import User
+
+from apps.applications.selectors.course_application import course_application_model
+from apps.applications.selectors.event_application import event_application_model
+from apps.applications.services.base_application import BaseApplicationService
 from apps.authen.services.profile import ProfileService
 from apps.commons.utils.django.user import UserUtils
+from apps.edu.services.service.education_service import EducationServiceService
+from apps.edu.services.service.information_service import InformationServiceService
 
 
 class MainPageService:
@@ -27,10 +34,10 @@ class MainPageService:
                 'first_login': self.uu.get_user_date_joined(request.user.id)
             },
             'study_info': {
-                'user_count': 15,
-                'app_count': 27,
-                'course_count': 8,
-                'event_count': 10
+                'user_count': User.objects.count(),
+                'app_count': BaseApplicationService.apps_count(),
+                'course_count': EducationServiceService.get_count(),
+                'event_count': InformationServiceService.get_count()
             },
             'last_apps': [
                 {

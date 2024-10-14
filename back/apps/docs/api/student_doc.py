@@ -49,7 +49,7 @@ class StudentDocViewSet(viewsets.ModelViewSet):
     def get_student_docs(self, request, *args, **kwargs):
         try:
             user_id = request.user.id
-            if 'profile_id' in self.kwargs:
+            if 'profile_id' in request.GET:
                 if not request.user.is_superuser:
                     journal_request = JournalRequest(
                         self._journal_request_builder
@@ -63,7 +63,7 @@ class StudentDocViewSet(viewsets.ModelViewSet):
                     return journal_request.create_response()
                 user_id = self._profile_service.get_profile_or_info_by_attribute(
                     'object_id',
-                    self.kwargs['profile_id'],
+                    request.GET['profile_id'],
                     'user_id'
                 )
             docs = self._student_doc_service.get_student_docs(user_id)
@@ -101,7 +101,7 @@ class StudentDocViewSet(viewsets.ModelViewSet):
             if not serialize.is_valid():
                 raise APIProcessError
             user_id = request.user.id
-            if 'profile_id' in self.kwargs:
+            if 'profile_id' in request.GET:
                 if not request.user.is_superuser:
                     journal_request = JournalRequest(
                         self._journal_request_builder
@@ -115,7 +115,7 @@ class StudentDocViewSet(viewsets.ModelViewSet):
                     return journal_request.create_response()
                 user_id = self._profile_service.get_profile_or_info_by_attribute(
                     'object_id',
-                    self.kwargs['profile_id'],
+                    request.GET['profile_id'],
                     'user_id'
                 )
             self._student_doc_service.create_student_doc(user_id, serialize.validated_data)

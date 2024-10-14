@@ -1,7 +1,16 @@
+import os
+from pathlib import Path
 from sqlalchemy import text
 
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
+from apps.docs.consts.student_doc_types import DIPLOMA, CHANGE_SURNAME, TRAINING_CERTIFICATE, LICENSE_SCAN
+from apps.commons.utils.django.settings import SettingsUtils
+from apps.docs.selectors.pay_doc import pay_doc_model
 from apps.docs.selectors.program_order import program_order_model
+from apps.docs.selectors.student_doc import student_doc_model
+from apps.guides.selectors.user import student_profile_model
+
+settings_utils = SettingsUtils()
 
 
 class DocsData:
@@ -9,6 +18,25 @@ class DocsData:
     Класс методов для получения и сохранения данных приложения
     Документы из олдовой базы edu
     """
+
+    _student_doc_types_mapper = {
+        1: {
+            'key': DIPLOMA,
+            'title': 'Диплом'
+        },
+        2: {
+            'key': CHANGE_SURNAME,
+            'title': 'Документ о смене фамилии'
+        },
+        3: {
+            'key': TRAINING_CERTIFICATE,
+            'title': 'Справка об обучении'
+        },
+        6: {
+            'key': LICENSE_SCAN,
+            'title': 'Скан удостоверения'
+        }
+    }
 
     @staticmethod
     def get_program_orders():
@@ -23,15 +51,117 @@ class DocsData:
         for order in data:
             if len(list(filter(lambda ord: ord.old_id == order[0], exists))) > 0:
                 continue
+            file = open(
+                os.path.join(settings_utils.get_parameter_from_settings('MEDIA_ROOT_OLD'), Path(order[9])),
+                'rb',
+            )
             new_order = {
                 'old_id': order[0],
                 'number': order[7],
                 'date': order[8],
-                'file': order[9]
             }
-            print(new_order)
-            # program_order_model.objects.update_or_create(
-            #     **new_order
-            # )
-            # print(f'Приказ ДПП №{new_order.number} от {new_order.date.strftime("%d.%m.%Y")} '
-            #       f'- добавлено')
+            order_object, _ = program_order_model.objects.update_or_create(
+                **new_order
+            )
+            order_object.file.save(
+                f"dpp_order.{order[9][-3:]}",
+                file
+            )
+            print(f'Приказ ДПП №{new_order["number"]} от {new_order["date"].strftime("%d.%m.%Y")} '
+                  f'- добавлено')
+            del file
+
+    @staticmethod
+    def get_student_docs(self):
+        """
+        Получение пользовательских документов
+        """
+        exists = student_doc_model.objects.all()
+        profiles = student_profile_model.objects.all()
+        with old_edu_connect_engine.connect() as conn:
+            sql = ('select sd.id, sd.[file], sd.doc_type_id, sd.profile_id, p.user_id, '
+                   'p.surname, p.name, p.patronymic '
+                   'from dbo.students_docs as sd inner join dbo.authen_profiles as p on sd.profile_id = p.id '
+                   'where sd.doc_type_id in (1, 2, 3, 6)')
+            data_query = conn.execute(text(sql))
+            data = data_query.all()
+        for user_doc in data:
+            if len(list(filter(lambda doc: doc.old_id == user_doc[0], exists))) > 0:
+                continue
+            try:
+                file = open(
+                    os.path.join(settings_utils.get_parameter_from_settings('MEDIA_ROOT_OLD'), Path(user_doc[1])),
+                    'rb',
+                )
+            except Exception:
+                continue
+            try:
+                profile_id = list(filter(lambda prof: prof.django_user_id == user_doc[4], profiles))[0].object_id
+            except Exception:
+                continue
+            new_doc = {
+                'old_id': user_doc[0],
+                'doc_type': self._student_doc_types_mapper[user_doc[2]]['key'],
+                'profile_id': profile_id,
+            }
+            doc_object, _ = student_doc_model.objects.update_or_create(
+                **new_doc
+            )
+            path_split = user_doc[1].split('/')
+            doc_object.file.save(
+                f"{path_split[-1:][0][:-5] if path_split[-1:][0].endswith('jpeg') else path_split[-1:][0][:-4]}"
+                f".{user_doc[1][-3:]}",
+                file
+            )
+            print(f'{self._student_doc_types_mapper[user_doc[2]]["title"]} '
+                  f'пользователя {user_doc[5]} {user_doc[6]} {user_doc[7]} '
+                  f'- добавлено')
+            del file
+
+    @staticmethod
+    def get_pay_docs():
+        """
+        Получение документов об оплате
+        """
+        exists = pay_doc_model.objects.all()
+        profiles = student_profile_model.objects.all()
+        with old_edu_connect_engine.connect() as conn:
+            sql = ('SELECT stdoc.[id], stdoc.[file], prof.[user_id] '
+                   'from dbo.students_docs as stdoc inner join dbo.authen_profiles as prof on '
+                   'stdoc.[profile_id] = prof.[id] '
+                   'where stdoc.[doc_type_id] = 5')
+            data_query = conn.execute(text(sql))
+            data = data_query.all()
+        for pay_doc in data:
+            if len(list(filter(lambda pay: pay.old_id == pay_doc[0], exists))) > 0:
+                continue
+            try:
+                profile = list(filter(lambda prof: prof.old_id == pay_doc[2], profiles))[0]
+            except Exception:
+                continue
+            try:
+                file = open(
+                    os.path.join(settings_utils.get_parameter_from_settings('MEDIA_ROOT_OLD'), Path(pay_doc[1])),
+                    'rb',
+                )
+            except Exception:
+                continue
+            new_pay_doc = {
+                'old_id': pay_doc[0],
+                'profile_id': profile.object_id,
+            }
+            print(new_pay_doc)
+            pay_doc_object, _ = pay_doc_model.objects.update_or_create(
+                **new_pay_doc
+            )
+            path_split = pay_doc[1].split('/')
+            pay_doc_object.pay_file.save(
+                (f"{path_split[-1:][0][:-5] if path_split[-1:][0].endswith('jpeg') else path_split[-1:][0][:-4]}"
+                f".{pay_doc[1][-3:]}"),
+                file
+            )
+            print(f'Документ об оплате обучающегося "{profile.display_name}" '
+                  f'- добавлено')
+            del file
+
+

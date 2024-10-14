@@ -9,6 +9,13 @@ class InformationServiceService:
     """Класс методов для работы с информационно-консультационными услугами (мероприятиями)"""
 
     @staticmethod
+    def get_count() -> int:
+        """
+        Получение общего количества мероприятий в АИС
+        """
+        return information_service_model.objects.count()
+
+    @staticmethod
     def service_count(department: str) -> int:
         """
         Получение количества ОУ (курсов) для подразделения в текущем году

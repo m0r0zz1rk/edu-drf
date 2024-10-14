@@ -17,7 +17,10 @@ def get_pay_doc_upload_path(instance, filename) -> str:
     new_file_name = (f"{''.join(symb for symb in file_name if symb == ' ' or symb.isalnum())}"
                      f"{file_extension}")
     doc_path = SettingsUtils().get_parameter_from_settings('MEDIA_ROOT')
-    for subfolder in ['Документы об оплате', instance.group.code, instance.profile.display_name]:
+    for subfolder in [
+        'Документы об оплате',
+        f'{instance.profile.display_name}_{instance.profile.birthday.strftime("%d-%m-%Y")}'
+    ]:
         doc_path = os.path.join(doc_path, subfolder)
         if not os.path.exists(doc_path):
             os.makedirs(doc_path)
@@ -31,13 +34,6 @@ class PayDoc(BaseTable):
         on_delete=models.CASCADE,
         null=False,
         verbose_name='Профиль обучающегося'
-    )
-    group = models.ForeignKey(
-        'edu.StudentGroup',
-        on_delete=models.CASCADE,
-        null=True,
-        default=None,
-        verbose_name='Учебная группа'
     )
     pay_file = models.FileField(
         upload_to=get_pay_doc_upload_path,

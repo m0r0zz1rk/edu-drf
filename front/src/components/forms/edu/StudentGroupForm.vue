@@ -83,6 +83,12 @@
           :serviceType="serviceType"
         />
 
+        <StudentGroupApps
+          v-if="groupTab === 'apps'"
+          :groupId="groupId"
+          :serviceType="serviceType"
+        />
+
         <StudentGroupSchedule
             v-if="groupTab === 'schedule'"
             :groupId="groupId"
@@ -121,10 +127,11 @@ import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
 import StudentGroupDocs from "@/components/forms/edu/student_group/StudentGroupDocs.vue";
 import studyForms from "@/commons/consts/edu/studyForms";
 import StudentGroupSchedule from "@/components/forms/edu/student_group/StudentGroupSchedule.vue";
+import StudentGroupApps from "@/components/forms/edu/student_group/StudentGroupApps.vue";
 
 export default {
   name: "StudentGroupForm",
-  components: {StudentGroupSchedule, StudentGroupDocs, StudentGroupManage, StudentGroupInfo, LkPage},
+  components: {StudentGroupApps, StudentGroupSchedule, StudentGroupDocs, StudentGroupManage, StudentGroupInfo, LkPage},
   props: {
     groupId: String, // object_id учебной группы
   },

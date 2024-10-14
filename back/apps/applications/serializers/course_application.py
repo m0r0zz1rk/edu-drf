@@ -3,8 +3,10 @@ import os
 
 from rest_framework import serializers
 
+from apps.applications.selectors.course_application import course_application_model
 from apps.applications.serializers.base_application import (BaseApplicationSerializer,
                                                             FullBaseApplicationSerializer)
+from apps.commons.drf.base64_coko_file_field import Base64CokoFileField
 
 
 class CourseApplicationListSerializer(serializers.Serializer):
@@ -179,3 +181,75 @@ class CourseApplicationUpdateSerializer(CourseApplicationDetailSerializer):
         allow_null=True,
         label='object_id скана удостоверения'
     )
+
+
+class CourseAppGroupListSerializer(serializers.ModelSerializer):
+    """Сериализация данных при получении списка заявок для учебной группы"""
+    student = serializers.SerializerMethodField(
+        label='Информация об обучающемся'
+    )
+    date_create = serializers.DateTimeField(
+        format='%d.%m.%Y',
+        label='Дата подачи заявки'
+    )
+    education_doc = serializers.SerializerMethodField(
+        label='Документ об образовании'
+    )
+    education_doc_name = serializers.SerializerMethodField(
+        label='Имя файла с документом об образовании'
+    )
+    pay_doc = serializers.SerializerMethodField(
+        label='Документ об оплате'
+    )
+    pay_doc_name = serializers.SerializerMethodField(
+        label='Имя файла с документом об оплате'
+    )
+
+    def get_student(self, obj):
+        return {
+            'display_name': obj.profile.display_name,
+            'email': obj.profile.django_user.email,
+            'phone': obj.profile.phone,
+        }
+
+    def get_education_doc(self, obj):
+        try:
+            with obj.education_doc.file.open(mode='rb') as doc_file:
+                doc_data = doc_file.read()
+            return base64.b64encode(doc_data).decode('utf-8')
+        except Exception:
+            return None
+
+    def get_education_doc_name(self, obj):
+        if obj.education_doc:
+            return os.path.basename(obj.education_doc.file.name)
+        return ''
+
+    def get_pay_doc(self, obj):
+        try:
+            with obj.pay_doc.file.open(mode='rb') as doc_file:
+                doc_data = doc_file.read()
+            return base64.b64encode(doc_data).decode('utf-8')
+        except Exception:
+            return None
+
+    def get_pay_doc_name(self, obj):
+        if obj.pay_doc:
+            return os.path.basename(obj.pay_doc.pay_file.name)
+        return ''
+
+    class Meta:
+        model = course_application_model
+        fields = (
+            'student',
+            'date_create',
+            'status',
+            'oo',
+            'oo_new',
+            'education_check',
+            'education_doc',
+            'education_doc_name',
+            'pay_doc',
+            'pay_doc_name',
+            'check_survey'
+        )

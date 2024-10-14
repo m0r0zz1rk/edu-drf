@@ -15,7 +15,8 @@ def get_program_order_upload_path(instance, filename) -> str:
     :return: Путь для загрузки
     """
     _, file_extension = os.path.splitext(filename)
-    new_file_name = f"{''.join(symb for symb in instance.number if symb == ' ' or symb.isalnum())}{file_extension}"
+    new_file_name = (f"{''.join(symb for symb in instance.number if symb == ' ' or symb.isalnum())}_"
+                     f"{instance.date.strftime('%d-%m-%Y')}{file_extension}")
     order_path = SettingsUtils().get_parameter_from_settings('MEDIA_ROOT')
     for subfolder in ['Приказы', 'ДПП']:
         order_path = os.path.join(order_path, subfolder)

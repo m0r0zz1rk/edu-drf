@@ -24,6 +24,8 @@ DATABASES = {
 
 MEDIA_ROOT = env.str('DEV_MEDIA_ROOT', os.path.join(BASE_DIR, 'media'))
 
+MEDIA_ROOT_OLD = env.str('DEV_MEDIA_ROOT_OLD', os.path.join(BASE_DIR, 'media'))
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 CORS_ALLOWED_ORIGINS = [

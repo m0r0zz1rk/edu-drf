@@ -13,5 +13,5 @@ class SurveyTargetAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        'survey__description'
+        'survey__description',
     )

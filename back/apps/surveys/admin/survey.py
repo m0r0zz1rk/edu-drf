@@ -9,7 +9,7 @@ class SurveyAdmin(admin.ModelAdmin):
     """Класс для вывода опросов в административную панель"""
     list_display = (
         'object_id',
-        'create_fio',
+        'creator_fio',
         'description'
     )
 
@@ -26,3 +26,5 @@ class SurveyAdmin(admin.ModelAdmin):
                 'display_name'
             )
         return '-'
+
+    creator_fio.short_description = 'Создатель'

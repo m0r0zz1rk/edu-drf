@@ -203,7 +203,6 @@
 
                   <p
                       v-if="!mobileDisplay"
-                      v-bind:class="{'one-line-text': header.key === 'code'}"
                   >
                     {{ item[header.key] }}
                   </p>

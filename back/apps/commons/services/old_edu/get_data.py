@@ -1,8 +1,16 @@
+from apps.commons.services.old_edu.queries.applications import ApplicationsData
 from apps.commons.services.old_edu.queries.authen import AuthenData
+from apps.commons.services.old_edu.queries.docs import DocsData
+from apps.commons.services.old_edu.queries.edu import EduData
 from apps.commons.services.old_edu.queries.guides import GuidesData
+from apps.commons.services.old_edu.queries.surveys import SurveysData
 
+application_data = ApplicationsData()
 authen_data = AuthenData()
 guides_data = GuidesData()
+docs_data = DocsData()
+edu_data = EduData()
+surveys_data = SurveysData()
 
 
 def get_all_edu_data():
@@ -31,3 +39,40 @@ def get_all_edu_data():
     # authen_data.get_coko_profile_info()
     # authen_data.add_coko_to_group()
     print('### Окончание работы с модулем авторизации и аутентификации (пользователи и профили)')
+
+    # Модуль docs
+    print('### Начало работы с модулем Документы')
+    # docs_data.get_program_orders()
+    # docs_data.get_student_docs()
+    # docs_data.get_pay_docs()
+    print('### Окончание работы с модулем Документы')
+
+    # Модуль edu
+    print('### Начало работы с модулем Учебная часть')
+    # edu_data.get_information_services()
+    # edu_data.get_info_service_categories()
+    # edu_data.get_programs()
+    # edu_data.get_program_calendar_chapters()
+    # edu_data.get_program_calendar_themes()
+    # edu_data.get_program_categories()
+    # edu_data.get_education_services()
+    # edu_data.get_student_groups()
+    # edu_data.set_group_curator()
+    # edu_data.get_course_schedule()
+    # edu_data.set_course_schedule_theme_teacher()
+    # edu_data.get_event_schedule()
+    # edu_data.set_event_schedule_teacher()
+    print('### Окончание работы с модулем Учебная часть')
+
+    # Модуль applications
+    print('### Начало работы с модулем Заявки')
+    # application_data.get_course_applications()
+    # application_data.get_event_applications()
+    print('### Окончание работы с модулем Заявки')
+
+    # Модуль surveys
+    print('### Начало работы с модулем Опросы')
+    surveys_data.get_surveys()
+    surveys_data.get_survey_questions()
+    surveys_data.get_student_answers()
+    print('### Окончание работы с модулем Опросы')

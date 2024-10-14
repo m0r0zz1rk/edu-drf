@@ -6,5 +6,5 @@ SHORT = 'short'
 SURVEY_QUESTION_TYPES = (
     (ONE, 'Один ответ'),
     (MANY, 'Несколько ответов'),
-    (SHORT, 'Короткий ответ')
+    (SHORT, 'Краткий ответ')
 )

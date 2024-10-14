@@ -255,13 +255,20 @@
                 :noTab="false"
                 :addButton="true"
                 :xlsxButton="false"
-                getRecsURL="/backend/api/v1/docs/student_docs/"
-                addRecURL="/backend/api/v1/docs/upload_student_doc/"
-                editRecURL="/backend/api/v1/docs/student_doc/"
-                delRecURL="/backend/api/v1/docs/student_doc/"
+                :getRecsURL="
+                  profileUuid ?
+                    '/backend/api/v1/docs/student_docs/?profile_id='+profileUuid
+                    :
+                    '/backend/api/v1/docs/student_docs/'
+                "
+                :addRecURL="
+                  profileUuid ?
+                    '/backend/api/v1/docs/student_docs/?profile_id='+profileUuid
+                    :
+                    '/backend/api/v1/docs/student_docs/'
+                "
                 :tableHeaders="tableHeaders"
                 :fieldsArray="fieldsArray"
-                :onlyDelete="true"
             />
           </div>
 
