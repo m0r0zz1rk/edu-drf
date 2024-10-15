@@ -10,7 +10,7 @@ from apps.applications.serializers.course_application import CourseApplicationLi
 from apps.applications.services.base_application import BaseApplicationService
 from apps.applications.services.course_application import CourseApplicationService
 from apps.authen.services.profile import ProfileService
-from apps.commons.permissions.is_students import IsStudent
+from apps.commons.permissions.is_admin_or_student import IsAdminOrStudent
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import USERS
@@ -21,7 +21,7 @@ from apps.journal.exceptions.api_process_error import APIProcessError
 
 class CourseApplicationViewSet(viewsets.ModelViewSet):
     """Класс эндпоинтов для работы с заявками обучающихся на участие в курсах"""
-    permission_classes = [IsAuthenticated, IsStudent]
+    permission_classes = [IsAuthenticated, IsAdminOrStudent]
 
     _base_application_service = BaseApplicationService()
     _course_application_service = CourseApplicationService()

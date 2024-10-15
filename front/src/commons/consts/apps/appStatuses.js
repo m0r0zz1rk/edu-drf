@@ -23,7 +23,7 @@ const appStatuses = [
     {
         key: 'pay',
         title: 'Оплачено',
-        color: 'light-green'
+        color: 'orange'
     },
     {
         key: 'study',

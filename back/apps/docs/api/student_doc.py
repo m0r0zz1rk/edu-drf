@@ -1,5 +1,3 @@
-import os
-
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
@@ -9,9 +7,7 @@ from apps.authen.services.profile import ProfileService
 from apps.commons.pagination import CustomPagination
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.response import ResponseUtils
-from apps.docs.selectors.pay_doc import pay_doc_model
-from apps.docs.selectors.student_doc import StudentDocFilter, student_doc_queryset, student_doc_model
-from apps.docs.selectors.student_group_offer import student_group_offer_model
+from apps.docs.selectors.student_doc import StudentDocFilter, student_doc_queryset
 from apps.docs.serializers.student_doc import StudentDocListSerializer, StudentDocCreateSerializer
 from apps.docs.services.student_doc import StudentDocService
 from apps.journal.consts.journal_modules import DOCS
@@ -135,16 +131,3 @@ class StudentDocViewSet(viewsets.ModelViewSet):
             return journal_request.create_response()
         except Exception:
             raise APIProcessError
-
-    def rename_peg_into_jpeg(self, request, *args, **kwargs):
-        doc_models = [
-            student_doc_model,
-            pay_doc_model,
-            student_group_offer_model
-        ]
-        for model in doc_models:
-            for doc in model.objects.all():
-                if doc.file.name.endswith('.peg'):
-                    os.rename(doc.file.name, doc.file.name[:-3] + '.jpeg')
-                    doc.file.name = doc.file.name[:-3] + '.jpeg'
-                    doc.save()

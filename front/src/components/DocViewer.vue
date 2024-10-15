@@ -73,15 +73,10 @@ export default {
         )
       } else {
         let ext = fileRequest.file_name.substring(
-            fileRequest.file_name.indexOf('.'),
+            fileRequest.file_name.indexOf('.')+1,
             fileRequest.file_name.length
         )
-        console.log(ext)
-        this.contentType = fileContentTypes.filter(
-            (type) => type.extension === fileRequest.file_name.substring(
-                fileRequest.file_name.length-3, fileRequest.file_name.length
-            )
-        )[0].mime
+        this.contentType = fileContentTypes.filter((type) => type.extension === ext)[0].mime
         this.base64String = 'data:'+this.contentType+';base64,'+fileRequest.file
       }
     }

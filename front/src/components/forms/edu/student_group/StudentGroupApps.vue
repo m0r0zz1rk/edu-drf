@@ -15,7 +15,38 @@
       :tableHeaders="tableHeaders"
       :fieldsArray="fieldsArray"
       :openDocViewerFunction="openDocViewer"
+      :selectGroupAppFunction="getAppInfo"
   />
+
+  <CokoDialog
+    ref="appFormDialog"
+  >
+
+    <template v-slot:title>
+      <p v-if="!mobileDisplay">Анкета обучающегося {{formFIO}}</p>
+      <p v-if="mobileDisplay">{{formFIO.split(' ')[0]}}</p>
+    </template>
+
+    <template v-slot:text>
+      <v-skeleton-loader
+        v-if="selectedApp === null"
+        type="paragraph"
+      />
+
+      <AppForm
+          v-if="selectedApp !== null"
+          ref="appForm"
+          :disabled="selectedApp.status !== 'draft'"
+          :studentApp="app"
+          :mos="formData.mo"
+          :positionCategories="formData.position_category"
+          :positions="formData.position"
+          :regions="formData.region"
+          :changeAppAttribute="changeAppField"
+      />
+    </template>
+
+  </CokoDialog>
 
   <CokoDialog
     ref="docViewerDialog"
@@ -45,16 +76,21 @@ import appStatuses from "@/commons/consts/apps/appStatuses";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import DocViewer from "@/components/DocViewer.vue";
 import {useDisplay} from "vuetify";
+import {apiRequest} from "@/commons/api_request";
+import {showAlert} from "@/commons/alerts";
+import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
 
 export default {
   name: 'StudentGroupApps',
-  components: {DocViewer, CokoDialog, PaginationTable},
+  components: {AppForm, DocViewer, CokoDialog, PaginationTable},
   props: {
     groupId: String, // object_id учбеной группы
     serviceType: String, // Тип услуги учебной группы (ou или iku)
   },
   data() {
     return {
+      // Массив данных для анкеты
+      formData: null,
       // Параметр проверки мобильного устройства
       mobileDisplay: useDisplay().smAndDown,
       // Список столбцов таблицы
@@ -70,6 +106,10 @@ export default {
         {
           'title': 'Статус',
           'key': 'status'
+        },
+        {
+          'title': 'Анкета',
+          'key': 'form'
         },
         {
           'title': 'ОО',
@@ -106,6 +146,11 @@ export default {
           addRequired: false
         },
         {
+          ui: 'appFormView',
+          key: 'form',
+          addRequired: false
+        },
+        {
           ui: 'appOoCheck',
           key: 'oo',
           addRequired: false
@@ -132,8 +177,12 @@ export default {
       docType: '',
       // Наименование документа,
       docName: '',
-      // ФИО обучаюещегося
-      docFIO: ''
+      // ФИО обучаюещегося - владельца документа
+      docFIO: '',
+      // ФИО анкеты обучающегося
+      formFIO: '',
+      // Выбранная анкета
+      selectedApp: null
     }
   },
   methods: {
@@ -144,7 +193,49 @@ export default {
       this.docFIO = fio
       this.docId = docId
       this.$refs.docViewerDialog.dialog = true
-    }
+    },
+    // Получение массива данных для работы с анкетой
+    async getFormData() {
+      let formDataRequest = await apiRequest(
+          '/backend/api/v1/users/form_data/',
+          'GET',
+          true,
+          null
+      )
+      if (formDataRequest.error) {
+        showAlert(
+            'error',
+            'Получение данных',
+            formDataRequest.error
+        )
+      } else {
+        this.formData = formDataRequest.success
+      }
+    },
+    // Получение информации по заявке
+    async getAppInfo(app_id) {
+      this.selectedApp = null
+      this.$refs.appFormDialog.dialog = true
+      let url = '/backend/api/v1/users/'+this.serviceType+'_application/'+app_id+'/'
+      let appInfoRequest = await apiRequest(
+          url,
+          'GET',
+          true,
+          null
+      )
+      if (appInfoRequest.error) {
+        showAlert(
+            'error',
+            'Получение информации по заявке',
+            appInfoRequest.error
+        )
+      } else {
+        this.selectedApp = appInfoRequest
+      }
+    },
+  },
+  mounted() {
+    this.getFormData()
   }
 }
 

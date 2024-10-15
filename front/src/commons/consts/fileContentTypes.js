@@ -23,11 +23,7 @@ const fileContentTypes = [
     {
         extension: 'JPG',
         mime: 'image/jpeg'
-    },
-    {
-        extension: 'PEG',
-        mime: 'image/jpeg'
-    },
+    }
 ]
 
 export default fileContentTypes

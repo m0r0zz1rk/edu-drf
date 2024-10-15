@@ -219,6 +219,7 @@ class CourseAppGroupListSerializer(serializers.ModelSerializer):
     class Meta:
         model = course_application_model
         fields = (
+            'object_id',
             'student',
             'date_create',
             'status',

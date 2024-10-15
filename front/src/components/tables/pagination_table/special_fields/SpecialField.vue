@@ -105,6 +105,12 @@
 
   </div>
 
+  <v-icon
+    v-if="ui === 'appFormView'"
+    icon="mdi-list-box-outline"
+    @click="selectGroupAppFunction(item.object_id)"
+  />
+
   <BooleanBadge
     v-if="ui === 'appSurveyCheck'"
     :bool="item[header.key]"
@@ -141,6 +147,8 @@ export default {
     mobileDisplay: Boolean, // Отображение на экране мобильного устройства
     // Функция для просмотра документов
     openDocViewerFunction: Function,
+    // Функция для получения полной заяки и просмотра анкеты в группе
+    selectGroupAppFunction: Function
   },
   data() {
     return {

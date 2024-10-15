@@ -157,6 +157,7 @@
                       :item="item"
                       :mobileDisplay="mobileDisplay"
                       :openDocViewerFunction="openDocViewerFunction"
+                      :selectGroupAppFunction="selectGroupAppFunction"
                   />
               </div>
 
@@ -378,6 +379,8 @@ export default {
     onlyDelete: Boolean,
     // Функция для просмотра документов
     openDocViewerFunction: Function,
+    // Функция для получения полной заявки в группе и просмотра анкеты
+    selectGroupAppFunction: Function,
   },
   data() {
     return {
