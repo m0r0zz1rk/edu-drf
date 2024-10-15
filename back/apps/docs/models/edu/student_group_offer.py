@@ -3,7 +3,24 @@ import os
 from django.db import models
 
 from apps.commons.models import BaseTable
-from apps.docs.services.edu.student_group_offer import StudentGroupOfferService
+from apps.commons.utils.django.settings import SettingsUtils
+
+
+def get_upload_path(instance, filename) -> str:
+    """
+    Получение пути загрузки файлов
+    :param instance: сущность файла (получаем из FileField)
+    :param filename: имя файла (получаем из FileField)
+    :return: Путь для загрузки
+    """
+    _, file_extension = os.path.splitext(filename)
+    new_file_name = f"{''.join(symb for symb in instance.number if symb == ' ' or symb.isalnum())}{file_extension}"
+    order_path = SettingsUtils().get_parameter_from_settings('MEDIA_ROOT')
+    for subfolder in ['Договора', 'Оферта', instance.student_group.code]:
+        order_path = os.path.join(order_path, subfolder)
+        if not os.path.exists(order_path):
+            os.makedirs(order_path)
+    return os.path.join(order_path, new_file_name)
 
 
 class StudentGroupOffer(BaseTable):
@@ -16,7 +33,7 @@ class StudentGroupOffer(BaseTable):
         verbose_name='Учебная группа'
     )
     file = models.FileField(
-        upload_to=StudentGroupOfferService().get_upload_path,
+        upload_to=get_upload_path,
         null=True,
         max_length=1000,
         verbose_name='Договор оферты'

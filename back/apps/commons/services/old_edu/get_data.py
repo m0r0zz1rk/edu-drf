@@ -64,6 +64,11 @@ def get_all_edu_data():
     # edu_data.set_event_schedule_teacher()
     print('### Окончание работы с модулем Учебная часть')
 
+    # Получение договор офферт для учебных групп
+    print('### Работа с договорами офферты')
+    docs_data.get_offers()
+    print('### Окончание работы с договорами офферты')
+
     # Модуль applications
     print('### Начало работы с модулем Заявки')
     # application_data.get_course_applications()
@@ -72,7 +77,7 @@ def get_all_edu_data():
 
     # Модуль surveys
     print('### Начало работы с модулем Опросы')
-    surveys_data.get_surveys()
-    surveys_data.get_survey_questions()
-    surveys_data.get_student_answers()
+    # surveys_data.get_surveys()
+    # surveys_data.get_survey_questions()
+    # surveys_data.get_student_answers()
     print('### Окончание работы с модулем Опросы')

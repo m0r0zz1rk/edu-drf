@@ -192,17 +192,11 @@ class CourseAppGroupListSerializer(serializers.ModelSerializer):
         format='%d.%m.%Y',
         label='Дата подачи заявки'
     )
-    education_doc = serializers.SerializerMethodField(
-        label='Документ об образовании'
-    )
     education_doc_name = serializers.SerializerMethodField(
-        label='Имя файла с документом об образовании'
-    )
-    pay_doc = serializers.SerializerMethodField(
-        label='Документ об оплате'
+        label='Имя файла документа об образовании'
     )
     pay_doc_name = serializers.SerializerMethodField(
-        label='Имя файла с документом об оплате'
+        label='Имя файла документа об оплате'
     )
 
     def get_student(self, obj):
@@ -212,30 +206,14 @@ class CourseAppGroupListSerializer(serializers.ModelSerializer):
             'phone': obj.profile.phone,
         }
 
-    def get_education_doc(self, obj):
-        try:
-            with obj.education_doc.file.open(mode='rb') as doc_file:
-                doc_data = doc_file.read()
-            return base64.b64encode(doc_data).decode('utf-8')
-        except Exception:
-            return None
-
     def get_education_doc_name(self, obj):
         if obj.education_doc:
             return os.path.basename(obj.education_doc.file.name)
         return ''
 
-    def get_pay_doc(self, obj):
-        try:
-            with obj.pay_doc.file.open(mode='rb') as doc_file:
-                doc_data = doc_file.read()
-            return base64.b64encode(doc_data).decode('utf-8')
-        except Exception:
-            return None
-
     def get_pay_doc_name(self, obj):
         if obj.pay_doc:
-            return os.path.basename(obj.pay_doc.pay_file.name)
+            return os.path.basename(obj.pay_doc.file.name)
         return ''
 
     class Meta:
@@ -247,9 +225,9 @@ class CourseAppGroupListSerializer(serializers.ModelSerializer):
             'oo',
             'oo_new',
             'education_check',
-            'education_doc',
+            'education_doc_id',
             'education_doc_name',
-            'pay_doc',
+            'pay_doc_id',
             'pay_doc_name',
             'check_survey'
         )

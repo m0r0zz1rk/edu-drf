@@ -35,7 +35,7 @@ class PayDoc(BaseTable):
         null=False,
         verbose_name='Профиль обучающегося'
     )
-    pay_file = models.FileField(
+    file = models.FileField(
         upload_to=get_pay_doc_upload_path,
         null=True,
         max_length=4000,

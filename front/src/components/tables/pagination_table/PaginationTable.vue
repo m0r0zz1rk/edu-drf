@@ -156,6 +156,7 @@
                       :header="header"
                       :item="item"
                       :mobileDisplay="mobileDisplay"
+                      :openDocViewerFunction="openDocViewerFunction"
                   />
               </div>
 
@@ -375,6 +376,8 @@ export default {
     defaultBody: Object, // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
     // Параметр отображение только удаления записи в поле Управление
     onlyDelete: Boolean,
+    // Функция для просмотра документов
+    openDocViewerFunction: Function,
   },
   data() {
     return {

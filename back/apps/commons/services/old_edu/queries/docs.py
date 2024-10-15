@@ -8,6 +8,8 @@ from apps.commons.utils.django.settings import SettingsUtils
 from apps.docs.selectors.pay_doc import pay_doc_model
 from apps.docs.selectors.program_order import program_order_model
 from apps.docs.selectors.student_doc import student_doc_model
+from apps.docs.selectors.student_group_offer import student_group_offer_model
+from apps.edu.selectors.student_group import student_group_model
 from apps.guides.selectors.user import student_profile_model
 
 settings_utils = SettingsUtils()
@@ -155,7 +157,7 @@ class DocsData:
                 **new_pay_doc
             )
             path_split = pay_doc[1].split('/')
-            pay_doc_object.pay_file.save(
+            pay_doc_object.file.save(
                 (f"{path_split[-1:][0][:-5] if path_split[-1:][0].endswith('jpeg') else path_split[-1:][0][:-4]}"
                 f".{pay_doc[1][-3:]}"),
                 file
@@ -163,5 +165,49 @@ class DocsData:
             print(f'Документ об оплате обучающегося "{profile.display_name}" '
                   f'- добавлено')
             del file
+
+    @staticmethod
+    def get_offers():
+        """
+        Получение договоров офферт
+        """
+        exists = student_group_offer_model.objects.all()
+        groups = student_group_model.objects.all()
+        with old_edu_connect_engine.connect() as conn:
+            sql = 'SELECT [id], [offer] from dbo.centre_studentgroups'
+            data_query = conn.execute(text(sql))
+            data = data_query.all()
+        for offer in data:
+            if len(list(filter(lambda of: of.old_id == offer[0], exists))) > 0:
+                continue
+            try:
+                group = list(filter(lambda gr: gr.old_id == offer[0], groups))[0]
+            except Exception:
+                print(f'group - {offer[0]}')
+                continue
+            # try:
+            #     file = open(
+            #         os.path.join(settings_utils.get_parameter_from_settings('MEDIA_ROOT_OLD'), Path(offer[1])),
+            #         'rb',
+            #     )
+            # except Exception:
+            #     print(f'file - {offer[1]}')
+            #     continue
+            new_offer = {
+                'old_id': offer[0],
+                'student_group_id': group.object_id,
+                'file': offer[1],
+            }
+            print(new_offer)
+            # order_object, _ = program_order_model.objects.update_or_create(
+            #     **new_order
+            # )
+            # order_object.file.save(
+            #     f"dpp_order.{order[9][-3:]}",
+            #     file
+            # )
+            # print(f'Приказ ДПП №{new_order["number"]} от {new_order["date"].strftime("%d.%m.%Y")} '
+            #       f'- добавлено')
+            # del file
 
 

@@ -14,7 +14,25 @@
       "
       :tableHeaders="tableHeaders"
       :fieldsArray="fieldsArray"
+      :openDocViewerFunction="openDocViewer"
   />
+
+  <CokoDialog
+    ref="docViewerDialog"
+  >
+
+    <template v-slot:title>
+      {{docName}} обучающегося {{docFIO}}
+    </template>
+
+    <template v-slot:text>
+      <DocViewer
+        :fileId="docId"
+        :fileType="docType"
+      />
+    </template>
+
+  </CokoDialog>
 
 </template>
 
@@ -23,10 +41,12 @@
 // Компонент для работы с заявками учебной группы
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import appStatuses from "@/commons/consts/apps/appStatuses";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
+import DocViewer from "@/components/DocViewer.vue";
 
 export default {
   name: 'StudentGroupApps',
-  components: {PaginationTable},
+  components: {DocViewer, CokoDialog, PaginationTable},
   props: {
     groupId: String, // object_id учбеной группы
     serviceType: String, // Тип услуги учебной группы (ou или iku)
@@ -101,7 +121,25 @@ export default {
           key: 'check_survey',
           addRequired: false
         }
-      ]
+      ],
+      // object_id выбранного документа,
+      docId: '',
+      // Выбранный тип документа
+      docType: '',
+      // Наименование документа,
+      docName: '',
+      // ФИО обучаюещегося
+      docFIO: ''
+    }
+  },
+  methods: {
+    // Открыть окно для просмотра документа
+    openDocViewer(fio, docId, docName, docType) {
+      this.docType = docType
+      this.docName = docName
+      this.docFIO = fio
+      this.docId = docId
+      this.$refs.docViewerDialog.dialog = true
     }
   }
 }

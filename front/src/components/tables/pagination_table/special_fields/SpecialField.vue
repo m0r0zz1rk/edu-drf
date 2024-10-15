@@ -70,12 +70,21 @@
   >
     <BooleanBadge
         :bool="item.education_check"
-    /><br/>
-    <FileField
-      v-if="item.education_doc !== null"
-      :fileName="item.education_doc_name"
-      :file="item.education_doc"
-    />
+    />&nbsp;
+    <v-btn
+      v-if="item.education_doc_id !== null"
+      color="coko-blue"
+      @click="openDocViewerFunction(
+          item.student.display_name,
+          item.education_doc_id,
+          item.education_doc_name,
+          'student'
+      )"
+    >
+      <v-icon
+        icon="file-document-outline"
+      />
+    </v-btn>
 
   </div>
 
@@ -84,11 +93,6 @@
   >
     <BooleanBadge
         :bool="item.status in ['pay', 'study', 'study_complete', 'archive']"
-    /><br/>
-    <FileField
-        v-if="item.pay_doc !== null"
-        :fileName="item.pay_doc_name"
-        :file="item.pay_doc"
     />
 
   </div>
@@ -127,6 +131,8 @@ export default {
     header: Object, // Заголовок пагинационной таблицы
     item: Object, // Запись таблицы,
     mobileDisplay: Boolean, // Отображение на экране мобильного устройства
+    // Функция для просмотра документов
+    openDocViewerFunction: Function,
   },
   data() {
     return {
