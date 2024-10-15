@@ -83,7 +83,7 @@
         <v-card-title
           class="login-card-title"
         >
-          Последние заявки
+          Последние заявки (Тест)
         </v-card-title>
         <v-card-text>
           <v-skeleton-loader

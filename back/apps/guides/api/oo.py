@@ -21,7 +21,7 @@ from apps.journal.services.journal import JournalService
 
 class OoViewSet(viewsets.ModelViewSet):
     """Работа с ОО в модуле Справочников"""
-    #permission_classes = [IsAuthenticated, IsAdministrators]
+    permission_classes = [IsAuthenticated, IsAdministrators]
     ju = JournalService()
     respu = ResponseUtils()
     mu = MoService()
@@ -177,7 +177,3 @@ class OoViewSet(viewsets.ModelViewSet):
                 ExceptionHandling.get_traceback()
             )
             return self.respu.bad_request_response('Произошла системная ошибка')
-
-    def delete_all(self, request, *args, **kwargs):
-        for oo in oo_queryset():
-            oo.delete()

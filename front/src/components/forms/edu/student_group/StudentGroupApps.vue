@@ -1,7 +1,7 @@
 <template>
 
   <PaginationTable
-      tableTitle="Заявки группы"
+      tableTitle="Заявки обучающихся"
       tableWidth="98"
       :noTab="false"
       :addButton="false"
@@ -22,7 +22,8 @@
   >
 
     <template v-slot:title>
-      {{docName}} обучающегося {{docFIO}}
+      <p v-if="!mobileDisplay">{{docName}} обучающегося {{docFIO}}</p>
+      <p v-if="mobileDisplay">{{docFIO.split(' ')[0]}}</p>
     </template>
 
     <template v-slot:text>
@@ -43,6 +44,7 @@ import PaginationTable from "@/components/tables/pagination_table/PaginationTabl
 import appStatuses from "@/commons/consts/apps/appStatuses";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import DocViewer from "@/components/DocViewer.vue";
+import {useDisplay} from "vuetify";
 
 export default {
   name: 'StudentGroupApps',
@@ -53,6 +55,8 @@ export default {
   },
   data() {
     return {
+      // Параметр проверки мобильного устройства
+      mobileDisplay: useDisplay().smAndDown,
       // Список столбцов таблицы
       tableHeaders: [
         {

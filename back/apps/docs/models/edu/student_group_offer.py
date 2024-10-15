@@ -14,9 +14,9 @@ def get_upload_path(instance, filename) -> str:
     :return: Путь для загрузки
     """
     _, file_extension = os.path.splitext(filename)
-    new_file_name = f"{''.join(symb for symb in instance.number if symb == ' ' or symb.isalnum())}{file_extension}"
+    new_file_name = f"{''.join(symb for symb in instance.group.code if symb == ' ' or symb.isalnum())}{file_extension}"
     order_path = SettingsUtils().get_parameter_from_settings('MEDIA_ROOT')
-    for subfolder in ['Договора', 'Оферта', instance.student_group.code]:
+    for subfolder in ['Договора', 'Оферта', instance.group.code]:
         order_path = os.path.join(order_path, subfolder)
         if not os.path.exists(order_path):
             os.makedirs(order_path)
@@ -25,7 +25,7 @@ def get_upload_path(instance, filename) -> str:
 
 class StudentGroupOffer(BaseTable):
     """Модель договоров оферты учебных групп"""
-    student_group = models.ForeignKey(
+    group = models.ForeignKey(
         'edu.StudentGroup',
         on_delete=models.CASCADE,
         null=True,

@@ -5,6 +5,10 @@ const fileContentTypes = [
         mime: 'application/pdf'
     },
     {
+        extension: 'PDF',
+        mime: 'application/pdf'
+    },
+    {
         extension: 'png',
         mime: 'image/png'
     },
@@ -14,6 +18,14 @@ const fileContentTypes = [
     },
     {
         extension: 'jpg',
+        mime: 'image/jpeg'
+    },
+    {
+        extension: 'JPG',
+        mime: 'image/jpeg'
+    },
+    {
+        extension: 'PEG',
         mime: 'image/jpeg'
     },
 ]

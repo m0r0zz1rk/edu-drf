@@ -71,20 +71,17 @@
     <BooleanBadge
         :bool="item.education_check"
     />&nbsp;
-    <v-btn
+    <v-icon
       v-if="item.education_doc_id !== null"
       color="coko-blue"
+      icon="mdi-file-document-outline"
       @click="openDocViewerFunction(
           item.student.display_name,
           item.education_doc_id,
           item.education_doc_name,
           'student'
       )"
-    >
-      <v-icon
-        icon="file-document-outline"
-      />
-    </v-btn>
+    />
 
   </div>
 
@@ -92,7 +89,18 @@
       v-if="ui === 'appPayCheck'"
   >
     <BooleanBadge
-        :bool="item.status in ['pay', 'study', 'study_complete', 'archive']"
+        :bool="['pay', 'study', 'study_complete', 'archive'].includes(item.status)"
+    />
+    <v-icon
+        v-if="item.pay_doc_id !== null"
+        color="coko-blue"
+        icon="mdi-file-document-outline"
+        @click="openDocViewerFunction(
+          item.student.display_name,
+          item.pay_doc_id,
+          item.pay_doc_name,
+          'pay'
+      )"
     />
 
   </div>

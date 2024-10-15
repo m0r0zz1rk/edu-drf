@@ -2,27 +2,42 @@
 
   <v-skeleton-loader
     v-if="base64String === null"
-    style="height: 100%"
     type="image"
   />
 
-  <div
-    id="viewerDiv"
-    style="height: 100%; width: 100%"
+  <PdfApp
+    v-if="(base64String !== null) && (contentType === 'application/pdf')"
+    :pdf="base64String"
+    style="width: 100%; height: 100%"
+  />
+
+  <object
+      v-if="base64String !== null && (contentType !== 'application/pdf')"
+      style="max-height: 150vh; max-width: 100vw"
+      :data="base64String"
+      :type="contentType"
   >
-  </div>
+    <embed
+        :src="base64String"
+    />
+  </object>
 
 </template>
 
 <script>
 
 // Компонент для просмотра документов
+import PdfApp from "vue3-pdf-app"
+import "vue3-pdf-app/dist/icons/main.css"
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import fileContentTypes from "@/commons/consts/fileContentTypes";
 
 export default {
   name: 'DocViewer',
+  components: {
+    PdfApp
+  },
   props: {
     // Тип файла (student, pay или offer)
     fileType: String,
@@ -36,7 +51,9 @@ export default {
       // Полученный файл с сервера
       file: null,
       // Строка base64
-      base64String: null
+      base64String: null,
+      // Тип контента
+      contentType: null
     }
   },
   methods: {
@@ -55,31 +72,22 @@ export default {
             fileRequest.error
         )
       } else {
-        this.base64String = 'data:'+fileContentTypes.filter(
+        let ext = fileRequest.file_name.substring(
+            fileRequest.file_name.indexOf('.'),
+            fileRequest.file_name.length
+        )
+        console.log(ext)
+        this.contentType = fileContentTypes.filter(
             (type) => type.extension === fileRequest.file_name.substring(
                 fileRequest.file_name.length-3, fileRequest.file_name.length
             )
-        )[0].mime+';base64,'+fileRequest.file
-        console.log(this.base64String)
+        )[0].mime
+        this.base64String = 'data:'+this.contentType+';base64,'+fileRequest.file
       }
     }
   },
   mounted() {
     this.getBase64String()
-  },
-  watch: {
-    base64String: function(newValue, oldValue) {
-      if (newValue !== null) {
-        const viewerFrame = document.createElement('iframe')
-        viewerFrame.src = this.base64String
-        try {
-          document.querySelector('#viewerDiv').appendChild(viewerFrame)
-        } catch (e) {
-          console.log('ABOBA')
-
-        }
-      }
-    }
   }
 }
 

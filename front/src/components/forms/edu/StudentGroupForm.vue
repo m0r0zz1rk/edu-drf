@@ -45,7 +45,7 @@
             class="coko-tab"
             value="apps"
           >
-            Участники
+            Заявки
           </v-tab>
 
           <v-tab
@@ -84,7 +84,7 @@
         />
 
         <StudentGroupApps
-          v-if="groupTab === 'apps'"
+          v-if="(serviceType !== '') && (groupTab === 'apps')"
           :groupId="groupId"
           :serviceType="serviceType"
         />
