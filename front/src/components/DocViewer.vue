@@ -9,6 +9,7 @@
     v-if="(base64String !== null) && (contentType === 'application/pdf')"
     :pdf="base64String"
     style="width: 100%; height: 100%"
+    defaultLocale="ru"
   />
 
   <object

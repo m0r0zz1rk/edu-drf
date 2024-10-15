@@ -108,7 +108,17 @@
   <v-icon
     v-if="ui === 'appFormView'"
     icon="mdi-list-box-outline"
-    @click="selectGroupAppFunction(item.object_id)"
+    @click="item.student ?
+      selectGroupAppFunction(
+          item.student.display_name,
+          item.object_id
+      )
+      :
+      selectGroupAppFunction(
+          item.group_code,
+          item.object_id
+      )
+    "
   />
 
   <BooleanBadge

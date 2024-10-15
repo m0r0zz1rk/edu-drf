@@ -28,7 +28,7 @@
         <b>{{curator}}</b><br/>
         <v-btn
           color="coko-blue"
-          @click="chooseCuratorDialog = !(chooseCuratorDialog)"
+          @click="$refs.curatorSelectDialog.dialog = true"
         >
           Изменить
         </v-btn>
@@ -119,39 +119,29 @@
 
   </v-expansion-panels>
 
-  <v-dialog
-    persistent
-    v-model="chooseCuratorDialog"
+  <CokoDialog
+    ref="curatorSelectDialog"
   >
 
-    <v-card class="lk-full-page-card">
-      <v-card-title class="d-flex justify-space-between align-center">
+    <template v-slot:title>
+      Выбор куратора
+    </template>
 
-        Выбор куратора
-
-        <v-btn
-          icon="mdi-close"
-          color="coko-blue"
-          @click="chooseCuratorDialog = !(chooseCuratorDialog)"
-        />
-      </v-card-title>
-
-
+    <template v-slot:text>
       <PaginationTable
-        tableTitle="Сотрудник ЦОКО"
-        tableWidth="80"
-        :noTab="false"
-        :addButton="false"
-        :xlsxButton="false"
-        getRecsURL="/backend/api/v1/guides/cokos/"
-        :tableHeaders="curatorTableHeaders"
-        :fieldsArray="curatorFieldsArray"
-        :itemSelectEvent="curatorSelect"
+          tableTitle="Сотрудник ЦОКО"
+          tableWidth="80"
+          :noTab="false"
+          :addButton="false"
+          :xlsxButton="false"
+          getRecsURL="/backend/api/v1/guides/cokos/"
+          :tableHeaders="curatorTableHeaders"
+          :fieldsArray="curatorFieldsArray"
+          :itemSelectEvent="curatorSelect"
       />
+    </template>
 
-    </v-card>
-
-  </v-dialog>
+  </CokoDialog>
 
 </template>
 
@@ -162,10 +152,11 @@ import {showAlert} from "@/commons/alerts";
 import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import studyForms from "@/commons/consts/edu/studyForms";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: "StudentGroupManage",
-  components: {PaginationTable},
+  components: {CokoDialog, PaginationTable},
   props: {
     groupId: String, // object_id учебной группы
   },
@@ -182,7 +173,6 @@ export default {
       curator: '-', // ФИО куратора
       loading: true, // Параметр отображения загрузки на элеметнах формы
       statuses: studentGroupStatuses, // Список статусов учебных групп
-      chooseCuratorDialog: false, // Параметр отображения диалогового окна выбора куратора учебной группы
       curatorTableHeaders: [
         {
           'title': 'Фамилия',
@@ -258,7 +248,7 @@ export default {
         this.curator += ' '+curator.patronymic
       }
       this.studentGroup.curator_id = curator.object_id
-      this.chooseCuratorDialog = false
+      this.$refs.curatorSelectDialog.dialog = false
     },
     // Удаление учебной группы
     async groupDelete() {

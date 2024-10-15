@@ -42,14 +42,13 @@ export function apiRequest (
             .catch(e => {return null})
             .then(resp => {
                 if ([401, 403].includes(resp.status)) {
-                    console.log(backendUrl)
-                  // delCookie('cokoToken')
-                  // showAlert(
-                  //   'error',
-                  //   'Авторизация',
-                  //   'Пожалуйста, войдите в систему'
-                  // )
-                  // window.location.replace('/login')
+                  delCookie('cokoToken')
+                  showAlert(
+                    'error',
+                    'Авторизация',
+                    'Пожалуйста, войдите в систему'
+                  )
+                  window.location.replace('/login')
                 }
                 if(!([200, 201, 202, 204, 400, 401, 403, 404, 409, 500].includes(resp.status))) {
                     showAlert(

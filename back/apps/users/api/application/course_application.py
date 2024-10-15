@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.applications.selectors.course_application import course_application_queryset, course_application_model
 from apps.applications.serializers.base_application import RequestApplicationCreateSerializer, \
-    ResponseApplicationCreateSerializer
+    ResponseApplicationCreateSerializer, BaseApplicationSerializer
 from apps.applications.serializers.course_application import CourseApplicationListSerializer, \
     CourseApplicationDetailSerializer, CourseApplicationUpdateSerializer
 from apps.applications.services.base_application import BaseApplicationService
@@ -39,7 +39,7 @@ class CourseApplicationViewSet(viewsets.ModelViewSet):
         responses={
             '403': 'Пользователь не авторизован или не является обучающимся',
             '400': 'Ошибка при получении списка',
-            '200': CourseApplicationListSerializer(many=True)
+            '200': CourseApplicationListSerializer(many=True) or BaseApplicationSerializer(many=True)
         }
     )
     @journal_api(
@@ -50,11 +50,19 @@ class CourseApplicationViewSet(viewsets.ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         try:
-            apps = self._course_application_service.get_departments_apps(
-                request.user.id,
-                self.get_queryset()
-            )
-            serializer = self.get_serializer(apps, many=True)
+            if 'profile_id' in request.GET:
+                if not request.user.is_superuser:
+                    apps = self._course_application_service.get_all_apps(
+                        request.GET['profile_id'],
+                        self.get_queryset()
+                    )
+                    serializer = BaseApplicationSerializer(apps, many=True)
+            else:
+                apps = self._course_application_service.get_departments_apps(
+                    request.user.id,
+                    self.get_queryset()
+                )
+                serializer = self.get_serializer(apps, many=True)
             return self._response_utils.ok_response_dict(serializer.data)
         except Exception:
             raise APIProcessError

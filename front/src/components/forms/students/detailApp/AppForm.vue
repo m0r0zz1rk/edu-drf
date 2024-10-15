@@ -11,7 +11,7 @@
         item-title="name"
         item-value="object_id"
         label="Регион*"
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
     />
 
@@ -23,7 +23,7 @@
         item-title="name"
         item-value="object_id"
         label="МО*"
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
     />
 
@@ -34,7 +34,7 @@
         item-title="title"
         item-value="key"
         label="Безработный*"
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
     />
 
@@ -45,10 +45,10 @@
       Образовательная организация:<br/>
       <v-btn
         color="coko-blue"
-        v-if="(internalApp.region_name === 'Иркутская область') && (internalApp.mo_object_id !== null)"
+        v-if="(!disabled) && (internalApp.region_name === 'Иркутская область') && (internalApp.mo_object_id !== null)"
         text="Справочник"
         @click="$refs.ooSelectDialog.dialog = true"
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
       />
       <v-textarea
@@ -63,7 +63,7 @@
               :
               'Введите название ОО*'
         "
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
       />
       <v-select
@@ -73,7 +73,7 @@
           item-title="name"
           item-value="object_id"
           label="Категория должности*"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
       <v-select
@@ -83,7 +83,7 @@
           item-title="name"
           item-value="object_id"
           label="Должность*"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
 
@@ -96,7 +96,7 @@
         item-title="title"
         item-value="key"
         label="Уровень образования*"
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
     />
 
@@ -108,7 +108,7 @@
         item-title="title"
         item-value="key"
         label="Категория получаемого образования*"
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
     />
 
@@ -139,10 +139,11 @@
       <b>(Не выбран)</b>
     </p>
     <v-btn
+        v-if="(!disabled)"
         color="coko-blue"
         text="Выбрать"
         @click="$refs.educationDocSelectDialog.dialog = true"
-        :disabled="disabled"
+        :readonly="disabled"
         :loading="loading"
     />
     <br/><br/>
@@ -154,7 +155,7 @@
           color="coko-blue"
           v-model="internalApp.diploma_surname"
           label="Фамиилия в дипломе*"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
 
@@ -179,10 +180,11 @@
           <b>(Не выбран)</b>
         </p>
         <v-btn
+            v-if="(!disabled)"
             color="coko-blue"
             text="Выбрать"
             @click="$refs.surnameDocSelectDialog.dialog = true"
-            :disabled="disabled"
+            :readonly="disabled"
             :loading="loading"
         />
         <br/><br/>
@@ -194,7 +196,7 @@
           v-model="internalApp.education_serial"
           :rules="[rules.education_serial,]"
           label="Серия диплома*"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
 
@@ -203,7 +205,7 @@
           v-model="internalApp.education_number"
           :rules="[rules.education_number,]"
           label="Номер диплома*"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
 
@@ -214,7 +216,7 @@
           prepend-icon=""
           prepend-inner-icon="$calendar"
           variant="solo"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
           clearable
       />
@@ -226,7 +228,7 @@
           item-title="title"
           item-value="key"
           label="Физическое лицо*"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
 
@@ -237,7 +239,7 @@
           item-title="title"
           item-value="key"
           label="Отправка удостоверения почтой*"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
 
@@ -246,7 +248,7 @@
           color="coko-blue"
           v-model="internalApp.mail_address"
           label="Почтовый адрес для отправки удостоверения"
-          :disabled="disabled"
+          :readonly="disabled"
           :loading="loading"
       />
 

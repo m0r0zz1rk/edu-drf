@@ -27,9 +27,17 @@
         <v-tab
             v-if="profileUuid"
             class="coko-tab"
-            value="apps"
+            value="course_apps"
         >
-          Заявки
+          ОУ
+        </v-tab>
+
+        <v-tab
+            v-if="profileUuid"
+            class="coko-tab"
+            value="event_apps"
+        >
+          ИКУ
         </v-tab>
 
       </v-tabs>
@@ -272,6 +280,11 @@
             />
           </div>
 
+          <CourseApps
+            v-if="userInfoTab === 'course_apps'"
+            :profileUuid="profileUuid"
+          />
+
         </slot>
 
       </DialogContentWithError>
@@ -315,10 +328,11 @@ import DialogContentWithError from "@/components/dialogs/DialogContentWithError.
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import studentDocTypes from "@/commons/consts/docs/studentDocTypes";
+import CourseApps from "@/components/forms/profile/CourseApps.vue";
 
 export default {
   name: "ProfileForm",
-  components: {PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
+  components: {CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
   props: {
     profileUuid: String, // Вариативный параметр, object_id профиля пользователя,
     closeDialogEvent: Function, // Событие для закрытия диалогового окна (для просмотра профиля из справочников)
