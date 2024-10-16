@@ -265,6 +265,7 @@
     }
 
     .lk-full-page-card .v-card-text:not(.internal-card-text) {
+        width: 100vw;
         height: calc(99vh - 150px);
         overflow: auto;
         background: white;
