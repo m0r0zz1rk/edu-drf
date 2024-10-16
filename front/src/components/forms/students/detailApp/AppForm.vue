@@ -126,9 +126,15 @@
     <template
       v-if="internalApp.education_doc_object_id !== null"
     >
-      <FileField
-          :file="internalApp.education_doc_file"
-          :fileName="internalApp.education_doc_name"
+      <v-icon
+          color="coko-blue"
+          icon="mdi-file-document-outline"
+          @click="openDocViewer(
+                'Просмотр документа',
+                internalApp.education_doc_object_id,
+                'Документ',
+                'student'
+            )"
       />
       <br/>
     </template>
@@ -167,9 +173,16 @@
         <template
           v-if="internalApp.surname_doc_object_id !== null"
         >
-          <FileField
-              :file="internalApp.surname_doc_file"
-              :fileName="internalApp.surname_doc_name"
+          <v-icon
+              v-if="internalApp.surname_doc_object_id !== null"
+              color="coko-blue"
+              icon="mdi-file-document-outline"
+              @click="openDocViewer(
+                'Просмотр документа',
+                internalApp.surname_doc_object_id,
+                'Документ',
+                'student'
+            )"
           />
           <br/>
         </template>
@@ -350,6 +363,24 @@
 
   </CokoDialog>
 
+  <CokoDialog
+      ref="docViewerDialog"
+  >
+
+    <template v-slot:title>
+      <p v-if="!mobileDisplay">Просмотр документа</p>
+      <p v-if="mobileDisplay">Документ</p>
+    </template>
+
+    <template v-slot:text>
+      <DocViewer
+          :fileId="docId"
+          :fileType="docType"
+      />
+    </template>
+
+  </CokoDialog>
+
 </template>
 
 <script>
@@ -362,12 +393,12 @@ import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import educationLevels from "@/commons/consts/apps/educationLevels";
 import educationCategories from "@/commons/consts/apps/educationCategories";
-import FileField from "@/components/tables/pagination_table/special_fields/sources/FileField.vue";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
+import {useDisplay} from "vuetify";
 
 export default {
   name: 'AppForm',
-  components: {FileField, PaginationTable, CokoDialog, AppStatusBadge},
+  components: {PaginationTable, CokoDialog, AppStatusBadge},
   props: {
     // Только для чтения
     disabled: Boolean,
@@ -382,10 +413,16 @@ export default {
     // Список категорий должностей
     positionCategories: Array,
     // Список должностей
-    positions: Array
-  },
+    positions: Array,
+      },
   data() {
     return {
+      // Параметр проверки мобильного устройства
+      mobileDisplay: useDisplay().smAndDown,
+      // Выбранный документ
+      docId: null,
+      // Тип документа
+      docType: null,
       // Параметр отображения анимации загрузки на элементах формы
       loading: false,
       // Варианты для выпадающего списка "Безработный" и "Физическое лицо"
@@ -463,6 +500,12 @@ export default {
     }
   },
   methods: {
+    // Открыть окно для просмотра документа
+    openDocViewer(fio, docId, docName, docType) {
+      this.docId = docId
+      this.$refs.docViewerDialog.dialog = true
+      this.docType = docType
+    },
     // Установка внутреннего объекта заявки
     setInternalApp() {
       this.internalApp = this.studentApp
@@ -671,4 +714,5 @@ export default {
 
 </style>
 <script setup>
+import DocViewer from "@/components/DocViewer.vue";
 </script>

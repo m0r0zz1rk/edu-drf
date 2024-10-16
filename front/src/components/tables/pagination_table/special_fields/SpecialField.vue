@@ -44,9 +44,16 @@
   <div
     v-if="ui === 'file'"
   >
-    <FileField
-      :file="item.file"
-      :fileName="item.doc_name"
+    <v-icon
+        v-if="item.pay_doc_id !== null"
+        color="coko-blue"
+        icon="mdi-file-document-outline"
+        @click="openDocViewerFunction(
+          'Просмотр документа',
+          item.object_id,
+          'Документ',
+          'student'
+      )"
     />
   </div>
 

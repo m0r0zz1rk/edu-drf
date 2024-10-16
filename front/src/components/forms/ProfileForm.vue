@@ -277,6 +277,7 @@
                 "
                 :tableHeaders="tableHeaders"
                 :fieldsArray="fieldsArray"
+                :openDocViewerFunction="openDocViewer"
             />
           </div>
 
@@ -316,6 +317,24 @@
 
   </v-card>
 
+  <CokoDialog
+      ref="docViewerDialog"
+  >
+
+    <template v-slot:title>
+      <p v-if="!mobileDisplay">Просмотр документа</p>
+      <p v-if="mobileDisplay">Документ</p>
+    </template>
+
+    <template v-slot:text>
+      <DocViewer
+          :fileId="docId"
+          fileType="student"
+      />
+    </template>
+
+  </CokoDialog>
+
 </template>
 
 <script>
@@ -329,16 +348,20 @@ import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import studentDocTypes from "@/commons/consts/docs/studentDocTypes";
 import CourseApps from "@/components/forms/profile/CourseApps.vue";
+import DocViewer from "@/components/DocViewer.vue";
+import {useDisplay} from "vuetify";
 
 export default {
   name: "ProfileForm",
-  components: {CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
+  components: {DocViewer, CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
   props: {
     profileUuid: String, // Вариативный параметр, object_id профиля пользователя,
     closeDialogEvent: Function, // Событие для закрытия диалогового окна (для просмотра профиля из справочников)
   },
   data() {
     return {
+      // Параметр проверки мобильного устройства
+      mobileDisplay: useDisplay().smAndDown,
       // Информация о профиле пользователя
       profileData: {
         'surname': '',
@@ -426,12 +449,16 @@ export default {
           key: 'file',
           addRequired: true
         }
-      ]
+      ],
+      // Выбранный ID документа
+      docId: null
     }
   },
   methods: {
-    openDocs() {
-
+    // Открыть окно для просмотра документа
+    openDocViewer(fio, docId, docName, docType) {
+      this.docId = docId
+      this.$refs.docViewerDialog.dialog = true
     },
     async setData() {
       let statesRequest = await apiRequest(

@@ -48,8 +48,7 @@ class StudentDocListSerializer(serializers.ModelSerializer):
             'object_id',
             'date_create',
             'doc_type',
-            'doc_name',
-            'file'
+            'doc_name'
         )
 
 

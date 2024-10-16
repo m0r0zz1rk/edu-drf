@@ -12,21 +12,18 @@
     :itemSelectEvent="userSelect"
   />
 
-  <CokoDialog
-    ref="profileFormDialog"
+  <v-dialog
+    persistent
+    v-model="userDialog"
   >
 
-    <template v-slot:text>
+    <ProfileForm
+      v-if="userInfoTab === 'profile' && profileUuid.length > 0"
+      :profileUuid="profileUuid"
+      :closeDialogEvent="() => {userDialog = !(userDialog)}"
+    />
 
-      <ProfileForm
-          v-if="userInfoTab === 'profile' && profileUuid.length > 0"
-          :profileUuid="profileUuid"
-          :closeDialogEvent="() => {userDialog = !(userDialog)}"
-      />
-
-    </template>
-
-  </CokoDialog>
+  </v-dialog>
 
 </template>
 
@@ -34,11 +31,10 @@
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
 import ProfileForm from "@/components/forms/ProfileForm.vue";
-import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: "StudentUsers",
-  components: {CokoDialog, ProfileForm, PaginationTableBaseField, PaginationTable},
+  components: {ProfileForm, PaginationTableBaseField, PaginationTable},
   data() {
     return {
       tableHeaders: [

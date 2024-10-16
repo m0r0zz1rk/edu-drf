@@ -3,8 +3,6 @@
   <v-dialog
       color="coko-blue"
       v-model="dialog"
-      :height="mobileDisplay && '99%'"
-      :width="mobileDisplay && '99%'"
       :fullscreen="mobileDisplay"
       persistent
   >

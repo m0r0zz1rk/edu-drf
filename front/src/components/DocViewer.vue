@@ -2,7 +2,7 @@
 
   <v-skeleton-loader
     v-if="base64String === null"
-    type="image"
+    type="card"
   />
 
   <PdfApp
