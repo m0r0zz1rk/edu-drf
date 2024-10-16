@@ -47,9 +47,9 @@ class CourseApplicationService:
         return course_application_model.objects.get(object_id=app_id)
 
     @staticmethod
-    def get_all_apps(profile_id: uuid, apps_queryset: QuerySet) -> list:
+    def get_all_apps(profile_id: uuid, apps_queryset: QuerySet) -> QuerySet:
         """
-        Получение всех заявок на курсы (для ЛК администратора)
+        Получение всех заявок обучающегося на курсы (для ЛК администратора)
         :param profile_id: object_id профиля обучающегося
         :param apps_queryset: QuerySet со всем заявками на курсы
         :return: список словарей с подразделением и его заявками обучающегося

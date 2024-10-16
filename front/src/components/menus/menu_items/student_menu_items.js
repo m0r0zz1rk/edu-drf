@@ -20,7 +20,7 @@ const studentMenuItems = [
   {
     'icon': 'mdi-archive',
     'title': 'Архив',
-    'link': '/student/archive',
+    'link': '/student/archive_apps',
     'value': 'archive'
   }
 ]

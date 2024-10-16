@@ -3,6 +3,7 @@ import Courses from "@/views/users/Courses.vue";
 import Events from "@/views/users/Events.vue";
 import DetailApp from "@/views/users/apps/DetailApp.vue";
 import ActiveApps from "@/views/users/ActiveApps.vue";
+import ArchiveApps from "@/views/users/ArchiveApps.vue";
 
 
 const users_routes = [
@@ -34,6 +35,12 @@ const users_routes = [
         path: '/student/active_apps',
         name: 'ActiveApps',
         component: ActiveApps,
+        beforeEnter: [isAuthenticated, ]
+    },
+    {
+        path: '/student/archive_apps',
+        name: 'ArchiveApps',
+        component: ArchiveApps,
         beforeEnter: [isAuthenticated, ]
     },
     // {

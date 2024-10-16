@@ -10,6 +10,7 @@ from apps.applications.serializers.course_application import CourseApplicationLi
 from apps.applications.services.base_application import BaseApplicationService
 from apps.applications.services.course_application import CourseApplicationService
 from apps.authen.services.profile import ProfileService
+from apps.commons.pagination import CustomPagination
 from apps.commons.permissions.is_admin_or_student import IsAdminOrStudent
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.response import ResponseUtils
@@ -31,6 +32,7 @@ class CourseApplicationViewSet(viewsets.ModelViewSet):
 
     queryset = course_application_queryset()
     serializer_class = CourseApplicationListSerializer
+    pagination_class = CustomPagination
     lookup_field = "object_id"
 
     @swagger_auto_schema(
@@ -52,11 +54,16 @@ class CourseApplicationViewSet(viewsets.ModelViewSet):
         try:
             if 'profile_id' in request.GET:
                 if not request.user.is_superuser:
-                    apps = self._course_application_service.get_all_apps(
-                        request.GET['profile_id'],
-                        self.get_queryset()
-                    )
-                    serializer = BaseApplicationSerializer(apps, many=True)
+                    raise APIProcessError
+                apps = self._course_application_service.get_all_apps(
+                    request.GET['profile_id'],
+                    self.get_queryset()
+                )
+                page = self.paginate_queryset(apps)
+                if page is not None:
+                    serializer = self.get_serializer(page, many=True)
+                    return self.get_paginated_response(serializer.data)
+                serializer = BaseApplicationSerializer(apps, many=True)
             else:
                 apps = self._course_application_service.get_departments_apps(
                     request.user.id,
