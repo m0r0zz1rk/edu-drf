@@ -21,20 +21,9 @@ class StudentDocListSerializer(serializers.ModelSerializer):
     doc_name = serializers.SerializerMethodField(
         label='Имя документа'
     )
-    file = serializers.SerializerMethodField(
-        label='Файл документа'
-    )
 
     def get_doc_name(self, obj):
         return os.path.basename(obj.file.name)
-
-    def get_file(self, obj):
-        try:
-            with obj.file.open(mode='rb') as doc_file:
-                doc_data = doc_file.read()
-            return base64.b64encode(doc_data).decode('utf-8')
-        except Exception:
-            return None
 
     def get_doc_type(self, obj):
         for doc_type in STUDENT_DOC_TYPES:
