@@ -136,7 +136,7 @@ class UserUtils:
         """
         if self.is_user_exists('id', user_id):
             if User.objects.get(id=user_id).groups.exists():
-                group_name = User.objects.get(id=user_id).groups.first().name
+                group_name = User.objects.prefetch_related('groups').get(id=user_id).groups.first().name
                 if group_name == 'Администраторы':
                     return 'centre'
                 elif group_name == 'Сотрудники':

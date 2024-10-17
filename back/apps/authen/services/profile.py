@@ -44,7 +44,10 @@ class ProfileService:
         """
         data = {attribute_name: value}
         try:
-            return (student_profile_model.objects.filter(**data).exists() or
+            return (student_profile_model.objects.
+                    select_related('django_user').
+                    select_related('state').
+                    filter(**data).exists() or
                     coko_profile_model.objects.filter(**data).exists())
         except Exception:
             return False
@@ -70,10 +73,16 @@ class ProfileService:
         """
         if self.is_profile_exist(attribute_name, value):
             find = {attribute_name: value}
-            if student_profile_model.objects.filter(**find).exists():
-                prof = student_profile_model.objects.filter(**find).first()
+            if (student_profile_model.objects.
+                    select_related('django_user').
+                    select_related('state').
+                    filter(**find).exists()):
+                prof = (student_profile_model.objects.
+                        select_related('django_user').
+                        select_related('state').
+                        filter(**find).first())
             else:
-                prof = coko_profile_model.objects.filter(**find).first()
+                prof = coko_profile_model.objects.select_related('django_user').filter(**find).first()
             if output in ['profile', 'username', 'display_name', 'email', 'phone', 'user_id']:
                 if output == 'profile':
                     return prof

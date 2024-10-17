@@ -24,13 +24,25 @@ class ApplicationsData:
     Заявки из олдовой базы edu
     """
 
-    _groups = student_group_model.objects.all()
-    _docs = student_doc_model.objects.all()
+    _groups = (student_group_model.objects.
+               select_related('ou').
+               select_related('iku').
+               select_related('curator').
+               all())
+    _docs = (student_doc_model.objects.
+             select_related('profile').
+             all())
     _pay_docs = pay_doc_model.objects.all()
-    _profiles = student_profile_model.objects.all()
+    _profiles = (student_profile_model.objects.
+                 select_related('django_user').
+                 select_related('state').
+                 all())
     _regions = region_model.objects.all()
     _mos = mo_model.objects.all()
-    _oos = oo_model.objects.all()
+    _oos = (oo_model.objects.
+            select_related('mo').
+            select_related('oo_type').
+            all())
     _position_categories = position_category_model.objects.all()
     _positions = position_model.objects.all()
 

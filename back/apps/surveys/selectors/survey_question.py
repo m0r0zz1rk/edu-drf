@@ -12,7 +12,9 @@ def survey_question_queryset() -> QuerySet:
     """
     Получение всех вопросов опросов
     """
-    return survey_question_model.objects.all().order_by('sequence_number')
+    return (survey_question_model.objects.
+            select_related('survey').
+            all().order_by('sequence_number'))
 
 
 class SurveyQuestionFilter(filters.FilterSet):

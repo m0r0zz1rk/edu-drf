@@ -11,7 +11,11 @@ student_group_model = apps.get_model('edu', 'StudentGroup')
 
 def student_group_queryset() -> QuerySet:
     """Получение queryset с учебными группами"""
-    return student_group_model.objects.all().order_by('-date_create')
+    return (student_group_model.objects.
+            select_related('ou').
+            select_related('iku').
+            select_related('curator').
+            all().order_by('-date_create'))
 
 
 class StudentGroupFilter(filters.FilterSet):

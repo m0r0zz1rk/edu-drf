@@ -16,13 +16,22 @@ def schedule_queryset(student_group_id: uuid = None) -> QuerySet:
     :return: queryset модели schedule
     """
     if student_group_id is None:
-        return schedule_model.objects.all().order_by('date')
-    return schedule_model.objects.filter(group_id=student_group_id).order_by('date')
+        return (schedule_model.objects.
+                select_related('group').
+                select_related('kug_theme').
+                all().order_by('date'))
+    return (schedule_model.objects.
+            select_related('group').
+            select_related('kug_theme').
+            filter(group_id=student_group_id).order_by('date'))
 
 
 def user_teachers_queryset() -> QuerySet:
     """Получение queryset со всеми внешними пользователями с параметром teacher=True"""
-    return student_profile_model.objects.filter(teacher=True)
+    return (student_profile_model.objects.
+            select_related('django_user').
+            select_related('state').
+            filter(teacher=True))
 
 
 class TeachersFilter(filters.FilterSet):

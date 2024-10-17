@@ -27,8 +27,8 @@ class StudentDocService:
         :return: QuerySet с документами пользователя
         """
         try:
-            return student_doc_model.objects.filter(
-                profile=student_profile_model.objects.get(django_user_id=user_id)
+            return student_doc_model.objects.select_related('profile').filter(
+                profile_id=student_profile_model.objects.get(django_user_id=user_id).object_id
             )
         except Exception:
             raise StudentNotExist

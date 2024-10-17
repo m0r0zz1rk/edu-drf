@@ -46,7 +46,9 @@ class CalendarChartService:
         :return: queryset - разделы КУГ для ДПП, None - разделы не найдены
         """
         if self.is_chapters_exists(program_id):
-            return calendar_chart_chapter_model.objects.filter(program_id=program_id)
+            return (calendar_chart_chapter_model.objects.
+                    select_related('program').
+                    filter(program_id=program_id))
         return None
 
     @staticmethod
@@ -57,7 +59,7 @@ class CalendarChartService:
         :return: None - темы не найдены,
         """
         if calendar_chart_chapter_model.objects.filter(object_id=chapter_id).exists():
-            return calendar_chart_theme_model.objects.filter(chapter_id=chapter_id)
+            return calendar_chart_theme_model.objects.select_related('chapter').filter(chapter_id=chapter_id)
         return None
 
     def get_program_calendar_chart(self, program_id: uuid, user_id: int) -> Optional[dict]:
@@ -82,7 +84,7 @@ class CalendarChartService:
             else:
                 kug['on_edit'] = program.kug_edit.display_name
         chapters = []
-        for chapter in (calendar_chart_chapter_model.objects.filter(
+        for chapter in (calendar_chart_chapter_model.objects.select_related('program').filter(
                 program_id=program_id
         ).order_by('position')):
             chapter_obj = {}
@@ -91,7 +93,7 @@ class CalendarChartService:
                     chapter_obj[field.name] = getattr(chapter, field.name)
             chapter_obj['program'] = chapter.program_id
             themes = []
-            for theme in (calendar_chart_theme_model.objects.filter(
+            for theme in (calendar_chart_theme_model.objects.select_related('chapter').filter(
                     chapter_id=chapter.object_id
             ).order_by('position')):
                 theme_obj = {}

@@ -56,7 +56,12 @@ class EducationServiceService:
         """
         return education_service_model.objects. \
             filter(
-                program__in=program_model.objects.filter(department__display_name=department)
+                program__in=(program_model.objects.
+                             select_related('department').
+                             select_related('kug_edit').
+                             prefetch_related('categories').
+                             select_related('program_order').
+                             filter(department__display_name=department))
             ).filter(
                 date_start__year=datetime.datetime.now().year
             ).count()

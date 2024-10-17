@@ -70,7 +70,10 @@ class AuthenData:
         """
         Получение информации из профилей обучающихся
         """
-        if student_profile_model.objects.filter(old_id=0).count() > 0:
+        if (student_profile_model.objects.
+                select_related('django_user').
+                select_related('state').
+                filter(old_id=0).count() > 0):
             with old_edu_connect_engine.connect() as conn:
                 user_profiles_query = conn.execute(
                     text(
@@ -78,7 +81,10 @@ class AuthenData:
                     )
                 )
                 user_profiles = user_profiles_query.all()
-            for profile in student_profile_model.objects.filter(old_id=0):
+            for profile in (student_profile_model.objects.
+                            select_related('django_user').
+                            select_related('state').
+                            filter(old_id=0)):
                 profile_user = list(filter(
                     lambda prof: prof[12] == profile.django_user_id,
                     user_profiles
@@ -109,11 +115,14 @@ class AuthenData:
         """
         dj_group = Group.objects.get(name='Обучающиеся')
         users = User.objects.all()
-        for prof in student_profile_model.objects.exclude(
-                django_user_id__in=User.objects.filter(
-                    groups__name__in=['Обучающиеся', ]
-                )
-        ):
+        for prof in (student_profile_model.objects.
+                     select_related('django_user').
+                     select_related('state').
+                     exclude(
+                     django_user_id__in=User.objects.filter(
+                         groups__name__in=['Обучающиеся', ]
+                     )
+        )):
             user = list(filter(lambda us: us.id == prof.django_user_id, users))[0]
             dj_group.user_set.add(user)
             print(f'Пользователь "{user.username}" добавлен в группу "Обучающиеся"')

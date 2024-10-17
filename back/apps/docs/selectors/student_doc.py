@@ -9,7 +9,7 @@ student_doc_model = apps.get_model('docs', 'StudentDoc')
 
 def student_doc_queryset() -> QuerySet:
     """QuerySet со всеми документами пользователей"""
-    return student_doc_model.objects.all().order_by('-date_create')
+    return student_doc_model.objects.select_related('profile').all().order_by('-date_create')
 
 
 class StudentDocFilter(filters.FilterSet):

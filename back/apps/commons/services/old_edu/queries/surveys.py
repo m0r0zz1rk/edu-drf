@@ -25,7 +25,9 @@ class SurveysData:
         """
         Получение опросов
         """
-        exists = survey_model.objects.all()
+        exists = (survey_model.objects.
+                  select_related('creator').
+                  all())
         users = User.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT survey.[id], survey.[description], prof.[user_id] FROM [edu-new].[dbo].[centre_surveys] '
@@ -55,8 +57,12 @@ class SurveysData:
         """
         Получение вопросов опросов
         """
-        exists = survey_question_model.objects.all()
-        surveys = survey_model.objects.all()
+        exists = (survey_question_model.objects.
+                  select_related('survey').
+                  all())
+        surveys = (survey_model.objects.
+                   select_related('creator').
+                   all())
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT * '
                    'FROM [edu-new].[dbo].[centre_survquestions]')
@@ -87,8 +93,12 @@ class SurveysData:
         """
         Получение ответов обучающихся на вопросы опросов
         """
-        exists = student_answer_model.objects.all()
-        surveys = survey_model.objects.all()
+        exists = (student_answer_model.objects.
+                  select_related('survey').
+                  all())
+        surveys = (survey_model.objects.
+                   select_related('creator').
+                   all())
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT * '
                    'FROM [edu-new].[dbo].[centre_surveysrecords]')

@@ -10,7 +10,9 @@ def survey_question_answer_queryset() -> QuerySet:
     """
     Получение списка возможных ответов на вопросы опросов
     """
-    return survey_question_answer_model.objects.all()
+    return (survey_question_answer_model.objects.
+            select_related('survey_question').
+            all())
 
 
 class SurveyQuestionAnswerFilter(filters.FilterSet):
