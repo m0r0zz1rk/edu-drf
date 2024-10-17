@@ -95,7 +95,10 @@ class GuidesData:
         """
         Получение ОО
         """
-        oos = oo_model.objects.all()
+        oos = (oo_model.objects.
+               select_related('mo').
+               select_related('oo_type').
+               all())
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT * from dbo.centre_oos'
             data_query = conn.execute(text(sql))

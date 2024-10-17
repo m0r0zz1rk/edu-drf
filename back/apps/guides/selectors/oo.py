@@ -7,7 +7,10 @@ oo_model = apps.get_model('guides', 'Oo')
 
 def oo_queryset() -> QuerySet:
     """Получение queryset c образовательными организациями"""
-    return oo_model.objects.all().order_by('date_create')
+    return (oo_model.objects.
+            select_related('mo').
+            select_related('oo_type').
+            all().order_by('date_create'))
 
 
 class OoFilter(filters.FilterSet):

@@ -10,11 +10,23 @@ course_application_model = apps.get_model('applications', 'CourseApplication')
 
 def course_application_queryset() -> QuerySet:
     """Получение queryset со всем заявками на участие в курсах"""
-    return course_application_model.objects.all().order_by(
-        'profile__surname',
-        'profile__name',
-        'profile__patronymic'
-    )
+    return (course_application_model.objects.
+            select_related('profile').
+            select_related('group').
+            select_related('pay_doc').
+            select_related('region').
+            select_related('mo').
+            select_related('oo').
+            select_related('position_category').
+            select_related('position').
+            select_related('education_doc').
+            select_related('surname_doc').
+            select_related('certificate_doc').
+            all().order_by(
+                'profile__surname',
+                'profile__name',
+                'profile__patronymic'
+            ))
 
 
 class CourseApplicationFilter(filters.FilterSet):

@@ -106,7 +106,12 @@ class EduData:
         """
         Получение ДПП
         """
-        exists = program_model.objects.all()
+        exists = (program_model.objects.
+                  select_related('department').
+                  select_related('kug_edit').
+                  prefetch_related('categories').
+                  select_related('program_order').
+                  all())
         program_orders = program_order_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT * from dbo.centre_programs'
@@ -145,8 +150,15 @@ class EduData:
         """
         Получение разделов КУГ-ов ДПП
         """
-        exists = calendar_chart_chapter_model.objects.all()
-        programs = program_model.objects.all()
+        exists = (calendar_chart_chapter_model.
+                  select_related('program').
+                  objects.all())
+        programs = (program_model.objects.
+                    select_related('department').
+                    select_related('kug_edit').
+                    prefetch_related('categories').
+                    select_related('program_order').
+                    all())
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT * from dbo.centre_stschedule where parent_id is NULL'
             data_query = conn.execute(text(sql))
@@ -179,9 +191,18 @@ class EduData:
         """
         Получение тем разделов КУГ-ов ДПП
         """
-        exists = calendar_chart_theme_model.objects.all()
-        chapters = calendar_chart_chapter_model.objects.all()
-        programs = program_model.objects.all()
+        exists = (calendar_chart_theme_model.objects.
+                  select_related('chapter').
+                  all())
+        chapters = (calendar_chart_chapter_model.
+                    select_related('program').
+                    objects.all())
+        programs = (program_model.objects.
+                    select_related('department').
+                    select_related('kug_edit').
+                    prefetch_related('categories').
+                    select_related('program_order').
+                    all())
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT * from dbo.centre_stschedule where parent_id is not NULL'
             data_query = conn.execute(text(sql))
@@ -222,7 +243,12 @@ class EduData:
         """
         Получение категорий слушателей для ДПП
         """
-        exists = program_model.objects.all()
+        exists = (program_model.objects.
+                  select_related('department').
+                  select_related('kug_edit').
+                  prefetch_related('categories').
+                  select_related('program_order').
+                  all())
         audience_categories = audience_category_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT * from dbo.centre_programs_categories'
@@ -248,7 +274,12 @@ class EduData:
         Получение курсов
         """
         exists = education_service_model.objects.all()
-        programs = program_model.objects.all()
+        programs = (program_model.objects.
+                    select_related('department').
+                    select_related('kug_edit').
+                    prefetch_related('categories').
+                    select_related('program_order').
+                    all())
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT * from dbo.centre_courses'
             data_query = conn.execute(text(sql))
@@ -280,7 +311,11 @@ class EduData:
         """
         Получение учебных групп
         """
-        exists = student_group_model.objects.all()
+        exists = (student_group_model.objects.
+                  select_related('ou').
+                  select_related('iku').
+                  select_related('curator').
+                  all())
         ou = education_service_model.objects.all()
         iku = information_service_model.objects.all()
         curators = coko_profile_model.objects.all()
@@ -327,7 +362,11 @@ class EduData:
         """
         Установить учебным группам кураторов
         """
-        exists = student_group_model.objects.all()
+        exists = (student_group_model.objects.
+                  select_related('ou').
+                  select_related('iku').
+                  select_related('curator').
+                  all())
         curators = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT gr.[id] as group_id, prof.[user_id] as teacher_django_id'
@@ -355,9 +394,18 @@ class EduData:
         """
         Получение расписания занятий курсов
         """
-        exists = schedule_model.objects.all()
-        groups = student_group_model.objects.all()
-        themes = calendar_chart_theme_model.objects.all()
+        exists = (schedule_model.objects.
+                  select_related('group').
+                  select_related('kug_theme').
+                  all())
+        groups = (student_group_model.objects.
+                  select_related('ou').
+                  select_related('iku').
+                  select_related('curator').
+                  all())
+        themes = (calendar_chart_theme_model.objects.
+                  select_related('chapter').
+                  all())
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT *'
                    ' from dbo.centre_courselessons')
@@ -410,8 +458,14 @@ class EduData:
         """
         Установка наименования темы и преподавателя
         """
-        exists = schedule_model.objects.all()
-        student_profiles = student_profile_model.objects.all()
+        exists = (schedule_model.objects.
+                  select_related('group').
+                  select_related('kug_theme').
+                  all())
+        student_profiles = (student_profile_model.objects.
+                            select_related('django_user').
+                            select_related('state').
+                            all())
         coko_profiles = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT lesson.[id], stsch.[name], prof.[user_id] FROM [edu-new].[dbo].[centre_courselessons] '
@@ -450,8 +504,15 @@ class EduData:
         """
         Получение расписания занятий курсов
         """
-        exists = schedule_model.objects.all()
-        groups = student_group_model.objects.all()
+        exists = (schedule_model.objects.
+                  select_related('group').
+                  select_related('kug_theme').
+                  all())
+        groups = (student_group_model.objects.
+                  select_related('ou').
+                  select_related('iku').
+                  select_related('curator').
+                  all())
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT *'
                    ' from dbo.centre_eventslessons')
@@ -499,8 +560,14 @@ class EduData:
         """
         Установка преподавателя
         """
-        exists = schedule_model.objects.all()
-        student_profiles = student_profile_model.objects.all()
+        exists = (schedule_model.objects.
+                  select_related('group').
+                  select_related('kug_theme').
+                  all())
+        student_profiles = (student_profile_model.objects.
+                            select_related('django_user').
+                            select_related('state').
+                            all())
         coko_profiles = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT lesson.[id], prof.[user_id] FROM [edu-new].[dbo].[centre_eventslessons] as lesson '

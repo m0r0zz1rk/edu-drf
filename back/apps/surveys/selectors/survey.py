@@ -10,7 +10,9 @@ survey_model = apps.get_model('surveys', 'Survey')
 
 def survey_queryset() -> QuerySet:
     """Получение списка опросов"""
-    return survey_model.objects.all()
+    return (survey_model.objects.
+            select_related('creator').
+            all())
 
 
 class SurveyFilter(filters.FilterSet):

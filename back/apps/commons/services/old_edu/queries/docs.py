@@ -78,8 +78,13 @@ class DocsData:
         """
         Получение пользовательских документов
         """
-        exists = student_doc_model.objects.all()
-        profiles = student_profile_model.objects.all()
+        exists = (student_doc_model.objects.
+                  select_related('profile').
+                  all())
+        profiles = (student_profile_model.objects.
+                    select_related('django_user').
+                    select_related('state').
+                    all())
         with old_edu_connect_engine.connect() as conn:
             sql = ('select sd.id, sd.[file], sd.doc_type_id, sd.profile_id, p.user_id, '
                    'p.surname, p.name, p.patronymic '
@@ -126,7 +131,10 @@ class DocsData:
         Получение документов об оплате
         """
         exists = pay_doc_model.objects.all()
-        profiles = student_profile_model.objects.all()
+        profiles = (student_profile_model.objects.
+                    select_related('django_user').
+                    select_related('state').
+                    all())
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT stdoc.[id], stdoc.[file], prof.[user_id] '
                    'from dbo.students_docs as stdoc inner join dbo.authen_profiles as prof on '
@@ -171,8 +179,14 @@ class DocsData:
         """
         Получение договоров офферт
         """
-        exists = student_group_offer_model.objects.all()
-        groups = student_group_model.objects.all()
+        exists = (student_group_offer_model.objects.
+                  select_related('group').
+                  all())
+        groups = (student_group_model.objects.
+                  select_related('ou').
+                  select_related('iku').
+                  select_related('curator').
+                  all())
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT [id], [offer] from dbo.centre_studentgroups'
             data_query = conn.execute(text(sql))

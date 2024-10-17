@@ -9,7 +9,10 @@ student_profile_model = apps.get_model('authen', 'StudentProfile')
 
 def student_profile_queryset() -> QuerySet:
     """Получение queryset c профилями обучающихся"""
-    return student_profile_model.objects.all().order_by('surname', 'name', 'patronymic')
+    return (student_profile_model.objects.
+            select_related('django_user').
+            select_related('state').
+            all().order_by('surname', 'name', 'patronymic'))
 
 
 class UserFilter(filters.FilterSet):

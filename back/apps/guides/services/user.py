@@ -27,7 +27,10 @@ class UserService:
             for attr in self._teachers_attrs:
                 teacher[attr] = getattr(coko, attr)
             teachers.append(teacher)
-        for user in student_profile_model.objects.all():
+        for user in (student_profile_model.
+                     select_related('django_user').
+                     select_related('state').
+                     objects.all()):
             teacher = {
                 'type': 'Внешний пользователь',
                 'phone': user.phone

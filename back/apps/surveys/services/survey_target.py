@@ -32,7 +32,10 @@ class SurveyTargetService:
         :param type: Тип таргетирования
         """
         if type in ['all', 'edu', 'info']:
-            for target in survey_target_model.objects.filter(type=type):
+            for target in (survey_target_model.objects.
+                           select_related('survey').
+                           select_related('group').
+                           filter(type=type)):
                 target.type = NOT_SET
                 target.save()
 

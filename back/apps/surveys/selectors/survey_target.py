@@ -10,7 +10,10 @@ survey_target_model = apps.get_model('surveys', 'SurveyTarget')
 
 def survey_target_model_queryset() -> QuerySet:
     """Получение списка всех назначений опросов"""
-    return survey_target_model.objects.all()
+    return (survey_target_model.objects.
+            select_related('survey').
+            select_related('group').
+            all())
 
 
 class SurveyTargetFilter(filters.FilterSet):

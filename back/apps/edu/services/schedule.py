@@ -300,14 +300,20 @@ class ScheduleService:
             user_id,
             'profile'
         )
-        days = {lesson.date for lesson in schedule_model.objects.filter(teacher=profile.object_id)
+        days = {lesson.date for lesson in (schedule_model.objects.
+                                           select_related('group').
+                                           select_related('kug_theme').
+                                           filter(teacher=profile.object_id))
                 if lesson.date > datetime.date.today()}
         schedule = []
         for day in days:
-            day_lessons = schedule_model.objects.filter(
-                date=day,
-                teacher=profile.object_id
-            ).order_by('date_create')
+            day_lessons = (schedule_model.objects.
+                           select_related('group').
+                           select_related('kug_theme').
+                           filter(
+                               date=day,
+                               teacher=profile.object_id
+                           ).order_by('date_create'))
             lessons = []
             for lesson in day_lessons:
                 obj = {
