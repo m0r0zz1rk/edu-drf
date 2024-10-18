@@ -29,56 +29,58 @@
       @click="searchShowEvent()"
     />
 
-    <v-dialog
+    <v-btn
         v-if="mobileDisplay"
-        v-model="searchDialog"
+        icon="mdi-magnify"
+        @click="$refs.searchDialog.dialog = true"
+    />
+
+    <CokoDialog
+      v-if="mobileDisplay"
+      ref="searchDialog"
+      :cardActions="true"
     >
-        <template v-slot:activator="{ props: activatorProps }">
 
-            <v-btn
-                icon="mdi-magnify"
-                v-bind="activatorProps"
-            />
+      <template v-slot:title>
+        Поиск записей
+      </template>
 
-        </template>
+      <template v-slot:text>
+        <v-container>
+          <v-row>
+            <template
+                v-for="field in fieldsArray"
+            >
+              <v-col
+                  v-if="(field.key !== 'actions') && (field.ui !== 'file')"
+                  cols="12"
+                  md="4"
+                  sm="6"
+              >
+                <PaginationTableBaseField
+                    :useInTableManage="true"
+                    :checkRequired="false"
+                    :field="field"
+                    :fieldTitle = "tableHeaders.filter((header) => header.key === field.key)[0].title"
+                    :onChangeEvent="onChangeEvent"
+                />
+              </v-col>
+            </template>
+          </v-row>
+        </v-container>
+      </template>
 
-        <v-card>
-            <v-card-title class="d-flex justify-space-between align-center">
-                <span class="text-h5">Поиск записей</span>
-                <v-btn
-                  icon="mdi-close"
-                  color="coko-blue"
-                  @click="searchDialog = !(searchDialog)"
-                ></v-btn>
-            </v-card-title>
+      <template v-slot:actions>
+        <v-btn
+            color="coko-blue"
+            variant="text"
+            @click="$refs.searchDialog.dialog = false"
+        >
+          ОК
+        </v-btn>
+      </template>
 
-            <v-card-text>
-                <v-container>
-                    <v-row>
-                      <template
-                        v-for="field in fieldsArray"
-                      >
-                        <v-col
-                            v-if="(field.key !== 'actions') && (field.ui !== 'file')"
-                            cols="12"
-                            md="4"
-                            sm="6"
-                        >
-                          <PaginationTableBaseField
-                              :useInTableManage="true"
-                              :checkRequired="false"
-                              :field="field"
-                              :fieldTitle = "tableHeaders.filter((header) => header.key === field.key)[0].title"
-                              :onChangeEvent="onChangeEvent"
-                          />
-                        </v-col>
-                      </template>
-                    </v-row>
-                </v-container>
-            </v-card-text>
-        </v-card>
-
-    </v-dialog>
+    </CokoDialog>
 
     <v-btn v-if="xlsxButton && !(foreignKey)"
       :icon="mobileDisplay && 'mdi-file-excel'"
@@ -119,10 +121,11 @@
 <script>
 import PaginationTableAddDialog from "@/components/tables/pagination_table/dialogs/PaginationTableAddDialog.vue";
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: "PaginationTableManage",
-  components: {PaginationTableBaseField, PaginationTableAddDialog},
+  components: {CokoDialog, PaginationTableBaseField, PaginationTableAddDialog},
   props: {
     tableTitle: String, // Заголовок таблицы
     itemsCount: Number, // Количество записей в базе данных

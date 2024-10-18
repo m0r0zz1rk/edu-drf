@@ -1,80 +1,71 @@
 <template>
-  <v-dialog
-    persistent
-    v-model="newItemDialog"
+
+  <v-btn
+      :icon="mobileDisplay && 'mdi-plus'"
+      :prepend-icon="!(mobileDisplay) && 'mdi-plus'"
+      :text="!(mobileDisplay) && 'Добавить'"
+      @click="$refs.newItemDialog.dialog = true"
+  />
+
+  <CokoDialog
+    ref="newItemDialog"
+    :cardActions="true"
   >
-    <template v-slot:activator="{ props }">
 
-      <v-btn
-        :icon="mobileDisplay && 'mdi-plus'"
-        :prepend-icon="!(mobileDisplay) && 'mdi-plus'"
-        :text="!(mobileDisplay) && 'Добавить'"
-        @click="newItemDialog = !(newItemDialog)"
-      />
-
+    <template v-slot:title>
+      Новая запись
     </template>
-    <v-card class="lk-full-page-card">
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span class="text-h5">Новая запись</span>
-        <v-btn
-          icon="mdi-close"
-          color="coko-blue"
-          @click="newItemDialog = !(newItemDialog)"
-        ></v-btn>
-      </v-card-title>
 
-      <v-card-text>
-        <v-container>
-          <v-row>
+    <template v-slot:text>
+      <v-container>
+        <v-row>
 
-            <template v-for="column in tableHeaders">
+          <template v-for="column in tableHeaders">
 
-              <v-col
+            <v-col
                 v-if="column.key !== 'actions'"
                 cols="12"
                 md="12"
                 sm="12"
-              >
+            >
 
-                <PaginationTableBaseField
+              <PaginationTableBaseField
                   v-if="column.key !== 'actions'"
                   :ref="'addField_'+column.key"
                   :fieldTitle="column.title"
                   :checkRequired="true"
                   :useInTableManage="true"
                   :field="fieldsArray.filter((field) => field.key === column.key)[0]"
-                />
+              />
 
-              </v-col>
+            </v-col>
 
-            </template>
+          </template>
 
-          </v-row>
-          <v-alert
+        </v-row>
+        <v-alert
             id="error-add-item-alert"
             class="alert-hidden"
             style="width: 100%"
             :text="errorMessage"
             type="error"
-          ></v-alert>
-        </v-container>
-      </v-card-text>
+        ></v-alert>
+      </v-container>
+    </template>
 
-      <v-divider></v-divider>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
+    <template v-slot:actions>
+      <v-btn
           color="coko-blue"
           variant="text"
           @click="addItem"
           :loading="loading"
-        >
-          Сохранить
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      >
+        Сохранить
+      </v-btn>
+    </template>
+
+  </CokoDialog>
+
 </template>
 
 <script>
@@ -83,10 +74,11 @@ import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
 import {getBase64} from "@/commons/files";
 import fileContentTypes from "@/commons/consts/fileContentTypes";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: "PaginationTableAddDialog",
-  components: {PaginationTableBaseField},
+  components: {CokoDialog, PaginationTableBaseField},
   props: {
     tableHeaders: Array, // Список заголовков пагинационной таблицы
     fieldsArray: Array, // Список описаний полей пагинационной таблицы
@@ -97,7 +89,6 @@ export default {
   },
   data() {
     return {
-
       newItemDialog: false,
       errorMessage: '',
       requiredValid: false,
@@ -162,7 +153,7 @@ export default {
             'Добавление записи',
             addItemRequest.success
           )
-          this.newItemDialog = !this.newItemDialog
+          this.$refs.newItemDialog.dialog = false
           this.getRecs()
         }
         this.loading = false

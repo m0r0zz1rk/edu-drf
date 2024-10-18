@@ -1,82 +1,76 @@
 <template>
-  <v-dialog v-if="editedItem !== null"
-      persistent
-      v-model="editItemDialog"
+
+  <CokoDialog
+    ref="editItemDialog"
+    :cardActions="true"
   >
-    <v-card>
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span class="text-h5">Редактирование записи</span>
-        <v-btn
-            icon="mdi-close"
-            color="coko-blue"
-            @click="editItemDialog = !(editItemDialog)"
-        ></v-btn>
-      </v-card-title>
 
-      <v-card-text>
-        <v-container>
-          <v-row>
+    <template v-slot:title>
+      Редактирование записи
+    </template>
 
-            <template v-for="column in tableHeaders">
+    <template v-slot:text>
+      <v-container>
+        <v-row>
 
-              <v-col
+          <template v-for="column in tableHeaders">
+
+            <v-col
+                v-if="column.key !== 'actions'"
+                cols="12"
+                md="12"
+                sm="12"
+            >
+
+              <PaginationTableBaseField
                   v-if="column.key !== 'actions'"
-                  cols="12"
-                  md="12"
-                  sm="12"
-              >
+                  :ref="'editField_'+column.key"
+                  :fieldTitle="column.title"
+                  :checkRequired="true"
+                  :value="editedItem[column.key]"
+                  :useInTableManage="true"
+                  :field="fieldsArray.filter((field) => field.key === column.key)[0]"
+              />
 
-                <PaginationTableBaseField
-                    v-if="column.key !== 'actions'"
-                    :ref="'editField_'+column.key"
-                    :fieldTitle="column.title"
-                    :checkRequired="true"
-                    :value="editedItem[column.key]"
-                    :useInTableManage="true"
-                    :field="fieldsArray.filter((field) => field.key === column.key)[0]"
-                />
+            </v-col>
 
-              </v-col>
-
-            </template>
+          </template>
 
 
-          </v-row>
-          <v-alert
-              id="error-edit-item-alert"
-              class="alert-hidden"
-              style="width: 100%"
-              :text="errorMessage"
-              type="error"
-          ></v-alert>
-        </v-container>
-      </v-card-text>
+        </v-row>
+        <v-alert
+            id="error-edit-item-alert"
+            class="alert-hidden"
+            style="width: 100%"
+            :text="errorMessage"
+            type="error"
+        ></v-alert>
+      </v-container>
+    </template>
 
-      <v-divider></v-divider>
+    <template v-slot:actions>
+      <v-btn
+          color="coko-blue"
+          variant="text"
+          @click="editItem()"
+          :loading="loading"
+      >
+        Сохранить
+      </v-btn>
+    </template>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-            color="coko-blue"
-            variant="text"
-            @click="editItem()"
-            :loading="loading"
-        >
-          Сохранить
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  </CokoDialog>
 </template>
 
 <script>
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
 import {apiRequest} from "@/commons/api_request";
 import {showAlert} from "@/commons/alerts";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: "PaginationTableEditDialog",
-  components: {PaginationTableBaseField},
+  components: {CokoDialog, PaginationTableBaseField},
   props: {
     tableHeaders: Array, // Список заголовков пагинационной таблицы
     fieldsArray: Array, // Список описаний полей пагинационной таблицы
@@ -147,7 +141,7 @@ export default {
               'Обновление записи',
               addItemRequest.success
           )
-          this.editItemDialog = !this.editItemDialog
+          this.$refs.editItemDialog.dialog = false
           this.getRecs()
         }
         this.loading = false
