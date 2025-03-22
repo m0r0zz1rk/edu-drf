@@ -311,13 +311,11 @@ import PaginationTableManage from "@/components/tables/pagination_table/Paginati
 import {xlsxDownloadFunction} from "@/commons/xlsx";
 import JournalModuleBadge from "@/components/badges/journal/JournalModuleBadge.vue";
 import JournalRecStatusBadge from "@/components/badges/journal/JournalRecStatusBadge.vue";
-import PaginationTableAddDialog from "@/components/tables/pagination_table/dialogs/PaginationTableAddDialog.vue";
 import JournalDetailInfoDialog from "@/components/dialogs/journal/JournalDetailInfoDialog.vue";
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
 import {useDisplay} from "vuetify";
 import specialFieldsList from "@/components/tables/pagination_table/special_fields/SpecialFieldsList";
 import SpecialField from "@/components/tables/pagination_table/special_fields/SpecialField.vue";
-import {no} from "vuetify/locale";
 import PaginationTableEditDialog from "@/components/tables/pagination_table/dialogs/PaginationTableEditDialog.vue";
 
 // Компонент пагинационной таблицы
@@ -328,7 +326,6 @@ export default {
     SpecialField,
     PaginationTableBaseField,
     JournalDetailInfoDialog,
-    PaginationTableAddDialog,
     JournalRecStatusBadge,
     JournalModuleBadge,
     PaginationTableManage
@@ -543,7 +540,7 @@ export default {
     },
     showEditDialog(item) {
         this.$refs.editDialog.editedItem = item
-        this.$refs.editDialog.editItemDialog = true
+        this.$refs.editDialog.$refs.editItemDialog.dialog = true
     },
     async deleteItem(object_id) {
       if (confirm('Вы уверены, что хотите удалить запись?')) {
