@@ -67,7 +67,6 @@
 
         <StudentGroupInfo
           v-if="groupTab === 'info'"
-          :setCode="setCode"
           :groupId="groupId"
         />
 
@@ -81,6 +80,7 @@
           v-if="groupTab === 'docs'"
           :groupId="groupId"
           :serviceType="serviceType"
+          :code="code"
         />
 
         <StudentGroupApps
@@ -140,7 +140,7 @@ export default {
       groupTab: 'info', // Выбранная вкладка на форме
       loading: false, // Параметр отображения анимации загрузки на элементах формы
       code: '', // Код учебной группы
-      serviceType: '', // Тип услуги учебной группы
+      serviceType: '', // Тип услуги учебной группы (ou, iku)
     }
   },
   methods: {
@@ -194,12 +194,25 @@ export default {
         this.serviceType = serviceTypeRequest.service_type
       }
     },
-    // Установить код учебной группы для отображения в шапке формы
-    setCode(code) {
-      this.code = code
-    }
+    // Получение кода учебной группы
+    async getGroupCode() {
+      this.loading = true
+      let getGroupCodeRequest = await apiRequest(
+        `/backend/api/v1/edu/student_group/${this.groupId}/`,
+        'GET',
+        true,
+        null,
+        true
+      )
+      if (getGroupCodeRequest.status === 200) {
+        let groupInfo = await getGroupCodeRequest.json()
+        this.code = groupInfo.code
+      }
+      this.loading = false
+    },
   },
   mounted() {
+    this.getGroupCode()
     this.getServiceType()
   }
 }

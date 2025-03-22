@@ -67,6 +67,10 @@ export default {
         {
           name: 'USERS',
           alias: 'ЛК Пользователя'
+        },
+        {
+          name: 'ORM',
+          alias: 'Модуль запросов к БД'
         }
       ]
     }

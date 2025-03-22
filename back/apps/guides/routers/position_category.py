@@ -1,0 +1,5 @@
+from apps.commons.drf.routers.LCUDE_router import ListCreateUpdateDeleteExportRouter
+from apps.guides.api.position_category import PositionCategoryViewSet
+
+position_category_router = ListCreateUpdateDeleteExportRouter(trailing_slash=True)
+position_category_router.register('position_category', PositionCategoryViewSet)

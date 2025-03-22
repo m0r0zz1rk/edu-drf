@@ -286,6 +286,11 @@
             :profileUuid="profileUuid"
           />
 
+          <EventApps
+            v-if="userInfoTab === 'event_apps'"
+            :profileUuid="profileUuid"
+          />
+
         </slot>
 
       </DialogContentWithError>
@@ -350,10 +355,11 @@ import studentDocTypes from "@/commons/consts/docs/studentDocTypes";
 import CourseApps from "@/components/forms/profile/CourseApps.vue";
 import DocViewer from "@/components/DocViewer.vue";
 import {useDisplay} from "vuetify";
+import EventApps from "@/components/forms/profile/EventApps.vue";
 
 export default {
   name: "ProfileForm",
-  components: {DocViewer, CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
+  components: {EventApps, DocViewer, CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
   props: {
     profileUuid: String, // Вариативный параметр, object_id профиля пользователя,
     closeDialogEvent: Function, // Событие для закрытия диалогового окна (для просмотра профиля из справочников)
@@ -462,7 +468,7 @@ export default {
     },
     async setData() {
       let statesRequest = await apiRequest(
-        '/backend/api/v1/guides/states/',
+        '/backend/api/v1/guides/state/',
         'GET',
         false,
         null,
@@ -473,7 +479,7 @@ export default {
       })
       let profileInfoURLRequest = '/backend/api/v1/auth/get_profile/'
       if (this.profileUuid) {
-        profileInfoURLRequest = '/backend/api/v1/guides/user/'+this.profileUuid+'/'
+        profileInfoURLRequest = '/backend/api/v1/guides/student_profile/'+this.profileUuid+'/'
       }
       let profileRequest = await apiRequest(
         profileInfoURLRequest,
@@ -491,27 +497,27 @@ export default {
     checkValidData() {
       Object.keys(this.profileData).map((key) => {
         if (key === 'phone') {
-          if (this.profileData[key] === null || this.profileData[key].length < 18) {
+          if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length < 18) {
             this.$refs["content-error"].showContentError('Введите корректный номер телефона')
             this.dataValid = false
             return false
           }
         }
         if (key === 'email') {
-          if (this.profileData[key] === null || !(email_pattern.test(this.profileData[key]))) {
+          if ([undefined, null].includes(this.profileData[key]) || !(email_pattern.test(this.profileData[key]))) {
             this.$refs["content-error"].showContentError('Введите корректный email')
             this.dataValid = false
             return false
           }
         }
         if (key === 'snils') {
-          if (this.profileData[key] === null || this.profileData[key].length < 14) {
+          if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length < 14) {
             this.$refs["content-error"].showContentError('Введите корректный СНИЛС')
             this.dataValid = false
             return false
           }
         }
-        if (this.profileData[key] === null || this.profileData[key].length === 0) {
+        if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length === 0) {
           this.$refs["content-error"].showContentError('Заполните все обязательные поля формы')
           this.dataValid = false
           return false
@@ -526,7 +532,7 @@ export default {
         let checkURL = '/backend/api/v1/auth/check_profile_phone/'
         let body = {'phone': this.profileData['phone']}
         if (this.profileUuid) {
-          checkURL = '/backend/api/v1/guides/user/check_phone/'
+          checkURL = '/backend/api/v1/guides/student_profile/check_phone/'
           body['profile_id'] = this.profileUuid
         }
         let checkPhone = await apiRequest(
@@ -545,7 +551,7 @@ export default {
         checkURL = '/backend/api/v1/auth/check_profile_email/'
         body = {'email': this.profileData['email']}
         if (this.profileUuid) {
-          checkURL = '/backend/api/v1/guides/user/check_email/'
+          checkURL = '/backend/api/v1/guides/student_profile/check_email/'
           body['profile_id'] = this.profileUuid
         }
         let checkEmail = await apiRequest(
@@ -564,7 +570,7 @@ export default {
         checkURL = '/backend/api/v1/auth/check_profile_snils/'
         body = {'snils': this.profileData['snils']}
         if (this.profileUuid) {
-          checkURL = '/backend/api/v1/guides/user/check_snils/'
+          checkURL = '/backend/api/v1/guides/student_profile/check_snils/'
           body['profile_id'] = this.profileUuid
         }
         let checkSnils = await apiRequest(
@@ -601,11 +607,11 @@ export default {
         }
         let saveProfileURL = '/backend/api/v1/auth/save_profile/'
         if (this.profileUuid) {
-          saveProfileURL = '/backend/api/v1/guides/user/update/'
+          saveProfileURL = '/backend/api/v1/guides/student_profile/update/'
         }
         let dataSaveRequest = await apiRequest(
           saveProfileURL,
-          'POST',
+          'PATCH',
           true,
           body
         )

@@ -1,4 +1,4 @@
-from apps.commons.drf.routers.list_retrieve_create_update_delete_router import (
+from apps.commons.drf.routers.LRCUD_router import (
     ListRetrieveCreateUpdateDeleteRouter)
 from apps.users.api.application.course_application import CourseApplicationViewSet
 

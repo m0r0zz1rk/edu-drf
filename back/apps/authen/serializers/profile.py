@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.guides.selectors.state import state_model
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 
 class BaseProfileSerializer(serializers.ModelSerializer):

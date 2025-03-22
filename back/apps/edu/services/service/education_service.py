@@ -1,8 +1,9 @@
 import datetime
+import uuid
 from typing import Optional
 
 from apps.edu.selectors.program import program_model
-from apps.edu.selectors.services.education_service import education_service_model
+from apps.edu.selectors.services.education_service import education_service_model, education_service_orm
 
 
 class EducationServiceService:
@@ -65,3 +66,32 @@ class EducationServiceService:
             ).filter(
                 date_start__year=datetime.datetime.now().year
             ).count()
+
+    @staticmethod
+    def create_service(validated_data: dict):
+        """
+        Создание курса (ОУ)
+        :param validated_data: Словарь с валидированными данными из EducationServiceAddUpdateSerializer
+        :return:
+        """
+        create_data = dict(validated_data)
+        del create_data['program']
+        create_data['program_id'] = validated_data.get('program')
+        education_service_orm.create_record(create_data)
+
+    @staticmethod
+    def update_service(service_id: uuid, validated_data: dict):
+        """
+        Обновление курса (ОУ)
+        :param service_id: UUID курса (ОУ)
+        :param validated_data: Словарь с валидированными данными из EducationServiceAddUpdateSerializer
+        :return:
+        """
+        update_data = dict(validated_data)
+        del update_data['object_id']
+        del update_data['program']
+        update_data['program_id'] = validated_data.get('program')
+        education_service_orm.update_record({'object_id': service_id}, update_data)
+
+
+education_service_service = EducationServiceService()

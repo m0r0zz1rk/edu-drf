@@ -15,7 +15,7 @@ class EventTypeListUpdateSerializer(EventTypeBaseSerializer):
     object_id = serializers.CharField(
         allow_null=False,
         allow_blank=False,
-        label="UUID МО"
+        label="UUID типа"
     )
 
     class Meta:

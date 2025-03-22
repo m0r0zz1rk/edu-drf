@@ -124,7 +124,7 @@ export default {
         let changePasswordURL = '/backend/api/v1/auth/change_password/'
         let body = {'password': this.pass1}
         if (this.profileUuid) {
-          changePasswordURL = '/backend/api/v1/guides/user/password_change/'
+          changePasswordURL = '/backend/api/v1/guides/student_profile/password_change/'
           body['profile_id'] = this.profileUuid
         }
         let changePassRequest = await apiRequest(

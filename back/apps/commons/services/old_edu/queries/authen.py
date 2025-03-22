@@ -2,9 +2,9 @@ from django.contrib.auth.models import User, Group
 from sqlalchemy import text
 
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
-from apps.guides.selectors.coko import coko_profile_model
+from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.guides.selectors.state import state_model
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 django_user_fields = [
     'password',

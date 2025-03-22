@@ -7,7 +7,7 @@ from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
 from apps.commons.utils.data_types.date import DateUtils
 from apps.docs.selectors.program_order import program_order_model
 from apps.edu.consts.lesson_types import LECTURE, PRACTICE, TRAINEE, INDIVIDUAL
-from apps.edu.consts.student_group.student_group_statuses import REGISTRATION, STATEMENT, OFFER, URL, PROCESS, COMPLETE
+from apps.edu.consts.student_group.statuses import REGISTRATION, STATEMENT, OFFER, URL, PROCESS, COMPLETE
 from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
 from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
 from apps.edu.selectors.program import program_model
@@ -16,9 +16,9 @@ from apps.edu.selectors.services.education_service import education_service_mode
 from apps.edu.selectors.services.information_service import information_service_model
 from apps.edu.selectors.student_group import student_group_model
 from apps.guides.selectors.audience_category import audience_category_model
-from apps.guides.selectors.coko import coko_profile_model
+from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.guides.selectors.event_type import event_type_model
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 
 class EduData:

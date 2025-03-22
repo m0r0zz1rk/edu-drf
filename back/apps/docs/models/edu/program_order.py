@@ -24,6 +24,7 @@ def get_program_order_upload_path(instance, filename) -> str:
             os.makedirs(order_path)
     return os.path.join(order_path, new_file_name)
 
+
 class ProgramOrder(BaseTable):
     """Модель приказов об утверждении ДПП"""
     number = models.CharField(

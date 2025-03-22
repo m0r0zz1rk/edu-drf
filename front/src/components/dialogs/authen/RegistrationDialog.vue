@@ -347,7 +347,7 @@ export default {
     },
     async getStates() {
       apiRequest(
-        '/backend/api/v1/guides/states/',
+        '/backend/api/v1/guides/state/',
         'GET',
         false,
         null,

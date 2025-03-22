@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from apps.commons.services.ad.ad_centre_coko_user import AdCentreCokoUserUtils
-from apps.guides.selectors.coko import coko_profile_model
+from apps.commons.services.ad.ad_centre_coko_user import ad_centre_coko_user_utils
+from apps.guides.selectors.profiles.coko import coko_profile_model
 
 
 class CokoSerializer(serializers.ModelSerializer):
@@ -11,7 +11,7 @@ class CokoSerializer(serializers.ModelSerializer):
 
     def get_department(self, obj):
         """Получение подразделения-центра AD для пользователя"""
-        return AdCentreCokoUserUtils().get_user_centre_display_name(obj.django_user)
+        return ad_centre_coko_user_utils.get_user_centre_display_name(obj.django_user)
 
     class Meta:
         model = coko_profile_model

@@ -31,6 +31,7 @@
         :fieldsArray="fieldsArray"
         :onChangeEvent="searchRecs"
         :defaultBody="defaultBody"
+        :tableLoading="tableLoading"
       />
     </template>
 
@@ -449,21 +450,41 @@ export default {
         return ''
       }
     },
-    xlsxDownload() {
+    async xlsxDownload() {
       showAlert(
         'success',
         'Выгрузка Excel',
         'Скачивание файла начнется автоматически после завершения формирования'
       )
-      let xlsxHeaders = []
-      this.headers.map((header) => {
-        xlsxHeaders.push(header.title)
-      })
-      xlsxDownloadFunction(
-        this.tableTitle,
-        xlsxHeaders,
-        this.recs
+      let xlsxRequest = await apiRequest(
+        this.getRecsURL+'export/',
+        'get',
+        true,
+        null,
+        true,
       )
+      if (xlsxRequest.status === 200) {
+        let data = await xlsxRequest.blob()
+        let a = document.createElement('a')
+        a.href = window.URL.createObjectURL(data)
+        a.download = this.tableTitle + '.xlsx'
+        a.click()
+      } else {
+        showAlert(
+          'error',
+          'Выгрузка Excel',
+          'Ошибка при формировании файла'
+        )
+      }
+      // let xlsxHeaders = []
+      // this.headers.map((header) => {
+      //   xlsxHeaders.push(header.title)
+      // })
+      // xlsxDownloadFunction(
+      //   this.tableTitle,
+      //   xlsxHeaders,
+      //   this.recs
+      // )
     },
     async getRecs() {
       this.tableLoading = true

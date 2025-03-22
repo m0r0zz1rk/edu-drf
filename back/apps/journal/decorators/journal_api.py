@@ -2,13 +2,11 @@ from functools import wraps
 
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES
 from apps.journal.exceptions.api_process_error import APIProcessError
 from apps.journal.services.journal import JournalService
 
-response_utils = ResponseUtils()
 journal_service = JournalService()
 exception_handling = ExceptionHandling()
 

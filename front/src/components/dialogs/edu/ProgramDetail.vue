@@ -434,8 +434,13 @@ export default {
       if (this.checkDataFill) {
         this.loading = true
         let form = new FormData()
+        let method = 'PATCH'
+        let url ='/backend/api/v1/edu/program/'
         if (!(Object.keys(this.programObject).includes('object_id'))) {
           form.append('object_id', null)
+          method = 'POST'
+        } else {
+          url += this.programObject.object_id+'/'
         }
         Object.keys(this.programObject).map((key) => {
           if (key === 'categories') {
@@ -461,8 +466,8 @@ export default {
           form.append('order_file', this.orderObject['order_file'])
         }
         let programRequest = await apiRequest(
-          '/backend/api/v1/edu/program/create_update/',
-          'POST',
+          url,
+          method,
           true,
           form,
           false,

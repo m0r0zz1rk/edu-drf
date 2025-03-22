@@ -4,9 +4,17 @@ from django.apps import apps
 from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
-from apps.guides.selectors.user import student_profile_model
+from apps.commons.orm.base_orm import BaseORM
+from apps.guides.selectors.profiles.student import student_profile_model
 
+# Модель занятий расписания
 schedule_model = apps.get_model('edu', 'Schedule')
+
+# Класс ORM для работы с моделью занятий расписания
+schedule_model_orm = BaseORM(
+    model=schedule_model,
+    select_related=['group', 'kug_theme']
+)
 
 
 def schedule_queryset(student_group_id: uuid = None) -> QuerySet:
@@ -16,14 +24,11 @@ def schedule_queryset(student_group_id: uuid = None) -> QuerySet:
     :return: queryset модели schedule
     """
     if student_group_id is None:
-        return (schedule_model.objects.
-                select_related('group').
-                select_related('kug_theme').
-                all().order_by('date'))
-    return (schedule_model.objects.
-            select_related('group').
-            select_related('kug_theme').
-            filter(group_id=student_group_id).order_by('date'))
+        return schedule_model_orm.get_filter_records(order_by=['date', ])
+    return schedule_model_orm.get_filter_records(
+        filter_by={'group_id': student_group_id},
+        order_by=['date', ]
+    )
 
 
 def user_teachers_queryset() -> QuerySet:

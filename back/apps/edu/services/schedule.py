@@ -3,6 +3,8 @@ import uuid
 from datetime import timedelta
 from datetime import datetime as dt
 
+from django.db.models import QuerySet
+
 from apps.authen.services.profile import ProfileService
 from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeFormatError
 from apps.commons.utils.data_types.date import DateUtils
@@ -11,7 +13,7 @@ from apps.edu.exceptions.calendar_chart.incorrect_theme_dict_format import Incor
 from apps.edu.exceptions.schedule.day_info_validate_error import DayInfoValidateError
 from apps.edu.exceptions.schedule.schedule_generate_error import ScheduleGenerateError
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
-from apps.edu.selectors.schedule import schedule_model
+from apps.edu.selectors.schedule import schedule_model, schedule_model_orm
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
 from apps.edu.services.student_group import StudentGroupService
@@ -336,3 +338,13 @@ class ScheduleService:
                 'lessons': lessons
             })
         return schedule
+
+    def get_group_lessons(self) -> QuerySet:
+        """
+        Получение QuerySet с занятиями группы
+        :return:
+        """
+        return schedule_model_orm.get_filter_records(
+            filter_by={'group_id': self.__group.object_id},
+            order_by=['date', ]
+        )

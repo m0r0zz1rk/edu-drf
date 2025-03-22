@@ -1,0 +1,5 @@
+from apps.applications.api.event_application.admin import EventApplicationAdminViewSet
+from apps.commons.drf.routers.LRUD_router import ListRetrieveUpdateDeleteRouter
+
+event_application_admin_router = ListRetrieveUpdateDeleteRouter(trailing_slash=True)
+event_application_admin_router.register('event_application_admin', EventApplicationAdminViewSet)

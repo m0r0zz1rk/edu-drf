@@ -1,77 +1,44 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 
-from apps.authen.services.profile import ProfileService
-from apps.commons.pagination import CustomPagination
-from apps.commons.permissions.is_administrators import IsAdministrators
-from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.request import RequestUtils
-from apps.commons.utils.django.response import ResponseUtils
-from apps.edu.selectors.program import ProgramFilter, program_queryset, approved_program_queryset
-from apps.edu.operations.program.add_update_program import AddUpdateProgramOperation
-from apps.edu.operations.program.delete_program import DeleteProgramOperation
-from apps.edu.serializers.program import (ProgramListSerializer,
-                                          ProgramRetrieveAddUpdateSerializer,
-                                          ProgramGetOrderSerializer)
-from apps.edu.services.calendar_chart import CalendarChartService
-from apps.edu.services.program import ProgramService
+from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
+from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.commons.utils.django.request import request_utils
+from apps.commons.utils.django.response import response_utils
+from apps.edu.api.edu_viewset import EduViewSet
+from apps.edu.selectors.program import ProgramFilter, program_queryset, approved_program_queryset, program_orm
+from apps.edu.serializers.program import ProgramListSerializer, ProgramRetrieveAddUpdateSerializer
+from apps.edu.services.calendar_chart import calendar_chart_service
+from apps.edu.services.program import program_service
 from apps.journal.consts.journal_modules import EDU
-from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-from apps.journal.services.journal import JournalService
+from apps.journal.consts.journal_rec_statuses import SUCCESS
+from apps.journal.services.journal import journal_service
 
 
-class ProgramViewSet(viewsets.ModelViewSet):
-    """Работа с ДПП"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
-    ru = RequestUtils()
-    ju = JournalService()
-    pu = ProfileService()
-    pru = ProgramService()
-    __calendar_chart_service = CalendarChartService()
-    respu = ResponseUtils()
-
+class ProgramViewSet(EduViewSet):
+    orm = program_orm
     queryset = program_queryset()
-    lookup_field = "object_id"
     serializer_class = ProgramListSerializer
-    pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend, ]
     filterset_class = ProgramFilter
+    swagger_object_name = 'ДПП'
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
-        operation_description="Получение списка ДПП",
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Получение списка",
         responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении списка',
-            '200': ProgramListSerializer(many=True)
+            **SWAGGER_TEXT['list'],
+            '200': serializer_class(many=True)
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'Список "{swagger_object_name}" получен',
+        f'Ошибка при получении списка "{swagger_object_name}"'
+    )
     def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении списка ДПП'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
+        tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Получение списка утвержденных приказом ДПП",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -79,30 +46,22 @@ class ProgramViewSet(viewsets.ModelViewSet):
             '200': ProgramListSerializer(many=True)
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'Список утвержденных ДПП получен',
+        f'Ошибка при получении списка утвержденных ДПП'
+    )
     def approved_list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(approved_program_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении списка утвержденных приказом ДПП'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        queryset = self.filter_queryset(approved_program_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
+        tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Получение объекта ДПП",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -110,28 +69,20 @@ class ProgramViewSet(viewsets.ModelViewSet):
             '200': ProgramRetrieveAddUpdateSerializer
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'ДПП получен',
+        f'Ошибка при получении ДПП'
+    )
     def retrieve(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            serializer = ProgramRetrieveAddUpdateSerializer(
-                self.pru.transform_instance_to_serializer(instance)
-            )
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении объекта ДПП'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        instance = self.get_object()
+        serializer = ProgramRetrieveAddUpdateSerializer(
+            program_service.transform_instance_to_serializer(instance)
+        )
+        return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
+        tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Создание копии ДПП",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -139,35 +90,23 @@ class ProgramViewSet(viewsets.ModelViewSet):
             '200': 'Сообщение "Копия ДПП успешно создана"'
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'Копия ДПП создана',
+        f'Ошибка при создании копии ДПП'
+    )
     def copy(self, request, *args, **kwargs):
-        try:
-            proc = self.pru.copy_program(
-                self.kwargs['object_id'],
-            )
-            if proc is not None:
-                proc = self.__calendar_chart_service.copy_calendar_chart(
-                    self.kwargs['object_id'],
-                    proc
-                )
-                if proc:
-                    return self.respu.ok_response('Копия ДПП успешно создана')
-                return self.respu.bad_request_response('Ошибка при создании копии КУГ ДПП, повторите попытку позже')
-            return self.respu.bad_request_response('Ошибка при создании копии ДПП, повторите попытку позже')
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при создании копии ДПП'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        program_id = program_service.copy_program(
+            self.kwargs['object_id'],
+        )
+        calendar_chart_service.copy_calendar_chart(
+            self.kwargs['object_id'],
+            program_id
+        )
+        return response_utils.ok_response('Копия ДПП успешно создана')
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
+        tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Изменение пользователя, редактирующего КУГ ДПП",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -175,61 +114,65 @@ class ProgramViewSet(viewsets.ModelViewSet):
             '200': 'Пользователь успешно установлен'
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'Изменен пользователь, редактирующий КУГ ДПП',
+        f'Ошибка при изменении пользователя, редактирующего КУГ ДПП'
+    )
     def set_kug_edit(self, request, *args, **kwargs):
-        try:
-            proc = self.pru.set_kug_edit(
-                self.kwargs['program_id'],
-                request.user.id
-            )
-            if proc:
-                return self.respu.ok_response_no_data()
-            else:
-                return self.respu.bad_request_no_data()
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Системная ошибка при измении пользователя, редактурующего КУГ ДПП'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        proc = program_service.set_kug_edit(
+            self.kwargs['program_id'],
+            request.user.id
+        )
+        if proc:
+            return response_utils.ok_response_no_data()
+        else:
+            return response_utils.bad_request_no_data()
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
-        operation_description="Добавление/обновление ДПП",
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Добавление записи",
         request_body=ProgramRetrieveAddUpdateSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при добавлении/обновлении ДПП',
-            '200': 'Сообщение "ДПП успешно добавлена/обновлена"'
-        }
+        responses=SWAGGER_TEXT['create']
     )
-    def create_update(self, request, *args, **kwargs):
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно добавлена',
+        f'Ошибка при добавлении записи "{swagger_object_name}"'
+    )
+    def create(self, request, *args, **kwargs):
         serialize = ProgramRetrieveAddUpdateSerializer(
-            data=self.ru.convert_form_data_data(request.data)
+            data=request_utils.convert_form_data_data(request.data)
         )
         if serialize.is_valid():
-            form_data = dict(serialize.data)
-            if form_data['order_file'] is not None:
-                del form_data['order_file']
-                form_data['order_file'] = request.FILES['order_file']
-            process = AddUpdateProgramOperation(
-                form_data,
-                request
-            )
-            if process.process_completed:
-                return self.respu.ok_response('ДПП успешно добавлена/обновлена')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+            program_service.create_program(request, serialize.data)
+            return response_utils.ok_response('Добавление выполнено')
         else:
-            return self.respu.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Обновление записи",
+        request_body=ProgramRetrieveAddUpdateSerializer,
+        responses=SWAGGER_TEXT['update']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно обновлена',
+        f'Ошибка при обновлении записи "{swagger_object_name}"'
+    )
+    def partial_update(self, request, *args, **kwargs):
+        serialize = ProgramRetrieveAddUpdateSerializer(
+            data=request_utils.convert_form_data_data(request.data)
+        )
+        if serialize.is_valid():
+            program_service.create_program(request, serialize.data, False)
+            return response_utils.ok_response('Обновление выполнено')
+        else:
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Получение файла приказа ДПП",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -237,66 +180,50 @@ class ProgramViewSet(viewsets.ModelViewSet):
             '200': 'Файл приказа ДПП'
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'Файл приказа ДПП успешно получен',
+        f'Ошибка при получении файла приказа ДПП"'
+    )
     def get_order_file(self, request, *args, **kwargs):
-        serialize = ProgramGetOrderSerializer(
-            data={'object_id': self.kwargs['order_id']}
+        file = program_service.get_order_file(
+            'object_id',
+            self.kwargs.get('order_id')
         )
-        if serialize.is_valid():
-            file = self.pru.get_order_file(
-                'object_id',
-                serialize.data['object_id']
-            )
-            self.ju.create_journal_rec(
-                {
-                    'source': self.ru.get_source_display_name(request),
-                    'module': EDU,
-                    'status': SUCCESS,
-                    'description': 'Получение приказа ДПП'
-                },
-                serialize.data,
-                None
-            )
-            return self.respu.file_response(file)
-        else:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении файла приказа ДПП - данные не прошли сериализацию'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_response('Данные не прошли валидацию')
+        journal_service.create_journal_rec(
+            {
+                'source': request_utils.get_source_display_name(request),
+                'module': EDU,
+                'status': SUCCESS,
+                'description': 'Получение приказа ДПП'
+            },
+            {'order_id': self.kwargs.get('order_id')},
+            None
+        )
+        return response_utils.file_response(file)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. ДПП', ],
-        operation_description="Удаление ДПП",
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при удалении ДПП',
-            '200': 'Сообщение "ДПП успешно удалена"'
-        }
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Удаление записи",
+        responses=SWAGGER_TEXT['delete']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно удалена',
+        f'Ошибка при удалении записи "{swagger_object_name}"'
     )
     def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            proc = DeleteProgramOperation(
-                {'object_id': instance.object_id},
-                request
-            )
-            if proc.process_completed:
-                return self.respu.ok_response('ДПП успешно удалена')
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при удалении ДПП'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-        return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+        return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Экспорт записей",
+        responses=SWAGGER_TEXT['export']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Экспорт записей "{swagger_object_name}" успешно выполнен',
+        f'Ошибка при выполнении экспорта записей "{swagger_object_name}"'
+    )
+    def export(self, request, *args, **kwargs):
+        return super().export(request, *args, **kwargs)

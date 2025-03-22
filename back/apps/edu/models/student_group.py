@@ -1,8 +1,8 @@
 from django.db import models
 
 from apps.commons.models import BaseTable
-from apps.edu.consts.student_group.student_group_forms import STUDENT_GROUP_FORMS, WITHOUT
-from apps.edu.consts.student_group.student_group_statuses import STUDENT_GROUP_STATUSES, REGISTRATION
+from apps.edu.consts.student_group.forms import STUDENT_GROUP_FORMS, WITHOUT
+from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES, REGISTRATION
 
 
 class StudentGroup(BaseTable):

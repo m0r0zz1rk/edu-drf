@@ -56,8 +56,7 @@ class CourseApplicationViewSet(viewsets.ModelViewSet):
                 if not request.user.is_superuser:
                     raise APIProcessError
                 apps = self._course_application_service.get_all_apps(
-                    request.GET['profile_id'],
-                    self.get_queryset()
+                    request.GET['profile_id']
                 )
                 page = self.paginate_queryset(apps)
                 if page is not None:
@@ -65,10 +64,7 @@ class CourseApplicationViewSet(viewsets.ModelViewSet):
                     return self.get_paginated_response(serializer.data)
                 serializer = BaseApplicationSerializer(apps, many=True)
             else:
-                apps = self._course_application_service.get_departments_apps(
-                    request.user.id,
-                    self.get_queryset()
-                )
+                apps = self._course_application_service.get_departments_apps(request.user.id)
                 serializer = self.get_serializer(apps, many=True)
             return self._response_utils.ok_response_dict(serializer.data)
         except Exception:

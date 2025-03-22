@@ -31,3 +31,6 @@ class RequestUtils:
             else:
                 source_dict[key] = value[0]
         return source_dict
+
+
+request_utils = RequestUtils()

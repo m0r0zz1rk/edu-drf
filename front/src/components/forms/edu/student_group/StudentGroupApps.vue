@@ -8,7 +8,7 @@
       :xlsxButton="false"
       :getRecsURL="
         serviceType === 'ou' ?
-          '/backend/api/v1/applications/course_group_apps/'+groupId+'/'
+          '/backend/api/v1/applications/course_application_admin?group_id='+groupId
           :
           ''
       "

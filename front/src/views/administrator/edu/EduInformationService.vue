@@ -13,7 +13,7 @@
     :addButton="true"
     :addSpecialFunction="addEditInformationService"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/edu/information_services/"
+    getRecsURL="/backend/api/v1/edu/information_service/"
     delRecURL="/backend/api/v1/edu/information_service/"
     :onEditClick="addEditInformationService"
     :tableHeaders="tableHeaders"
@@ -81,7 +81,7 @@ export default {
   methods: {
     async getData() {
       let ikuTypesRequest = await apiRequest(
-        '/backend/api/v1/guides/event_types/',
+        '/backend/api/v1/guides/event_type/',
         'GET',
         true,
         null
@@ -98,7 +98,7 @@ export default {
         })
       }
       let audienceCategoriesRequest = await apiRequest(
-        '/backend/api/v1/guides/audience_categories/',
+        '/backend/api/v1/guides/audience_category/',
         'GET',
         true,
         null

@@ -1,12 +1,13 @@
-import base64
 import os
 
 from rest_framework import serializers
 
 from apps.applications.selectors.course_application import course_application_model
 from apps.applications.serializers.base_application import (BaseApplicationSerializer,
-                                                            FullBaseApplicationSerializer)
-from apps.commons.drf.base64_coko_file_field import Base64CokoFileField
+                                                            FullBaseApplicationSerializer,
+                                                            BaseApplicationUpdateSerializer,
+                                                            BaseApplicationGroupListSerializer)
+from apps.edu.selectors.student_group import student_group_queryset
 
 
 class CourseApplicationListSerializer(serializers.Serializer):
@@ -105,8 +106,7 @@ class CourseApplicationDetailSerializer(FullBaseApplicationSerializer):
         )
 
 
-class CourseApplicationUpdateSerializer(CourseApplicationDetailSerializer):
-    """Сериализация данных при сохранении информации по заявке на курс"""
+class CourseBaseUpdateSerializer(CourseApplicationDetailSerializer):
     region_object_id = serializers.UUIDField(
         allow_null=False,
         label='object_id региона РФ'
@@ -127,6 +127,20 @@ class CourseApplicationUpdateSerializer(CourseApplicationDetailSerializer):
         allow_null=True,
         label='object_id должности'
     )
+
+    class Meta:
+        model = course_application_model
+        fields = CourseApplicationDetailSerializer.Meta.fields + (
+            'region_object_id',
+            'mo_object_id',
+            'oo_object_id',
+            'position_category_object_id',
+            'position_object_id'
+        )
+
+
+class CourseApplicationUpdateSerializer(CourseBaseUpdateSerializer):
+    """Сериализация данных при сохранении информации по заявке на курс"""
     education_doc_object_id = serializers.UUIDField(
         allow_null=True,
         label='object_id документа об образовании'
@@ -140,29 +154,23 @@ class CourseApplicationUpdateSerializer(CourseApplicationDetailSerializer):
         label='object_id скана удостоверения'
     )
 
+    class Meta:
+        model = course_application_model
+        fields = CourseBaseUpdateSerializer.Meta.fields + (
+            'education_doc_object_id',
+            'surname_doc_object_id',
+            'certificate_doc_object_id'
+        )
 
-class CourseAppGroupListSerializer(serializers.ModelSerializer):
+
+class CourseAppGroupListSerializer(BaseApplicationGroupListSerializer):
     """Сериализация данных при получении списка заявок для учебной группы"""
-    student = serializers.SerializerMethodField(
-        label='Информация об обучающемся'
-    )
-    date_create = serializers.DateTimeField(
-        format='%d.%m.%Y',
-        label='Дата подачи заявки'
-    )
     education_doc_name = serializers.SerializerMethodField(
         label='Имя файла документа об образовании'
     )
     pay_doc_name = serializers.SerializerMethodField(
         label='Имя файла документа об оплате'
     )
-
-    def get_student(self, obj):
-        return {
-            'display_name': obj.profile.display_name,
-            'email': obj.profile.django_user.email,
-            'phone': obj.profile.phone,
-        }
 
     def get_education_doc_name(self, obj):
         if obj.education_doc:
@@ -178,6 +186,7 @@ class CourseAppGroupListSerializer(serializers.ModelSerializer):
         model = course_application_model
         fields = (
             'object_id',
+            'group',
             'student',
             'date_create',
             'status',

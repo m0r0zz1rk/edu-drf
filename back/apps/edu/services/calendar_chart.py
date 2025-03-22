@@ -107,48 +107,45 @@ class CalendarChartService:
         kug['chapters'] = chapters
         return kug
 
-    def copy_calendar_chart(self, curr_program_id: uuid, new_program_id: uuid) -> bool:
+    def copy_calendar_chart(self, curr_program_id: uuid, new_program_id: uuid):
         """
         Копирование КУГ ДПП
         :param curr_program_id: object_id существующей ДПП
         :param new_program_id: object_id новой ДПП
         :return: True - КУГ успешно скоирован, False - произошла системная ошибка
         """
-        try:
-            kug_chapters = self.get_chapters_for_program(curr_program_id)
-            if kug_chapters:
-                keys = AddUpdateCalendarChartElement.calendar_chart_required_keys
-                for chapter in kug_chapters:
-                    new_chapter_object_id = uuid.uuid4()
-                    new_chapter = {
-                        'object_id': new_chapter_object_id
-                    }
+        kug_chapters = self.get_chapters_for_program(curr_program_id)
+        if kug_chapters:
+            keys = AddUpdateCalendarChartElement.calendar_chart_required_keys
+            for chapter in kug_chapters:
+                new_chapter_object_id = uuid.uuid4()
+                new_chapter = {
+                    'object_id': new_chapter_object_id
+                }
+                for key in keys:
+                    if key != 'object_id':
+                        new_chapter[key] = getattr(chapter, key)
+                new_chapter['program_id'] = new_program_id
+                AddUpdateCalendarChartElement({
+                    'source': 'Процесс создания копии ДПП',
+                    'module': EDU,
+                    'process_data': new_chapter
+                })
+                chapter_themes = self.get_themes_for_kug_chapter(chapter.object_id)
+                for theme in chapter_themes:
+                    new_theme = {}
                     for key in keys:
-                        if key != 'object_id':
-                            new_chapter[key] = getattr(chapter, key)
-                    new_chapter['program_id'] = new_program_id
+                        if key == 'object_id':
+                            new_theme[key] = uuid.uuid4()
+                        else:
+                            new_theme[key] = getattr(theme, key)
+                    new_theme['chapter_id'] = new_chapter_object_id
                     AddUpdateCalendarChartElement({
                         'source': 'Процесс создания копии ДПП',
                         'module': EDU,
-                        'process_data': new_chapter
+                        'process_data': new_theme
                     })
-                    chapter_themes = self.get_themes_for_kug_chapter(chapter.object_id)
-                    for theme in chapter_themes:
-                        new_theme = {}
-                        for key in keys:
-                            if key == 'object_id':
-                                new_theme[key] = uuid.uuid4()
-                            else:
-                                new_theme[key] = getattr(theme, key)
-                        new_theme['chapter_id'] = new_chapter_object_id
-                        AddUpdateCalendarChartElement({
-                            'source': 'Процесс создания копии ДПП',
-                            'module': EDU,
-                            'process_data': new_theme
-                        })
-            return True
-        except Exception:
-            return False
+        return True
 
     def update_program_calendar_chart(
         self,
@@ -287,3 +284,6 @@ class CalendarChartService:
             chapter_info['themes'] = themes
             kug_remains.append(chapter_info)
         return kug_remains
+
+
+calendar_chart_service = CalendarChartService()

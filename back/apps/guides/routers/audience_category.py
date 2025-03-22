@@ -1,0 +1,6 @@
+from apps.commons.drf.routers.LCUDE_router import ListCreateUpdateDeleteExportRouter
+from apps.guides.api.audience_category import AudienceCategoryViewSet
+
+audience_category_router = ListCreateUpdateDeleteExportRouter(trailing_slash=True)
+audience_category_router.register('audience_category', AudienceCategoryViewSet)
+

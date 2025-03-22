@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.user import UserUtils
 from apps.commons.utils.validate import ValidateUtils
-from apps.guides.selectors.coko import coko_profile_model
+from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.guides.selectors.state import state_model
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 
 class ProfileService:
@@ -194,3 +194,6 @@ class ProfileService:
                         return False
                 return True
         return False
+
+
+profile_service = ProfileService()

@@ -1,6 +1,6 @@
 from django.db.models import QuerySet
 
-from apps.edu.consts.student_group.student_group_statuses import REGISTRATION
+from apps.edu.consts.student_group.statuses import REGISTRATION
 from apps.edu.selectors.student_group import student_group_queryset
 
 

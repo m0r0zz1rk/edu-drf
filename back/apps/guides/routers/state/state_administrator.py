@@ -1,0 +1,5 @@
+from apps.commons.drf.routers.LCUDE_router import ListCreateUpdateDeleteExportRouter
+from apps.guides.api.state.state_administrator import StateAdministratorViewSet
+
+state_administrator_router = ListCreateUpdateDeleteExportRouter(trailing_slash=True)
+state_administrator_router.register('admin_state', StateAdministratorViewSet)

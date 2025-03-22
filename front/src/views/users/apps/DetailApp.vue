@@ -241,7 +241,7 @@ export default {
       }
       this.$refs.appForm.loading = true
       let saveAppRequest = await apiRequest(
-          '/backend/api/v1/users/course_application/'+this.app.object_id+'/',
+          '/backend/api/v1/applications/course_application_user/'+this.app.object_id+'/',
           'PATCH',
           true,
           this.app

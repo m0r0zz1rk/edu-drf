@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from apps.applications.selectors.course_application import course_application_model
+from apps.applications.selectors.event_application import event_application_model
+from apps.edu.selectors.student_group import student_group_queryset
 
 
 class BaseApplicationSerializer(serializers.ModelSerializer):
@@ -78,7 +80,7 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
             return (f'{obj.group.ou.date_start.strftime("%d.%m.%Y")} - '
                     f'{obj.group.ou.date_end.strftime("%d.%m.%Y")}')
         if obj.group.iku:
-            return (f'{obj.group.iku.date_start.strtfime("%d.%m.%Y")} - '
+            return (f'{obj.group.iku.date_start.strftime("%d.%m.%Y")} - '
                     f'{obj.group.iku.date_end.strftime("%d.%m.%Y")}')
         return '-'
 
@@ -239,3 +241,73 @@ class ResponseApplicationCreateSerializer(serializers.Serializer):
         allow_null=False,
         label='object_id созданной заявки'
     )
+
+
+class BaseApplicationUpdateSerializer(serializers.Serializer):
+    """Базовый сериалайзер для обновления заявки обучающегося"""
+    region_object_id = serializers.UUIDField(
+        allow_null=False,
+        label='object_id региона РФ'
+    )
+    mo_object_id = serializers.UUIDField(
+        allow_null=True,
+        label='object_id МО (для региона Иркутская область)'
+    )
+    oo_object_id = serializers.UUIDField(
+        allow_null=True,
+        label='object_id ОО из справочника'
+    )
+    position_category_object_id = serializers.UUIDField(
+        allow_null=True,
+        label='object_id категории должности'
+    )
+    position_object_id = serializers.UUIDField(
+        allow_null=True,
+        label='object_id должности'
+    )
+
+    class Meta:
+        model = course_application_model
+        fields = (
+            'region_object_id',
+            'mo_object_id',
+            'oo_object_id',
+            'position_category_object_id',
+            'position_object_id'
+        )
+
+
+class BaseApplicationGroupListSerializer(serializers.ModelSerializer):
+    """Сериализация данных при получении списка заявок для учебной группы"""
+    group = serializers.SlugRelatedField(
+        slug_field='code',
+        queryset=student_group_queryset,
+        label='Учебная группа'
+    )
+    student = serializers.SerializerMethodField(
+        label='Информация об обучающемся'
+    )
+    date_create = serializers.DateTimeField(
+        format='%d.%m.%Y',
+        label='Дата подачи заявки'
+    )
+
+    def get_student(self, obj):
+        return {
+            'display_name': obj.profile.display_name,
+            'email': obj.profile.django_user.email,
+            'phone': obj.profile.phone,
+        }
+
+    class Meta:
+        model = event_application_model
+        fields = (
+            'object_id',
+            'group',
+            'student',
+            'date_create',
+            'status',
+            'oo',
+            'oo_new',
+            'check_survey'
+        )

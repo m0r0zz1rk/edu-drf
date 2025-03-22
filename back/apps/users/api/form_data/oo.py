@@ -7,7 +7,7 @@ from apps.commons.pagination import CustomPagination
 from apps.commons.utils.django.response import ResponseUtils
 from apps.guides.selectors.oo import oo_queryset, OoFilter
 from apps.guides.serializers.oo import OoListSerializer
-from apps.guides.services.oo import OoService
+from apps.guides.services.oo import oo_service
 from apps.journal.consts.journal_modules import USERS
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.decorators.journal_api import journal_api
@@ -20,7 +20,6 @@ class FormDataOoViewSet(viewsets.ModelViewSet):
     """
     permission_classes = [IsAuthenticated, ]
 
-    _oo_service = OoService()
     _response_utils = ResponseUtils()
 
     queryset = oo_queryset()
@@ -46,7 +45,7 @@ class FormDataOoViewSet(viewsets.ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         try:
-            qs = self._oo_service.get_mo_oos(self.kwargs['mo_id'])
+            qs = oo_service.get_mo_oos(self.kwargs['mo_id'])
             queryset = self.filter_queryset(qs)
             page = self.paginate_queryset(queryset)
             if page is not None:

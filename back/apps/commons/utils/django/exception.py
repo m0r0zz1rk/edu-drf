@@ -15,3 +15,6 @@ class ExceptionHandling:
             )
         )
         return trb
+
+
+exception_handling = ExceptionHandling()

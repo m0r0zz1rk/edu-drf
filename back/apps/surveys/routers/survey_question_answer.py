@@ -1,4 +1,4 @@
-from apps.commons.drf.routers.list_create_update_delete_router import ListCreateUpdateDeleteRouter
+from apps.commons.drf.routers.LCUD_router import ListCreateUpdateDeleteRouter
 from apps.surveys.api.survey_question_answer import SurveyQuestionAnswerViewSet
 
 survey_question_answer_router = ListCreateUpdateDeleteRouter(trailing_slash=True)

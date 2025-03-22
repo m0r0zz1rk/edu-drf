@@ -6,7 +6,7 @@
       :noTab="false"
       :addButton="false"
       :xlsxButton="false"
-      :getRecsURL="'/backend/api/v1/users/course_application/?profile_id='+profileUuid"
+      :getRecsURL="'/backend/api/v1/applications/course_application_admin/?profile='+profileUuid"
       :tableHeaders="tableHeaders"
       :fieldsArray="fieldsArray"
       :selectGroupAppFunction="getAppInfo"
@@ -30,8 +30,9 @@
       />
 
       <AppForm
-          v-if="selectedApp !== null"
+          v-if="(selectedApp !== null) && (formData !== null)"
           ref="appForm"
+          appType="ou"
           :disabled="false"
           :studentApp="selectedApp"
           :mos="formData.mo"
@@ -44,9 +45,10 @@
 
     <template v-slot:actions>
       <v-btn
-          color="coko-blue"
-          text="Сохранить"
-          @click="saveApp()"
+        :loading="loading"
+        color="coko-blue"
+        text="Сохранить"
+        @click="saveApp()"
       />
     </template>
 
@@ -63,6 +65,7 @@ import {showAlert} from "@/commons/alerts";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
 import {useDisplay} from "vuetify";
+import {convertDateToBackend} from "@/commons/date";
 
 export default {
   name: 'CourseApps',
@@ -83,7 +86,7 @@ export default {
         },
         {
           'title': 'Группа',
-          'key': 'group_code'
+          'key': 'group'
         },
         {
           'title': 'Статус',
@@ -104,7 +107,7 @@ export default {
         {
           ui: 'input',
           type: 'text',
-          key: 'group_code',
+          key: 'group',
           addRequired: false,
         },
         {
@@ -123,7 +126,9 @@ export default {
       // Выбранная заявка
       selectedApp: null,
       // Шифр группы
-      formGroup: ''
+      formGroup: '',
+      // Параметр загрузки формы
+      loading: true,
     }
   },
   methods: {
@@ -147,6 +152,7 @@ export default {
     },
     // Получение информации по заявке
     async getAppInfo(group_code, app_id) {
+      this.loading = true
       this.selectedApp = null
       this.formGroup = group_code
       this.$refs.appFormDialog.dialog = true
@@ -154,7 +160,7 @@ export default {
       if (this.serviceType !== 'ou') {
         st = 'events'
       }
-      let url = '/backend/api/v1/users/course_application/'+app_id+'/'
+      let url = '/backend/api/v1/applications/course_application_admin/'+app_id+'/'
       let appInfoRequest = await apiRequest(
           url,
           'GET',
@@ -169,15 +175,42 @@ export default {
         )
       } else {
         this.selectedApp = appInfoRequest
+        this.loading = false
       }
     },
     // Изменение поля анкеты заявки
     changeAppField(field, value) {
-
+      this.selectedApp[field] = value
     },
     // Сохранить изменения в заявке
-    saveApp() {
-
+    async saveApp() {
+      this.loading = true
+      console.log('selectedApp: ', this.selectedApp)
+      if (this.selectedApp.education_date !== null && this.selectedApp.education_date instanceof Date) {
+        this.selectedApp.education_date = convertDateToBackend(this.selectedApp.education_date)
+      }
+      this.$refs.appForm.loading = true
+      let saveAppRequest = await apiRequest(
+        '/backend/api/v1/applications/course_application_admin/'+this.selectedApp.object_id+'/',
+        'PATCH',
+        true,
+        this.selectedApp
+      )
+      if (saveAppRequest.error) {
+        showAlert(
+          'error',
+          'Сохранение заявки',
+          saveAppRequest.error
+        )
+      } else {
+        showAlert(
+          'success',
+          'Сохранение заявки',
+          saveAppRequest.success
+        )
+      }
+      this.loading = false
+      this.$refs.appFormDialog.close()
     }
   },
   mounted() {

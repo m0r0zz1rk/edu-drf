@@ -1,169 +1,123 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 
-from apps.authen.services.profile import ProfileService
-from apps.commons.pagination import CustomPagination
-from apps.commons.permissions.is_administrators import IsAdministrators
-from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.request import RequestUtils
-from apps.commons.utils.django.response import ResponseUtils
-from apps.edu.operations.service.add_update import AddUpdateService
-from apps.edu.operations.service.delete import DeleteService
-from apps.edu.selectors.services.education_service import education_service_queryset, EducationServiceFilter
+from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
+from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.commons.utils.django.response import response_utils
+from apps.edu.api.edu_viewset import EduViewSet
+from apps.edu.selectors.services.education_service import education_service_queryset, EducationServiceFilter, \
+    education_service_orm
 
 from apps.edu.serializers.services.education_service import EducationServiceListSerializer, \
     EducationServiceRetrieveSerializer, EducationServiceAddUpdateSerializer
-from apps.edu.services.program import ProgramService
+from apps.edu.services.service.education_service import education_service_service
 from apps.journal.consts.journal_modules import EDU
-from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.services.journal import JournalService
 
 
-class EducationServiceViewSet(viewsets.ModelViewSet):
-    """Работа с образовательными услугами (курсами)"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
-    ru = RequestUtils()
-    ju = JournalService()
-    pu = ProfileService()
-    pru = ProgramService()
-    respu = ResponseUtils()
-
+class EducationServiceViewSet(EduViewSet):
+    orm = education_service_orm
     queryset = education_service_queryset()
-    lookup_field = "object_id"
     serializer_class = EducationServiceListSerializer
-    pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend, ]
+    base_serializer = EducationServiceAddUpdateSerializer
+    create_serializer = EducationServiceAddUpdateSerializer
+    update_serializer = EducationServiceAddUpdateSerializer
     filterset_class = EducationServiceFilter
+    swagger_object_name = 'Курс (ОУ)'
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Образовательные услуги', ],
-        operation_description="Получение списка образовательных услуг (курсов)",
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Получение списка",
         responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении списка',
-            '200': EducationServiceListSerializer(many=True)
+            **SWAGGER_TEXT['list'],
+            '200': serializer_class(many=True)
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'Список "{swagger_object_name}" получен',
+        f'Ошибка при получении списка "{swagger_object_name}"'
+    )
     def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении списка образовательных услуг (курсов)'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Образовательные услуги', ],
-        operation_description="Получение объекта образовательной услуги (курса)",
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Получение объекта курса (ОУ)",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
             '400': 'Ошибка при получении объекта',
             '200': EducationServiceRetrieveSerializer
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'"{swagger_object_name}" получен',
+        f'Ошибка при получении "{swagger_object_name}"'
+    )
     def retrieve(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            serializer = EducationServiceRetrieveSerializer(instance)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Системная ошибка при получении объекта образовательной услуги'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        instance = self.get_object()
+        serialize = EducationServiceRetrieveSerializer(instance)
+        return response_utils.ok_response_dict(serialize.data)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Образовательные услуги', ],
-        operation_description="Добавление/обновление образовательной услуги (курса)",
-        request_body=EducationServiceAddUpdateSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при добавлении/обновлении образовательной услуги (курса)',
-            '200': 'Сообщение "Образовательная услуга успешно добавлена/обновлена"'
-        }
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Добавление записи",
+        request_body=create_serializer,
+        responses=SWAGGER_TEXT['create']
     )
-    def create_update(self, request, *args, **kwargs):
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно добавлена',
+        f'Ошибка при добавлении записи "{swagger_object_name}"'
+    )
+    def create(self, request, *args, **kwargs):
         serialize = EducationServiceAddUpdateSerializer(data=request.data)
         if serialize.is_valid():
-            process = AddUpdateService(
-                {
-                    'source': self.pu.get_profile_or_info_by_attribute(
-                        'django_user_id',
-                        request.user.id,
-                        'display_name'
-                    ),
-                    'module': EDU,
-                    'process_data': dict(serialize.validated_data)
-                },
-                'edu',
-                request
-            )
-            if process.process_completed:
-                return self.respu.ok_response('Образовательная услуга успешно добавлена/обновлена')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+            education_service_service.create_service(serialize.validated_data)
+            return response_utils.ok_response('Добавление выполнено')
         else:
-            return self.respu.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Образовательные услуги', ],
-        operation_description="Удаление образовательной услуги (курса)",
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при удалении образовательной услуги (курса)',
-            '200': 'Сообщение "бразовательная услуга (курс) успешно удалена"'
-        }
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Обновление записи",
+        request_body=update_serializer,
+        responses=SWAGGER_TEXT['update']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно обновлена',
+        f'Ошибка при обновлении записи "{swagger_object_name}"'
+    )
+    def partial_update(self, request, *args, **kwargs):
+        serialize = EducationServiceAddUpdateSerializer(data=request.data)
+        if serialize.is_valid():
+            education_service_service.update_service(self.kwargs['object_id'], serialize.validated_data)
+            return response_utils.ok_response('Обновление выполнено')
+        else:
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Удаление записи",
+        responses=SWAGGER_TEXT['delete']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно удалена',
+        f'Ошибка при удалении записи "{swagger_object_name}"'
     )
     def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            proc = DeleteService(
-                {
-                    'source': self.pu.get_profile_or_info_by_attribute(
-                        'django_user_id',
-                        request.user.id,
-                        'display_name'
-                    ),
-                    'module': EDU,
-                    'process_data': {'object_id': instance.object_id}
-                },
-                'edu',
-                request
-            )
-            if proc.process_completed:
-                return self.respu.ok_response('Образовательная услуга (курс) успешно удалена')
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Системная ошибка при удалении образовательной услуги (курса)'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-        return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+        return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Экспорт записей",
+        responses=SWAGGER_TEXT['export']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Экспорт записей "{swagger_object_name}" успешно выполнен',
+        f'Ошибка при выполнении экспорта записей "{swagger_object_name}"'
+    )
+    def export(self, request, *args, **kwargs):
+        return super().export(request, *args, **kwargs)

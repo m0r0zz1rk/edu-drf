@@ -83,7 +83,7 @@
                   :noTab="false"
                   :addButton="false"
                   :xlsxButton="false"
-                  getRecsURL="/backend/api/v1/edu/approved_programs/"
+                  getRecsURL="/backend/api/v1/edu/approved_program/"
                   :tableHeaders="programTableHeaders"
                   :fieldsArray="programFieldsArray"
                   :itemSelectEvent="changeDpp"
@@ -342,6 +342,12 @@ export default {
       }
       this.loading = true
       let body = {}
+      let url = '/backend/api/v1/edu/education_service/'
+      let method = 'POST'
+      if (this.educationService.object_id !== null) {
+        url += this.educationService.object_id+'/'
+        method = 'PATCH'
+      }
       Object.keys(this.educationService).map((key) => {
         if (key === 'program') {
           body[key] = this.educationService.program.object_id
@@ -352,8 +358,8 @@ export default {
         }
       })
       let addUpdateRequest = await apiRequest(
-        '/backend/api/v1/edu/education_service/',
-        'POST',
+        url,
+        method,
         true,
         body
       )

@@ -278,6 +278,12 @@ export default {
     async saveInformationService() {
       this.$refs["content-error"].hideContentError()
       let checkData = true
+      let url = '/backend/api/v1/edu/information_service/'
+      let method = 'POST'
+      if (this.informationService.object_id !== null) {
+        url += this.informationService.object_id+'/'
+        method = 'PATCH'
+      }
       Object.keys(this.informationService).map((key) => {
         if ((key !== 'object_id') && (
           ([undefined, null].includes(this.informationService[key]) ||
@@ -306,8 +312,8 @@ export default {
         }
       })
       let addUpdateRequest = await apiRequest(
-        '/backend/api/v1/edu/information_service/',
-        'POST',
+        url,
+        method,
         true,
         body
       )

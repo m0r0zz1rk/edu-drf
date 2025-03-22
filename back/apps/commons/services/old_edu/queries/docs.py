@@ -10,7 +10,7 @@ from apps.docs.selectors.program_order import program_order_model
 from apps.docs.selectors.student_doc import student_doc_model
 from apps.docs.selectors.student_group_offer import student_group_offer_model
 from apps.edu.selectors.student_group import student_group_model
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 settings_utils = SettingsUtils()
 

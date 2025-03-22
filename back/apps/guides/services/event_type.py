@@ -29,3 +29,6 @@ class EventTypeService:
         ):
             return event_type_model.objects.get(name=name)
         return None
+
+
+event_type_service = EventTypeService()

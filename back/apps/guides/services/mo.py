@@ -29,3 +29,6 @@ class MoService:
         ):
             return mo_model.objects.get(name=name)
         return None
+
+
+mo_service = MoService()

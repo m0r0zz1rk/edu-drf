@@ -231,7 +231,7 @@ export default {
         service_id: null,
         plan_seats_number: 0
       }, // Объект с информацией о новой учебной группы
-      getRecsURL: '/backend/api/v1/edu/education_services/', // URL эндопинта для получения услуг
+      getRecsURL: '/backend/api/v1/edu/education_service/', // URL эндопинта для получения услуг
       selectedServiceName: '', // Название выбранной услуги
       servicesTableHeaders: [
         {
@@ -318,9 +318,9 @@ export default {
       this.newGroup.service_id = null
       this.newGroup.type = this.serviceType
       if (this.serviceType === 'ou') {
-        this.getRecsURL = '/backend/api/v1/edu/education_services/'
+        this.getRecsURL = '/backend/api/v1/edu/education_service/'
       } else {
-        this.getRecsURL = '/backend/api/v1/edu/information_services/'
+        this.getRecsURL = '/backend/api/v1/edu/information_service/'
       }
       console.log(this.newGroup)
     }

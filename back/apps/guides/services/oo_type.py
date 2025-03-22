@@ -29,3 +29,6 @@ class OoTypeService:
         ):
             return oo_type_model.objects.get(name=name)
         return None
+
+
+oo_type_service = OoTypeService()

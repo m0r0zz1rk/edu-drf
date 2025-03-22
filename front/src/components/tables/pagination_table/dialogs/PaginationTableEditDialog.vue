@@ -133,7 +133,7 @@ export default {
           }
         })
         let addItemRequest = await apiRequest(
-            this.editRecURL,
+            `${this.editRecURL}${this.editedItem.object_id}/`,
             'PATCH',
             true,
             body

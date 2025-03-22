@@ -15,7 +15,7 @@ from apps.guides.selectors.oo import oo_model
 from apps.guides.selectors.position import position_model
 from apps.guides.selectors.position_category import position_category_model
 from apps.guides.selectors.region import region_model
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 
 class ApplicationsData:

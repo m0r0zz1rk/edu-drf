@@ -24,6 +24,7 @@
 
     <v-btn
       v-if="!(hideSearchButton) && (!(mobileDisplay) && !(hideSearchButton))"
+      :loading="tableLoading"
       prepend-icon="mdi-magnify"
       text="Поиск"
       @click="searchShowEvent()"
@@ -81,6 +82,7 @@
     </v-dialog>
 
     <v-btn v-if="xlsxButton && !(foreignKey)"
+      :loading="tableLoading"
       :icon="mobileDisplay && 'mdi-file-excel'"
       :prepend-icon="!(mobileDisplay) && 'mdi-file-excel'"
       :text="!(mobileDisplay) && 'Скачать'"
@@ -95,10 +97,12 @@
       :getRecs="getRecs"
       :mobileDisplay="mobileDisplay"
       :defaultBody="defaultBody"
+      :tableLoading="tableLoading"
     />
 
     <v-btn
       v-if="addButton && !(foreignKey) && addSpecialFunction"
+      :loading="tableLoading"
       :icon="mobileDisplay && 'mdi-plus'"
       :prepend-icon="!(mobileDisplay) && 'mdi-plus'"
       :text="!(mobileDisplay) && 'Добавить'"
@@ -107,6 +111,7 @@
 
     <v-btn
       v-if="foreignKey"
+      :loading="tableLoading"
       :icon="mobileDisplay && 'mdi-open-in-new'"
       :prepend-icon="!(mobileDisplay) && 'mdi-open-in-new'"
       :text="!(mobileDisplay) && 'Перейти к таблице'"
@@ -141,7 +146,8 @@ export default {
     tableHeaders: Array, // Объект fieldsArray из пагинационной таблицы (для диалогового окна поиска записей)
     fieldsArray: Array, // Объект fieldsArray из пагинационной таблицы (для диалогового окна поиска записей)
     onChangeEvent: Function, // Функция для вызова поиска записей
-    defaultBody: Object // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
+    defaultBody: Object, // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
+    tableLoading: Boolean
   },
   data() {
     return {

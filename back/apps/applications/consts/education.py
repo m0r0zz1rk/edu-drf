@@ -12,7 +12,7 @@ EDUCATION_LEVELS = (
 
 # Категория получаемого образования
 EDUCATION_CATEGORIES = (
-    (NONE, 'none'),
+    (NONE, '-'),
     (MIDDLE_PROFESSIONAL, 'Среднее профессиональное образование'),
     (HIGHER, 'Высшее образование')
 )

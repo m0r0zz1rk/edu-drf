@@ -2,7 +2,7 @@ from django.apps import apps
 from django.contrib.auth.models import User
 
 from apps.commons.services.ad.ad_centre import AdCentreService
-from apps.commons.utils.ldap import LdapUtils
+from apps.commons.utils.ldap import ldap_utils
 
 ad_centre_coko_user_model = apps.get_model('commons', 'AdCentreCokoUser')
 
@@ -66,5 +66,8 @@ class AdCentreCokoUserUtils:
             ad_centre_coko_user_model.objects.get(coko_user=user).delete()
             self.add_rec(
                 user,
-                LdapUtils().get_ad_user_centre(user)
+                ldap_utils.get_ad_user_centre(user)
             )
+
+
+ad_centre_coko_user_utils = AdCentreCokoUserUtils()

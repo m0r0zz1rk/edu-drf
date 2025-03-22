@@ -1,10 +1,8 @@
 from rest_framework import serializers
 
-from apps.applications.services.base_application import BaseApplicationService
-from apps.authen.services.profile import ProfileService
+from apps.applications.services.base_application import base_application_service
+from apps.edu.consts.student_group.doc_types import STUDENT_GROUP_DOC_TYPES
 from apps.edu.selectors.student_group import student_group_model
-from apps.edu.services.service.education_service import EducationServiceService
-from apps.edu.services.service.information_service import InformationServiceService
 
 
 class StudentGroupListSerializer(serializers.ModelSerializer):
@@ -27,57 +25,29 @@ class StudentGroupListSerializer(serializers.ModelSerializer):
 
     def get_service_name(self, obj):
         if obj.ou:
-            return EducationServiceService().get_info_by_service(
-                'object_id',
-                obj.ou.object_id,
-                'service_name'
-            )
+            return obj.ou.program.name
         else:
-            return InformationServiceService().get_info_by_service(
-                'object_id',
-                obj.iku.object_id,
-                'service_name'
-            )
+            return obj.iku.name
 
     def get_date_start(self, obj):
         if obj.ou:
-            return EducationServiceService().get_info_by_service(
-                'object_id',
-                obj.ou.object_id,
-                'date_start'
-            )
+            return obj.ou.date_start.strftime('%d.%m.%Y')
         else:
-            return InformationServiceService().get_info_by_service(
-                'object_id',
-                obj.iku.object_id,
-                'date_start'
-            )
+            return obj.iku.date_start.strftime('%d.%m.%Y')
 
     def get_date_end(self, obj):
         if obj.ou:
-            return EducationServiceService().get_info_by_service(
-                'object_id',
-                obj.ou.object_id,
-                'date_end'
-            )
+            return obj.ou.date_end.strftime('%d.%m.%Y')
         else:
-            return InformationServiceService().get_info_by_service(
-                'object_id',
-                obj.iku.object_id,
-                'date_end'
-            )
+            return obj.iku.date_end.strftime('%d.%m.%Y')
 
     def get_curator(self, obj):
         if obj.curator:
-            return ProfileService().get_profile_or_info_by_attribute(
-                'object_id',
-                obj.curator_id,
-                'display_name'
-            )
+            return obj.curator.display_name
         return '-'
 
     def get_apps_count(self, obj):
-        return BaseApplicationService.get_app_count_for_group(
+        return base_application_service.get_app_count_for_group(
             obj.object_id,
             obj.ou
         )
@@ -157,4 +127,15 @@ class StudentGroupUpdateSerializer(serializers.Serializer):
         min_value=0,
         allow_null=True,
         label='Плановое количество мест'
+    )
+
+
+class StudentGroupDocRequestSerializer(serializers.Serializer):
+    group_id = serializers.UUIDField(
+        allow_null=False,
+        label='object_id учебной группы'
+    )
+    doc_type = serializers.ChoiceField(
+        choices=STUDENT_GROUP_DOC_TYPES,
+        label='Тип запрашиваемого документа'
     )

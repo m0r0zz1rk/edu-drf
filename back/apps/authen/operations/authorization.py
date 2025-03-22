@@ -6,7 +6,7 @@ from apps.authen.services.profile import ProfileService
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.services.ad.ad_centre_coko_user import AdCentreCokoUserUtils
 from apps.commons.utils.django.user import UserUtils
-from apps.commons.utils.ldap import LdapUtils
+from apps.commons.utils.ldap import ldap_utils
 from apps.commons.utils.token import TokenUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import AUTHEN
@@ -26,7 +26,6 @@ class Authorization(MainProcessing):
     ju = JournalService()
     uu = UserUtils()
     pu = ProfileService()
-    lu = LdapUtils()
     accu = AdCentreCokoUserUtils()
     request = username = auth_error = auth_user = auth_data = None
 
@@ -120,16 +119,16 @@ class Authorization(MainProcessing):
             if self.auth_user.is_staff and not self.auth_user.is_superuser:
                 self.accu.add_rec(
                     self.auth_user,
-                    self.lu.get_ad_user_centre(self.auth_user)
+                    ldap_utils.get_ad_user_centre(self.auth_user)
                 )
             if profile.surname == 'Фамилия':
                 self.pu.set_coko_profile_data(
                     profile,
                     {
-                        'surname': self.lu.get_ad_attribute_coko_user('sn', self.auth_user.username),
-                        'name': self.lu.get_ad_attribute_coko_user('GivenName', self.auth_user.username),
-                        'patronymic': self.lu.get_ad_attribute_coko_user('middleName', self.auth_user.username),
-                        'internal_phone': self.lu.get_ad_attribute_coko_user('telephoneNumber', self.auth_user.username)
+                        'surname': ldap_utils.get_ad_attribute_coko_user('sn', self.auth_user.username),
+                        'name': ldap_utils.get_ad_attribute_coko_user('GivenName', self.auth_user.username),
+                        'patronymic': ldap_utils.get_ad_attribute_coko_user('middleName', self.auth_user.username),
+                        'internal_phone': ldap_utils.get_ad_attribute_coko_user('telephoneNumber', self.auth_user.username)
                     }
                 )
                 if self.auth_user.is_staff:

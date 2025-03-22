@@ -10,7 +10,8 @@ class EventType(BaseTable):
         unique=True,
         blank=False,
         null=False,
-        default='Новый тип мероприятий'
+        default='Новый тип мероприятий',
+        verbose_name='Наименование'
     )
 
     def __str__(self):

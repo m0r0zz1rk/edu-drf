@@ -18,3 +18,6 @@ class SettingsUtils:
         if self.is_settings_parameter_exists(param):
             return getattr(settings, param, None)
         return None
+
+
+settings_utils = SettingsUtils()

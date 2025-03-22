@@ -1,55 +1,36 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
+from rest_framework import permissions
 
-from apps.commons.pagination import CustomPagination
-from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.response import ResponseUtils
+from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
+from apps.commons.drf.viewset.base_viewset import BaseViewSet
+from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
 from apps.guides.selectors.name_field import NameFieldFilter
-from apps.guides.selectors.state import state_queryset
+from apps.guides.selectors.state import state_queryset, state_orm
 from apps.guides.serializers.state.state_registration import StateRegistrationSerializer
 from apps.journal.consts.journal_modules import GUIDES
-from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.services.journal import JournalService
 
 
-class StateRegistrationViewSet(viewsets.ModelViewSet):
-    """Класс эндпоинтов для работы с государствами"""
-    serializer_class = StateRegistrationSerializer
+class StateRegistrationViewSet(BaseViewSet):
+    permission_classes = [permissions.AllowAny, ]
+    module = GUIDES
+    orm = state_orm
     queryset = state_queryset()
-    pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend, ]
+    serializer_class = StateRegistrationSerializer
     filterset_class = NameFieldFilter
-
-    ju = JournalService()
-    respu = ResponseUtils()
+    swagger_object_name = 'Государство (Регистрация)'
 
     @swagger_auto_schema(
-        tags=['Cправочники. Государства', ],
-        operation_description="Получение списка государств",
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Получение списка",
         responses={
-            '400': 'Ошибка при получении списка',
-            '200': StateRegistrationSerializer(many=True)
+            **SWAGGER_TEXT['list'],
+            '200': serializer_class(many=True)
         }
     )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Список "{swagger_object_name}" получен',
+        f'Ошибка при получении списка "{swagger_object_name}"'
+    )
     def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении списка государств'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        return super().list(request, *args, **kwargs)

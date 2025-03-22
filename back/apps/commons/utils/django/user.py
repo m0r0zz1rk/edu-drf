@@ -4,6 +4,7 @@ from typing import Optional, Union
 
 from django.contrib.auth.models import User
 
+from apps.commons.exceptions.user_not_found import UserNotFound
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.group import GroupUtils
 from apps.commons.utils.transliterate import TransliterateUtils
@@ -159,6 +160,19 @@ class UserUtils:
             return True
         return False
 
+    def email_change(self, user_id: int, email: str):
+        """
+        Смена Email у пользователя
+        :param user_id: ID пользователя Django
+        :param email: новый Email
+        :return:
+        """
+        user = self.get_user('id', user_id)
+        if user is None:
+            raise UserNotFound
+        user.email = email
+        user.save()
+
     def get_user_date_joined(self, user_id: int) -> Optional[datetime]:
         """
         Получение даты первого входа в АИС пользователя
@@ -169,3 +183,6 @@ class UserUtils:
         if user is not None:
             return user.date_joined
         return None
+
+
+user_utils = UserUtils()

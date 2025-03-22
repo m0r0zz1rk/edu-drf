@@ -1,11 +1,8 @@
 from rest_framework import serializers
 
 from apps.journal.selectors.journal import journal_model
-from apps.journal.services.output import OutputService
-from apps.journal.services.payload import PayloadService
-
-pu = PayloadService()
-ou = OutputService()
+from apps.journal.services.output import output_service
+from apps.journal.services.payload import payload_service
 
 
 class JournalSerializer(serializers.ModelSerializer):
@@ -18,13 +15,11 @@ class JournalSerializer(serializers.ModelSerializer):
     output = serializers.SerializerMethodField(label='Выходные данные')
 
     def get_payload(self, obj):
-        payload = pu.get_payload(obj.object_id)
-        if payload == '[]':
-            return None
-        return pu.get_payload(obj.object_id)
+        payload = payload_service.get_payload(obj.object_id)
+        return None if payload == '[]' else payload
 
     def get_output(self, obj):
-        return ou.get_output(obj.object_id)
+        return output_service.get_output(obj.object_id)
 
     class Meta:
         model = journal_model

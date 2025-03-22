@@ -25,3 +25,6 @@ class AudienceCategoryService:
         if self.is_category_exists('name', category_name):
             return audience_category_model.objects.get(name=category_name)
         return None
+
+
+audience_category_service = AudienceCategoryService()

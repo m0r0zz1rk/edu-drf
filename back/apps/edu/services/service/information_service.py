@@ -2,7 +2,10 @@ import datetime
 import uuid
 from typing import Optional
 
-from apps.edu.selectors.services.information_service import information_service_model
+from apps.commons.services.ad.ad_centre import ad_centre_service
+from apps.edu.selectors.services.information_service import information_service_model, information_service_orm
+from apps.guides.services.audience_category import audience_category_service
+from apps.guides.services.event_type import event_type_service
 
 
 class InformationServiceService:
@@ -81,3 +84,72 @@ class InformationServiceService:
             return None
         except Exception:
             return None
+
+    @staticmethod
+    def process_data_from_validated(
+            validated_data: dict,
+            service_id: uuid.uuid4 = None
+    ) -> (dict, list):
+        """
+        Формирование словаря с готовыми для добавления или обновления данными
+        на основе данных из сериализатора
+        :param service_id: UUID сервиса
+        :param validated_data: словарь валидированных данных из InformationServiceRetrieveAddUpdateSerializer
+        :return: словарь с данными для ORM и список полученных категорий
+        """
+        process_data = dict(validated_data)
+        if service_id:
+            process_data['object_id'] = service_id
+        event_type = event_type_service.get_event_type_object_by_name(validated_data.get('type'))
+        process_data['type_id'] = event_type.object_id
+        del process_data['type']
+        department = ad_centre_service.get_ad_centre('display_name', validated_data.get('department'))
+        process_data['department_id'] = department.object_id
+        del process_data['department']
+        data_categories = validated_data.get('categories').split(';;') \
+            if len(validated_data.get('categories')) > 0 else []
+        del process_data['categories']
+        return process_data, data_categories
+
+    @staticmethod
+    def update_service_categories(service_id: uuid.uuid4, data_categories: list):
+        """
+        Обновление категорий для мероприятия (ИКУ)
+        :param service_id: UUID мероприятия в БД
+        :param data_categories: список категорий
+        :return:
+        """
+        if len(data_categories) > 0:
+            categories = []
+            for category in data_categories:
+                audience_category = audience_category_service.get_category_object_by_name(category)
+                if audience_category:
+                    categories.append(audience_category)
+            information_service_orm.clear_many_to_many({'object_id': service_id}, 'categories')
+            information_service_orm.add_many_to_many({'object_id': service_id}, 'categories', categories)
+
+    def create_service(self, validated_data: dict):
+        """
+        Создание мероприятия (ИКУ)
+        :param validated_data: словарь валидированных данных из InformationServiceRetrieveAddUpdateSerializer
+        :return:
+        """
+        object_id = uuid.uuid4()
+        create_data, data_categories = self.process_data_from_validated(validated_data, object_id)
+        information_service_orm.create_record(create_data)
+        self.update_service_categories(object_id, data_categories)
+
+    def update_service(self, service_id: uuid.uuid4, validated_data: dict):
+        """
+        Обновление мероприятия (ИКУ)
+        :param service_id: UUID мероприятия в БД
+        :param validated_data: словарь валидированных данных из InformationServiceRetrieveAddUpdateSerializer
+        :return:
+        """
+        del validated_data['object_id']
+        update_data, data_categories = self.process_data_from_validated(validated_data)
+        information_service_orm.update_record({'object_id': service_id}, update_data)
+        self.update_service_categories(service_id, data_categories)
+
+
+information_service_service = InformationServiceService()

@@ -88,11 +88,11 @@ export default {
     // Подать заявку на курсу
     async createApp() {
       this.loading = true
-      let url = '/backend/api/v1/users/'
+      let url = '/backend/api/v1/applications/'
       if (this.serviceType === 'course') {
-        url += 'course_application/'
+        url += 'course_application_user/'
       } else {
-        url += 'event_application/'
+        url += 'event_application_user/'
       }
       let createAppRequest = await apiRequest(
           url,

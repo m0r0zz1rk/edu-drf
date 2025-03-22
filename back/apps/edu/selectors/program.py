@@ -2,27 +2,27 @@ from django.apps import apps
 from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
+
+# Модель дополнительных профессиональных программ
 program_model = apps.get_model('edu', 'Program')
+
+# Класс ORM для дополнительных профессиональных программ
+program_orm = BaseORM(
+    model=program_model,
+    select_related=['department', 'kug_edit', 'program_order'],
+    prefetch_related=['categories']
+)
 
 
 def program_queryset() -> QuerySet:
     """Получение queryset с ДПП"""
-    return (program_model.objects.
-            select_related('department').
-            select_related('kug_edit').
-            prefetch_related('categories').
-            select_related('program_order').
-            all().order_by('-date_create'))
+    return program_orm.get_filter_records(order_by=['-date_create', ])
 
 
 def approved_program_queryset() -> QuerySet:
     """Получение queryset ДПП с установленными приказами"""
-    return (program_model.objects.
-            select_related('department').
-            select_related('kug_edit').
-            prefetch_related('categories').
-            select_related('program_order').
-            exclude(program_order_id=None).order_by('-date_create'))
+    return program_orm.get_filter_records(exclude={'program_order_id': None}, order_by=['-date_create'], )
 
 
 class ProgramFilter(filters.FilterSet):

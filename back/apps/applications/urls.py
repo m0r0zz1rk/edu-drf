@@ -1,7 +1,9 @@
-from django.urls import path
+from apps.applications.routers.course_application.admin import course_application_admin_router
+from apps.applications.routers.course_application.user import course_application_user_router
+from apps.applications.routers.event_application.admin import event_application_admin_router
 
-from apps.applications.api.course_application import CourseApplicationAdminViewSet
-
-urlpatterns = [
-    path('course_group_apps/<uuid:group_id>/', CourseApplicationAdminViewSet.as_view({'get': 'list'})),
-]
+urlpatterns = (
+    course_application_admin_router.urls +
+    course_application_user_router.urls +
+    event_application_admin_router.urls
+)

@@ -8,7 +8,7 @@
     :noTab="false"
     :addButton="true"
     :addSpecialFunction="openCreateDialog"
-    :xlsxButton="false"
+    :xlsxButton="true"
     getRecsURL="/backend/api/v1/edu/student_group/"
     editRecURL="/backend/api/v1/edu/student_group/update/"
     :tableHeaders="tableHeaders"

@@ -4,8 +4,8 @@
     tableWidth="98"
     :noTab="false"
     :addButton="false"
-    :xlsxButton="true"
-    getRecsURL="/backend/api/v1/guides/cokos/"
+    :xlsxButton="false"
+    getRecsURL="/backend/api/v1/guides/coko/"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
   />

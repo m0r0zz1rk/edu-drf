@@ -1,62 +1,34 @@
 from django.apps import apps
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet
+from apps.commons.orm.base_orm import BaseORM
 
-from django_filters import rest_framework as filters
-
-from apps.applications.consts.application_statuses import APPLICATION_STATUSES
-
+# Модель типов мероприятий
 course_application_model = apps.get_model('applications', 'CourseApplication')
+
+# Список связанных полей
+select_related = [
+    'profile',
+    'group',
+    'pay_doc',
+    'region',
+    'mo',
+    'oo',
+    'position_category',
+    'position',
+    'education_doc',
+    'surname_doc',
+    'certificate_doc'
+]
+
+# Класс ORM для типов мероприятий
+course_application_orm = BaseORM(
+    model=course_application_model,
+    select_related=select_related
+)
 
 
 def course_application_queryset() -> QuerySet:
     """Получение queryset со всем заявками на участие в курсах"""
-    return (course_application_model.objects.
-            select_related('profile').
-            select_related('group').
-            select_related('pay_doc').
-            select_related('region').
-            select_related('mo').
-            select_related('oo').
-            select_related('position_category').
-            select_related('position').
-            select_related('education_doc').
-            select_related('surname_doc').
-            select_related('certificate_doc').
-            all().order_by(
-                'profile__surname',
-                'profile__name',
-                'profile__patronymic'
-            ))
-
-
-class CourseApplicationFilter(filters.FilterSet):
-    """Поля для фильтрации заявок в таблице учебной группы"""
-    student = filters.CharFilter(
-        method='filter_student',
-        label='Информация по студенту'
+    return course_application_orm.get_filter_records(
+        order_by=['profile__surname', 'profile__name', 'profile__patronymic']
     )
-    date_create = filters.DateFilter(
-        input_formats=['%d.%m.%Y'],
-        label='Дата подачи заявки'
-    )
-    status = filters.CharFilter(
-        method="filter_status",
-        label='Статус заявки'
-    )
-
-    def filter_student(self, queryset, name, value):
-        """Фильтрация по ФИО, email или номеру телефона обучающегося"""
-        return queryset.filter(
-            Q(profile__surname__contains=value) |
-            Q(profile__name__contains=value) |
-            Q(profile__patronymic__contains=value) |
-            Q(profile__django_user__email__contains=value) |
-            Q(profile__phone__contains=value)
-        )
-
-    def filter_status(self, queryset, name, value):
-        """Фильтрация по статусу заявки"""
-        for st in APPLICATION_STATUSES:
-            if st[1] == value:
-                return queryset.filter(status=st[0])
-

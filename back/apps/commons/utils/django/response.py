@@ -104,3 +104,6 @@ class ResponseUtils:
     def locked_response() -> Response:
         """Генерация пустого ответа с кодом 423"""
         return Response(status=status.HTTP_423_LOCKED)
+
+
+response_utils = ResponseUtils()

@@ -11,6 +11,7 @@ REPORTS = 'REPORTS'
 SETTINGS = 'SETTINGS'
 SURVEYS = 'SURVEYS'
 USERS = 'USERS'
+ORM = 'ORM'
 
 # Список модулей АИС
 JOURNAL_MODULES = (
@@ -26,5 +27,6 @@ JOURNAL_MODULES = (
     (REPORTS, 'Модуль отчетов'),
     (SETTINGS, 'Модуль настроек'),
     (SURVEYS, 'Модуль опросов'),
-    (USERS, 'ЛК Пользователя')
+    (USERS, 'ЛК Пользователя'),
+    (ORM, 'Модуль запросов к БД')
 )

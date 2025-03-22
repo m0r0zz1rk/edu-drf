@@ -381,7 +381,7 @@
                                     :noTab="false"
                                     :addButton="false"
                                     :xlsxButton="false"
-                                    getRecsURL="/backend/api/v1/guides/cokos/"
+                                    getRecsURL="/backend/api/v1/guides/coko/"
                                     :tableHeaders="[
                                       ...teacherTableHeaders,
                                       {

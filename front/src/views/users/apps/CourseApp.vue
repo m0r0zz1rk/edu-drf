@@ -114,10 +114,10 @@ export default {
     }
   },
   methods: {
-    // Получение списка заявок на курсу, сгруппированных по поздразделениям
+    // Получение списка заявок на курсы, сгруппированных по поздразделениям
     async getCourseApps() {
       let courseAppsRequest = await apiRequest(
-          '/backend/api/v1/users/course_application/',
+          '/backend/api/v1/applications/course_application_user/',
           'GET',
           true,
           null

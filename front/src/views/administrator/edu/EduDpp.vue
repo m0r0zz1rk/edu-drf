@@ -13,8 +13,8 @@
     :addButton="true"
     :addSpecialFunction="addProgramDetailDialog"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/edu/programs/"
-    delRecURL="/backend/api/v1/edu/program/delete/"
+    getRecsURL="/backend/api/v1/edu/program/"
+    delRecURL="/backend/api/v1/edu/program/"
     :onEditClick="setProgramEdit"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
@@ -74,7 +74,7 @@ export default {
   methods: {
     async getData() {
       let audienceCategoriesRequest = await apiRequest(
-        '/backend/api/v1/guides/audience_categories/',
+        '/backend/api/v1/guides/audience_category/',
         'GET',
         true,
         null

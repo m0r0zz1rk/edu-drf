@@ -1,0 +1,5 @@
+from apps.applications.api.course_application.user import CourseApplicationUserViewSet
+from apps.commons.drf.routers.LRCU_router import ListRetrieveCreateUpdateRouter
+
+course_application_user_router = ListRetrieveCreateUpdateRouter(trailing_slash=True)
+course_application_user_router.register('course_application_user', CourseApplicationUserViewSet)

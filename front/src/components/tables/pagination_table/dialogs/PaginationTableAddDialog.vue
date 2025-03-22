@@ -7,6 +7,7 @@
 
       <v-btn
         :icon="mobileDisplay && 'mdi-plus'"
+        :loading="tableLoading"
         :prepend-icon="!(mobileDisplay) && 'mdi-plus'"
         :text="!(mobileDisplay) && 'Добавить'"
         @click="newItemDialog = !(newItemDialog)"
@@ -17,6 +18,7 @@
       <v-card-title class="d-flex justify-space-between align-center">
         <span class="text-h5">Новая запись</span>
         <v-btn
+          :loading="tableLoading"
           icon="mdi-close"
           color="coko-blue"
           @click="newItemDialog = !(newItemDialog)"
@@ -93,7 +95,8 @@ export default {
     addRecURL: String, // URL эндпоинта для добавления новой записи
     getRecs: Function, // Функция для получения записей с backend
     mobileDisplay: Boolean, // Отображение на мобильном устройстве
-    defaultBody: Object // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
+    defaultBody: Object, // Параметры для тела запроса по умолчанию (для добавления и редактирования объектов)
+    tableLoading: Boolean
   },
   data() {
     return {

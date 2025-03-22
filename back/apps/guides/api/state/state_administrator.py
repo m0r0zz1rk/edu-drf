@@ -1,161 +1,91 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
 
-from apps.commons.pagination import CustomPagination
-from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.response import ResponseUtils
+from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
+from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.guides.api.guide_viewset import GuideViewSet
 from apps.guides.selectors.name_field import NameFieldFilter
-from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
-from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
-from apps.guides.selectors.state import state_queryset
+from apps.guides.selectors.state import state_queryset, state_orm
 from apps.guides.serializers.state.state_administrator import StateAdministratorSerializer, \
     StateAdministratorCreateSerializer, StateAdministratorUpdateSerializer
 from apps.journal.consts.journal_modules import GUIDES
-from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.services.journal import JournalService
 
 
-class StateAdministratorViewSet(viewsets.ModelViewSet):
-    """Работа с государствами в модуле Справочников"""
-    ju = JournalService()
-    respu = ResponseUtils()
-
+class StateAdministratorViewSet(GuideViewSet):
+    orm = state_orm
     queryset = state_queryset()
     serializer_class = StateAdministratorSerializer
-    pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend, ]
+    base_serializer = StateAdministratorCreateSerializer
+    create_serializer = StateAdministratorCreateSerializer
+    update_serializer = StateAdministratorUpdateSerializer
     filterset_class = NameFieldFilter
+    swagger_object_name = 'Государство'
 
     @swagger_auto_schema(
-        tags=['Cправочники. Государства', ],
-        operation_description="Получение списка государств",
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Получение списка",
         responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении списка',
-            '200': StateAdministratorSerializer(many=True)
+            **SWAGGER_TEXT['list'],
+            '200': serializer_class(many=True)
         }
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Список "{swagger_object_name}" получен',
+        f'Ошибка при получении списка "{swagger_object_name}"'
     )
     def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении списка государств'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Cправочники. Государства', ],
-        operation_description="Добавление государства",
-        request_body=StateAdministratorCreateSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при добавлении государства',
-            '200': 'Сообщение "Государство успешно добавлено"'
-        }
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Добавление записи",
+        request_body=create_serializer,
+        responses=SWAGGER_TEXT['create']
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Запись "{swagger_object_name}" успешно добавлена',
+        f'Ошибка при добавлении записи "{swagger_object_name}"'
     )
     def create(self, request, *args, **kwargs):
-        serialize = StateAdministratorCreateSerializer(data=request.data)
-        if serialize.is_valid():
-            process = AddUpdateGuidesRec(
-                'State',
-                serialize.data
-            )
-            if process.process_completed:
-                return self.respu.ok_response('Государство успешно добавлено')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-        else:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Ошибка при добавлении государства - данные не прошли сериализацию'
-                },
-                repr(request.data),
-                repr(serialize.errors)
-            )
-            return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
+        return super().create(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Cправочники. Государства', ],
-        operation_description="Обновление государства",
-        request_body=StateAdministratorUpdateSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при обновлении государства',
-            '200': 'Сообщение "Государство успешно обновлено"'
-        }
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Обновление записи",
+        request_body=update_serializer,
+        responses=SWAGGER_TEXT['update']
     )
-    def update(self, request, *args, **kwargs):
-        serialize = StateAdministratorUpdateSerializer(data=request.data)
-        if serialize.is_valid():
-            process = AddUpdateGuidesRec(
-                'State',
-                serialize.data
-            )
-            if process.process_completed:
-                return self.respu.ok_response('Государство успешно обновлено')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-        else:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Ошибка при обновлении государства - данные не прошли сериализацию'
-                },
-                repr(request.data),
-                repr(serialize.errors)
-            )
-            return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Запись "{swagger_object_name}" успешно обновлена',
+        f'Ошибка при обновлении записи "{swagger_object_name}"'
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Cправочники. Государства', ],
-        operation_description="Удаление государства",
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при удалении государства',
-            '200': 'Сообщение "Государство успешно удалено"'
-        }
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Удаление записи",
+        responses=SWAGGER_TEXT['delete']
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Запись "{swagger_object_name}" успешно удалена',
+        f'Ошибка при удалении записи "{swagger_object_name}"'
     )
     def destroy(self, request, *args, **kwargs):
-        try:
-            process = DeleteGuidesRec(
-                'State',
-                {
-                    'object_id': self.kwargs['object_id'],
-                }
-            )
-            if process.process_completed:
-                return self.respu.ok_response('Государство успешно удалено')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Системная ошибка при удалени государства'
-                },
-                repr(self.kwargs),
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_response('Произошла системная ошибка')
+        return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Экспорт записей",
+        responses=SWAGGER_TEXT['export']
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Экспорт записей "{swagger_object_name}" успешно выполнен',
+        f'Ошибка при выполнении экспорта записей "{swagger_object_name}"'
+    )
+    def export(self, request, *args, **kwargs):
+        return super().export(request, *args, **kwargs)

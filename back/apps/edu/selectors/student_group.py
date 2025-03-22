@@ -4,18 +4,22 @@ from django.apps import apps
 from django.db.models import QuerySet, Q
 from django_filters import rest_framework as filters
 
-from apps.edu.consts.student_group.student_group_statuses import STUDENT_GROUP_STATUSES
+from apps.commons.orm.base_orm import BaseORM
+from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES
 
+# Модель учебных групп
 student_group_model = apps.get_model('edu', 'StudentGroup')
+
+# Класс ORM для учебных групп
+student_group_orm = BaseORM(
+    model=student_group_model,
+    select_related=['ou', 'iku', 'curator']
+)
 
 
 def student_group_queryset() -> QuerySet:
     """Получение queryset с учебными группами"""
-    return (student_group_model.objects.
-            select_related('ou').
-            select_related('iku').
-            select_related('curator').
-            all().order_by('-date_create'))
+    return student_group_orm.get_filter_records(order_by=['-date_create',])
 
 
 class StudentGroupFilter(filters.FilterSet):

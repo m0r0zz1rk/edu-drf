@@ -9,6 +9,21 @@ from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeForm
 class DateUtils:
     """Валидаторы и методы для даты/даты и времени"""
 
+    _month_genitive_case = {
+        'January': 'января',
+        'February': 'февраля',
+        'March': 'марта',
+        'April': 'апреля',
+        'May': 'мая',
+        'June': 'июня',
+        'July': 'июля',
+        'August': 'августа',
+        'September': 'сентября',
+        'October': 'октября',
+        'November': 'ноября',
+        'December': 'декабря',
+    }
+
     @staticmethod
     def is_object_date(obj) -> bool:
         """Проверка является ли объект датой"""
@@ -104,3 +119,24 @@ class DateUtils:
         :return: время в формате ЧЧ:ММ
         """
         return time.strftime('%H:%M', time.gmtime(seconds))
+
+    def get_month_genitive_case(self, month: str) -> str:
+        """
+        Получение родительного падежа для полученного названия месяца
+        :param month: название месяца (с большой буквы)
+        :return: родительный падеж
+        """
+        return self._month_genitive_case[month]
+
+    def get_text_date_genitive_case(self, date: datetime) -> str:
+        """
+        Получение текстового представления даты (ДД месяц ГГГГ г.) в родительном падеже
+        :param date: исходная дата
+        :return: дата в родительном падеже
+        """
+        return (f'{date.strftime("%d")} '
+               f'{self.get_month_genitive_case(date.strftime("%B"))} '
+               f'{date.strftime("%Y")} года')
+
+
+date_utils = DateUtils()

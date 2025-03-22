@@ -1,12 +1,6 @@
-from django.urls import path
-
+from apps.commons.drf.routers.LRCUDE_router import ListRetrieveCreateUpdateDeleteExportRouter
 from apps.edu.api.services.education_service import EducationServiceViewSet
 
-education_service_urlpatterns = [
-    path('education_services/', EducationServiceViewSet.as_view({'get': 'list'})),
-    path('education_service/<uuid:object_id>/', EducationServiceViewSet.as_view({
-        'get': 'retrieve',
-        'delete': 'destroy'
-    })),
-    path('education_service/', EducationServiceViewSet.as_view({'post': 'create_update'})),
-]
+education_service_router = ListRetrieveCreateUpdateDeleteExportRouter(trailing_slash=True)
+education_service_router.register('education_service', EducationServiceViewSet)
+

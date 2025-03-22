@@ -1,104 +1,63 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 
-from apps.authen.services.profile import ProfileService
-from apps.commons.pagination import CustomPagination
-from apps.commons.permissions.is_administrators import IsAdministrators
-from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.request import RequestUtils
-from apps.commons.utils.django.response import ResponseUtils
-from apps.edu.operations.student_group.add import AddStudentGroup
-from apps.edu.operations.student_group.delete import DeleteStudentGroup
-from apps.edu.operations.student_group.update import UpdateStudentGroup
-from apps.edu.selectors.student_group import student_group_queryset, StudentGroupFilter
+from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
+from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.commons.utils.django.response import response_utils
+from apps.edu.api.edu_viewset import EduViewSet
+from apps.edu.selectors.student_group import student_group_queryset, StudentGroupFilter, student_group_orm
 from apps.edu.serializers.student_group import StudentGroupListSerializer, StudentGroupAddSerializer, \
-    StudentGroupUpdateSerializer, StudentGroupServiceTypeSerializer
-from apps.edu.services.program import ProgramService
+    StudentGroupUpdateSerializer, StudentGroupServiceTypeSerializer, StudentGroupDocRequestSerializer
+from apps.edu.services.student_group import student_group_service
 from apps.journal.consts.journal_modules import EDU
-from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.services.journal import JournalService
 
 
-class StudentGroupViewSet(viewsets.ModelViewSet):
-    """Работа с учебными группами"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
-    ru = RequestUtils()
-    ju = JournalService()
-    pu = ProfileService()
-    pru = ProgramService()
-    respu = ResponseUtils()
-
+class StudentGroupViewSet(EduViewSet):
+    orm = student_group_orm
     queryset = student_group_queryset()
-    lookup_field = "object_id"
     serializer_class = StudentGroupListSerializer
-    pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend, ]
+    base_serializer = StudentGroupAddSerializer
+    create_serializer = StudentGroupAddSerializer
+    update_serializer = StudentGroupUpdateSerializer
     filterset_class = StudentGroupFilter
+    swagger_object_name = 'Учебная группа'
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Учебные группы', ],
-        operation_description="Получение списка учебных групп",
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Получение списка",
         responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении списка',
-            '200': StudentGroupListSerializer(many=True)
+            **SWAGGER_TEXT['list'],
+            '200': serializer_class(many=True)
         }
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Список "{swagger_object_name}" получен',
+        f'Ошибка при получении списка "{swagger_object_name}"'
     )
     def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении списка учебных групп'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Учебные группы', ],
-        operation_description="Получение информации по учебной группы",
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Получение объекта курса (ОУ)",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении списка',
-            '200': StudentGroupListSerializer
+            '400': 'Ошибка при получении объекта',
+            '200': serializer_class
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'"{swagger_object_name}" получен',
+        f'Ошибка при получении "{swagger_object_name}"'
+    )
     def retrieve(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            serializer = StudentGroupListSerializer(
-                instance
-            )
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении информации по учебной группе'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        instance = self.get_object()
+        serializer = StudentGroupListSerializer(instance)
+        return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Учебные группы', ],
+        tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Получение типа услуги учебной группы",
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
@@ -106,133 +65,97 @@ class StudentGroupViewSet(viewsets.ModelViewSet):
             '200': StudentGroupServiceTypeSerializer
         }
     )
+    @view_set_journal_decorator(
+        EDU,
+        f'Тип услуги учебной группы получен',
+        f'Ошибка при получении типа услуги учебной группы'
+    )
     def get_service_type(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            if instance.ou is not None:
-                return self.respu.ok_response_dict({'service_type': 'ou'})
-            return self.respu.ok_response_dict({'service_type': 'iku'})
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении типа услуги учебной группы'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        instance = self.get_object()
+        if instance.ou is not None:
+            return response_utils.ok_response_dict({'service_type': 'ou'})
+        return response_utils.ok_response_dict({'service_type': 'iku'})
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Учебные группы', ],
-        operation_description="Добавление учебной группы",
-        request_body=StudentGroupAddSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении объекта',
-            '200': 'Сообщение "Учебная группа успешно добавлена"'
-        }
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Добавление записи",
+        request_body=create_serializer,
+        responses=SWAGGER_TEXT['create']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно добавлена',
+        f'Ошибка при добавлении записи "{swagger_object_name}"'
     )
     def create(self, request, *args, **kwargs):
-        try:
-            serialize = StudentGroupAddSerializer(data=request.data)
-            if serialize.is_valid():
-                process = AddStudentGroup({
-                    'source': self.pu.get_profile_or_info_by_attribute(
-                        'django_user_id',
-                        request.user.id,
-                        'display_name'
-                    ),
-                    'module': EDU,
-                    'process_data': serialize.validated_data
-                })
-                if process.process_completed:
-                    return self.respu.ok_response('Учебная группа успешно добавлена')
-                else:
-                    return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-            else:
-                return self.respu.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Системная ошибка при добавлении учебной группы'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
-
-    @swagger_auto_schema(
-        tags=['Учебная часть. Учебные группы', ],
-        operation_description="Изменение информации по учебной группе",
-        request_body=StudentGroupUpdateSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при изменении информации',
-            '200': 'Сообщение "Информация успешно обновлена"'
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        serialize = StudentGroupUpdateSerializer(
-            data=request.data
-        )
+        serialize = StudentGroupAddSerializer(data=request.data)
         if serialize.is_valid():
-            process = UpdateStudentGroup({
-                'source': self.pu.get_profile_or_info_by_attribute(
-                    'django_user_id',
-                    request.user.id,
-                    'display_name'
-                ),
-                'module': EDU,
-                'process_data': {
-                    **request.data,
-                    'group_id': self.kwargs['object_id']
-                }
-            })
-            if process.process_completed:
-                return self.respu.ok_response('Информация успешно обновлена')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+            student_group_service.create_group(serialize.validated_data)
+            return response_utils.ok_response('Добавление выполнено')
         else:
-            return self.respu.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Учебные группы', ],
-        operation_description="Удаление учебной группы",
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при удалении',
-            '200': 'Сообщение "Учебная группа успешно удалена"'
-        }
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Обновление записи",
+        request_body=update_serializer,
+        responses=SWAGGER_TEXT['update']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно обновлена',
+        f'Ошибка при обновлении записи "{swagger_object_name}"'
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Удаление записи",
+        responses=SWAGGER_TEXT['delete']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Запись "{swagger_object_name}" успешно удалена',
+        f'Ошибка при удалении записи "{swagger_object_name}"'
     )
     def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            proc = DeleteStudentGroup({
-                'source': self.pu.get_profile_or_info_by_attribute(
-                    'django_user_id',
-                    request.user.id,
-                    'display_name'
-                ),
-                'module': EDU,
-                'process_data': {'group_id': instance.object_id}
-            })
-            if proc.process_completed:
-                return self.respu.ok_response('Учебная группа успешно удалена')
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': EDU,
-                    'status': ERROR,
-                    'description': 'Ошибка при удалении учебной группы'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
+        return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Экспорт записей",
+        responses=SWAGGER_TEXT['export']
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Экспорт записей "{swagger_object_name}" успешно выполнен',
+        f'Ошибка при выполнении экспорта записей "{swagger_object_name}"'
+    )
+    def export(self, request, *args, **kwargs):
+        return super().export(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Получение документа по учебной группе",
+        request_body=StudentGroupDocRequestSerializer,
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при получении документа',
+            '200': 'HttpResponse с документом'
+        }
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Документ по учебной группе успешно сформирован и отправлен',
+        f'Ошибка при получении документа по учебной группе'
+    )
+    def doc(self, request, *args, **kwargs):
+        serialize = StudentGroupDocRequestSerializer(data=request.data)
+        if serialize.is_valid():
+            return student_group_service.get_doc_response(
+                group_id=serialize.validated_data.get('group_id'),
+                doc_type=serialize.validated_data.get('doc_type')
             )
-        return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
+        else:
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')

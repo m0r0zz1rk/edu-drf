@@ -164,11 +164,3 @@ class ProgramRetrieveAddUpdateSerializer(serializers.Serializer):
         use_url=False,
         label='Скан приказа'
     )
-
-
-class ProgramGetOrderSerializer(serializers.Serializer):
-    """Сериализация данных для получения приказа ДПП"""
-    object_id = serializers.UUIDField(
-        allow_null=False,
-        label='object_id ДПП'
-    )

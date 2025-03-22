@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.authen.serializers.profile import ProfileOutputSerializer, ProfileInputSerializer, \
     ProfileChangePasswordSerializer
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 
 class UserSerializer(serializers.ModelSerializer):

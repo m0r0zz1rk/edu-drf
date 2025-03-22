@@ -2,15 +2,21 @@ from django.apps import apps
 from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
+
+# Модель образовательных организаций
 oo_model = apps.get_model('guides', 'Oo')
+
+# Класс ORM для образовательных организаций
+oo_orm = BaseORM(
+    model=oo_model,
+    select_related=['mo', 'oo_type']
+)
 
 
 def oo_queryset() -> QuerySet:
     """Получение queryset c образовательными организациями"""
-    return (oo_model.objects.
-            select_related('mo').
-            select_related('oo_type').
-            all().order_by('date_create'))
+    return oo_orm.get_filter_records(order_by=['date_create'])
 
 
 class OoFilter(filters.FilterSet):

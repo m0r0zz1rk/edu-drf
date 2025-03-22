@@ -3,7 +3,7 @@ from django.db.models import QuerySet, Q
 
 from django_filters import rest_framework as filters
 
-from apps.guides.selectors.coko import coko_profile_model
+from apps.guides.selectors.profiles.coko import coko_profile_model
 
 survey_model = apps.get_model('surveys', 'Survey')
 

@@ -89,7 +89,11 @@
 
     </template>
 
-    <v-select
+    <template
+      v-if="appType === 'ou'"
+    >
+
+      <v-select
         color="coko-blue"
         v-model="internalApp.education_level"
         :items="educationLevels"
@@ -98,9 +102,9 @@
         label="Уровень образования*"
         :readonly="disabled"
         :loading="loading"
-    />
+      />
 
-    <v-select
+      <v-select
         v-if="internalApp.education_level === 'student'"
         color="coko-blue"
         v-model="internalApp.education_category"
@@ -110,23 +114,23 @@
         label="Категория получаемого образования*"
         :readonly="disabled"
         :loading="loading"
-    />
+      />
 
-    <p
-      v-if="internalApp.education_level !== 'student'"
-    >
-      Диплом об образовании <b style="color:red">(НЕ О ПРОФЕССИОНАЛЬНОЙ ПЕРЕПОДГОТОВКЕ)</b>:
-    </p>
+      <p
+        v-if="internalApp.education_level !== 'student'"
+      >
+        Диплом об образовании <b style="color:red">(НЕ О ПРОФЕССИОНАЛЬНОЙ ПЕРЕПОДГОТОВКЕ)</b>:
+      </p>
 
-    <p
-      v-if="internalApp.education_level === 'student'"
-    >
-      Справка об обучении:
-    </p>
-    <template
-      v-if="internalApp.education_doc_object_id !== null"
-    >
-      <v-icon
+      <p
+        v-if="internalApp.education_level === 'student'"
+      >
+        Справка об обучении:
+      </p>
+      <template
+        v-if="internalApp.education_doc_object_id !== null"
+      >
+        <v-icon
           color="coko-blue"
           icon="mdi-file-document-outline"
           @click="openDocViewer(
@@ -135,45 +139,45 @@
                 'Документ',
                 'student'
             )"
-      />
-      <br/>
-    </template>
+        />
+        <br/>
+      </template>
 
-    <p
-      v-if="internalApp.education_doc_object_id === null"
-    >
-      <b>(Не выбран)</b>
-    </p>
-    <v-btn
+      <p
+        v-if="internalApp.education_doc_object_id === null"
+      >
+        <b>(Не выбран)</b>
+      </p>
+      <v-btn
         v-if="(!disabled)"
         color="coko-blue"
         text="Выбрать"
         @click="$refs.educationDocSelectDialog.dialog = true"
         :readonly="disabled"
         :loading="loading"
-    />
-    <br/><br/>
-    <template
-      v-if="internalApp.education_level !== 'student'"
-    >
+      />
+      <br/><br/>
+      <template
+        v-if="internalApp.education_level !== 'student'"
+      >
 
-      <v-text-field
+        <v-text-field
           color="coko-blue"
           v-model="internalApp.diploma_surname"
           label="Фамиилия в дипломе*"
           :readonly="disabled"
           :loading="loading"
-      />
+        />
 
-      <template
-        v-if="internalApp.diploma_surname !== internalApp.profile_surname"
-      >
-
-        Документ о смене фамилии:<br/>
         <template
-          v-if="internalApp.surname_doc_object_id !== null"
+          v-if="internalApp.diploma_surname !== internalApp.profile_surname"
         >
-          <v-icon
+
+          Документ о смене фамилии:<br/>
+          <template
+            v-if="internalApp.surname_doc_object_id !== null"
+          >
+            <v-icon
               v-if="internalApp.surname_doc_object_id !== null"
               color="coko-blue"
               icon="mdi-file-document-outline"
@@ -183,46 +187,46 @@
                 'Документ',
                 'student'
             )"
-          />
-          <br/>
-        </template>
+            />
+            <br/>
+          </template>
 
-        <p
-          v-if="internalApp.surname_doc_object_id === null"
-        >
-          <b>(Не выбран)</b>
-        </p>
-        <v-btn
+          <p
+            v-if="internalApp.surname_doc_object_id === null"
+          >
+            <b>(Не выбран)</b>
+          </p>
+          <v-btn
             v-if="(!disabled)"
             color="coko-blue"
             text="Выбрать"
             @click="$refs.surnameDocSelectDialog.dialog = true"
             :readonly="disabled"
             :loading="loading"
-        />
-        <br/><br/>
+          />
+          <br/><br/>
 
-      </template>
+        </template>
 
-      <v-text-field
+        <v-text-field
           color="coko-blue"
           v-model="internalApp.education_serial"
           :rules="[rules.education_serial,]"
           label="Серия диплома*"
           :readonly="disabled"
           :loading="loading"
-      />
+        />
 
-      <v-text-field
+        <v-text-field
           color="coko-blue"
           v-model="internalApp.education_number"
           :rules="[rules.education_number,]"
           label="Номер диплома*"
           :readonly="disabled"
           :loading="loading"
-      />
+        />
 
-      <v-date-input
+        <v-date-input
           color="coko-blue"
           v-model="internalApp.education_date"
           label="Дата выдачи диплома*"
@@ -232,18 +236,26 @@
           :readonly="disabled"
           :loading="loading"
           clearable
-      />
+        />
 
-      <v-select
-          color="coko-blue"
-          v-model="internalApp.physical"
-          :items="booleanOptions"
-          item-title="title"
-          item-value="key"
-          label="Физическое лицо*"
-          :readonly="disabled"
-          :loading="loading"
-      />
+      </template>
+
+    </template>
+
+    <v-select
+        color="coko-blue"
+        v-model="internalApp.physical"
+        :items="booleanOptions"
+        item-title="title"
+        item-value="key"
+        label="Физическое лицо*"
+        :readonly="disabled"
+        :loading="loading"
+    />
+
+    <template
+      v-if="appType === 'ou'"
+    >
 
       <v-select
           color="coko-blue"
@@ -404,6 +416,8 @@ export default {
     disabled: Boolean,
     // Объект заявки обучающегося
     studentApp: Object,
+    // Тип заявки (ou, iku)
+    appType: String,
     // Функция изменения атрибутов объекта заявки в родительском компоненте
     changeAppAttribute: Function,
     // Список регионов РФ
@@ -652,54 +666,86 @@ export default {
       }
     },
     'internalApp.position_category_object_id': function(newValue, oldValue) {
+      if (newValue !== null) {
         let name = this.positionCategories.filter((pc) => pc.object_id === newValue)[0].name
         this.internalApp.position_category_name = name
         this.changeAppAttribute('position_category_object_id', newValue)
         this.changeAppAttribute('position_category_name', name)
+      } else {
+        this.changeAppAttribute('position_category_object_id', null)
+        this.changeAppAttribute('position_category_name', '')
+      }
     },
     'internalApp.position_object_id': function(newValue, oldValue) {
+      if (newValue !== null) {
         let name = this.positions.filter((pc) => pc.object_id === newValue)[0].name
         this.internalApp.position_name = name
         this.changeAppAttribute('position_object_id', newValue)
         this.changeAppAttribute('position_name', name)
+      } else {
+        this.changeAppAttribute('position_object_id', null)
+        this.changeAppAttribute('position_name', '')
+      }
+
     },
     'internalApp.education_level': function(newValue, oldValue) {
+      try {
         this.changeAppAttribute('education_level', newValue)
+      } catch (e) {console.log('internalApp.education_level error: ', e)}
     },
     'internalApp.education_category': function(newValue, oldValue) {
-      this.changeAppAttribute('education_category', newValue)
+      try {
+        this.changeAppAttribute('education_category', newValue)
+      } catch (e) {console.log('internalApp.education_category error: ', e)}
     },
     'internalApp.education_doc_object_id': function (newValue, oldValue) {
-      this.changeAppAttribute('education_doc_object_id', newValue)
-      this.changeAppAttribute('education_doc_name', this.internalApp.education_doc_name)
-      this.changeAppAttribute('education_doc_file', this.internalApp.education_doc_file)
+      try {
+        this.changeAppAttribute('education_doc_object_id', newValue)
+        this.changeAppAttribute('education_doc_name', this.internalApp.education_doc_name)
+        this.changeAppAttribute('education_doc_file', this.internalApp.education_doc_file)
+      } catch (e) {console.log('internalApp.education_doc_object_id error: ', e)}
     },
     'internalApp.diploma_surname': function (newValue, oldValue) {
-      this.changeAppAttribute('diploma_surname', newValue)
+      try {
+        this.changeAppAttribute('diploma_surname', newValue)
+      } catch (e) {console.log('internalApp.diploma_surname error: ', e)}
     },
     'internalApp.surname_doc_object_id': function (newValue, oldValue) {
-      this.changeAppAttribute('surname_doc_object_id', newValue)
-      this.changeAppAttribute('surname_doc_name', this.internalApp.surname_doc_name)
-      this.changeAppAttribute('surname_doc_file', this.internalApp.surname_doc_file)
+      try {
+        this.changeAppAttribute('surname_doc_object_id', newValue)
+        this.changeAppAttribute('surname_doc_name', this.internalApp.surname_doc_name)
+        this.changeAppAttribute('surname_doc_file', this.internalApp.surname_doc_file)
+      } catch (e) {console.log('internalApp.surname_doc_object_id error: ', e)}
     },
     'internalApp.education_serial': function (newValue, oldValue) {
-      this.changeAppAttribute('education_serial', newValue)
+      try {
+        this.changeAppAttribute('education_serial', newValue)
+      } catch (e) {console.log('internalApp.education_serial error: ', e)}
     },
     'internalApp.education_number': function (newValue, oldValue) {
-      this.changeAppAttribute('education_number', newValue)
+      try {
+        this.changeAppAttribute('education_number', newValue)
+      } catch(e) {console.log('internalApp.education_number error: ', e)}
     },
     'internalApp.education_date': function (newValue, oldValue) {
-      console.log(newValue)
-      console.log(oldValue)
-      if (!(newValue instanceof Date)) {
-        this.changeAppAttribute('education_date', convertDateToBackend(newValue))
-      }
+      try {
+        console.log(newValue)
+        console.log(oldValue)
+        if (!(newValue instanceof Date)) {
+          this.changeAppAttribute('education_date', convertDateToBackend(newValue))
+        }
+      } catch(e) {console.log('internalApp.education_date error: ', e)}
+
     },
     'internalApp.certificate_mail': function (newValue, oldValue) {
-      this.changeAppAttribute('certificate_mail', newValue)
+      try {
+        this.changeAppAttribute('certificate_mail', newValue)
+      } catch(e) {console.log('internalApp.certificate_mail error: ', e)}
     },
     'internalApp.mail_address': function(newValue, oldValue) {
-      this.changeAppAttribute('mail_address', newValue)
+      try {
+        this.changeAppAttribute('mail_address', newValue)
+      } catch(e) {console.log('internalApp.mail_address error: ', e)}
     }
   },
   mounted() {

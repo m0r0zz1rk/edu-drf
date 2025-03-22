@@ -5,6 +5,9 @@
         <PreLoader ref="preLoader" />
       </keep-alive>
       <router-view :usePreLoader="usePreLoader"/>
+      <notifications
+        position="top right"
+      />
       <div class="alerts adaptive-alerts">
         <v-alert
           id="error-alert"
@@ -40,6 +43,7 @@
 
 import PreLoader from "@/components/Preloader.vue";
 import {hideAlert} from "@/commons/alerts";
+import {Notifications} from "@kyvg/vue3-notification";
 
 export default {
   name: 'App',
@@ -48,7 +52,7 @@ export default {
       firstRender: true
     }
   },
-  components: {PreLoader},
+  components: {Notifications, PreLoader},
   methods: {
     hideAlert,
     usePreLoader(onlyClose = false) {

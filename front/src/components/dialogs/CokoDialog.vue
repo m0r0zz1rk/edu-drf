@@ -89,6 +89,10 @@ export default {
     // Прокрутить блок с контентом вверх
     scrollTextToTop() {
       this.$refs.topTextDiv.scrollIntoView()
+    },
+    // Закрыть окно
+    close() {
+      this.dialog = !(this.dialog)
     }
   }
 }

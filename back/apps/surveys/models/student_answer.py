@@ -1,7 +1,7 @@
 from django.db import models
 
 from apps.commons.models import BaseTable
-from apps.edu.consts.student_group.student_group_type import STUDENT_GROUP_TYPES
+from apps.edu.consts.student_group.type import STUDENT_GROUP_TYPES
 
 
 class StudentAnswer(BaseTable):

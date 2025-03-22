@@ -1,164 +1,91 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 
-from apps.commons.pagination import CustomPagination
-from apps.commons.permissions.is_administrators import IsAdministrators
-from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.response import ResponseUtils
+from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
+from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.guides.api.guide_viewset import GuideViewSet
 from apps.guides.selectors.name_field import NameFieldFilter
-from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
-from apps.guides.operations.delete_guides_rec import DeleteGuidesRec
-from apps.guides.selectors.position_category import position_category_queryset
+from apps.guides.selectors.position_category import position_category_queryset, position_category_orm
 from apps.guides.serializers.position_category import PositionCategoryListUpdateSerializer, \
     PositionCategoryBaseSerializer
 from apps.journal.consts.journal_modules import GUIDES
-from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.services.journal import JournalService
 
 
-class PositionCategoryViewSet(viewsets.ModelViewSet):
-    """Работа с категориями должностей в модуле Справочников"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
-    ju = JournalService()
-    respu = ResponseUtils()
-
+class PositionCategoryViewSet(GuideViewSet):
+    orm = position_category_orm
     queryset = position_category_queryset()
     serializer_class = PositionCategoryListUpdateSerializer
-    pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend, ]
+    base_serializer = PositionCategoryBaseSerializer
+    create_serializer = PositionCategoryBaseSerializer
+    update_serializer = PositionCategoryListUpdateSerializer
     filterset_class = NameFieldFilter
+    swagger_object_name = 'Категория должностей'
 
     @swagger_auto_schema(
-        tags=['Cправочники. Категории должностей', ],
-        operation_description="Получение списка категорий должностей",
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Получение списка",
         responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении списка',
-            '200': PositionCategoryListUpdateSerializer(many=True)
+            **SWAGGER_TEXT['list'],
+            '200': serializer_class(many=True)
         }
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Список "{swagger_object_name}" получен',
+        f'Ошибка при получении списка "{swagger_object_name}"'
     )
     def list(self, request, *args, **kwargs):
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return self.respu.ok_response_dict(serializer.data)
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Ошибка при получении списка категорий должностей'
-                },
-                '-',
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_no_data()
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Cправочники. Категории должностей', ],
-        operation_description="Добавление категории должностей",
-        request_body=PositionCategoryBaseSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при добавлении категории должностей',
-            '200': 'Сообщение "Категория должностей успешно добавлена"'
-        }
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Добавление записи",
+        request_body=create_serializer,
+        responses=SWAGGER_TEXT['create']
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Запись "{swagger_object_name}" успешно добавлена',
+        f'Ошибка при добавлении записи "{swagger_object_name}"'
     )
     def create(self, request, *args, **kwargs):
-        serialize = PositionCategoryBaseSerializer(data=request.data)
-        if serialize.is_valid():
-            process = AddUpdateGuidesRec(
-                'PositionCategory',
-                serialize.data
-            )
-            if process.process_completed:
-                return self.respu.ok_response('Категория должностей успешно добавлена')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-        else:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Ошибка при добавлении категории должностей - данные не прошли сериализацию'
-                },
-                repr(request.data),
-                repr(serialize.errors)
-            )
-            return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
+        return super().create(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Cправочники. Категории должностей', ],
-        operation_description="Обновление категории должностей",
-        request_body=PositionCategoryListUpdateSerializer,
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при обновлении категории должностей',
-            '200': 'Сообщение "Категория должностей успешно обновлена"'
-        }
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Обновление записи",
+        request_body=update_serializer,
+        responses=SWAGGER_TEXT['update']
     )
-    def update(self, request, *args, **kwargs):
-        serialize = PositionCategoryListUpdateSerializer(data=request.data)
-        if serialize.is_valid():
-            process = AddUpdateGuidesRec(
-                'PositionCategory',
-                serialize.data
-            )
-            if process.process_completed:
-                return self.respu.ok_response('Категория должностей успешно обновлена')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-        else:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Ошибка при обновлении категории должностей- данные не прошли сериализацию'
-                },
-                repr(request.data),
-                repr(serialize.errors)
-            )
-            return self.respu.bad_request_response(f'Ошибка сериализации: {serialize.errors}')
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Запись "{swagger_object_name}" успешно обновлена',
+        f'Ошибка при обновлении записи "{swagger_object_name}"'
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=['Cправочники. Категории должностей', ],
-        operation_description="Удаление категории должностей",
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при удалении категории должностей',
-            '200': 'Сообщение "Категория должностей успешно удалена"'
-        }
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Удаление записи",
+        responses=SWAGGER_TEXT['delete']
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Запись "{swagger_object_name}" успешно удалена',
+        f'Ошибка при удалении записи "{swagger_object_name}"'
     )
     def destroy(self, request, *args, **kwargs):
-        try:
-            process = DeleteGuidesRec(
-                'PositionCategory',
-                {
-                    'object_id': self.kwargs['object_id'],
-                }
-            )
-            if process.process_completed:
-                return self.respu.ok_response('Категория должностей успешно удалена')
-            else:
-                return self.respu.bad_request_response('Произошла ошибка, повторите попытку позже')
-        except Exception:
-            self.ju.create_journal_rec(
-                {
-                    'source': 'Внешний запрос',
-                    'module': GUIDES,
-                    'status': ERROR,
-                    'description': 'Системная ошибка при удалени категории должностей'
-                },
-                repr(self.kwargs),
-                ExceptionHandling.get_traceback()
-            )
-            return self.respu.bad_request_response('Произошла системная ошибка')
+        return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Экспорт записей",
+        responses=SWAGGER_TEXT['export']
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Экспорт записей "{swagger_object_name}" успешно выполнен',
+        f'Ошибка при выполнении экспорта записей "{swagger_object_name}"'
+    )
+    def export(self, request, *args, **kwargs):
+        return super().export(request, *args, **kwargs)

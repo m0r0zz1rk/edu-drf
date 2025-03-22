@@ -47,3 +47,6 @@ class AdCentreService:
             ad_centre_model.objects.update_or_create(
                 **ad_centre_data
             )
+
+
+ad_centre_service = AdCentreService()

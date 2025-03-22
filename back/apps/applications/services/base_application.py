@@ -5,7 +5,7 @@ from django.db.models import Model
 from apps.applications.exceptions.application import ApplicationCreateError
 from apps.applications.selectors.course_application import course_application_model
 from apps.applications.selectors.event_application import event_application_model
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.guides.selectors.region import irkutsk_state_object
 
 
@@ -13,8 +13,6 @@ class BaseApplicationService:
     """
     Класс методов для работы с заявками
     """
-
-    _profile_service = ProfileService()
 
     def create_app(self, user_id: int, group_id: uuid, application_model: Model) -> uuid:
         """
@@ -25,7 +23,7 @@ class BaseApplicationService:
         :return: object_id созданной заявки
         """
         try:
-            profile = self._profile_service.get_profile_or_info_by_attribute(
+            profile = profile_service.get_profile_or_info_by_attribute(
                 'django_user_id',
                 user_id,
                 'profile'
@@ -57,3 +55,6 @@ class BaseApplicationService:
         if course_group:
             return course_application_model.objects.filter(group_id=group_id).count()
         return event_application_model.objects.filter(group_id=group_id).count()
+
+
+base_application_service = BaseApplicationService()

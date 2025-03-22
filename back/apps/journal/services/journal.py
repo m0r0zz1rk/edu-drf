@@ -111,3 +111,6 @@ def journal_house_keeping(sender, **kwargs):
     ju = JournalService()
     if ju.get_journal_size() > journal_max:
         ju.journal_older_delete()
+
+
+journal_service = JournalService()

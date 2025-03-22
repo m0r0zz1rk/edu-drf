@@ -6,7 +6,7 @@
     :noTab="false"
     :addButton="false"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/guides/users/"
+    getRecsURL="/backend/api/v1/guides/student_profile/"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
     :itemSelectEvent="userSelect"

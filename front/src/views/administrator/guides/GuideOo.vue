@@ -11,10 +11,10 @@
     :noTab="false"
     :addButton="true"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/guides/oos/"
-    addRecURL="/backend/api/v1/guides/oo/create/"
-    editRecURL="/backend/api/v1/guides/oo/update/"
-    delRecURL="/backend/api/v1/guides/oo/delete/"
+    getRecsURL="/backend/api/v1/guides/oo/"
+    addRecURL="/backend/api/v1/guides/oo/"
+    editRecURL="/backend/api/v1/guides/oo/"
+    delRecURL="/backend/api/v1/guides/oo/"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
   />
@@ -63,7 +63,7 @@ export default {
   methods: {
     async getData() {
       let moListRequest = await apiRequest(
-        '/backend/api/v1/guides/mos/',
+        '/backend/api/v1/guides/mo/',
         'GET',
         true,
         null
@@ -81,7 +81,7 @@ export default {
         mos.push(mo.name)
       })
       let ooTypeListRequest = await apiRequest(
-        '/backend/api/v1/guides/oo_types/',
+        '/backend/api/v1/guides/oo_type/',
         'GET',
         true,
         null

@@ -2,12 +2,21 @@ from django.apps import apps
 from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
+
+# Модель курсов (ОУ)
 education_service_model = apps.get_model('edu', 'EducationService')
+
+# Класс ORM для курсов (ОУ)
+education_service_orm = BaseORM(
+    model=education_service_model,
+    select_related=['program',]
+)
 
 
 def education_service_queryset() -> QuerySet:
     """Получение queryset с образовательными услугами (курсами)"""
-    return education_service_model.objects.all().order_by('-date_create')
+    return education_service_orm.get_filter_records(order_by=['-date_create',])
 
 
 class EducationServiceFilter(filters.FilterSet):

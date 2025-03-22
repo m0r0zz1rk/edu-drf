@@ -8,7 +8,7 @@ from apps.commons.utils.django.settings import SettingsUtils
 from apps.docs.consts.student_doc_types import STUDENT_DOC_TYPES
 from apps.docs.exceptions.student_doc import StudentDocNotValidInfo
 from apps.docs.selectors.student_doc import student_doc_model
-from apps.guides.selectors.user import student_profile_model
+from apps.guides.selectors.profiles.student import student_profile_model
 
 
 class StudentDocService:

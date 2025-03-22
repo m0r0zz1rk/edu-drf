@@ -8,7 +8,7 @@
     :addButton="true"
     :addSpecialFunction="addEditEducationService"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/edu/education_services/"
+    getRecsURL="/backend/api/v1/edu/education_service/"
     delRecURL="/backend/api/v1/edu/education_service/"
     :onEditClick="addEditEducationService"
     :tableHeaders="tableHeaders"
