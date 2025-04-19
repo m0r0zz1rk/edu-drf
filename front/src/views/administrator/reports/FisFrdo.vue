@@ -144,7 +144,6 @@ export default {
   },
   watch: {
     reportMonth: function () {
-      console.log(this.reportMonth)
       let notAll = false
       for (let i=1;i<this.months.length;i++) {
         if (this.months[i].key === this.reportMonth) {

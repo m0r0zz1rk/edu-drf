@@ -5,7 +5,6 @@ from django.db import models
 from apps.commons.models import BaseTable
 from apps.commons.utils.django.settings import SettingsUtils
 
-
 def get_upload_path(instance, filename) -> str:
     """
     Получение пути загрузки файлов
@@ -40,7 +39,7 @@ class StudentGroupOffer(BaseTable):
     )
 
     def __str__(self):
-        return f'Договор оферты группы {self.student_group.code}'
+        return f'Договор оферты группы {self.group.code}'
 
     def delete(self, *args, **kwargs):
         """Удаление файла после удаления записи"""

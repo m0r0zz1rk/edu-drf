@@ -4,9 +4,11 @@ from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
 from apps.commons.utils.django.response import response_utils
 from apps.edu.api.edu_viewset import EduViewSet
+from apps.edu.exceptions.student_group.lessons_not_found import LessonsNotFound, LessonsWithControlNotFound
 from apps.edu.selectors.student_group import student_group_queryset, StudentGroupFilter, student_group_orm
 from apps.edu.serializers.student_group import StudentGroupListSerializer, StudentGroupAddSerializer, \
-    StudentGroupUpdateSerializer, StudentGroupServiceTypeSerializer, StudentGroupDocRequestSerializer
+    StudentGroupUpdateSerializer, StudentGroupDocRequestSerializer, \
+    StudentGroupBaseDocRequestSerializer, StudentGroupRetrieveSerializer, StudentGroupCertListSerializer
 from apps.edu.services.student_group import student_group_service
 from apps.journal.consts.journal_modules import EDU
 
@@ -15,6 +17,7 @@ class StudentGroupViewSet(EduViewSet):
     orm = student_group_orm
     queryset = student_group_queryset()
     serializer_class = StudentGroupListSerializer
+    retrieve_serializer = StudentGroupRetrieveSerializer
     base_serializer = StudentGroupAddSerializer
     create_serializer = StudentGroupAddSerializer
     update_serializer = StudentGroupUpdateSerializer
@@ -53,28 +56,8 @@ class StudentGroupViewSet(EduViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = StudentGroupListSerializer(instance)
+        serializer = self.retrieve_serializer(instance)
         return response_utils.ok_response_dict(serializer.data)
-
-    @swagger_auto_schema(
-        tags=[f'Учебная часть. {swagger_object_name}', ],
-        operation_description="Получение типа услуги учебной группы",
-        responses={
-            '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при получении типа',
-            '200': StudentGroupServiceTypeSerializer
-        }
-    )
-    @view_set_journal_decorator(
-        EDU,
-        f'Тип услуги учебной группы получен',
-        f'Ошибка при получении типа услуги учебной группы'
-    )
-    def get_service_type(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.ou is not None:
-            return response_utils.ok_response_dict({'service_type': 'ou'})
-        return response_utils.ok_response_dict({'service_type': 'iku'})
 
     @swagger_auto_schema(
         tags=[f'Учебная часть. {swagger_object_name}', ],
@@ -138,7 +121,7 @@ class StudentGroupViewSet(EduViewSet):
     @swagger_auto_schema(
         tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Получение документа по учебной группе",
-        request_body=StudentGroupDocRequestSerializer,
+        request_body=StudentGroupDocRequestSerializer or StudentGroupCertListSerializer,
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
             '400': 'Ошибка при получении документа',
@@ -151,11 +134,54 @@ class StudentGroupViewSet(EduViewSet):
         f'Ошибка при получении документа по учебной группе'
     )
     def doc(self, request, *args, **kwargs):
-        serialize = StudentGroupDocRequestSerializer(data=request.data)
+        serialize = StudentGroupCertListSerializer(data=request.data)
         if serialize.is_valid():
             return student_group_service.get_doc_response(
                 group_id=serialize.validated_data.get('group_id'),
-                doc_type=serialize.validated_data.get('doc_type')
+                doc_type=serialize.validated_data.get('doc_type'),
+                orders_info={
+                    'date_enroll': serialize.validated_data.get('enroll_date'),
+                    'date_exp': serialize.validated_data.get('exp_date'),
+                    'enroll_number': serialize.validated_data.get('enroll_number'),
+                    'exp_number': serialize.validated_data.get('exp_number'),
+                }
             )
+        else:
+            serialize = StudentGroupDocRequestSerializer(data=request.data)
+            if serialize.is_valid():
+                try:
+                    return student_group_service.get_doc_response(
+                        group_id=serialize.validated_data.get('group_id'),
+                        doc_type=serialize.validated_data.get('doc_type')
+                    )
+                except LessonsNotFound:
+                    return response_utils.bad_request_response('В группе отсутствуют занятия в расписании')
+                except LessonsWithControlNotFound:
+                    return response_utils.bad_request_response('В группе отсутствуют занятия c контролем в расписании')
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Получение договора оферты",
+        request_body=StudentGroupBaseDocRequestSerializer,
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при получении документа',
+            '200': 'HttpResponse с документом'
+        }
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Договор оферты успешно отправлен',
+        f'Ошибка при получении договора оферты'
+    )
+    def offer(self, request, *args, **kwargs):
+        serialize = StudentGroupBaseDocRequestSerializer(data=request.data)
+        if serialize.is_valid():
+            doc = student_group_service.get_offer(serialize.validated_data.get('group_id'),)
+            if doc:
+                return response_utils.file_response(doc.file)
+            else:
+                return response_utils.bad_request_response('Договор оферты отсутствует')
         else:
             return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')

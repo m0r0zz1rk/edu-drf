@@ -1,5 +1,5 @@
 import {showAlert} from "../../../commons/alerts.js"
-import {apiRequest} from "../../../commons/api_request.js";
+import {apiRequest} from "../../../commons/apiRequest.js";
 
 const isDepartment = (to, from, next) => {
     // Проверка роли пользователя на сотрудника подразделения

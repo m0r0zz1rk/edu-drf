@@ -61,7 +61,7 @@
               </v-tab>
 
               <v-tab
-                  v-if="(app.status === 'Архив') && (app.certificate_doc_object_id)"
+                  v-if="(app.status === 'Архив') && (app.certificate_doc_id)"
                   class="coko-tab"
                   value="schedule"
               >
@@ -149,7 +149,7 @@
 
 // Форма для управления заявкой обучающегося
 import LkPage from "@/components/LkPage.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import AppInfo from "@/components/forms/students/detailApp/AppInfo.vue";
@@ -224,7 +224,6 @@ export default {
             appInfoRequest.error
         )
       } else {
-        console.log(appInfoRequest)
         this.app = appInfoRequest
         this.checkServiceLastDay()
         this.checkAppDraft()

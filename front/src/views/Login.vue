@@ -152,7 +152,7 @@
 <script>
 import {showAlert} from "@/commons/alerts";
 import RegistrationDialog from "@/components/dialogs/authen/RegistrationDialog.vue";
-import {getUrlParameter} from "@/commons/get_url_parameter";
+import {getUrlParameter} from "@/commons/getUrlParameter";
 
 export default {
   name: 'Login',

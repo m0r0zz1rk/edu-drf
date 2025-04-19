@@ -23,121 +23,29 @@
 
 <script>
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
+import {tableColumns} from "@/commons/table-data/tableColumns";
+import {getOoFieldsArray} from "@/commons/table-data/get-data-for-fields-array/getOoFieldsArray";
 
 export default {
   name: "GuideOo",
   components: {PaginationTable},
   data() {
     return {
-      tableHeaders: [
-        {
-          'title': 'Краткое наименование',
-          'key': 'short_name'
-        },
-        {
-          'title': 'Полное наименование',
-          'key': 'full_name'
-        },
-        {
-          'title': 'МО',
-          'key': 'mo'
-        },
-        {
-          'title': 'Тип ОО',
-          'key': 'oo_type'
-        },
-        {
-          'title': 'Форма',
-          'key': 'form'
-        },
-        {
-          'title': 'Управление',
-          'key': 'actions'
-        }
-      ],
+      // Список столбцов для таблицы
+      tableHeaders: tableColumns['oo'].tableHeaders,
+      // Описания столбцов для таблицы
       fieldsArray: null
     }
   },
   methods: {
-    async getData() {
-      let moListRequest = await apiRequest(
-        '/backend/api/v1/guides/mo/',
-        'GET',
-        true,
-        null
-      )
-      if (moListRequest.error) {
-        showAlert(
-          'error',
-          'Получение списка МО',
-          moListRequest.error
-        )
-        return false
-      }
-      let mos = []
-      moListRequest.map((mo) => {
-        mos.push(mo.name)
-      })
-      let ooTypeListRequest = await apiRequest(
-        '/backend/api/v1/guides/oo_type/',
-        'GET',
-        true,
-        null
-      )
-      if (ooTypeListRequest.error) {
-        showAlert(
-          'error',
-          'Получение списка типов ОО',
-          ooTypeListRequest.error
-        )
-        return false
-      }
-      let oo_types = []
-      ooTypeListRequest.map((oo_type) => {
-        oo_types.push(oo_type.name)
-      })
-      this.fieldsArray = [
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'short_name',
-          addRequired: true,
-        },
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'full_name',
-          addRequired: true,
-        },
-        {
-          ui: 'select',
-          items: mos,
-          key: 'mo',
-          addRequired: true
-        },
-        {
-          ui: 'select',
-          items: oo_types,
-          key: 'oo_type',
-          addRequired: true
-        },
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'form',
-          addRequired: true,
-        },
-        {
-          ui: 'actions',
-          key: 'actions'
-        }
-      ]
+    async setFieldsArray() {
+      this.fieldsArray = await getOoFieldsArray()
     }
   },
   mounted() {
-    this.getData()
+    this.setFieldsArray()
   }
 }
 </script>

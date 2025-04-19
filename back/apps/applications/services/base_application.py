@@ -1,11 +1,18 @@
 import uuid
+from typing import Callable
 
 from django.db.models import Model
 
+from apps.applications.consts.application_statuses import CHECK, WORK, WAIT_PAY
 from apps.applications.exceptions.application import ApplicationCreateError
-from apps.applications.selectors.course_application import course_application_model
-from apps.applications.selectors.event_application import event_application_model
+from apps.applications.selectors.course_application import course_application_orm
+from apps.applications.selectors.event_application import event_application_orm
+from apps.applications.services.course_application import course_application_service
+from apps.applications.services.event_application import event_application_service
 from apps.authen.services.profile import profile_service
+from apps.commons.orm.base_orm import BaseORM
+from apps.commons.utils.django.settings import settings_utils
+from apps.edu.services.student_group import student_group_service
 from apps.guides.selectors.region import irkutsk_state_object
 
 
@@ -14,7 +21,34 @@ class BaseApplicationService:
     Класс методов для работы с заявками
     """
 
-    def create_app(self, user_id: int, group_id: uuid, application_model: Model) -> uuid:
+    _check_edu_fields = [
+        'education_doc_id',
+        'diploma_surname',
+        'surname_doc_id',
+        'education_serial',
+        'education_number',
+        'education_date'
+    ]
+
+    _pass_fields = [
+        'object_id',
+        'old_id',
+        'date_create',
+        'group',
+        'profile',
+        'oo_new',
+        'coursecertificate'
+    ]
+
+    _fk_fields = [
+        'region',
+        'mo',
+        'position_category',
+        'position',
+    ]
+
+    @staticmethod
+    def create_app(user_id: int, group_id: uuid, application_model: Model) -> uuid:
         """
         Создание заявки
         :param user_id: ID пользователя Django
@@ -42,7 +76,8 @@ class BaseApplicationService:
         """
         Получение общего количества заявок в АИС
         """
-        return course_application_model.objects.count() + event_application_model.objects.count()
+        return (course_application_service.get_total_apps_count() +
+                event_application_service.get_total_apps_count())
 
     @staticmethod
     def get_app_count_for_group(group_id: uuid, course_group: bool) -> int:
@@ -53,8 +88,161 @@ class BaseApplicationService:
         :return: количество заявок
         """
         if course_group:
-            return course_application_model.objects.filter(group_id=group_id).count()
-        return event_application_model.objects.filter(group_id=group_id).count()
+            return course_application_service.get_group_apps(group_id).count()
+        return event_application_service.get_group_apps(group_id).count()
+
+    def get_check_data(self, group_id: uuid) -> dict:
+        """
+        Получение данных заявок для проверки
+        :param group_id: object_id учебной группы
+        :return: словарь с ключами:
+                 oo - список заявок для проверки ОО,
+                 edu - список заявок для проверки документов об образовании,
+                 pay - список заявок для проверки документов об оплате
+        """
+        data = {
+            'oo': [],
+            'edu': [],
+            'pay': []
+        }
+        is_ou = student_group_service.get_group_service_type(group_id) == 'ou'
+        if is_ou:
+            applications = course_application_service.get_group_apps(group_id)
+        else:
+            applications = event_application_service.get_group_apps(group_id)
+        for app in applications:
+            base_obj = {
+                'app_id': app.object_id,
+                'student': app.profile.display_name,
+            }
+            if app.oo_new:
+                data.get('oo').append({
+                    **base_obj,
+                    'mo': app.mo.name,
+                    'oo_new': app.oo_new
+                })
+            if app.status == CHECK and app.pay_doc_id is not None:
+                data.get('pay').append({
+                    **base_obj,
+                    'student': app.profile.display_name,
+                    'pay_doc_id': app.pay_doc_id
+                })
+            if is_ou and not app.education_check:
+                obj = {**base_obj}
+                for field in self._check_edu_fields:
+                    if field == 'education_date':
+                        obj[field] = getattr(app, field).strftime('%d.%m.%Y')
+                    else:
+                        obj[field] = getattr(app, field)
+                data.get('edu').append(obj)
+        return data
+
+    def save_app(
+            self,
+            orm: BaseORM,
+            get_app_func: Callable,
+            app_id: uuid,
+            app_info: dict
+    ):
+        """
+        Сохранение информации по заявке
+        :param orm: Класс ORM для работы с типами заявки
+        :param get_app_func: функция для получения объекта заявки
+        :param app_id: object_id изменяемой заявки
+        :param app_info: словарь с информацией по заявке
+        """
+        app = get_app_func(app_id)
+        updated_app = {
+            'group_id': app.group_id,
+            'profile_id': app.profile_id,
+            'old_id': app.old_id
+        }
+        for field in orm.model._meta.get_fields():
+            if field.name in self._pass_fields:
+                continue
+            if field.name in self._fk_fields:
+                updated_app[field.name+'_id'] = app_info.get(
+                    f'{field.name}_id',
+                    getattr(app, f'{field.name}_id')
+                )
+            elif field.name == 'oo':
+                if app_info.get('oo_new') != '':
+                    updated_app[field.name+'_id'] = None
+                    updated_app[field.name+'_new'] = app_info.get('oo_new', getattr(app, 'oo_new'))
+                else:
+                    updated_app[field.name+'_id'] = app_info.get('oo_id', getattr(app, 'oo_id'))
+                    updated_app[field.name+'_new'] = ''
+            else:
+                updated_app[field.name] = app_info.get(field.name, getattr(app, field.name))
+        orm.update_record(
+            filter_by={'object_id': app_id},
+            update_object=updated_app
+        )
+
+    @staticmethod
+    def move_application(
+            orm: BaseORM,
+            application_id: uuid,
+            destination_group_id: uuid
+    ):
+        """
+        Перенос заявки из одной учебной группы в другую
+        :param orm: Класс ORM для работы с заявками
+        :param application_id: object_id заявки для переноса
+        :param destination_group_id: object_id учебной группы назначения
+        :return:
+        """
+        orm.update_record(
+            dict(object_id=application_id),
+            dict(group_id=destination_group_id)
+        )
+
+    @staticmethod
+    def move_group_applications(
+        orm: BaseORM,
+        source_group_id: uuid,
+        destination_group_id: uuid
+    ):
+        """
+        Перенос всех заявок учебной группы в другую
+        :param orm: Класс ORM для работы с заявками
+        :param source_group_id: object_id исходной группы
+        :param destination_group_id: object_id группы назначения
+        :return:
+        """
+        orm.update_record(
+            dict(group_id=source_group_id),
+            dict(group_id=destination_group_id)
+        )
+
+    @staticmethod
+    def get_recipients_for_offer_pay(group_id: uuid) -> list:
+        """
+        Получить список получателей писем с офертой в учебной группе
+        (только физлица с текущим статусом заявки "В работе")
+        :param group_id: object_id учебной группы
+        :return: список емэйлов
+        """
+        group = student_group_service.get_student_group('object_id', group_id)
+        orm = event_application_orm
+        base_url = f'{settings_utils.get_parameter_from_settings("AIS_ADDRESS")}student/app/'
+        prefix = '/event'
+        if group.ou:
+            orm = course_application_orm
+            prefix = 'course/'
+        recipients = []
+        for app in orm.get_filter_records(filter_by=dict(group_id=group_id)):
+            if app.status == WORK:
+                orm.update_record(
+                    filter_by=dict(object_id=app.object_id),
+                    update_object={'status': WAIT_PAY}
+                )
+                if app.physical:
+                    recipients.append({
+                        'email': app.profile.django_user.email,
+                        'url': f'{base_url}{prefix}{str(app.object_id)}'
+                    })
+        return recipients
 
 
 base_application_service = BaseApplicationService()

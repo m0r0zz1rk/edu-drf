@@ -187,7 +187,7 @@
 <script>
 import KUGTable from "@/components/tables/KUGTable.vue";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";

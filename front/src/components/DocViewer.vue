@@ -30,7 +30,7 @@
 // Компонент для просмотра документов
 import PdfApp from "vue3-pdf-app"
 import "vue3-pdf-app/dist/icons/main.css"
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import fileContentTypes from "@/commons/consts/fileContentTypes";
 

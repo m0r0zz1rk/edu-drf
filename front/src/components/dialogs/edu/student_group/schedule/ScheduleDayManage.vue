@@ -507,7 +507,7 @@ import {useDisplay} from "vuetify";
 import BooleanBadge from "@/components/badges/BooleanBadge.vue";
 import lessonTypes from "@/commons/consts/edu/lessonTypes";
 import {convertSecondsToTimeStr, convertTimeStrToSeconds} from "@/commons/time";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import {convertBackendDate} from "@/commons/date";
 import {showAlert} from "@/commons/alerts";
@@ -663,7 +663,6 @@ export default {
           this.$refs["content-error"].showContentError(remainHoursRequest.error)
           return false
         } else {
-          console.log(remainHoursRequest)
           this.kugRemainHours = remainHoursRequest['kug_remain']
         }
       } else {
@@ -701,12 +700,9 @@ export default {
     // Выбрать час занятия из КУГ
     pickKUGHour(lessonId, chapter, theme, type) {
       let lesson = this.dayInfo.lessons[lessonId]
-      console.log('lesson: '+JSON.stringify(lesson))
       this.kugRemainHours.map((ch) => {
         ch.themes.map((th) => {
           if (lesson['kug_theme_id'] === th['theme_id']) {
-            console.log(th)
-            console.log(lesson['type'])
             th[lesson['type']] += 1
           }
           if (th['theme_id'] === theme.theme_id) {
@@ -719,15 +715,12 @@ export default {
       lesson['type'] = type
       this.dayInfo.lessons[lessonId] = lesson
       this.lessonsDialogs.filter((rec) => rec.lessonId === lessonId)[0]['theme'] = false
-      console.log(this.kugRemainHours)
-      console.log(this.dayInfo.lessons)
     },
     // Выбор преподавателя
     chooseTeacher(teacher) {
       this.dayInfo.lessons[this.selectedLessonID].teacher = teacher.object_id
       this.dayInfo.lessons[this.selectedLessonID].teacher_fio = teacher.surname+' '+teacher.name+' '+teacher.patronymic
       this.teacherDialog = false
-      console.log(this.dayInfo.lessons)
       this.checkTeacherBusy(
           teacher.object_id,
           this.dayInfo.lessons[this.selectedLessonID].time_start_str,
@@ -764,7 +757,6 @@ export default {
       this.loading = true
       let requestBody = this.dayInfo
       requestBody['group_id'] = this.groupId
-      console.log(requestBody)
       let daySaveRequest = await apiRequest(
           '/backend/api/v1/edu/schedule/save_day/',
           'POST',

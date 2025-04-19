@@ -4,9 +4,11 @@ from sqlalchemy import text
 
 from apps.applications.consts.application_statuses import WORK, PAY, CHECK, WAIT_PAY, STUDY, STUDY_COMPLETE, ARCHIVE
 from apps.applications.consts.education import MIDDLE_PROFESSIONAL, HIGHER, STUDENT, NONE
-from apps.applications.selectors.course_application import course_application_model
+from apps.applications.selectors.course_application import course_application_model, course_application_orm
+from apps.applications.selectors.course_certificate import course_certificate_orm
 from apps.applications.selectors.event_application import event_application_model
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
+from apps.commons.utils.django.exception import exception_handling
 from apps.docs.selectors.pay_doc import pay_doc_model
 from apps.docs.selectors.student_doc import student_doc_model
 from apps.edu.selectors.student_group import student_group_model
@@ -24,27 +26,27 @@ class ApplicationsData:
     Заявки из олдовой базы edu
     """
 
-    _groups = (student_group_model.objects.
-               select_related('ou').
-               select_related('iku').
-               select_related('curator').
-               all())
-    _docs = (student_doc_model.objects.
-             select_related('profile').
-             all())
-    _pay_docs = pay_doc_model.objects.all()
-    _profiles = (student_profile_model.objects.
-                 select_related('django_user').
-                 select_related('state').
-                 all())
-    _regions = region_model.objects.all()
-    _mos = mo_model.objects.all()
-    _oos = (oo_model.objects.
-            select_related('mo').
-            select_related('oo_type').
-            all())
-    _position_categories = position_category_model.objects.all()
-    _positions = position_model.objects.all()
+    # _groups = (student_group_model.objects.
+    #            select_related('ou').
+    #            select_related('iku').
+    #            select_related('curator').
+    #            all())
+    # _docs = (student_doc_model.objects.
+    #          select_related('profile').
+    #          all())
+    # _pay_docs = pay_doc_model.objects.all()
+    # _profiles = (student_profile_model.objects.
+    #              select_related('django_user').
+    #              select_related('state').
+    #              all())
+    # _regions = region_model.objects.all()
+    # _mos = mo_model.objects.all()
+    # _oos = (oo_model.objects.
+    #         select_related('mo').
+    #         select_related('oo_type').
+    #         all())
+    # _position_categories = position_category_model.objects.all()
+    # _positions = position_model.objects.all()
 
     _app_status_mapping = {
         1: WORK,
@@ -304,3 +306,48 @@ class ApplicationsData:
                 **new_course_app
             )
             print(f'Заявка обучающегося "{profile.display_name}" в группу {group.code} - добавлено')
+
+    @staticmethod
+    def get_course_certificates():
+        """
+        Получение сертификатов обучающихся из олдовой базы EDU
+        :return:
+        """
+        _course_applications = course_application_orm.get_filter_records()
+        with old_edu_connect_engine.connect() as conn:
+            sql = ("SELECT [cert].[id] "
+                   ",[cert].[reg_number]"
+                   ",[cert].[blank_serial]"
+                   ",[cert].[blank_number]"
+                   ",[cert].[group_id]"
+                   ",[student].[user_id] "
+                   "FROM [edu-new].[dbo].[centre_studentscerts] as cert "
+                   "inner join [edu-new].[dbo].[authen_profiles] as student "
+                   "on cert.[student_id] = student.[id]")
+            data_query = conn.execute(text(sql))
+            data = data_query.all()
+        for certificate in data:
+            try:
+                application = list(
+                    filter(
+                        lambda app: (app.profile.old_id, app.group.old_id) == (certificate[5], certificate[4]),
+                        _course_applications
+                    )
+                )[0]
+            except Exception:
+                continue
+            new_course_certificate = {
+                'old_id': certificate[0],
+                'application_id': application.object_id,
+                'registration_number': certificate[1],
+                'blank_serial': certificate[2],
+                'blank_number': certificate[3]
+            }
+            if not course_certificate_orm.get_one_record_or_none({'old_id': certificate[0]}):
+                course_certificate_orm.create_record(new_course_certificate)
+                print('Добавлен сертификат: ', repr(new_course_certificate))
+            else:
+                course_certificate_orm.update_record(
+                    filter_by={'old_id': certificate[0]},
+                    update_object=new_course_certificate
+                )

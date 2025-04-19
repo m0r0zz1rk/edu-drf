@@ -1,6 +1,8 @@
 from typing import Union
 
-from apps.guides.selectors.oo_type import oo_type_model
+from django.db.models import QuerySet
+
+from apps.guides.selectors.oo_type import oo_type_model, oo_type_orm
 
 
 class OoTypeService:
@@ -29,6 +31,14 @@ class OoTypeService:
         ):
             return oo_type_model.objects.get(name=name)
         return None
+
+    @staticmethod
+    def get_all() -> QuerySet:
+        """
+        Получение полного списка типов ОО
+        :return: QuerySet с типами ОО
+        """
+        return oo_type_orm.get_filter_records(order_by=['name', ])
 
 
 oo_type_service = OoTypeService()

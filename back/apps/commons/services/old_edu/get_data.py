@@ -64,14 +64,15 @@ def get_all_edu_data():
     # edu_data.set_event_schedule_teacher()
     print('### Окончание работы с модулем Учебная часть')
 
-    # Получение договор офферт для учебных групп
-    print('### Работа с договорами офферты')
-    docs_data.get_offers()
-    print('### Окончание работы с договорами офферты')
+    # Получение договоров оферт для учебных групп
+    print('### Работа с договорами оферты')
+    # docs_data.get_offers()
+    print('### Окончание работы с договорами оферты')
 
     # Модуль applications
     print('### Начало работы с модулем Заявки')
     # application_data.get_course_applications()
+    application_data.get_course_certificates()
     # application_data.get_event_applications()
     print('### Окончание работы с модулем Заявки')
 

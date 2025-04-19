@@ -117,7 +117,6 @@ export default {
     userSelect(user) {
       this.userDialog = !(this.userDialog)
       this.profileUuid = user.object_id
-      console.log(user.object_id)
     }
   }
 

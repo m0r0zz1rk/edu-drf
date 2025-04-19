@@ -179,7 +179,7 @@
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 import surveyQuestionTypes from "@/commons/consts/survey/surveyQuestionTypes";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import SurveyQuestionAnswerDetail from "@/components/forms/surveys/SurveyQuestionAnswerDetail.vue";
 

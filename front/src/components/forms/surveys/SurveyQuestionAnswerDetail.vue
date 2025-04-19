@@ -83,7 +83,7 @@
 <script>
 
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 export default {

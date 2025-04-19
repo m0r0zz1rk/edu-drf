@@ -12,7 +12,8 @@ const specialFieldsList = [
     'appEducationCheck',
     'appPayCheck',
     'appSurveyCheck',
-    'appFormView'
+    'appFormView',
+    'appMove'
 ]
 
 export default specialFieldsList

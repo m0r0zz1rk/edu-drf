@@ -14,9 +14,9 @@ from apps.edu.exceptions.schedule.day_info_validate_error import DayInfoValidate
 from apps.edu.exceptions.schedule.schedule_generate_error import ScheduleGenerateError
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.selectors.schedule import schedule_model, schedule_model_orm
+from apps.edu.selectors.student_group import student_group_orm
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
-from apps.edu.services.student_group import StudentGroupService
 
 
 class ScheduleService:
@@ -24,7 +24,6 @@ class ScheduleService:
 
     __group = None
 
-    __student_group_service = StudentGroupService()
     __education_service = EducationServiceService()
     __information_service = InformationServiceService()
     __date_utils = DateUtils()
@@ -59,10 +58,7 @@ class ScheduleService:
         Инициализация класса - установка статического атрибута object_id учбеной группы
         :param group_id: object_id учбеной группы - объекта StudentGroup
         """
-        self.__group = self.__student_group_service.get_student_group(
-            'object_id',
-            group_id
-        )
+        self.__group = student_group_orm.get_one_record_or_none(filter_by={'object_id': group_id})
 
     def get_period_borders(self) -> list:
         """
@@ -346,5 +342,5 @@ class ScheduleService:
         """
         return schedule_model_orm.get_filter_records(
             filter_by={'group_id': self.__group.object_id},
-            order_by=['date', ]
+            order_by=['date', 'time_start']
         )

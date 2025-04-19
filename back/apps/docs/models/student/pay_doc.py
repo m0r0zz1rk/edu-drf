@@ -43,8 +43,7 @@ class PayDoc(BaseTable):
     )
 
     def __str__(self):
-        return (f'Документ об оплате пользователя {self.profile.display_name} в группе '
-                f'{self.group.code} (ID: {self.object_id}')
+        return f'Документ об оплате пользователя {self.profile.display_name} (ID: {self.object_id}'
 
     class Meta:
         verbose_name = 'Документ об оплате'

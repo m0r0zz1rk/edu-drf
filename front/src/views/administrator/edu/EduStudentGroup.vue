@@ -80,7 +80,7 @@ export default {
     // Открыть страницу управления учебной группой
     groupSelect(group) {
       this.$router.push({
-        path: '/centre/edu/student_group/'+group.object_id
+        path: '/centre/edu/student-group/'+group.object_id
       })
     },
     // Получение списка возможных статусов учебных групп

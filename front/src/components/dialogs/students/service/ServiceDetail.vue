@@ -60,7 +60,7 @@
 
 // Диалоговое окно для просмотра детальной информации по услуге и подачи заявки
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 export default {
@@ -94,31 +94,41 @@ export default {
       } else {
         url += 'event_application_user/'
       }
-      let createAppRequest = await apiRequest(
+      try {
+        const createAppRequest = await apiRequest(
           url,
           'POST',
           true,
           {
             group_id: this.serviceInfo.object_id
           }
-      )
-      if (createAppRequest.error) {
-        showAlert(
+        )
+        if (createAppRequest.error) {
+          showAlert(
             'error',
             'Подача заявки',
             createAppRequest.error
-        )
-        this.$refs.courseDetailDialog.dialog = false
-      } else {
-        showAlert(
+          )
+          this.$refs.courseDetailDialog.dialog = false
+        } else {
+          showAlert(
             'success',
             'Подача заявки',
             'Заявка успешно создана'
+          )
+          this.$router.push({
+            path: '/student/app/'+this.serviceType+'/'+createAppRequest.app_id
+          })
+        }
+      } catch(e) {
+        console.log('ou_service save error: ', e)
+        showAlert(
+          'error',
+          'Подача заявки',
+          'Произошла ошибка в процессе выполнения запроса'
         )
-        this.$router.push({
-          path: '/student/app/'+this.serviceType+'/'+createAppRequest.app_id
-        })
       }
+
       this.loading = false
     }
   }

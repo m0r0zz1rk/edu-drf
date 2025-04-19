@@ -116,7 +116,7 @@
 
 // Компонент для просмотра доступных курсов для регистрации
 import LkPage from "@/components/LkPage.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import ServiceDetail from "@/components/dialogs/students/service/ServiceDetail.vue";
 

@@ -73,7 +73,7 @@
 
 <script>
 import {showAlert} from "@/commons/alerts";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {

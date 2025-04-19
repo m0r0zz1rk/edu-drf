@@ -60,7 +60,7 @@
 
 // Компонент для работы с заявками обучающегося на курсы
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
@@ -196,7 +196,6 @@ export default {
         this.selectedApp
       )
       if (saveAppRequest.error) {
-        console.log('saveApp error: ', saveAppRequest.error)
         showAlert(
           'error',
           'Сохранение заявки',

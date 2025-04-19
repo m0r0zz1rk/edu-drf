@@ -81,7 +81,7 @@
 
 <script>
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import {getBase64} from "@/commons/files";
 import fileContentTypes from "@/commons/consts/fileContentTypes";
@@ -149,7 +149,6 @@ export default {
             }
           }
         })
-        console.log(body)
         let addItemRequest = await apiRequest(
           this.addRecURL,
           'POST',

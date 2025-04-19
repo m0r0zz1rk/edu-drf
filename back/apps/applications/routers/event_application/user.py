@@ -1,0 +1,5 @@
+from apps.applications.api.event_application.user import EventApplicationUserViewSet
+from apps.commons.drf.routers.LRCU_router import ListRetrieveCreateUpdateRouter
+
+event_application_user_router = ListRetrieveCreateUpdateRouter(trailing_slash=True)
+event_application_user_router.register('event_application_user', EventApplicationUserViewSet)

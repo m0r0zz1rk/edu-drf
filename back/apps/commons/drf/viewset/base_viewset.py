@@ -1,8 +1,10 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import Serializer
 
 from apps.commons.pagination import CustomPagination
+from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.utils.django.response import response_utils
 from apps.docs.services.table_export import TableExport
 from apps.journal.consts.journal_modules import COMMON
@@ -22,7 +24,7 @@ class BaseViewSet(viewsets.ModelViewSet):
     lookup_field = 'object_id'
 
     # Изменяемые параметры
-    # permission_classes = [IsAuthenticated, IsAdministrators]
+    permission_classes = [IsAuthenticated, IsAdministrators]
     orm = queryset = None
     module = COMMON
     serializer_class = base_serializer = create_serializer = update_serializer = Serializer

@@ -3,7 +3,9 @@ import uuid
 from typing import Optional
 
 from apps.commons.services.ad.ad_centre import ad_centre_service
+from apps.edu.exceptions.planning_parameter.planning_days_error import PlanningDaysError
 from apps.edu.selectors.services.information_service import information_service_model, information_service_orm
+from apps.edu.services.planning_parameter import planning_parameter_service
 from apps.guides.services.audience_category import audience_category_service
 from apps.guides.services.event_type import event_type_service
 
@@ -136,7 +138,10 @@ class InformationServiceService:
         """
         object_id = uuid.uuid4()
         create_data, data_categories = self.process_data_from_validated(validated_data, object_id)
-        information_service_orm.create_record(create_data)
+        if planning_parameter_service.check_planning_days(create_data.get('date_start')):
+            information_service_orm.create_record(create_data)
+        else:
+            raise PlanningDaysError
         self.update_service_categories(object_id, data_categories)
 
     def update_service(self, service_id: uuid.uuid4, validated_data: dict):
@@ -148,7 +153,10 @@ class InformationServiceService:
         """
         del validated_data['object_id']
         update_data, data_categories = self.process_data_from_validated(validated_data)
-        information_service_orm.update_record({'object_id': service_id}, update_data)
+        if planning_parameter_service.check_planning_days(update_data.get('date_start')):
+            information_service_orm.update_record({'object_id': service_id}, update_data)
+        else:
+            raise PlanningDaysError
         self.update_service_categories(service_id, data_categories)
 
 

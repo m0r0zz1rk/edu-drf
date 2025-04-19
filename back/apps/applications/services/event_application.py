@@ -32,7 +32,7 @@ class EventApplicationService:
     ]
 
     @staticmethod
-    def get_course_app(app_id: uuid) -> event_application_model:
+    def get_event_app(app_id: uuid) -> event_application_model:
         """
         Получить заявку на мероприятие (ИКУ) по object_id
         :param app_id: object_id заявки на мероприятие
@@ -87,36 +87,22 @@ class EventApplicationService:
             })
         return res
 
-    def save_app(self, app_id: uuid, app_info: dict):
+    @staticmethod
+    def get_group_apps(group_id: uuid) -> QuerySet:
         """
-        Сохранение информации по заявке
-        :param app_id: object_id изменяемой заявки
-        :param app_info: словарь с информацией по заявке
+        Получение списка заявок в учебной группе мероприятия
+        :param group_id: object_id учебной группы
+        :return: QuerySet с заявками
         """
-        app = self.get_course_app(app_id)
-        updated_app = {
-            'group_id': app.group_id,
-            'profile_id': app.profile_id,
-            'old_id': app.old_id
-        }
-        for field in event_application_model._meta.get_fields():
-            if field.name in self._pass_fields:
-                continue
-            if field.name in self._fk_fields:
-                updated_app[field.name+'_id'] = app_info.get(field.name+'_object_id')
-            elif field.name == 'oo':
-                if app_info.get('oo_new') != '':
-                    updated_app[field.name+'_id'] = None
-                    updated_app[field.name+'_new'] = app_info.get('oo_new')
-                else:
-                    updated_app[field.name+'_id'] = app_info.get('oo_object_id')
-                    updated_app[field.name+'_new'] = ''
-            else:
-                updated_app[field.name] = app_info.get(field.name)
-        event_application_orm.update_record(
-            filter_by={'object_id': app_id},
-            update_object=updated_app
-        )
+        return event_application_orm.get_filter_records(filter_by={'group_id': group_id})
+
+    @staticmethod
+    def get_total_apps_count() -> int:
+        """
+        Получение общего количества заявок на курсы в БД
+        :return: количество
+        """
+        return event_application_orm.get_filter_records().count()
 
 
 event_application_service = EventApplicationService()

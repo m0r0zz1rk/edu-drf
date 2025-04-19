@@ -7,8 +7,8 @@ student_group_router = ListRetrieveCreateUpdateDeleteExportRouter(trailing_slash
 student_group_router.register('student_group', StudentGroupViewSet)
 
 student_group_urlpatterns = [
-    path('student_group_service_type/<uuid:object_id>/', StudentGroupViewSet.as_view({'get': 'get_service_type'})),
-    path('student_group/doc/', StudentGroupViewSet.as_view({'post': 'doc'}))
+    path('student_group/doc/', StudentGroupViewSet.as_view({'post': 'doc'})),
+    path('student_group/offer/', StudentGroupViewSet.as_view({'post': 'offer'}))
 ]
 
 student_group_urlpatterns += student_group_router.urls

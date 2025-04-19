@@ -1,14 +1,13 @@
 from functools import wraps
 
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
-from apps.commons.utils.django.exception import ExceptionHandling
+from apps.commons.utils.django.exception import exception_handling
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES
 from apps.journal.exceptions.api_process_error import APIProcessError
 from apps.journal.services.journal import JournalService
 
 journal_service = JournalService()
-exception_handling = ExceptionHandling()
 
 
 def journal_api(
@@ -32,7 +31,7 @@ def journal_api(
                     .set_status(status)
                     .set_description(description)
                     .set_payload('-')
-                    .set_output(ExceptionHandling.get_traceback())
+                    .set_output(exception_handling.get_traceback())
                     .set_response_message(error_text)
                 )
                 return journal_request.create_response()

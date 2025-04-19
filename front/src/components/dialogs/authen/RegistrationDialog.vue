@@ -290,9 +290,9 @@
 
 <script>
 
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
-import email_pattern from "@/commons/email_pattern";
+import emailPattern from "@/commons/emailPattern";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 import {useDisplay} from "vuetify";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
@@ -331,7 +331,7 @@ export default {
         required: value => !!value || 'Обязательно для заполнения.',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
-        email: value => email_pattern.test(value) || 'Некорректный e-mail.',
+        email: value => emailPattern.test(value) || 'Некорректный e-mail.',
         password: value => value.length >= 8 || 'Минимальная длина пароля - 8 символов'
       },
       states: ['Россия', 'Украина', 'Беларусь', 'Казахстан'],
@@ -382,7 +382,7 @@ export default {
         this.$refs["content-error"].showContentError('Задан некорректный номер телефона')
         return null
       }
-      if (!(email_pattern.test(email))) {
+      if (!(emailPattern.test(email))) {
         this.$refs["content-error"].showContentError('Задан некорректный email')
         return null
       }

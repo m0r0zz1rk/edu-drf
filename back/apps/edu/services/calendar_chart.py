@@ -118,9 +118,9 @@ class CalendarChartService:
         if kug_chapters:
             keys = AddUpdateCalendarChartElement.calendar_chart_required_keys
             for chapter in kug_chapters:
-                new_chapter_object_id = uuid.uuid4()
+                new_chapter_id = uuid.uuid4()
                 new_chapter = {
-                    'object_id': new_chapter_object_id
+                    'object_id': new_chapter_id
                 }
                 for key in keys:
                     if key != 'object_id':
@@ -139,7 +139,7 @@ class CalendarChartService:
                             new_theme[key] = uuid.uuid4()
                         else:
                             new_theme[key] = getattr(theme, key)
-                    new_theme['chapter_id'] = new_chapter_object_id
+                    new_theme['chapter_id'] = new_chapter_id
                     AddUpdateCalendarChartElement({
                         'source': 'Процесс создания копии ДПП',
                         'module': EDU,

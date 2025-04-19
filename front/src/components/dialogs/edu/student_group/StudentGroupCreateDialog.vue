@@ -200,7 +200,7 @@
 import KUGTable from "@/components/tables/KUGTable.vue";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 // Диалоговое окно для добавления новой учебной группы
@@ -322,7 +322,6 @@ export default {
       } else {
         this.getRecsURL = '/backend/api/v1/edu/information_service/'
       }
-      console.log(this.newGroup)
     }
   }
 }

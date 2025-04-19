@@ -121,7 +121,7 @@
 // Страница для просмотра списка доступных для регистрации мероприятий
 import LkPage from "@/components/LkPage.vue";
 import ServiceDetail from "@/components/dialogs/students/service/ServiceDetail.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 export default {

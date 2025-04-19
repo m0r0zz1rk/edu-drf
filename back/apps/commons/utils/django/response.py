@@ -70,10 +70,10 @@ class ResponseUtils:
 
     @staticmethod
     def auth_failed_response(text: str) -> Response:
-        """Генерация ответа с кодом 401 при ошибке авторизации"""
+        """Генерация ответа с кодом 400 при ошибке авторизации"""
         return Response(
             {'error': text},
-            status=status.HTTP_401_UNAUTHORIZED
+            status=status.HTTP_400_BAD_REQUEST
         )
 
     @staticmethod

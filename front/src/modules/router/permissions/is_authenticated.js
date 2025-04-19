@@ -1,5 +1,5 @@
 import {getCookie} from "@/commons/cookie";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 const isAuthenticated = (to, from, next) => {

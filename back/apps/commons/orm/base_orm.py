@@ -127,7 +127,8 @@ class BaseORM:
                 records = self.model.objects.filter(**filter_by)
             for record in records:
                 self.model.objects.update_or_create(
-                    object_id=record.object_id, defaults=update_object
+                    object_id=record.object_id,
+                    defaults=update_object
                 )
 
         return function()

@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.applications.selectors.event_application import event_application_model
 from apps.applications.serializers.base_application import BaseApplicationSerializer, FullBaseApplicationSerializer, \
-    BaseApplicationUpdateSerializer, BaseApplicationGroupListSerializer
+    BaseApplicationGroupListSerializer
 
 
 class EventApplicationListSerializer(serializers.Serializer):
@@ -25,23 +25,23 @@ class EventApplicationDetailSerializer(FullBaseApplicationSerializer):
 
 
 class EventApplicationUpdateSerializer(EventApplicationDetailSerializer):
-    region_object_id = serializers.UUIDField(
+    region_id = serializers.UUIDField(
         allow_null=False,
         label='object_id региона РФ'
     )
-    mo_object_id = serializers.UUIDField(
+    mo_id = serializers.UUIDField(
         allow_null=True,
         label='object_id МО (для региона Иркутская область)'
     )
-    oo_object_id = serializers.UUIDField(
+    oo_id = serializers.UUIDField(
         allow_null=True,
         label='object_id ОО из справочника'
     )
-    position_category_object_id = serializers.UUIDField(
+    position_category_id = serializers.UUIDField(
         allow_null=True,
         label='object_id категории должности'
     )
-    position_object_id = serializers.UUIDField(
+    position_id = serializers.UUIDField(
         allow_null=True,
         label='object_id должности'
     )
@@ -49,11 +49,11 @@ class EventApplicationUpdateSerializer(EventApplicationDetailSerializer):
     class Meta:
         model = event_application_model
         fields = EventApplicationDetailSerializer.Meta.fields + (
-            'region_object_id',
-            'mo_object_id',
-            'oo_object_id',
-            'position_category_object_id',
-            'position_object_id'
+            'region_id',
+            'mo_id',
+            'oo_id',
+            'position_category_id',
+            'position_id'
         )
 
 

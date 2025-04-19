@@ -64,7 +64,7 @@
 
 <script>
 import PaginationTableBaseField from "@/components/tables/pagination_table/PaginationTableBaseField.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 

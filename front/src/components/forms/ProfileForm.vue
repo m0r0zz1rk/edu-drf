@@ -343,10 +343,10 @@
 </template>
 
 <script>
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
-import email_pattern from "@/commons/email_pattern";
+import emailPattern from "@/commons/emailPattern";
 import PasswordChange from "@/components/PasswordChange.vue";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
@@ -412,7 +412,7 @@ export default {
         required: value => !!value || 'Обязательно для заполнения.',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
-        email: value => email_pattern.test(value) || 'Некорректный e-mail.'
+        email: value => emailPattern.test(value) || 'Некорректный e-mail.'
       },
       // Параметр валидности полученных данных
       dataValid: false,
@@ -504,7 +504,7 @@ export default {
           }
         }
         if (key === 'email') {
-          if ([undefined, null].includes(this.profileData[key]) || !(email_pattern.test(this.profileData[key]))) {
+          if ([undefined, null].includes(this.profileData[key]) || !(emailPattern.test(this.profileData[key]))) {
             this.$refs["content-error"].showContentError('Введите корректный email')
             this.dataValid = false
             return false

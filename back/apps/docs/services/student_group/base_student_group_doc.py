@@ -1,6 +1,7 @@
 import datetime
 import io
 import os
+import re
 import uuid
 from abc import abstractmethod
 
@@ -52,6 +53,21 @@ class BaseStudentGroupDoc:
         manager = all_centres.get(dep, '')
         return dep, manager
 
+    def _get_department_short_name(self) -> str:
+        """
+        Получение сокращения названия подразделения
+        :return: Сокращение названия центра
+        """
+        if self.student_group.ou:
+            department = self.student_group.ou.program.department.display_name
+        else:
+            department = self.student_group.iku.department.display_name
+        dep_name_split = re.split(' |-', department)
+        short_dep = ''
+        for word in dep_name_split:
+            short_dep += word[:1].upper()
+        return short_dep
+
     def _get_date_start_and_end(self) -> tuple:
         """
         Получение даты начала и окончания обучения в учебной группе
@@ -60,6 +76,21 @@ class BaseStudentGroupDoc:
         if self.student_group.ou:
             return self.student_group.ou.date_start, self.student_group.ou.date_end
         return self.student_group.iku.date_start, self.student_group.iku.date_end
+
+    def _get_audience_categories_str(self) -> str:
+        """
+        Получение строкового представления для всех связанных с учебной группой
+        категорий слушателей с разеделителем ","
+        :return: строка с категориями слушателей через запятую
+        """
+        if self.student_group.ou:
+            categories = self.student_group.ou.program.categories.all()
+        else:
+            categories = self.student_group.iku.categories.all()
+        categories_string = ''
+        for category in categories:
+            categories_string += f'{category.name}, '
+        return categories_string[:-2]
 
     @staticmethod
     def _get_order_date(date_start: datetime) -> datetime:
@@ -179,16 +210,17 @@ class BaseStudentGroupDoc:
         """
         pass
 
-    def _set_student_data_into_table(self, doc):
+    def _set_student_data_into_table(self, doc, table_index: int = 0):
         """
         Подстановка данных о студентах в первую таблицу полученного файла ворд
         :param doc: Word файл
+        :param table_index: Номер таблицы в документе (по умолчанию первая таблица)
         :return:
         """
         file_stream = io.BytesIO()
         doc.save(file_stream)
         document = Document(file_stream)
-        table = document.tables[0]
+        table = document.tables[table_index]
         applications = self._get_group_applications()
         for index, application in enumerate(applications):
             row_cells = table.add_row().cells

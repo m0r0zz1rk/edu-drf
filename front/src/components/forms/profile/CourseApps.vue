@@ -60,7 +60,7 @@
 
 // Компонент для работы с заявками обучающегося на курсы
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
@@ -185,7 +185,6 @@ export default {
     // Сохранить изменения в заявке
     async saveApp() {
       this.loading = true
-      console.log('selectedApp: ', this.selectedApp)
       if (this.selectedApp.education_date !== null && this.selectedApp.education_date instanceof Date) {
         this.selectedApp.education_date = convertDateToBackend(this.selectedApp.education_date)
       }

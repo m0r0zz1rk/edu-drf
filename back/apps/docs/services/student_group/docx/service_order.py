@@ -46,7 +46,7 @@ class ServiceOrder(BaseStudentGroupDoc):
             'manager': self._get_manager_fio(manager),
             'code': self.student_group.code,
             'date_start': f'{date_utils.get_text_date_genitive_case(date_start)}',
-            'date_end': f'{date_utils.get_text_date_genitive_case(date_start)}',
+            'date_end': f'{date_utils.get_text_date_genitive_case(date_end)}',
             'duration': str(self._get_duration()),
             'price': str(self._get_price())
         }

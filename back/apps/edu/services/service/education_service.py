@@ -2,8 +2,10 @@ import datetime
 import uuid
 from typing import Optional
 
+from apps.edu.exceptions.planning_parameter.planning_days_error import PlanningDaysError
 from apps.edu.selectors.program import program_model
 from apps.edu.selectors.services.education_service import education_service_model, education_service_orm
+from apps.edu.services.planning_parameter import planning_parameter_service
 
 
 class EducationServiceService:
@@ -77,7 +79,10 @@ class EducationServiceService:
         create_data = dict(validated_data)
         del create_data['program']
         create_data['program_id'] = validated_data.get('program')
-        education_service_orm.create_record(create_data)
+        if planning_parameter_service.check_planning_days(validated_data.get('date_start')):
+            education_service_orm.create_record(create_data)
+        else:
+            raise PlanningDaysError
 
     @staticmethod
     def update_service(service_id: uuid, validated_data: dict):
@@ -91,7 +96,10 @@ class EducationServiceService:
         del update_data['object_id']
         del update_data['program']
         update_data['program_id'] = validated_data.get('program')
-        education_service_orm.update_record({'object_id': service_id}, update_data)
+        if planning_parameter_service.check_planning_days(validated_data.get('date_start')):
+            education_service_orm.update_record({'object_id': service_id}, update_data)
+        else:
+            raise PlanningDaysError
 
 
 education_service_service = EducationServiceService()

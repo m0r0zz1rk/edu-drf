@@ -6,22 +6,6 @@ from apps.docs.services.student_group.base_student_group_doc import BaseStudentG
 class InformationLetter(BaseStudentGroupDoc):
     """Класс для генерации информационного письма в учебной группе"""
 
-    def _get_audience_categories_str(self) -> str:
-        """
-        Получение строкового представления для всех связанных с учебной группой
-        категорий слушателей с разеделителем ","
-        :return: строка с категориями слушателей через запятую
-        """
-        categories = None
-        if self.student_group.ou:
-            categories = self.student_group.ou.program.categories.all()
-        else:
-            categories = self.student_group.iku.categories.all()
-        categories_string = ''
-        for category in categories:
-            categories_string += f'{category.name}, '
-        return categories_string[:-2]
-
     def _get_context(self) -> dict:
         """
         Получение словаря с данными для подстановки

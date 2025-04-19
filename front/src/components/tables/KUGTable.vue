@@ -458,7 +458,7 @@ import PaginationTableBaseField from "@/components/tables/pagination_table/Pagin
 import SpecialField from "@/components/tables/pagination_table/special_fields/SpecialField.vue";
 import PaginationTableManage from "@/components/tables/pagination_table/PaginationTableManage.vue";
 import {useDisplay} from "vuetify";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 // Компонент для работы с КУГ ДПП

@@ -92,6 +92,7 @@
                   :useInTableManage="false"
                   :field="fieldsArray.filter((field) => field.key === column.key)[0]"
                   :onChangeEvent="searchRecs"
+                  :getRecs="getRecs"
               />
 
             </template>
@@ -159,6 +160,8 @@
                       :mobileDisplay="mobileDisplay"
                       :openDocViewerFunction="openDocViewerFunction"
                       :selectGroupAppFunction="selectGroupAppFunction"
+                      :getRecs="getRecs"
+                      :appMoveFunction="appMoveFunction"
                   />
               </div>
 
@@ -305,7 +308,7 @@
 </template>
 
 <script>
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import PaginationTableManage from "@/components/tables/pagination_table/PaginationTableManage.vue";
 import {xlsxDownloadFunction} from "@/commons/xlsx";
@@ -379,6 +382,8 @@ export default {
     openDocViewerFunction: Function,
     // Функция для получения полной заявки в группе и просмотра анкеты
     selectGroupAppFunction: Function,
+    // Функция для выбора заявки и подготовки к ее переносу
+    appMoveFunction: Function
   },
   data() {
     return {

@@ -11,7 +11,7 @@
 <script>
 
 import LkPage from "@/components/LkPage.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {getCookie} from "@/commons/cookie";
 import StudentMainPage from "@/components/main_pages/StudentMainPage.vue";
 import CentreMainPage from "@/components/main_pages/CentreMainPage.vue";

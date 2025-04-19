@@ -210,7 +210,7 @@
 <script>
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 

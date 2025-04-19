@@ -62,6 +62,12 @@
     :studentInfo="item[header.key]"
   />
 
+  <AppMove
+    v-if="ui === 'appMove'"
+    :application="item"
+    :appMoveFunction="appMoveFunction"
+  />
+
   <AppStatusBadge
     v-if="ui === 'appStatus'"
     :appStatus="item[header.key]"
@@ -147,10 +153,12 @@ import FileField from "@/components/tables/pagination_table/special_fields/sourc
 import AppStudentInfo from "@/components/tables/pagination_table/special_fields/sources/AppStudentInfo.vue";
 import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
 import BooleanBadge from "@/components/badges/BooleanBadge.vue";
+import AppMove from "@/components/tables/pagination_table/special_fields/sources/AppMove.vue";
 
 export default {
   name: "SpecialField",
   components: {
+    AppMove,
     BooleanBadge,
     AppStatusBadge,
     AppStudentInfo,
@@ -165,7 +173,11 @@ export default {
     // Функция для просмотра документов
     openDocViewerFunction: Function,
     // Функция для получения полной заяки и просмотра анкеты в группе
-    selectGroupAppFunction: Function
+    selectGroupAppFunction: Function,
+    // Функция получения записей в таблице
+    getRecs: Function,
+    // Функция для выбора заявки и подготовки к ее переносу
+    appMoveFunction: Function
   },
   data() {
     return {

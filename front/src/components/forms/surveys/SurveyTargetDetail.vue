@@ -205,7 +205,7 @@
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 import surveyTargetTypes from "@/commons/consts/survey/surveyTargetTypes";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
 

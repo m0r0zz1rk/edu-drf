@@ -16,7 +16,7 @@ from apps.journal.services.journal import JournalService
 from apps.surveys.exceptions.survey import SurveyDataNotValid, SurveyNotExist
 from apps.surveys.selectors.survey import survey_queryset, SurveyFilter
 from apps.surveys.serializers.survey import SurveyListSerializer, SurveyBaseSerializer, SurveyCreateSerializer
-from apps.surveys.services.survey import SurveyService
+from apps.surveys.services.survey import survey_service
 
 
 class SurveyViewSet(viewsets.ModelViewSet):
@@ -24,7 +24,6 @@ class SurveyViewSet(viewsets.ModelViewSet):
     """Класс эндпоинтов для работы с опросами"""
     permission_classes = [IsAuthenticated, IsAdministrators]
     _profile_service = ProfileService()
-    _survey_service = SurveyService()
     _respu = ResponseUtils()
     _js = JournalService()
     _journal_request_builder = JournalRequestBuilder()
@@ -85,7 +84,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
                 data=request.data
             )
             if serialize.is_valid():
-                self._survey_service.create_survey(request.user.id, serialize.data)
+                survey_service.create_survey(request.user.id, serialize.data)
                 journal_request = JournalRequest(
                     self._journal_request_builder
                     .set_source(
@@ -157,7 +156,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
                 data=request.data
             )
             if serialize.is_valid():
-                self._survey_service.update_survey(
+                survey_service.update_survey(
                     self.kwargs['object_id'],
                     serialize.data
                 )

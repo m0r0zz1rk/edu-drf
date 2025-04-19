@@ -6,6 +6,9 @@ TRANSFER_ORDER = 'transfer_order'
 DEDUCTION_ORDER = 'deduction_order'
 FORMS = 'forms'
 STUDENT_JOURNAL = 'student_journal'
+CLOSE_DOC = 'close_doc'
+SCHEDULE = 'schedule'
+CERTIFICATES_LIST = 'certificates_list'
 
 # Типы документов для выгрузки по учебной группе
 STUDENT_GROUP_DOC_TYPES = (
@@ -16,5 +19,8 @@ STUDENT_GROUP_DOC_TYPES = (
     (TRANSFER_ORDER, 'Приказ о зачислении'),
     (DEDUCTION_ORDER, 'Приказ об отчислении'),
     (FORMS, 'Анкеты'),
-    (STUDENT_JOURNAL, 'Журнал')
+    (STUDENT_JOURNAL, 'Журнал'),
+    (CLOSE_DOC, 'Закрывной документ'),
+    (SCHEDULE, 'Расписание'),
+    (CERTIFICATES_LIST, 'Ведомость удостоверений'),
 )

@@ -1,6 +1,8 @@
 from typing import Union
 
-from apps.guides.selectors.mo import mo_model
+from django.db.models import QuerySet
+
+from apps.guides.selectors.mo import mo_model, mo_orm
 
 
 class MoService:
@@ -29,6 +31,14 @@ class MoService:
         ):
             return mo_model.objects.get(name=name)
         return None
+
+    @staticmethod
+    def get_all() -> QuerySet:
+        """
+        Получение полного списка МО
+        :return: QuerySet с МО
+        """
+        return mo_orm.get_filter_records(order_by=['name',])
 
 
 mo_service = MoService()

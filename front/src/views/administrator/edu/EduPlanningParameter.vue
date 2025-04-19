@@ -7,7 +7,7 @@
     :addButton="false"
     :xlsxButton="false"
     getRecsURL="/backend/api/v1/edu/planning_parameter/"
-    editRecURL="/backend/api/v1/edu/planning_parameter/update/"
+    editRecURL="/backend/api/v1/edu/planning_parameter/"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
   />

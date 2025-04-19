@@ -94,7 +94,7 @@
 <script>
 
 // Форма для просмотра активных заявок на курсы
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
 

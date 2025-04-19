@@ -5,25 +5,27 @@ from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.course_application import course_application_orm, course_application_queryset, \
     course_application_model
 from apps.applications.serializers.base_application import ResponseApplicationCreateSerializer
+from apps.applications.serializers.base_application.response_application_create_serializer import \
+    ApplicationCreateSerializer
 from apps.applications.serializers.course_application import CourseApplicationListSerializer, \
     CourseApplicationDetailSerializer, CourseApplicationUpdateSerializer
 from apps.applications.services.base_application import base_application_service
 from apps.applications.services.course_application import course_application_service
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
-from apps.commons.permissions.is_students import IsStudent
+from apps.commons.permissions.is_admin_or_student import IsAdminOrStudent
 from apps.commons.utils.django.response import response_utils
 from apps.journal.consts.journal_modules import APPLICATIONS
 
 
 class CourseApplicationUserViewSet(ApplicationsViewSet):
-    permission_classes = [IsAuthenticated, IsStudent]
+    permission_classes = [IsAuthenticated, IsAdminOrStudent]
 
     orm = course_application_orm
     queryset = course_application_queryset()
     serializer_class = CourseApplicationListSerializer
     base_serializer = CourseApplicationDetailSerializer
-    create_serializer = ResponseApplicationCreateSerializer
+    create_serializer = ApplicationCreateSerializer
     update_serializer = CourseApplicationUpdateSerializer
     swagger_object_name = 'Заявка на курс (ОУ) (обучающийся)'
 
@@ -60,7 +62,9 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
         f'Ошибка при получении "{swagger_object_name}"'
     )
     def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        instance = self.get_object()
+        serializer = self.base_serializer(instance)
+        return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(
         tags=[f'Заявки. {swagger_object_name}', ],
@@ -105,7 +109,9 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
             data=request.data
         )
         if serialize.is_valid():
-            course_application_service.save_app(
+            base_application_service.save_app(
+                self.orm,
+                course_application_service.get_course_app,
                 self.kwargs['object_id'],
                 serialize.validated_data
             )

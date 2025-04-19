@@ -122,6 +122,7 @@
   <div style="width: 100%; text-align: center">
     <v-btn
         color="coko-blue"
+        :loading="loading"
         @click="createReport()"
         text="Сформировать"
     />
@@ -212,6 +213,9 @@ import PaginationTable from "@/components/tables/pagination_table/PaginationTabl
 import surveyReportTypes from "@/commons/consts/survey/surveyReportTypes";
 import serviceTypes from "@/commons/consts/edu/serviceTypes";
 import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
+import {apiRequest} from "@/commons/apiRequest";
+import {showAlert} from "@/commons/alerts";
+import {convertDateToBackend} from "@/commons/date";
 
 export default {
   name: 'SurveyReport',
@@ -366,7 +370,34 @@ export default {
     },
     // Отправка запроса на формирование отчета
     async createReport() {
-
+      this.loading = true
+      try {
+        let body = this.reportInfo
+        try {
+          body.start_period = convertDateToBackend(this.reportInfo.start_period)
+          body.end_period = convertDateToBackend(this.reportInfo.end_period)
+        } catch(e) {
+          body.start_period = this.reportInfo.start_period
+          body.end_period = this.reportInfo.end_period
+        }
+        delete body.group_code
+        delete body.survey_description
+        const reportRequest = await apiRequest(
+          '/backend/api/v1/surveys/generate_report/',
+          'POST',
+          true,
+          body
+        )
+        if (reportRequest.success) {
+          showAlert('success', 'Отчет по опросу', reportRequest.success)
+        } else {
+          showAlert('error', 'Отчет по опросу', 'Произошла ошибка при формировании отчета по опросу')
+        }
+      } catch(e) {
+        console.log('report error: ', e)
+        showAlert('error', 'Отчет по опросу', 'Произошла ошибка при формировании отчета по опросу')
+      }
+      this.loading = false
     }
   },
   mounted() {

@@ -1,2 +1,3 @@
 from .course_application import CourseApplicationAdmin
+from .course_certificate import CourseCertificateAdmin
 from .event_application import EventApplicationAdmin

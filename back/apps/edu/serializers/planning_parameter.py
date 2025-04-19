@@ -12,4 +12,4 @@ class PlanningParameterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = planning_parameter_model
-        exclude = ('date_create', 'name')
+        exclude = ('date_create', 'old_id', 'name')

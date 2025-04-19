@@ -5,14 +5,13 @@ from apps.surveys.exceptions.survey import SurveyNotExist
 from apps.surveys.exceptions.survey_question import IncorrectQuestionInfo, QuestionCreateUpdateError, \
     QuestionDoesNotExist
 from apps.surveys.selectors.survey_question import survey_question_model
-from apps.surveys.services.survey import SurveyService
+from apps.surveys.services.survey import survey_service
 
 
 class SurveyQuestionService:
     """Класс методов для работы с вопросами опроса"""
 
     _survey = None
-    _survey_service = SurveyService()
 
     _survey_question_keys = [
         'sequence_number',
@@ -26,7 +25,7 @@ class SurveyQuestionService:
         :param survey_id: object_id опроса
         """
         try:
-            self._survey = self._survey_service.get_survey(
+            self._survey = survey_service.get_survey(
                 'object_id',
                 survey_id
             )

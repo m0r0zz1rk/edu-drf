@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 export default {

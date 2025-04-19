@@ -6,7 +6,7 @@
 
     <v-select
         color="coko-blue"
-        v-model="internalApp.region_object_id"
+        v-model="internalApp.region_id"
         :items="regions"
         item-title="name"
         item-value="object_id"
@@ -18,7 +18,7 @@
     <v-select
         v-if="internalApp.region_name === 'Иркутская область'"
         color="coko-blue"
-        v-model="internalApp.mo_object_id"
+        v-model="internalApp.mo_id"
         :items="mos"
         item-title="name"
         item-value="object_id"
@@ -45,7 +45,7 @@
       Образовательная организация:<br/>
       <v-btn
         color="coko-blue"
-        v-if="(!disabled) && (internalApp.region_name === 'Иркутская область') && (internalApp.mo_object_id !== null)"
+        v-if="(!disabled) && (internalApp.region_name === 'Иркутская область') && (internalApp.mo_id !== null)"
         text="Справочник"
         @click="$refs.ooSelectDialog.dialog = true"
         :readonly="disabled"
@@ -56,7 +56,7 @@
         v-model="oo"
         :label="
             internalApp.region_name === 'Иркутская область' ?
-              internalApp.mo_object_id === null ?
+              internalApp.mo_id === null ?
                 'Введите название ОО (для выбора из справочника выберите МО)*'
                 :
                 'Введите название ОО или выберите из справочника*'
@@ -68,7 +68,7 @@
       />
       <v-select
           color="coko-blue"
-          v-model="internalApp.position_category_object_id"
+          v-model="internalApp.position_category_id"
           :items="positionCategories"
           item-title="name"
           item-value="object_id"
@@ -78,7 +78,7 @@
       />
       <v-select
           color="coko-blue"
-          v-model="internalApp.position_object_id"
+          v-model="internalApp.position_id"
           :items="positions"
           item-title="name"
           item-value="object_id"
@@ -128,14 +128,14 @@
         Справка об обучении:
       </p>
       <template
-        v-if="internalApp.education_doc_object_id !== null"
+        v-if="internalApp.education_doc_id !== null"
       >
         <v-icon
           color="coko-blue"
           icon="mdi-file-document-outline"
           @click="openDocViewer(
                 'Просмотр документа',
-                internalApp.education_doc_object_id,
+                internalApp.education_doc_id,
                 'Документ',
                 'student'
             )"
@@ -144,7 +144,7 @@
       </template>
 
       <p
-        v-if="internalApp.education_doc_object_id === null"
+        v-if="internalApp.education_doc_id === null"
       >
         <b>(Не выбран)</b>
       </p>
@@ -175,15 +175,15 @@
 
           Документ о смене фамилии:<br/>
           <template
-            v-if="internalApp.surname_doc_object_id !== null"
+            v-if="internalApp.surname_doc_id !== null"
           >
             <v-icon
-              v-if="internalApp.surname_doc_object_id !== null"
+              v-if="internalApp.surname_doc_id !== null"
               color="coko-blue"
               icon="mdi-file-document-outline"
               @click="openDocViewer(
                 'Просмотр документа',
-                internalApp.surname_doc_object_id,
+                internalApp.surname_doc_id,
                 'Документ',
                 'student'
             )"
@@ -192,7 +192,7 @@
           </template>
 
           <p
-            v-if="internalApp.surname_doc_object_id === null"
+            v-if="internalApp.surname_doc_id === null"
           >
             <b>(Не выбран)</b>
           </p>
@@ -299,7 +299,7 @@
           :noTab="false"
           :addButton="false"
           :xlsxButton="false"
-          :getRecsURL="'/backend/api/v1/users/oos/'+internalApp.mo_object_id+'/'"
+          :getRecsURL="'/backend/api/v1/users/oos/'+internalApp.mo_id+'/'"
           :tableHeaders="ooTableHeaders"
           :fieldsArray="ooFieldsArray"
           :itemSelectEvent="selectOo"
@@ -401,7 +401,7 @@
 import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import educationLevels from "@/commons/consts/apps/educationLevels";
 import educationCategories from "@/commons/consts/apps/educationCategories";
@@ -574,7 +574,7 @@ export default {
     },
     // Установить ОО, выбранную из справочника
     selectOo(oo) {
-      this.internalApp.oo_object_id = oo.object_id
+      this.internalApp.oo_id = oo.object_id
       this.internalApp.oo_name = oo.full_name
       this.oo = oo.full_name
       this.$refs.ooSelectDialog.dialog = false
@@ -583,33 +583,33 @@ export default {
     selectEduDoc(doc) {
       this.internalApp.education_doc_name = doc.doc_name
       this.internalApp.education_doc_file = doc.file
-      this.internalApp.education_doc_object_id = doc.object_id
+      this.internalApp.education_doc_id = doc.object_id
       this.$refs.educationDocSelectDialog.dialog = false
     },
     // Установить выбранный документ о смене фамилии
     selectSurnameDoc(doc) {
       this.internalApp.surname_doc_name = doc.doc_name
       this.internalApp.surname_doc_file = doc.file
-      this.internalApp.surname_doc_object_id = doc.object_id
+      this.internalApp.surname_doc_id = doc.object_id
       this.$refs.surnameDocSelectDialog.dialog = false
     },
   },
   watch: {
-    'internalApp.region_object_id': function (newValue, oldValue) {
+    'internalApp.region_id': function (newValue, oldValue) {
       if (oldValue !== null) {
-        let new_reg_name = this.regions.filter((reg) => reg.object_id === newValue)[0].name
-        this.internalApp.region_name = new_reg_name
+        const newRegName = this.regions.filter((reg) => reg.object_id === newValue)[0].name
+        this.internalApp.region_name = newRegName
         this.changeAppAttribute(
-            'region_object_id',
+            'region_id',
             newValue
         )
         this.changeAppAttribute(
             'region_name',
-            new_reg_name
+          newRegName
         )
-        if (new_reg_name !== 'Иркутская область') {
+        if (newRegName !== 'Иркутская область') {
           this.changeAppAttribute(
-              'mo_object_id',
+              'mo_id',
               null
           )
           this.changeAppAttribute(
@@ -624,7 +624,7 @@ export default {
         this.changeAppAttribute('work_less', newValue)
         if (newValue === true) {
           this.changeAppAttribute(
-              'oo_object_id',
+              'oo_id',
               null
           )
           this.changeAppAttribute(
@@ -636,7 +636,7 @@ export default {
               ''
           )
           this.changeAppAttribute(
-              'position_category_object_id',
+              'position_category_id',
               null
           )
           this.changeAppAttribute(
@@ -644,7 +644,7 @@ export default {
               ''
           )
           this.changeAppAttribute(
-              'position_object_id',
+              'position_id',
               null
           )
           this.changeAppAttribute(
@@ -656,34 +656,34 @@ export default {
     },
     'oo': function(newValue, oldValue) {
       if (this.oo === this.internalApp.oo_name) {
-        this.changeAppAttribute('oo_object_id', this.internalApp.oo_object_id)
+        this.changeAppAttribute('oo_id', this.internalApp.oo_id)
         this.changeAppAttribute('oo_name', this.internalApp.oo_name)
         this.changeAppAttribute('oo_new', '')
       } else {
-        this.changeAppAttribute('oo_object_id', null)
+        this.changeAppAttribute('oo_id', null)
         this.changeAppAttribute('oo_name', '')
         this.changeAppAttribute('oo_new', newValue)
       }
     },
-    'internalApp.position_category_object_id': function(newValue, oldValue) {
+    'internalApp.position_category_id': function(newValue, oldValue) {
       if (newValue !== null) {
         let name = this.positionCategories.filter((pc) => pc.object_id === newValue)[0].name
         this.internalApp.position_category_name = name
-        this.changeAppAttribute('position_category_object_id', newValue)
+        this.changeAppAttribute('position_category_id', newValue)
         this.changeAppAttribute('position_category_name', name)
       } else {
-        this.changeAppAttribute('position_category_object_id', null)
+        this.changeAppAttribute('position_category_id', null)
         this.changeAppAttribute('position_category_name', '')
       }
     },
-    'internalApp.position_object_id': function(newValue, oldValue) {
+    'internalApp.position_id': function(newValue, oldValue) {
       if (newValue !== null) {
         let name = this.positions.filter((pc) => pc.object_id === newValue)[0].name
         this.internalApp.position_name = name
-        this.changeAppAttribute('position_object_id', newValue)
+        this.changeAppAttribute('position_id', newValue)
         this.changeAppAttribute('position_name', name)
       } else {
-        this.changeAppAttribute('position_object_id', null)
+        this.changeAppAttribute('position_id', null)
         this.changeAppAttribute('position_name', '')
       }
 
@@ -698,24 +698,24 @@ export default {
         this.changeAppAttribute('education_category', newValue)
       } catch (e) {console.log('internalApp.education_category error: ', e)}
     },
-    'internalApp.education_doc_object_id': function (newValue, oldValue) {
+    'internalApp.education_doc_id': function (newValue, oldValue) {
       try {
-        this.changeAppAttribute('education_doc_object_id', newValue)
+        this.changeAppAttribute('education_doc_id', newValue)
         this.changeAppAttribute('education_doc_name', this.internalApp.education_doc_name)
         this.changeAppAttribute('education_doc_file', this.internalApp.education_doc_file)
-      } catch (e) {console.log('internalApp.education_doc_object_id error: ', e)}
+      } catch (e) {console.log('internalApp.education_doc_id error: ', e)}
     },
     'internalApp.diploma_surname': function (newValue, oldValue) {
       try {
         this.changeAppAttribute('diploma_surname', newValue)
       } catch (e) {console.log('internalApp.diploma_surname error: ', e)}
     },
-    'internalApp.surname_doc_object_id': function (newValue, oldValue) {
+    'internalApp.surname_doc_id': function (newValue, oldValue) {
       try {
-        this.changeAppAttribute('surname_doc_object_id', newValue)
+        this.changeAppAttribute('surname_doc_id', newValue)
         this.changeAppAttribute('surname_doc_name', this.internalApp.surname_doc_name)
         this.changeAppAttribute('surname_doc_file', this.internalApp.surname_doc_file)
-      } catch (e) {console.log('internalApp.surname_doc_object_id error: ', e)}
+      } catch (e) {console.log('internalApp.surname_doc_id error: ', e)}
     },
     'internalApp.education_serial': function (newValue, oldValue) {
       try {
@@ -729,8 +729,6 @@ export default {
     },
     'internalApp.education_date': function (newValue, oldValue) {
       try {
-        console.log(newValue)
-        console.log(oldValue)
         if (!(newValue instanceof Date)) {
           this.changeAppAttribute('education_date', convertDateToBackend(newValue))
         }

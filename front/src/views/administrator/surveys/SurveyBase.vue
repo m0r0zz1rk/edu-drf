@@ -77,7 +77,6 @@ export default {
   methods: {
     // Выбор опроса из пагинационной таблицы
     selectSurvey(survey) {
-      console.log(survey)
       this.$refs.surveyDetail.surveyDescription = survey.description
       this.$refs.surveyDetail.surveyObjectID = survey.object_id
       this.$refs.surveyDetail.dialog = true

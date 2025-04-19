@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django_rest_passwordreset.signals import reset_password_token_created
 
-from apps.celery_app.tasks.password_reset_email import password_reset_email_task
+from apps.celery_app.tasks.worker.emails.password_reset_email import password_reset_email_task
 from apps.commons.utils.django.settings import SettingsUtils
 
 

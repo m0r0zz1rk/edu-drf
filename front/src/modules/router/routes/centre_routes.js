@@ -30,7 +30,7 @@ const centre_routes = [
       beforeEnter: [isAuthenticated, isAdministrator]
     },
     {
-      path: '/centre/edu/student_group/:groupId',
+      path: '/centre/edu/student-group/:groupId',
       name: 'EduDetailStudentGroup',
       component: EduDetailStudentGroup,
       beforeEnter: [isAuthenticated, isAdministrator]

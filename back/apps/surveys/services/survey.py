@@ -66,3 +66,6 @@ class SurveyService:
         survey = self.get_survey('object_id', survey_id)
         survey.description = serialize_data['description']
         survey.save()
+
+
+survey_service = SurveyService()

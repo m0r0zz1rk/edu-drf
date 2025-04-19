@@ -197,7 +197,7 @@
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 import {useDisplay} from "vuetify";
 import {getDayOfWeek} from "@/commons/date";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 
 export default {
@@ -254,7 +254,6 @@ export default {
           'open': false
         })
       })
-      console.log(temp)
       this.template = temp
       this.timePickerDialogs = tsd
     },

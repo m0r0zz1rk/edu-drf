@@ -297,7 +297,7 @@
 </template>
 
 <script>
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import contentTypeFormats from "@/commons/consts/contentTypeFormats";
 import {convertDateToBackend} from "@/commons/date";
@@ -368,7 +368,6 @@ export default {
             if (data.error) {
               this.$refs["content-error"].showContentError(data.error)
             } else {
-              console.log(data)
               Object.keys(data).map((key) => {
                 if (!(Object.keys(this.orderObject).includes(key))) {
                   this.programObject[key] = data[key]

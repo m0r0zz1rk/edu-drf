@@ -31,7 +31,7 @@
 
 <script>
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import ProgramDetail from "@/components/dialogs/edu/ProgramDetail.vue";
 

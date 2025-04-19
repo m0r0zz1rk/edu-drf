@@ -141,6 +141,8 @@ export default {
     value: String, // Значение (при редактировании записи)
     fieldTitle: String, // Наименование поля
     onChangeEvent: Function, //Функция, вызываемая при изменении
+    // Функция получения записей в таблице
+    getRecs: Function
   },
   data() {
     return {

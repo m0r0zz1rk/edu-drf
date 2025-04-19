@@ -1,5 +1,5 @@
 import {showAlert} from "../../../commons/alerts.js"
-import {apiRequest} from "../../../commons/api_request.js";
+import {apiRequest} from "../../../commons/apiRequest.js";
 import {getCookie} from "@/commons/cookie";
 
 const isStudent = (to, from, next) => {

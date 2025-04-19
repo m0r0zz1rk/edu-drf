@@ -22,7 +22,7 @@ def view_set_journal_decorator(module: JOURNAL_MODULES, success_description: str
                 payload = kwargs
             if args:
                 payload['args'] = args
-
+                payload['data'] = repr(args[1].data)
             source = 'Анонимный пользователь'
             request_object = args[1]
             if not isinstance(request_object.user, AnonymousUser):

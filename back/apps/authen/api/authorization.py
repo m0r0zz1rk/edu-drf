@@ -68,7 +68,7 @@ class AuthorizationViewSet(viewsets.ViewSet):
         tags=['Приложение авторизации/аутентификации. Авторизация', ],
         operation_description="Авторизация пользователя",
         request_body=AuthSerializer,
-        responses={'401': 'Ошибка в процессе авторизации',
+        responses={'400': 'Ошибка в процессе авторизации',
                    '200': AuthorizationResponseSerializer}
     )
     def user_login(self, request, *args, **kwargs):

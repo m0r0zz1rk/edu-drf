@@ -2,16 +2,16 @@ from typing import Union
 
 from django.contrib.auth import authenticate, login
 
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import ProfileService, profile_service
 from apps.commons.abc.main_processing import MainProcessing
-from apps.commons.services.ad.ad_centre_coko_user import AdCentreCokoUserUtils
-from apps.commons.utils.django.user import UserUtils
+from apps.commons.services.ad.ad_centre_coko_user import ad_centre_coko_user_utils
+from apps.commons.utils.django.user import user_utils
 from apps.commons.utils.ldap import ldap_utils
 from apps.commons.utils.token import TokenUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-from apps.journal.services.journal import JournalService
+from apps.journal.services.journal import journal_service
 
 
 class Authorization(MainProcessing):
@@ -23,10 +23,6 @@ class Authorization(MainProcessing):
         'password',
         'centre_auth'
     ]
-    ju = JournalService()
-    uu = UserUtils()
-    pu = ProfileService()
-    accu = AdCentreCokoUserUtils()
     request = username = auth_error = auth_user = auth_data = None
 
     def _validate_process_data(self) -> Union[bool, str]:
@@ -48,7 +44,7 @@ class Authorization(MainProcessing):
         description = 'Пользователь не найден'
         if error_type:
             description = 'Неверный пароль'
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': 'Авторизация пользователя',
                 'module': AUTHEN,
@@ -64,7 +60,7 @@ class Authorization(MainProcessing):
             'login': self.process_data['login'],
             'password': '*******',
         }
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': ProfileService().get_profile_or_info_by_attribute(
                     'django_user_id',
@@ -82,19 +78,19 @@ class Authorization(MainProcessing):
     def _main_process(self):
         username = self.process_data['login']
         if not self.process_data['centre_auth']:
-            username = self.pu.get_profile_or_info_by_attribute(
+            username = profile_service.get_profile_or_info_by_attribute(
                 'phone',
                 self.process_data['login'],
                 'username'
             )
             if username is None:
-                username = self.pu.get_profile_or_info_by_attribute(
+                username = profile_service.get_profile_or_info_by_attribute(
                     'snils',
                     self.process_data['login'],
                     'username'
                 )
                 if username is None:
-                    username = self.uu.get_username_by_email(self.process_data['login'])
+                    username = user_utils.get_username_by_email(self.process_data['login'])
                     if username is None:
                         self.auth_error = 'Пользователь не найден'
                         self._auth_error(False)
@@ -111,29 +107,54 @@ class Authorization(MainProcessing):
             self.process_completed = False
         login(self.process_data['request'], self.auth_user)
         if self.process_data['centre_auth']:
-            profile = self.pu.get_profile_or_info_by_attribute(
+            profile = profile_service.get_profile_or_info_by_attribute(
                 'django_user_id',
                 self.auth_user.id,
                 'profile'
             )
             if self.auth_user.is_staff and not self.auth_user.is_superuser:
-                self.accu.add_rec(
+                ad_centre_coko_user_utils.add_rec(
                     self.auth_user,
                     ldap_utils.get_ad_user_centre(self.auth_user)
                 )
             if profile.surname == 'Фамилия':
-                self.pu.set_coko_profile_data(
+                profile_service.set_coko_profile_data(
                     profile,
                     {
-                        'surname': ldap_utils.get_ad_attribute_coko_user('sn', self.auth_user.username),
-                        'name': ldap_utils.get_ad_attribute_coko_user('GivenName', self.auth_user.username),
-                        'patronymic': ldap_utils.get_ad_attribute_coko_user('middleName', self.auth_user.username),
-                        'internal_phone': ldap_utils.get_ad_attribute_coko_user('telephoneNumber', self.auth_user.username)
+                        'surname': ldap_utils.get_ad_attribute_coko_user(
+                            'sn',
+                            self.auth_user.username
+                        ),
+                        'name': ldap_utils.get_ad_attribute_coko_user(
+                            'GivenName',
+                            self.auth_user.username
+                        ),
+                        'patronymic': ldap_utils.get_ad_attribute_coko_user(
+                            'middleName',
+                            self.auth_user.username
+                        ),
+                        'internal_phone': ldap_utils.get_ad_attribute_coko_user(
+                            'telephoneNumber',
+                            self.auth_user.username
+                        )
                     }
                 )
                 if self.auth_user.is_staff:
                     if self.auth_user.is_superuser:
-                        self.uu.add_user_to_group('username', username, 'Администраторы')
+                        user_utils.add_user_to_group('username', username, 'Администраторы')
                     else:
-                        self.uu.add_user_to_group('username', username, 'Сотрудники')
+                        user_utils.add_user_to_group('username', username, 'Сотрудники')
+            if profile.internal_phone == '100':
+                try:
+                    profile_service.set_coko_profile_data(
+                        profile,
+                        {
+                            'internal_phone': ldap_utils.get_ad_attribute_coko_user(
+                                'telephoneNumber',
+                                self.auth_user.username
+                            )
+                        }
+                    )
+                except Exception as e:
+                    pass
         self.auth_data = TokenUtils(self.auth_user.id).jwt_token()

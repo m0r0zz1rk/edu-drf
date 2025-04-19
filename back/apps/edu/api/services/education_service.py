@@ -2,8 +2,11 @@ from drf_yasg.utils import swagger_auto_schema
 
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.commons.utils.django.exception import exception_handling
 from apps.commons.utils.django.response import response_utils
 from apps.edu.api.edu_viewset import EduViewSet
+from apps.edu.consts.planning_days_error_text import PLANNING_DAYS_ERROR_TEXT
+from apps.edu.exceptions.planning_parameter.planning_days_error import PlanningDaysError
 from apps.edu.selectors.services.education_service import education_service_queryset, EducationServiceFilter, \
     education_service_orm
 
@@ -72,8 +75,11 @@ class EducationServiceViewSet(EduViewSet):
     def create(self, request, *args, **kwargs):
         serialize = EducationServiceAddUpdateSerializer(data=request.data)
         if serialize.is_valid():
-            education_service_service.create_service(serialize.validated_data)
-            return response_utils.ok_response('Добавление выполнено')
+            try:
+                education_service_service.create_service(serialize.validated_data)
+                return response_utils.ok_response('Добавление выполнено')
+            except PlanningDaysError:
+                return response_utils.bad_request_response(PLANNING_DAYS_ERROR_TEXT)
         else:
             return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
 
@@ -91,8 +97,11 @@ class EducationServiceViewSet(EduViewSet):
     def partial_update(self, request, *args, **kwargs):
         serialize = EducationServiceAddUpdateSerializer(data=request.data)
         if serialize.is_valid():
-            education_service_service.update_service(self.kwargs['object_id'], serialize.validated_data)
-            return response_utils.ok_response('Обновление выполнено')
+            try:
+                education_service_service.update_service(self.kwargs['object_id'], serialize.validated_data)
+                return response_utils.ok_response('Обновление выполнено')
+            except PlanningDaysError:
+                return response_utils.bad_request_response(PLANNING_DAYS_ERROR_TEXT)
         else:
             return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
 

@@ -66,8 +66,30 @@ class StudentGroupListSerializer(serializers.ModelSerializer):
             'status',
             'event_url',
             'plan_seats_number',
-            'form'
+            'form',
+            'date_enroll',
+            'date_exp',
+            'enroll_number',
+            'exp_number'
         )
+
+
+class StudentGroupRetrieveSerializer(StudentGroupListSerializer):
+    """
+    Сериализация данных при получении информации по конкретной группе
+    """
+    check_data = serializers.SerializerMethodField(label='Данные для проверки')
+    service_type = serializers.SerializerMethodField(label='Тип услуги')
+
+    def get_check_data(self, obj):
+        return base_application_service.get_check_data(obj.object_id)
+
+    def get_service_type(self, obj):
+        return 'ou' if obj.ou else 'iku'
+
+    class Meta:
+        model = StudentGroupListSerializer.Meta.model
+        fields = StudentGroupListSerializer.Meta.fields + ('check_data', 'service_type')
 
 
 class StudentGroupAddSerializer(serializers.Serializer):
@@ -130,12 +152,43 @@ class StudentGroupUpdateSerializer(serializers.Serializer):
     )
 
 
-class StudentGroupDocRequestSerializer(serializers.Serializer):
+class StudentGroupBaseDocRequestSerializer(serializers.Serializer):
     group_id = serializers.UUIDField(
         allow_null=False,
         label='object_id учебной группы'
     )
+
+
+class StudentGroupDocRequestSerializer(StudentGroupBaseDocRequestSerializer):
     doc_type = serializers.ChoiceField(
         choices=STUDENT_GROUP_DOC_TYPES,
         label='Тип запрашиваемого документа'
+    )
+
+
+class StudentGroupCertListSerializer(StudentGroupDocRequestSerializer):
+    """
+    Сериализация данных для получения ведомости удостоверений учебной группы
+    """
+    enroll_number = serializers.CharField(
+        max_length=50,
+        allow_null=False,
+        allow_blank=False,
+        label='Номер приказа о зачислении'
+    )
+    enroll_date = serializers.DateField(
+        format='%d.%m.%Y',
+        allow_null=False,
+        label='Дата приказа о зачислении'
+    )
+    exp_number = serializers.CharField(
+        max_length=50,
+        allow_null=False,
+        allow_blank=False,
+        label='Номер приказа об отчислении'
+    )
+    exp_date = serializers.DateField(
+        format='%d.%m.%Y',
+        allow_null=False,
+        label='Дата приказа об отчислении'
     )

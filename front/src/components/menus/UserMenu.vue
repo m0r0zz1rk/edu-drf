@@ -16,7 +16,7 @@
 
 <script>
 import {getCookie, setCookie} from "@/commons/cookie";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 
 export default {
   name: "UserMenu",

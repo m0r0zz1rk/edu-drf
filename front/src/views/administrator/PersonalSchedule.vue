@@ -180,7 +180,7 @@
 // Страница для просмотра личного расписания
 import BooleanBadge from "@/components/badges/BooleanBadge.vue";
 import ScheduleDayManage from "@/components/dialogs/edu/student_group/schedule/ScheduleDayManage.vue";
-import {apiRequest} from "@/commons/api_request";
+import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import LkPage from "@/components/LkPage.vue";
 import {getDayOfWeek} from "@/commons/date";
