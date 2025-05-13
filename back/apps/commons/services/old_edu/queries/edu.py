@@ -14,7 +14,7 @@ from apps.edu.selectors.program import program_model
 from apps.edu.selectors.schedule import schedule_model
 from apps.edu.selectors.services.education_service import education_service_model
 from apps.edu.selectors.services.information_service import information_service_model
-from apps.edu.selectors.student_group import student_group_model
+from apps.edu.selectors.student_group import student_group_model, student_group_orm
 from apps.guides.selectors.audience_category import audience_category_model
 from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.guides.selectors.event_type import event_type_model
@@ -150,9 +150,7 @@ class EduData:
         """
         Получение разделов КУГ-ов ДПП
         """
-        exists = (calendar_chart_chapter_model.
-                  select_related('program').
-                  objects.all())
+        exists = calendar_chart_chapter_model.objects.select_related('program').all()
         programs = (program_model.objects.
                     select_related('department').
                     select_related('kug_edit').
@@ -170,9 +168,13 @@ class EduData:
                 program = list(filter(lambda pr: pr.old_id == chapter[13], programs))[0]
             except Exception:
                 continue
+            try:
+                position = int(chapter[1][7])
+            except ValueError:
+                position = 15
             new_chapter = {
                 'old_id': chapter[0],
-                'position': int(chapter[1][7]),
+                'position': position,
                 'name': chapter[1][10:].strip(),
                 'total_hours': chapter[2],
                 'lecture_hours': chapter[3],
@@ -191,12 +193,8 @@ class EduData:
         """
         Получение тем разделов КУГ-ов ДПП
         """
-        exists = (calendar_chart_theme_model.objects.
-                  select_related('chapter').
-                  all())
-        chapters = (calendar_chart_chapter_model.
-                    select_related('program').
-                    objects.all())
+        exists = calendar_chart_theme_model.objects.select_related('chapter').all()
+        chapters = calendar_chart_chapter_model.objects.select_related('program').all()
         programs = (program_model.objects.
                     select_related('department').
                     select_related('kug_edit').
@@ -318,13 +316,23 @@ class EduData:
                   all())
         ou = education_service_model.objects.all()
         iku = information_service_model.objects.all()
-        curators = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = 'SELECT * from dbo.centre_studentgroups'
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for group in data:
+            # if len(list(filter(lambda gr: gr.old_id == group[0], exists))) > 0:
+            #     update_gr = {
+            #         'form': group[7],
+            #     }
+            #     student_group_orm.update_record(
+            #         filter_by=dict(object_id=list(filter(lambda gr: gr.old_id == group[0], exists))[0].object_id),
+            #         update_object=update_gr
+            #     )
+            #     print('Обновлена группа: ', repr(list(filter(lambda gr: gr.old_id == group[0], exists))[0]))
             if len(list(filter(lambda gr: gr.old_id == group[0], exists))) > 0:
+                continue
+            if len(list(filter(lambda gr: gr.code == group[1], exists))) > 0:
                 continue
             course = event = None
             if group[12]:

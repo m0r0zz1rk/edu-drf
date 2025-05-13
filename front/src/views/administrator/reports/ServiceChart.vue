@@ -49,6 +49,7 @@
   <div style="width: 100%; text-align: center">
     <v-btn
         color="coko-blue"
+        @loading="loading"
         @click="createReport()"
         text="Сформировать"
     />
@@ -60,6 +61,8 @@
 
 // Форма для формирования отчета с графиком услуг
 import monthList from "@/commons/consts/reports/monthList";
+import {apiRequest} from "@/commons/apiRequest";
+import {showAlert} from "@/commons/alerts";
 
 export default {
   name: 'ServiceChart',
@@ -78,7 +81,20 @@ export default {
   methods: {
     // Отправка запроса на формирование отчета
     async createReport() {
-
+      this.loading = true
+      const serviceChartRequest = await apiRequest(
+        '/backend/api/v1/reports/service_chart/',
+        'POST',
+        true,
+        {report_year: this.reportYear, report_month: this.reportMonth},
+        true
+      )
+      if (serviceChartRequest.status === 200) {
+        showAlert('success', 'График услуг', 'Запрос обработан, файл будет отправлен на почту')
+      } else {
+        showAlert('error', 'График услуг', 'Ошибка при обработке запроса')
+      }
+      this.loading = false
     }
   }
 }

@@ -57,6 +57,8 @@ class AuthenData:
         for dj_user in dj_users:
             if len(list(filter(lambda us: us.id == dj_user[0], users))) > 0:
                 continue
+            if len(list(filter(lambda us: us.username == dj_user[4], users))) > 0:
+                continue
             new_user = {
                 'id': dj_user[0]
             }

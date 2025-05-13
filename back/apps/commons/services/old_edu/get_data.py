@@ -72,7 +72,7 @@ def get_all_edu_data():
     # Модуль applications
     print('### Начало работы с модулем Заявки')
     # application_data.get_course_applications()
-    application_data.get_course_certificates()
+    # application_data.get_course_certificates()
     # application_data.get_event_applications()
     print('### Окончание работы с модулем Заявки')
 

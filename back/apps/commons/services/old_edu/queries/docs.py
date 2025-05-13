@@ -14,14 +14,8 @@ from apps.guides.selectors.profiles.student import student_profile_model
 
 settings_utils = SettingsUtils()
 
-
-class DocsData:
-    """
-    Класс методов для получения и сохранения данных приложения
-    Документы из олдовой базы edu
-    """
-
-    _student_doc_types_mapper = {
+# Маппинг наименований типов документов обучающихся
+_student_doc_types_mapper = {
         1: {
             'key': DIPLOMA,
             'title': 'Диплом'
@@ -39,6 +33,15 @@ class DocsData:
             'title': 'Скан удостоверения'
         }
     }
+
+
+class DocsData:
+    """
+    Класс методов для получения и сохранения данных приложения
+    Документы из олдовой базы edu
+    """
+
+
 
     @staticmethod
     def get_program_orders():
@@ -74,7 +77,7 @@ class DocsData:
             del file
 
     @staticmethod
-    def get_student_docs(self):
+    def get_student_docs():
         """
         Получение пользовательских документов
         """
@@ -108,7 +111,7 @@ class DocsData:
                 continue
             new_doc = {
                 'old_id': user_doc[0],
-                'doc_type': self._student_doc_types_mapper[user_doc[2]]['key'],
+                'doc_type': _student_doc_types_mapper[user_doc[2]]['key'],
                 'profile_id': profile_id,
             }
             doc_object, _ = student_doc_model.objects.update_or_create(
@@ -120,7 +123,7 @@ class DocsData:
                 f".{user_doc[1][-3:]}",
                 file
             )
-            print(f'{self._student_doc_types_mapper[user_doc[2]]["title"]} '
+            print(f'{_student_doc_types_mapper[user_doc[2]]["title"]} '
                   f'пользователя {user_doc[5]} {user_doc[6]} {user_doc[7]} '
                   f'- добавлено')
             del file
@@ -177,7 +180,7 @@ class DocsData:
     @staticmethod
     def get_offers():
         """
-        Получение договоров офферт
+        Получение договоров оферт
         """
         exists = (student_group_offer_model.objects.
                   select_related('group').
@@ -199,29 +202,28 @@ class DocsData:
             except Exception:
                 print(f'group - {offer[0]}')
                 continue
-            # try:
-            #     file = open(
-            #         os.path.join(settings_utils.get_parameter_from_settings('MEDIA_ROOT_OLD'), Path(offer[1])),
-            #         'rb',
-            #     )
-            # except Exception:
-            #     print(f'file - {offer[1]}')
-            #     continue
+            try:
+                file = open(
+                    os.path.join(settings_utils.get_parameter_from_settings('MEDIA_ROOT_OLD'), Path(offer[1])),
+                    'rb',
+                )
+            except Exception:
+                print(f'file - {offer[1]}')
+                continue
             new_offer = {
                 'old_id': offer[0],
-                'student_group_id': group.object_id,
+                'group_id': group.object_id,
                 'file': offer[1],
             }
             print(new_offer)
-            # order_object, _ = program_order_model.objects.update_or_create(
-            #     **new_order
-            # )
-            # order_object.file.save(
-            #     f"dpp_order.{order[9][-3:]}",
-            #     file
-            # )
-            # print(f'Приказ ДПП №{new_order["number"]} от {new_order["date"].strftime("%d.%m.%Y")} '
-            #       f'- добавлено')
-            # del file
+            offer_object, _ = student_group_offer_model.objects.update_or_create(
+                **new_offer
+            )
+            offer_object.file.save(
+                f"dpp_order.{offer[1][-3:]}",
+                file
+            )
+            print(f'Договор оферта для группы {group.object_id} - добавлено')
+            del file
 
 

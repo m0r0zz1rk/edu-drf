@@ -10,9 +10,9 @@ from web_app.init_celery import app
 
 
 @app.task
-def survey_report(email: str, report_parameters: dict):
+def email_survey_report(email: str, report_parameters: dict):
     """
-    Задача Celery для отправки сформированного файла отчета на почту
+    Задача Celery для отправки сформированного файла отчета по опросу на почту
     :param email: Адрес почты для отправки файла
     :param report_parameters: Параметры для отчета по опросу
     :return:

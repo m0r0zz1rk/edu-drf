@@ -40,20 +40,7 @@ export default {
   },
   methods: {
     async getMenuItems() {
-      if (getCookie('cokoRole')) {
-        switch (getCookie('cokoRole')) {
-          case 'centre':
-            this.menuItems = centreMenuItems
-            break;
-
-          case 'dep':
-            this.menuItems = depMenuItems
-            break;
-
-          default:
-            this.menuItems = studentMenuItems
-        }
-      } else {
+      if (!(getCookie('cokoRole'))) {
         apiRequest(
           '/backend/api/v1/auth/get_user_role/',
           'GET',
@@ -61,21 +48,19 @@ export default {
           null,
           false
         )
-          .then(data => {
-            setCookie('cokoRole', data.role)
-            switch (data.role) {
-              case 'centre':
-                this.menuItems = centreMenuItems
-                break;
+          .then(data => {setCookie('cokoRole', data.role)})
+      }
+      switch (getCookie('cokoRole')) {
+        case 'centre':
+          this.menuItems = centreMenuItems
+          break;
 
-              case 'dep':
-                this.menuItems = depMenuItems
-                break;
+        case 'dep':
+          this.menuItems = depMenuItems
+          break;
 
-              default:
-                this.menuItems = studentMenuItems
-            }
-          })
+        default:
+          this.menuItems = studentMenuItems
       }
     },
     navigate(path) {

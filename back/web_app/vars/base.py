@@ -8,6 +8,8 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES = env.int('JWT_ACCESS_TOKEN_EXPIRE_MINUTES', 15)
 
 AIS_ADDRESS = env.str('AIS_ADDRESS')
 
+RUOREFS_MOSRU_KEY = env.str('RUOREFS_MOSRU_KEY')
+
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

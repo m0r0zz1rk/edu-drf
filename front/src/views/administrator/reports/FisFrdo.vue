@@ -66,6 +66,8 @@
 import monthList from "@/commons/consts/reports/monthList";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
+import {apiRequest} from "@/commons/apiRequest";
+import {showAlert} from "@/commons/alerts";
 
 export default {
   name: 'FisFrdo',
@@ -139,7 +141,24 @@ export default {
   methods: {
     // Отправка запроса на формирование отчета
     async createReport() {
-
+      if (this.$refs.studentGroupPaginationTable.itemsList.length === 0) {
+        showAlert('error', 'ФИС ФРДО', 'Выберите учебный группы')
+        return
+      }
+      this.loading = true
+      const serviceChartRequest = await apiRequest(
+        '/backend/api/v1/reports/fis_frdo/',
+        'POST',
+        true,
+        {group_ids: this.$refs.studentGroupPaginationTable.itemsList},
+        true
+      )
+      if (serviceChartRequest.status === 200) {
+        showAlert('success', 'ФИС ФРДО', 'Запрос обработан, файл будет отправлен на почту')
+      } else {
+        showAlert('error', 'ФИС ФРДО', 'Ошибка при обработке запроса')
+      }
+      this.loading = false
     }
   },
   watch: {

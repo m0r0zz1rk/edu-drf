@@ -49,6 +49,7 @@
   <div style="width: 100%; text-align: center">
     <v-btn
         color="coko-blue"
+        :loading="loading"
         @click="createReport()"
         text="Сформировать"
     />
@@ -60,6 +61,8 @@
 
 // Форма для формирования отчета с переченем ДПП
 import monthList from "@/commons/consts/reports/monthList";
+import {apiRequest} from "@/commons/apiRequest";
+import {showAlert} from "@/commons/alerts";
 
 export default {
   name: 'DppList',
@@ -72,13 +75,26 @@ export default {
       // Выбранный год
       reportYear: new Date().getFullYear(),
       // Выбранный месяц
-      reportMonth: 'all'
+      reportMonth: 'all',
     }
   },
   methods: {
     // Отправка запроса на формирование отчета
     async createReport() {
-
+      this.loading = true
+      const dppReportRequest = await apiRequest(
+        '/backend/api/v1/reports/dpp/',
+        'POST',
+        true,
+        {report_year: this.reportYear, report_month: this.reportMonth},
+        true
+      )
+      if (dppReportRequest.status === 200) {
+        showAlert('success', 'Отчет ДПП', 'Запрос обработан, файл будет отправлен на почту')
+      } else {
+        showAlert('error', 'Отчет ДПП', 'Ошибка при обработке запроса')
+      }
+      this.loading = false
     }
   }
 }

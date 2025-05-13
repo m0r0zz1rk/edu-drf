@@ -30,9 +30,10 @@
 
   <div style="width: 100%; text-align: center">
     <v-btn
-        color="coko-blue"
-        @click="createReport()"
-        text="Сформировать"
+      color="coko-blue"
+      :loading="loading"
+      @click="createReport()"
+      text="Сформировать"
     />
   </div>
 
@@ -42,6 +43,8 @@
 
 // Форма для формирования отчета ПК-1
 import monthList from "@/commons/consts/reports/monthList";
+import {apiRequest} from "@/commons/apiRequest";
+import {showAlert} from "@/commons/alerts";
 
 export default {
   name: 'PkOne',
@@ -56,7 +59,20 @@ export default {
   methods: {
     // Отправка запроса на формирование отчета
     async createReport() {
-
+      this.loading = true
+      const serviceChartRequest = await apiRequest(
+        '/backend/api/v1/reports/pk_one/',
+        'POST',
+        true,
+        {report_year: this.reportYear},
+        true
+      )
+      if (serviceChartRequest.status === 200) {
+        showAlert('success', 'ПК-1', 'Запрос обработан, файл будет отправлен на почту')
+      } else {
+        showAlert('error', 'ПК-1', 'Ошибка при обработке запроса')
+      }
+      this.loading = false
     }
   }
 }

@@ -6,51 +6,51 @@ const monthList = [
         title: 'Все'
     },
     {
-        key: 'jan',
+        key: '1',
         title: 'Январь'
     },
     {
-        key: 'feb',
+        key: '2',
         title: 'Февраль'
     },
     {
-        key: 'march',
+        key: '3',
         title: 'Март'
     },
     {
-        key: 'april',
+        key: '4',
         title: 'Апрель'
     },
     {
-        key: 'may',
+        key: '5',
         title: 'Май'
     },
     {
-        key: 'june',
+        key: '6',
         title: 'Июнь'
     },
     {
-        key: 'jule',
+        key: '7',
         title: 'Июль'
     },
     {
-        key: 'aug',
+        key: '8',
         title: 'Август'
     },
     {
-        key: 'sept',
+        key: '9',
         title: 'Сентябрь'
     },
     {
-        key: 'oct',
+        key: '10',
         title: 'Октябрь'
     },
     {
-        key: 'nov',
+        key: '11',
         title: 'Ноябрь'
     },
     {
-        key: 'dec',
+        key: '12',
         title: 'Декабрь'
     }
 ]

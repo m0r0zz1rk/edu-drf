@@ -26,27 +26,27 @@ class ApplicationsData:
     Заявки из олдовой базы edu
     """
 
-    # _groups = (student_group_model.objects.
-    #            select_related('ou').
-    #            select_related('iku').
-    #            select_related('curator').
-    #            all())
-    # _docs = (student_doc_model.objects.
-    #          select_related('profile').
-    #          all())
-    # _pay_docs = pay_doc_model.objects.all()
-    # _profiles = (student_profile_model.objects.
-    #              select_related('django_user').
-    #              select_related('state').
-    #              all())
-    # _regions = region_model.objects.all()
-    # _mos = mo_model.objects.all()
-    # _oos = (oo_model.objects.
-    #         select_related('mo').
-    #         select_related('oo_type').
-    #         all())
-    # _position_categories = position_category_model.objects.all()
-    # _positions = position_model.objects.all()
+    _groups = (student_group_model.objects.
+               select_related('ou').
+               select_related('iku').
+               select_related('curator').
+               all())
+    _docs = (student_doc_model.objects.
+             select_related('profile').
+             all())
+    _pay_docs = pay_doc_model.objects.all()
+    _profiles = (student_profile_model.objects.
+                 select_related('django_user').
+                 select_related('state').
+                 all())
+    _regions = region_model.objects.all()
+    _mos = mo_model.objects.all()
+    _oos = (oo_model.objects.
+            select_related('mo').
+            select_related('oo_type').
+            all())
+    _position_categories = position_category_model.objects.all()
+    _positions = position_model.objects.all()
 
     _app_status_mapping = {
         1: WORK,
@@ -314,6 +314,7 @@ class ApplicationsData:
         :return:
         """
         _course_applications = course_application_orm.get_filter_records()
+        _certificates = course_certificate_orm.get_filter_records()
         with old_edu_connect_engine.connect() as conn:
             sql = ("SELECT [cert].[id] "
                    ",[cert].[reg_number]"
@@ -343,11 +344,18 @@ class ApplicationsData:
                 'blank_serial': certificate[2],
                 'blank_number': certificate[3]
             }
-            if not course_certificate_orm.get_one_record_or_none({'old_id': certificate[0]}):
+            if len(list(filter(lambda cert: cert.old_id == certificate[0], _certificates))) > 0:
+                exist = list(filter(lambda cert: cert.old_id == certificate[0], _certificates))[0]
+                if (exist.registration_number, exist.blank_serial, exist.blank_number) == \
+                        (certificate[1], certificate[2], certificate[3]):
+                    continue
+                else:
+                    print('Оригинал:', repr(exist))
+                    print('Обновлен сертификат: ', repr(new_course_certificate))
+                    course_certificate_orm.update_record(
+                        filter_by={'old_id': certificate[0]},
+                        update_object=new_course_certificate
+                    )
+            else:
                 course_certificate_orm.create_record(new_course_certificate)
                 print('Добавлен сертификат: ', repr(new_course_certificate))
-            else:
-                course_certificate_orm.update_record(
-                    filter_by={'old_id': certificate[0]},
-                    update_object=new_course_certificate
-                )

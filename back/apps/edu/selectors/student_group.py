@@ -62,7 +62,7 @@ class StudentGroupFilter(filters.FilterSet):
             return queryset
         return queryset.filter(
             Q(ou__date_start__month=int_value) |
-            Q(iku__date_start__month=int_value)
+            Q(ou__date_end__month=int_value)
         )
 
     def filter_curator(self, queryset, name, value):

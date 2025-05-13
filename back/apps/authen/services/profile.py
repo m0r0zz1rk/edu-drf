@@ -195,5 +195,13 @@ class ProfileService:
                 return True
         return False
 
+    @staticmethod
+    def get_coko_count() -> int:
+        """
+        Получение количества преподавателей Центра в БД
+        :return: число
+        """
+        return coko_profile_model.objects.count()
+
 
 profile_service = ProfileService()

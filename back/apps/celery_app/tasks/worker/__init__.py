@@ -1,2 +1,10 @@
-from .emails import (survey_report, email_pay_denied, email_pay_accept, email_offer_pay, email_print_file,
-                     password_reset_email_task)
+from .offer_pay import email_offer_pay
+from .password_reset_email import password_reset_email_task
+from .pay_accept import email_pay_accept
+from .pay_denied import email_pay_denied
+from .print_file import email_print_file
+from .report_dpp import email_report_dpp
+from .report_pk_one import email_report_pk_one
+from .report_service_chart import email_report_service_chart
+from .survey_report import email_survey_report
+from .report_fis_frdo import email_report_fis_frdo

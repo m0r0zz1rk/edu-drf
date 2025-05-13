@@ -22,7 +22,7 @@ urlpatterns = [
     path('backend/api/v1/guides/', include('apps.guides.urls')),
     path('backend/api/v1/journal/', include('apps.journal.urls')),
     path('backend/api/v1/surveys/', include('apps.surveys.urls')),
-    # path('api/v1/reports/', include('apps.reports.urls')),
+    path('backend/api/v1/reports/', include('apps.reports.urls')),
     path('backend/api/v1/users/', include('apps.users.urls')),
     # path('api/v1/password_reset/', include('django_rest_passwordreset.routes', namespace='password_reset')),
 ]

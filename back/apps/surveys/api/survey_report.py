@@ -1,7 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 
-from apps.celery_app.tasks.worker.emails import survey_report
+from apps.celery_app.tasks.worker import email_survey_report
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.utils.django.response import response_utils
 from apps.journal.consts.journal_modules import SURVEYS
@@ -31,7 +31,7 @@ class SurveyReportViewSet(viewsets.ViewSet):
     def generate_report(self, request, *args, **kwargs):
         serialize = ReportParametersSerializer(data=request.data)
         if serialize.is_valid():
-            survey_report.delay(request.user.email, serialize.validated_data)
+            email_survey_report.delay(request.user.email, serialize.validated_data)
             return response_utils.ok_response('Отчет будет сформирован и отправлен на вашу почту')
         else:
             return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
