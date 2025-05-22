@@ -1,7 +1,9 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from apps.authen.services.profile import ProfileService
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.services.journal_request import JournalRequestBuilder
 from apps.commons.utils.django.response import ResponseUtils
 from apps.edu.serializers.schedule import PersonalScheduleSerializer
@@ -11,7 +13,8 @@ from apps.edu.services.schedule import ScheduleService
 class PersonalScheduleViewSet(viewsets.ViewSet):
     """Класс эндпоинта для получения списка своих занятий"""
 
-    _schedule_serivce = ScheduleService(None)
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
+    _schedule_service = ScheduleService(None)
     _resp_utils = ResponseUtils()
     _journal_request_builder = JournalRequestBuilder()
     _profile_service = ProfileService()
@@ -27,7 +30,7 @@ class PersonalScheduleViewSet(viewsets.ViewSet):
             '200': PersonalScheduleSerializer(many=True)}
     )
     def get_personal_schedule(self, request, *args, **kwargs):
-        schedule = self._schedule_serivce.get_personal_schedule(
+        schedule = self._schedule_service.get_personal_schedule(
             request.user.id
         )
         return self._resp_utils.ok_response_dict(schedule)

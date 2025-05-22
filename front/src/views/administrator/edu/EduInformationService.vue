@@ -5,7 +5,7 @@
   </template>
 
   <PaginationTable
-    v-if="fieldsArray !== null"
+    v-if="!([0, 1].includes(fieldsArray.length))"
     ref="informationServiceTable"
     tableTitle="Мероприятия (ИКУ)"
     tableWidth="98"
@@ -13,7 +13,12 @@
     :addButton="true"
     :addSpecialFunction="addEditInformationService"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/edu/information_service/"
+    :getRecsURL="
+      userRole === 'centre' ?
+        '/backend/api/v1/edu/information_service/'
+        :
+        `/backend/api/v1/edu/information_service?dep=${userDep}`
+    "
     delRecURL="/backend/api/v1/edu/information_service/"
     :onEditClick="addEditInformationService"
     :tableHeaders="tableHeaders"
@@ -26,6 +31,9 @@
     :ikuTypes="ikuTypes"
     :audienceCategories="audienceCategories"
     :getRecsFunction="getRecsInformationServiceTable"
+    :userRole="userRole"
+    :userDep="userDep"
+    :userDepDisplay="userDepDisplay"
   />
 
 </template>
@@ -40,39 +48,18 @@ import InformationServiceDetail from "@/components/dialogs/edu/InformationServic
 export default {
   name: "EduInformationService",
   components: {InformationServiceDetail, PaginationTable},
+  props: {
+    // Роль пользователя (centre или dep)
+    userRole: String,
+    // ObjectGUID подразеделения пользвоателя
+    userDep: String,
+    // Наименование подразделения пользователя
+    userDepDisplay: String
+  },
   data() {
     return {
-      tableHeaders: [
-        {
-          'title': 'Подразделение',
-          'key': 'department'
-        },
-        {
-          'title': 'Тип',
-          'key': 'type'
-        },
-        {
-          'title': 'Наименование',
-          'key': 'name'
-        },
-        {
-          'title': 'Место проведения',
-          'key': 'location'
-        },
-        {
-          'title': 'Дата начала обучения',
-          'key': 'date_start'
-        },
-        {
-          'title': 'Дата окончания обучения',
-          'key': 'date_end'
-        },
-        {
-          'title': 'Управление',
-          'key': 'actions'
-        }
-      ], // Заголовки пагинационной таблицы
-      fieldsArray: null, // Описания полей пагинационной таблицы
+      tableHeaders: [], // Заголовки пагинационной таблицы
+      fieldsArray: [], // Описания полей пагинационной таблицы
       adCentres: [], // Список подразделений ЦОКО
       ikuTypes: [], // Список типов ИКУ
       audienceCategories: [] // Список категорий слушателей
@@ -80,6 +67,39 @@ export default {
   },
   methods: {
     async getData() {
+      if (this.userRole === 'centre') {
+        this.tableHeaders = [
+          {
+            'title': 'Подразделение',
+            'key': 'department'
+          },
+        ]
+        const adCentresRequest = await apiRequest(
+          '/backend/api/v1/commons/ad_centres',
+          'GET',
+          true,
+          null
+        )
+        if (adCentresRequest.error) {
+          showAlert(
+            'error',
+            'Получение подразделений',
+            adCentresRequest.error
+          )
+        } else {
+          adCentresRequest.map((ad_centre) => {
+            this.adCentres.push(ad_centre.display_name)
+          })
+        }
+        this.fieldsArray = [
+          {
+            ui: 'select',
+            items: this.adCentres,
+            key: 'department',
+            addRequired: true,
+          },
+        ]
+      }
       let ikuTypesRequest = await apiRequest(
         '/backend/api/v1/guides/event_type/',
         'GET',
@@ -114,63 +134,66 @@ export default {
           this.audienceCategories.push(category.name)
         })
       }
-      let adCentresRequest = await apiRequest(
-        '/backend/api/v1/commons/ad_centres',
-        'GET',
-        true,
-        null
-      )
-      if (adCentresRequest.error) {
-        showAlert(
-          'error',
-          'Получение подразделений',
-          adCentresRequest.error
-        )
-      } else {
-        adCentresRequest.map((ad_centre) => {
-          this.adCentres.push(ad_centre.display_name)
-        })
-        this.fieldsArray = [
-          {
-            ui: 'select',
-            items: this.adCentres,
-            key: 'department',
-            addRequired: true,
-          },
-          {
-            ui: 'select',
-            items: this.ikuTypes,
-            key: 'type',
-            addRequired: true,
-          },
-          {
-            ui: 'input',
-            type: 'text',
-            key: 'name',
-            addRequired: true,
-          },
-          {
-            ui: 'input',
-            type: 'text',
-            key: 'location',
-            addRequired: true,
-          },
-          {
-            ui: 'date',
-            key: 'date_start',
-            addRequired: true,
-          },
-          {
-            ui: 'date',
-            key: 'date_end',
-            addRequired: true,
-          },
-          {
-            ui: 'actions',
-            key: 'actions'
-          }
-        ]
-      }
+      this.tableHeaders.push.apply(this.tableHeaders, [
+        {
+          'title': 'Тип',
+          'key': 'type'
+        },
+        {
+          'title': 'Наименование',
+          'key': 'name'
+        },
+        {
+          'title': 'Место проведения',
+          'key': 'location'
+        },
+        {
+          'title': 'Дата начала обучения',
+          'key': 'date_start'
+        },
+        {
+          'title': 'Дата окончания обучения',
+          'key': 'date_end'
+        },
+        {
+          'title': 'Управление',
+          'key': 'actions'
+        }
+      ])
+      this.fieldsArray.push.apply(this.fieldsArray, [
+        {
+          ui: 'select',
+          items: this.ikuTypes,
+          key: 'type',
+          addRequired: true,
+        },
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'name',
+          addRequired: true,
+        },
+        {
+          ui: 'input',
+          type: 'text',
+          key: 'location',
+          addRequired: true,
+        },
+        {
+          ui: 'date',
+          key: 'date_start',
+          addRequired: true,
+        },
+        {
+          ui: 'date',
+          key: 'date_end',
+          addRequired: true,
+        },
+        {
+          ui: 'actions',
+          key: 'actions'
+        }
+      ])
     },
     getRecsInformationServiceTable() {
       this.$refs.informationServiceTable.getRecs()

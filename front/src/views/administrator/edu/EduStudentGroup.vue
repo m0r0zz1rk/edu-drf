@@ -1,7 +1,7 @@
 <template>
 
   <PaginationTable
-    v-if="fieldsArray !== null"
+    v-if="fieldsArray !== null && urlGet !== ''"
     ref="studentGroupPaginationTable"
     tableTitle="Учебные группы"
     tableWidth="98"
@@ -9,16 +9,19 @@
     :addButton="true"
     :addSpecialFunction="openCreateDialog"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/edu/student_group/"
+    :getRecsURL="urlGet"
     editRecURL="/backend/api/v1/edu/student_group/update/"
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
     :itemSelectEvent="groupSelect"
+    :userRole="userRole"
   />
 
   <StudentGroupCreateDialog
     ref="groupCreateDialog"
     :getRecsFunction="getRecsTable"
+    :userRole="userRole"
+    :userDep="userDep"
   />
 
 </template>
@@ -27,13 +30,20 @@
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import StudentGroupCreateDialog from "@/components/dialogs/edu/student_group/StudentGroupCreateDialog.vue";
 import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
+import {getCookie} from "@/commons/cookie";
 
 // Компонент для просмотра списка учебных групп
 export default {
   name: "EduStudentGroup",
   components: {StudentGroupCreateDialog, PaginationTable},
+  props: {
+    // Роль пользователя (centre или dep)
+    userRole: String
+  },
   data() {
     return {
+      // Подразделение работника
+      userDep: this.userRole === 'dep' ? getCookie('cokoDep') : 'centre',
       statuses: [],
       tableHeaders: [
         {
@@ -65,10 +75,22 @@ export default {
           'key': 'apps_count'
         }
       ], // Заголовки таблицы
-      fieldsArray: null // Описание заголовков
+      fieldsArray: null, // Описание заголовков
+      // URL эндпоинта на получение данных
+      urlGet: '',
     }
   },
   methods: {
+    // Получить URL эндпоинта в зависимости от роли
+    getURL() {
+      let urlGet = "/backend/api/v1/edu/student_group/"
+      console.log('userRole: ', this.userRole)
+      console.log('userDep: ', this.userDep)
+      if (this.userRole === 'dep') {
+        urlGet += `?dep=${this.userDep}`
+      }
+      this.urlGet = urlGet
+    },
     // Открыть диалоговое окно для создания учебной группы
     openCreateDialog() {
       this.$refs.groupCreateDialog.dialog = true
@@ -133,6 +155,7 @@ export default {
     }
   },
   mounted() {
+    this.getURL()
     this.getStatuses()
   }
 }

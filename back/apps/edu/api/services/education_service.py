@@ -1,7 +1,9 @@
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated
 
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.utils.django.exception import exception_handling
 from apps.commons.utils.django.response import response_utils
 from apps.edu.api.edu_viewset import EduViewSet
@@ -17,6 +19,7 @@ from apps.journal.consts.journal_modules import EDU
 
 
 class EducationServiceViewSet(EduViewSet):
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
     orm = education_service_orm
     queryset = education_service_queryset()
     serializer_class = EducationServiceListSerializer

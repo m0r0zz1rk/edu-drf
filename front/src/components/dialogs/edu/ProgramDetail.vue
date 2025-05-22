@@ -65,6 +65,7 @@
               >
 
                 <v-col
+                  v-if="userRole === 'centre'"
                   cols="12"
                   md="6"
                   sm="6"
@@ -310,7 +311,11 @@ export default {
   props: {
     adCentres: Array, // Список подразделений AD,
     audienceCategories: Array, // Список категорий слушателей,
-    getRecs: Function // Функция для получения записи в пагинационной таблице
+    getRecs: Function, // Функция для получения записи в пагинационной таблице
+    // Роль пользователя (dep или centre)
+    userRole: String,
+    // Наименование подразделения пользователя
+    userDepDisplay: String,
   },
   data() {
     return {
@@ -448,6 +453,12 @@ export default {
               cats_str += cat+';;'
             })
             form.append(key, cats_str.slice(0, -2))
+          } else if (key === 'department') {
+            if (this.userRole === 'dep') {
+              form.append(key, this.userDepDisplay)
+            } else {
+              form.append(key, this.programObject[key])
+            }
           } else {
             form.append(key, this.programObject[key])
           }

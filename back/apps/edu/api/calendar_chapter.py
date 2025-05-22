@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from apps.authen.services.profile import ProfileService
-from apps.commons.permissions.is_administrators import IsAdministrators
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.services.journal_request import JournalRequest, JournalRequestBuilder
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.request import RequestUtils
@@ -25,7 +25,7 @@ from apps.journal.services.journal import JournalService
 class CalendarChartViewSet(viewsets.ViewSet):
     """Работа с КУГ"""
 
-    permission_classes = [IsAuthenticated, IsAdministrators]
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
     ru = RequestUtils()
     ju = JournalService()
     pu = ProfileService()

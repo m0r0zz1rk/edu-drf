@@ -2,7 +2,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from apps.commons.permissions.is_administrators import IsAdministrators
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
@@ -19,7 +19,7 @@ from apps.journal.exceptions.api_process_error import APIProcessError
 
 class ScheduleViewSet(viewsets.ViewSet):
     """Работа с расписаниями занятий учебных групп"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
 
     __response_utils = ResponseUtils()
     _user_service = UserService()

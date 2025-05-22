@@ -9,6 +9,12 @@ class UserInfoSerializer(serializers.Serializer):
         allow_blank=False,
         label='ФИО'
     )
+    dep = serializers.CharField(
+        max_length=1500,
+        allow_null=False,
+        allow_blank=False,
+        label='Подразделение пользователя'
+    )
     first_login = serializers.DateTimeField(
         format="%d.%m.%Y %H:%M",
         allow_null=False,

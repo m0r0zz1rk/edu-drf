@@ -61,6 +61,8 @@
 // Форма для формирования списка анкет обучающихся за определенный год
 import monthList from "@/commons/consts/reports/monthList";
 import serviceTypes from "@/commons/consts/edu/serviceTypes";
+import {apiRequest} from "@/commons/apiRequest";
+import {showAlert} from "@/commons/alerts";
 
 export default {
   name: 'ReportForms',
@@ -79,7 +81,20 @@ export default {
   methods: {
     // Отправка запроса на формирование отчета
     async createReport() {
-
+      this.loading = true
+      const yearFormsRequest = await apiRequest(
+        '/backend/api/v1/reports/year_forms/',
+        'POST',
+        true,
+        {report_year: this.reportYear, service_type: this.serviceType === 'edu' ? 'ou' : 'iku'},
+        true
+      )
+      if (yearFormsRequest.status === 200) {
+        showAlert('success', 'Анкеты', 'Запрос обработан, файл будет отправлен на почту')
+      } else {
+        showAlert('error', 'Анкеты', 'Ошибка при обработке запроса')
+      }
+      this.loading = false
     }
   }
 }

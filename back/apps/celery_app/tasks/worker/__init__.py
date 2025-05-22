@@ -8,3 +8,4 @@ from .report_pk_one import email_report_pk_one
 from .report_service_chart import email_report_service_chart
 from .survey_report import email_survey_report
 from .report_fis_frdo import email_report_fis_frdo
+from .report_year_forms import email_report_year_forms

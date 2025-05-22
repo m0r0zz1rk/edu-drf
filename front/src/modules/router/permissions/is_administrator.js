@@ -1,5 +1,5 @@
-import {showAlert} from "../../../commons/alerts.js"
-import {apiRequest} from "../../../commons/apiRequest.js";
+import {showAlert} from "@/commons/alerts"
+import {apiRequest} from "@/commons/apiRequest";
 import {getCookie} from "@/commons/cookie";
 
 const isAdministrator = (to, from, next) => {

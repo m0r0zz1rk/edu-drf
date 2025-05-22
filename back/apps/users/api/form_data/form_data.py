@@ -2,7 +2,6 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from apps.commons.permissions.is_admin_or_student import IsAdminOrStudent
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import USERS
 from apps.journal.consts.journal_rec_statuses import ERROR
@@ -17,7 +16,7 @@ class FormDataViewSet(viewsets.ViewSet):
     Класс эндпоинтов для получения массива данных, необходимых для
     заполнения анкеты в заявке обучающегося
     """
-    permission_classes = [IsAuthenticated, IsAdminOrStudent]
+    permission_classes = [IsAuthenticated, ]
 
     _form_data_service = FormDataService()
     _response_utils = ResponseUtils()

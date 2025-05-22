@@ -208,7 +208,12 @@ export default {
   name: "StudentGroupCreateDialog",
   components: {DialogContentWithError, PaginationTable, KUGTable},
   props: {
-    getRecsFunction: Function // Функция получения записей из пагинационной таблицы
+    // Функция получения записей из пагинационной таблицы
+    getRecsFunction: Function,
+    // Роль пользователя (centre или dep)
+    userRole: String,
+    // ObjectGUID подразделения пользователя
+    userDep: String
   },
   data() {
     return {
@@ -225,7 +230,7 @@ export default {
           title: 'ИКУ (Мероприятие)'
         }
       ], // Типы услуг,
-      serviceType: 'ou',
+      serviceType: 'iku',
       newGroup: {
         type: 'ou',
         service_id: null,
@@ -268,6 +273,10 @@ export default {
     }
   },
   methods: {
+    // Изменение типа учебной группы
+    changeServiceType() {
+      this.serviceType = 'ou'
+    },
     // Установка значений выбранной услуги в объект создаваемой группы и в текст для вывода на форму
     serviceSelect(service) {
       if (this.newGroup.type === 'ou') {
@@ -319,10 +328,19 @@ export default {
       this.newGroup.type = this.serviceType
       if (this.serviceType === 'ou') {
         this.getRecsURL = '/backend/api/v1/edu/education_service/'
+        if (this.userRole !== 'centre') {
+          this.getRecsURL += `?dep=${this.userDep}`
+        }
       } else {
         this.getRecsURL = '/backend/api/v1/edu/information_service/'
+        if (this.userRole !== 'centre') {
+          this.getRecsURL += `?dep=${this.userDep}`
+        }
       }
     }
+  },
+  mounted() {
+    this.changeServiceType()
   }
 }
 </script>

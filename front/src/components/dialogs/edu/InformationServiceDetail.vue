@@ -31,6 +31,7 @@
             >
 
               <v-col
+                v-if="userRole === 'centre'"
                 cols="12"
                 md="6"
                 sm="6"
@@ -223,6 +224,12 @@ export default {
     ikuTypes: Array, // Список типов мероприятий (ИКУ)
     audienceCategories: Array, // Список категорий слушателей
     getRecsFunction: Function, // Метод для вызова получения записей в пагинационной таблице в родителе
+    // Роль пользователя (centre или dep)
+    userRole: String,
+    // ObjectGUID подразеделения пользвоателя
+    userDep: String,
+    // Наименование подразделения пользователя
+    userDepDisplay: String
   },
   data() {
     return {
@@ -270,6 +277,9 @@ export default {
           "date_start": null,
           "date_end": null
         }
+        if (this.userRole !== 'centre') {
+          this.informationService.deparment = this.userDepDisplay
+        }
       }
       this.dialog = true
       this.loading = false
@@ -283,6 +293,9 @@ export default {
       if (this.informationService.object_id !== null) {
         url += this.informationService.object_id+'/'
         method = 'PATCH'
+      }
+      if (this.userRole === 'dep') {
+        this.informationService.department = this.userDepDisplay
       }
       Object.keys(this.informationService).map((key) => {
         if ((key !== 'object_id') && (

@@ -26,8 +26,10 @@
             <b>Пользователь:</b><br/>
             {{ mainPageInfo['user_info']['display_name'] }}<br/><br/>
             <b>Роль:</b><br/>
-            Администратор<br/><br/>
-            <b>Первый вход в АИС:</b><br/>
+            {{ userRole }}<br/><br/>
+            <b>Подразделение:</b><br/>
+            {{ mainPageInfo['user_info']['dep'] }}<br/><br/>
+            <b>Дата регистрации в АИС:</b><br/>
             {{ mainPageInfo['user_info']['first_login'] }}<br/><br/>
           </div>
         </v-card-text>
@@ -40,6 +42,7 @@
       sm="12"
     >
       <v-card
+        v-if="userRole === 'Администратор'"
         variant="outlined"
         class="adaptive-main-card-height"
       >
@@ -71,57 +74,58 @@
       </v-card>
     </v-col>
 
-    <v-col
-      cols="12"
-      md="6"
-      sm="12"
-    >
-      <v-card
-        variant="outlined"
-        class="adaptive-main-card-height"
-      >
-        <v-card-title
-          class="login-card-title"
-        >
-          Последние заявки (Тест)
-        </v-card-title>
-        <v-card-text>
-          <v-skeleton-loader
-              v-if="loading"
-              type="paragraph"
-          />
-          <div
-              v-if="!(loading)"
-              style="background-color: white"
-              class="adaptive-main-card-text-height"
-          >
-            <v-list >
-              <template v-for="app in mainPageInfo['last_apps']">
-                <v-list-item
-                >
-                  <v-list-item-title>
-                    {{app.user}}<br/>
-                    {{app.event_name}}
-                  </v-list-item-title>
-                  <template v-slot:subtitle>
-                    {{app.status}}
-                  </template>
+<!--    <v-col-->
+<!--      cols="12"-->
+<!--      md="6"-->
+<!--      sm="12"-->
+<!--    >-->
+<!--      <v-card-->
+<!--        v-if="userRole === 'Администратор'"-->
+<!--        variant="outlined"-->
+<!--        class="adaptive-main-card-height"-->
+<!--      >-->
+<!--        <v-card-title-->
+<!--          class="login-card-title"-->
+<!--        >-->
+<!--          Последние заявки (Тест)-->
+<!--        </v-card-title>-->
+<!--        <v-card-text>-->
+<!--          <v-skeleton-loader-->
+<!--              v-if="loading"-->
+<!--              type="paragraph"-->
+<!--          />-->
+<!--          <div-->
+<!--              v-if="!(loading)"-->
+<!--              style="background-color: white"-->
+<!--              class="adaptive-main-card-text-height"-->
+<!--          >-->
+<!--            <v-list >-->
+<!--              <template v-for="app in mainPageInfo['last_apps']">-->
+<!--                <v-list-item-->
+<!--                >-->
+<!--                  <v-list-item-title>-->
+<!--                    {{app.user}}<br/>-->
+<!--                    {{app.event_name}}-->
+<!--                  </v-list-item-title>-->
+<!--                  <template v-slot:subtitle>-->
+<!--                    {{app.status}}-->
+<!--                  </template>-->
 
-                  <template v-slot:append>
-                    <v-btn
-                      icon="mdi-chevron-right"
-                      variant="text"
-                    ></v-btn>
-                  </template>
-                </v-list-item>
-                <v-divider inset></v-divider>
-              </template>
+<!--                  <template v-slot:append>-->
+<!--                    <v-btn-->
+<!--                      icon="mdi-chevron-right"-->
+<!--                      variant="text"-->
+<!--                    ></v-btn>-->
+<!--                  </template>-->
+<!--                </v-list-item>-->
+<!--                <v-divider inset></v-divider>-->
+<!--              </template>-->
 
-            </v-list>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-col>
+<!--            </v-list>-->
+<!--          </div>-->
+<!--        </v-card-text>-->
+<!--      </v-card>-->
+<!--    </v-col>-->
 
   </v-row>
 </template>
@@ -129,15 +133,18 @@
 <script>
 import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
+import {getCookie} from "@/commons/cookie";
 
 export default {
   name: "CentreMainPage",
   data() {
     return {
+      // Роль пользователя
+      userRole: getCookie('cokoRole') === 'centre' ? 'Администратор' : 'Сотрудник центра',
       mainPageInfo: {
         'user_info': {
           'display_name': 'Фамилия Имя Отчество',
-          'role': 'Роль',
+          'dep': '-',
           'first_login': new Date(2000, 1, 1)
         },
         'study_info': {

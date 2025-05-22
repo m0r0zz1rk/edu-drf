@@ -83,7 +83,7 @@
 
     </CokoDialog>
 
-    <v-btn v-if="xlsxButton && !(foreignKey)"
+    <v-btn v-if="xlsxButton && !(foreignKey) && userRole === 'centre' "
       :loading="tableLoading"
       :icon="mobileDisplay && 'mdi-file-excel'"
       :prepend-icon="!(mobileDisplay) && 'mdi-file-excel'"
@@ -132,6 +132,8 @@ export default {
   name: "PaginationTableManage",
   components: {CokoDialog, PaginationTableBaseField, PaginationTableAddDialog},
   props: {
+    // Роль пользователя (centre или dep)
+    userRole: String,
     tableTitle: String, // Заголовок таблицы
     itemsCount: Number, // Количество записей в базе данных
     foreignKey: String, // FK таблица

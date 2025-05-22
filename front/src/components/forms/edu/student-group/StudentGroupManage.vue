@@ -7,6 +7,7 @@
   >
 
     <v-expansion-panel
+      v-if="userRole === 'centre'"
       color="coko-blue"
       title="Изменение шифра"
     >
@@ -23,6 +24,7 @@
 
     <v-expansion-panel
       title="Изменение куратора"
+      v-if="userRole === 'centre'"
     >
       <v-expansion-panel-text>
         <b>{{curator}}</b><br/>
@@ -86,6 +88,7 @@
     </v-expansion-panel>
 
     <v-expansion-panel
+      v-if="userRole === 'centre'"
       title="Изменение формы обучения"
     >
       <v-expansion-panel-text>
@@ -160,7 +163,9 @@ export default {
   props: {
     groupId: String, // object_id учебной группы
     // Объект с информацией об учебной группе
-    groupInfo: Object
+    groupInfo: Object,
+    // Роль пользователя (dep или centre)
+    userRole: String,
   },
   data() {
     return {

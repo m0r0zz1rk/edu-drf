@@ -2,10 +2,16 @@ import {showAlert} from "@/commons/alerts"
 import {apiRequest} from "@/commons/apiRequest";
 import {getCookie} from "@/commons/cookie";
 
-const isDepartment = (to, from, next) => {
-    // Проверка роли пользователя на сотрудника подразделения
+/**
+ * Проверка на адмнистратор или сотрудника центра
+ * @param to
+ * @param from
+ * @param next
+ */
+export const isDepOrAdministrator = (to, from, next) => {
+  // Проверка роли пользователя на администратора системы
   if (getCookie('cokoRole')) {
-    if (getCookie('cokoRole') === 'dep') {
+    if (['centre', 'dep'].includes(getCookie('cokoRole'))) {
       next()
       return
     } else {
@@ -19,7 +25,7 @@ const isDepartment = (to, from, next) => {
     }
   } else {
     apiRequest(
-      '/api/v1/auth/get_user_role/',
+      'backend/api/v1/auth/get_user_role/',
       true,
       'GET',
       null,
@@ -53,7 +59,6 @@ const isDepartment = (to, from, next) => {
       .then(data => {
         switch (data.role) {
           case 'student':
-          case 'centre':
             showAlert(
               'error',
               'Доступ к разделу',
@@ -68,5 +73,3 @@ const isDepartment = (to, from, next) => {
       })
   }
 }
-
-export default isDepartment

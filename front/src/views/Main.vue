@@ -2,7 +2,7 @@
   <LkPage :usePreLoader="usePreLoader">
     <slot>
       <StudentMainPage v-if="userRole === 'student'" />
-      <CentreMainPage v-if="userRole === 'centre'" />
+      <CentreMainPage v-if="['centre', 'dep'].includes(userRole)" />
     </slot>
   </LkPage>
 

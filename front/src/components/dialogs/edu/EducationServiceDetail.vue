@@ -62,8 +62,10 @@
                         color="coko-blue"
                       >{{educationService.program.name}}</v-expansion-panel-title>
                       <v-expansion-panel-text>
-                        <b>Подразделение:</b><br/>
-                        {{educationService.program.department}}<br/><br/>
+                        <div v-if="userRole === 'centre'">
+                          <b>Подразделение:</b><br/>
+                          {{educationService.program.department}}<br/><br/>
+                        </div>
                         <b>Объем часов:</b><br/>
                         {{educationService.program.duration}}<br/><br/>
                         <b>Категории слушателей:</b><br/>
@@ -78,12 +80,18 @@
                 </div><br/>
 
                 <PaginationTable
+                  v-if="!([0, 1].includes(programTableHeaders.length))"
                   tableTitle="ДПП"
                   tableWidth="98"
                   :noTab="false"
                   :addButton="false"
                   :xlsxButton="false"
-                  getRecsURL="/backend/api/v1/edu/approved_program/"
+                  :getRecsURL="
+                    userRole === 'centre' ?
+                      '/backend/api/v1/edu/approved_program/'
+                      :
+                      `/backend/api/v1/edu/approved_program?dep=${userDep}`
+                  "
                   :tableHeaders="programTableHeaders"
                   :fieldsArray="programFieldsArray"
                   :itemSelectEvent="changeDpp"
@@ -199,6 +207,10 @@ export default {
   props: {
     getRecsFunction: Function, // функция для получения записей в родительской пагинационной таблицы
                                // после добавления/обновления курса
+    // Роль пользователя
+    userRole: String,
+    // ObjectGUID подразделения пользователя
+    userDep: String
   },
   data() {
     return {
@@ -213,35 +225,30 @@ export default {
         "date_end": null,
         "location": null
       }, // Объект образовательной услуги (при наличии)
-      programTableHeaders: [
-        {
-          'title': 'Подразделение',
-          'key': 'department'
-        },
-        {
-          'title': 'Наименование',
-          'key': 'name'
-        },
-        {
-          'title': 'Объем (часов)',
-          'key': 'duration'
-        },
-        {
-          'title': 'Номер приказа',
-          'key': 'order_number'
-        },
-        {
-          'title': 'Дата приказа',
-          'key': 'order_date'
-        }
-      ], // Заголовки для пагинационной таблицы для выбора ДПП
-      programFieldsArray: [
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'department',
-          addRequired: true,
-        },
+      programTableHeaders: [], // Заголовки для пагинационной таблицы для выбора ДПП
+      programFieldsArray: [] // Описание полей пагинационной таблицы для выбора ДПП
+    }
+  },
+  methods: {
+    // Получение столбцов и описаний в зависимости от роли
+    getTableData() {
+      if (this.userRole === 'centre') {
+        this.programTableHeaders = [
+          {
+            'title': 'Подразделение',
+            'key': 'department'
+          },
+        ]
+        this.programFieldsArray = [
+          {
+            ui: 'input',
+            type: 'text',
+            key: 'department',
+            addRequired: true,
+          },
+        ]
+      }
+      this.programFieldsArray.push.apply(this.programFieldsArray, [
         {
           ui: 'input',
           type: 'text',
@@ -265,10 +272,26 @@ export default {
           key: 'order_date',
           addRequired: false,
         }
-      ] // Описание полей пагинационной таблицы для выбора ДПП
-    }
-  },
-  methods: {
+      ])
+      this.programTableHeaders.push.apply(this.programTableHeaders, [
+        {
+          'title': 'Наименование',
+          'key': 'name'
+        },
+        {
+          'title': 'Объем (часов)',
+          'key': 'duration'
+        },
+        {
+          'title': 'Номер приказа',
+          'key': 'order_number'
+        },
+        {
+          'title': 'Дата приказа',
+          'key': 'order_date'
+        }
+      ])
+    },
     // Смена object_id образовательной услуги
     changeServiceID(object_id) {
       if (object_id === this.educationServiceID) {
@@ -376,6 +399,9 @@ export default {
       }
       this.loading = false
     }
+  },
+  mounted() {
+    this.getTableData()
   },
   watch: {
     // Преобразование даты форма дд.мм.гггг в объект Date при изменении информации о приказе ДПП

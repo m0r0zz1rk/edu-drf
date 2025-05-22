@@ -8,7 +8,11 @@
     :addButton="true"
     :addSpecialFunction="addEditEducationService"
     :xlsxButton="true"
-    getRecsURL="/backend/api/v1/edu/education_service/"
+    :getRecsURL="
+      userRole === 'centre' ?
+        '/backend/api/v1/edu/education_service/'
+        :
+        `/backend/api/v1/edu/education_service/?dep=${userDep}`"
     delRecURL="/backend/api/v1/edu/education_service/"
     :onEditClick="addEditEducationService"
     :tableHeaders="tableHeaders"
@@ -18,6 +22,8 @@
   <EducationServiceDetail
     ref="educationServiceDetail"
     :getRecsFunction="getRecsEducationServiceTable"
+    :userRole="userRole"
+    :userDep="userDep"
   />
 
 </template>
@@ -29,6 +35,14 @@ import EducationServiceDetail from "@/components/dialogs/edu/EducationServiceDet
 export default {
   name: "EducationService",
   components: {EducationServiceDetail, PaginationTable},
+  props: {
+    // Роль пользователя (centre или dep)
+    userRole: String,
+    // ObjectGUID подразеделения пользвоателя
+    userDep: String,
+    // Наименование подразделения пользователя
+    userDepDisplay: String
+  },
   data() {
     return {
       tableHeaders: [

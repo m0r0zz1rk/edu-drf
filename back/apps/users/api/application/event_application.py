@@ -8,7 +8,6 @@ from apps.applications.serializers.event_application import EventApplicationList
 from apps.applications.services.event_application import event_application_service
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
-from apps.commons.permissions.is_admin_or_student import IsAdminOrStudent
 from apps.commons.utils.django.response import response_utils
 from apps.journal.consts.journal_modules import USERS
 from apps.journal.exceptions.api_process_error import APIProcessError
@@ -16,7 +15,7 @@ from apps.users.api.users_viewset import UsersViewSet
 
 
 class EventApplicationViewSet(UsersViewSet):
-    permission_classes = [IsAuthenticated, IsAdminOrStudent]
+    permission_classes = [IsAuthenticated, ]
 
     orm = event_application_orm
     queryset = event_application_queryset()

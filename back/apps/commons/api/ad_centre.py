@@ -1,6 +1,8 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.serializers.ad_centre import AdCentreSerializer, ad_centre_model
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils
@@ -11,6 +13,7 @@ from apps.journal.services.journal import JournalService
 
 class AdCentreViewSet(viewsets.ModelViewSet):
     """Работа с подразделениями-центрами из AD"""
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
     respu = ResponseUtils()
     ju = JournalService()
 

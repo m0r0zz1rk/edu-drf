@@ -57,7 +57,7 @@
         </v-tab>
 
         <v-tab
-          v-if="studentGroupInfo?.service_type === 'ou'"
+          v-if="studentGroupInfo?.service_type === 'ou' && userRole === 'centre'"
           class="coko-tab"
           value="certificate"
         >
@@ -82,12 +82,14 @@
           v-if="groupTab === 'manage'"
           :groupId="groupId"
           :groupInfo="studentGroupInfo"
+          :userRole="userRole"
         />
 
         <StudentGroupDocs
           v-if="groupTab === 'docs'"
           :groupId="groupId"
           :studentGroupInfo="studentGroupInfo"
+          :userRole="userRole"
         />
 
         <StudentGroupApps
@@ -107,7 +109,7 @@
 
         <StudentGroupCertificates
           ref="studentGroupCertificates"
-          v-if="studentGroupInfo?.service_type === 'ou' && groupTab === 'certificate'"
+          v-if="studentGroupInfo?.service_type === 'ou' && groupTab === 'certificate' && userRole === 'centre'"
           :groupCode="studentGroupInfo?.code"
         />
 
@@ -132,7 +134,7 @@
         />
 
         <v-btn
-          v-if="groupTab === 'apps'"
+          v-if="groupTab === 'apps' && userRole === 'centre'"
           color="coko-blue"
           text="Перенос всех"
           :loading="loading"
@@ -164,7 +166,7 @@
         />
 
         <v-btn
-          v-if="groupTab === 'certificate'"
+          v-if="groupTab === 'certificate' && userRole === 'centre'"
           color="coko-blue"
           text="Генерация"
           :loading="loading"
@@ -172,7 +174,7 @@
         />
 
         <v-btn
-          v-if="groupTab === 'certificate'"
+          v-if="groupTab === 'certificate' && userRole === 'centre'"
           color="coko-blue"
           text="Файл печати"
           :loading="loading"
@@ -243,6 +245,7 @@
   </CokoDialog>
 
   <CokoDialog
+    v-if="userRole === 'centre'"
     ref="appMoveDialog"
     :cardActions="true"
   >
@@ -284,6 +287,7 @@
   </CokoDialog>
 
   <CokoDialog
+    v-if="userRole === 'centre'"
     ref="generateCertificate"
     :cardActions="true"
   >
@@ -376,6 +380,7 @@ import {useDisplay} from "vuetify";
 import {CheckOo, CheckEdu, CheckPay} from "@/components/forms/edu/student-group/check-data";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import StudentGroupCertificates from "@/components/forms/edu/student-group/StudentGroupCertificates.vue";
+import {getCookie} from "@/commons/cookie";
 
 export default {
   name: "StudentGroupForm",
@@ -393,6 +398,8 @@ export default {
   },
   data() {
     return {
+      // Роль пользователя
+      userRole: getCookie('cokoRole'),
       groupTab: 'info', // Выбранная вкладка на форме
       loading: false, // Параметр отображения анимации загрузки на элементах формы
       // Объект с информацией об учебной группе
@@ -508,7 +515,7 @@ export default {
     },
     // Сохранить информацию по учебной группе
     async saveGroup() {
-      let groupInfo = this.$refs.groupManage.studentGroup
+      let groupInfo = this.$refs.groupManage.groupInfo
       if ((groupInfo.code === null) || (groupInfo.code.length === 0)) {
         showAlert(
           'error',

@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.course_application import course_application_orm, course_application_queryset, \
     course_application_model
-from apps.applications.serializers.base_application import ResponseApplicationCreateSerializer
 from apps.applications.serializers.base_application.response_application_create_serializer import \
     ApplicationCreateSerializer
 from apps.applications.serializers.course_application import CourseApplicationListSerializer, \
@@ -13,13 +12,12 @@ from apps.applications.services.base_application import base_application_service
 from apps.applications.services.course_application import course_application_service
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
-from apps.commons.permissions.is_admin_or_student import IsAdminOrStudent
 from apps.commons.utils.django.response import response_utils
 from apps.journal.consts.journal_modules import APPLICATIONS
 
 
 class CourseApplicationUserViewSet(ApplicationsViewSet):
-    permission_classes = [IsAuthenticated, IsAdminOrStudent]
+    permission_classes = [IsAuthenticated, ]
 
     orm = course_application_orm
     queryset = course_application_queryset()

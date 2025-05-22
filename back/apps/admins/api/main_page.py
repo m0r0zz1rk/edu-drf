@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from apps.admins.serializers.centre_main_page import CentreMainPageSerializer
 from apps.admins.services.main_page import MainPageService
 from apps.authen.services.profile import ProfileService
-from apps.commons.permissions.is_administrators import IsAdministrators
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import ADMINS
 from apps.journal.consts.journal_rec_statuses import (JOURNAL_REC_STATUSES,
@@ -15,7 +15,7 @@ from apps.journal.services.journal import JournalService
 
 class MainPageViewSet(viewsets.ViewSet):
     """Работа с главной страницей ЛК администратора АИС"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
 
     ju = JournalService()
     pu = ProfileService()

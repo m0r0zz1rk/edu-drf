@@ -1,9 +1,8 @@
 from django.contrib.auth.models import User
 
-from apps.applications.selectors.course_application import course_application_model
-from apps.applications.selectors.event_application import event_application_model
 from apps.applications.services.base_application import BaseApplicationService
 from apps.authen.services.profile import ProfileService
+from apps.commons.services.ad.ad_centre_coko_user import ad_centre_coko_user_utils
 from apps.commons.utils.django.user import UserUtils
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
@@ -31,6 +30,7 @@ class MainPageService:
                     request.user.id,
                     'display_name'
                 ),
+                'dep': ad_centre_coko_user_utils.get_user_centre_display_name(request.user),
                 'first_login': self.uu.get_user_date_joined(request.user.id)
             },
             'study_info': {

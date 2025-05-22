@@ -7,4 +7,5 @@ urlpatterns = [
     path('service_chart/', ReportMainViewSet.as_view({'post': 'service_chart'})),
     path('pk_one/', ReportMainViewSet.as_view({'post': 'pk_one'})),
     path('fis_frdo/', ReportMainViewSet.as_view({'post': 'fis_frdo'})),
+    path('year_forms/', ReportMainViewSet.as_view({'post': 'year_forms'}))
 ]

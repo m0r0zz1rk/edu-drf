@@ -28,7 +28,7 @@ import {apiRequest} from "@/commons/apiRequest";
 import {getCookie, setCookie} from "@/commons/cookie";
 import studentMenuItems from "@/components/menus/menu_items/student_menu_items";
 import centreMenuItems from "@/components/menus/menu_items/centre_menu_items";
-import depMenuItems from "@/components/menus/menu_items/dep_menu_items";
+import {depMenuItems} from "@/components/menus/menu_items/dep_menu_items";
 
 export default {
   name: "SideMenu",

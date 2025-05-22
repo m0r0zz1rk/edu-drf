@@ -30,9 +30,13 @@ const actions = {
           } else {
             const token = data.coko_token
             const role = data.coko_role
+            const dep = data.coko_dep
+            const depDisplay = data.coko_dep_display
             commit('AUTH_SUCCESS', token, role)
             setCookie('cokoToken', token)
             setCookie('cokoRole', role)
+            setCookie('cokoDep', dep)
+            setCookie('cokoDepDisplay', depDisplay)
             showAlert(
               'success',
               'Вход в систему',

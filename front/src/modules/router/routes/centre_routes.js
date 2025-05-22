@@ -9,6 +9,7 @@ import EduDetailStudentGroup from "@/views/administrator/edu/EduDetailStudentGro
 import Surveys from "@/views/administrator/Surveys.vue";
 import Reports from "@/views/administrator/Reports.vue";
 import PersonalSchedule from "@/views/administrator/PersonalSchedule.vue";
+import {isDepOrAdministrator} from "@/modules/router/permissions/is_dep_or_admin";
 
 const centre_routes = [
     {
@@ -27,13 +28,13 @@ const centre_routes = [
       path: '/centre/edu',
       name: 'Edu',
       component: Edu,
-      beforeEnter: [isAuthenticated, isAdministrator]
+      beforeEnter: [isAuthenticated, isDepOrAdministrator]
     },
     {
       path: '/centre/edu/student-group/:groupId',
       name: 'EduDetailStudentGroup',
       component: EduDetailStudentGroup,
-      beforeEnter: [isAuthenticated, isAdministrator]
+      beforeEnter: [isAuthenticated, isDepOrAdministrator]
     },
     {
         path: '/centre/surveys',
@@ -51,7 +52,7 @@ const centre_routes = [
         path: '/centre/personal_schedule',
         name: 'PersonalSchedule',
         component: PersonalSchedule,
-        beforeEnter: [isAuthenticated, isAdministrator]
+        beforeEnter: [isAuthenticated, isDepOrAdministrator]
     },
     {
         path: '/centre/journal',

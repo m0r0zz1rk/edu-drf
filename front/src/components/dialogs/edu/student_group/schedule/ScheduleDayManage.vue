@@ -682,11 +682,12 @@ export default {
         this.dayInfo.lessons.push({
           "time_start_str": "00:00",
           "time_end_str": "00:45",
+          "kug_theme_id": null,
           "theme": "Тема",
           "type": "lecture",
           "teacher_fio": "-",
           "distance": false,
-          "control": null
+          "control": ""
         })
       }
     },

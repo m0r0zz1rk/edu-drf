@@ -1,16 +1,14 @@
-const depMenuItems = [
+export const depMenuItems = [
   {
     'icon': 'mdi-bank',
     'title': 'Учебная деятельность',
-    'link': '/dep/study',
+    'link': '/centre/edu',
     'value': 'study'
   },
   {
     'icon': 'mdi-book-clock-outline',
     'title': 'Личное расписание',
-    'link': '/dep/personal_schedule',
+    'link': '/centre/personal_schedule',
     'value': 'personal_schedule'
   }
 ]
-
-export default depMenuItems

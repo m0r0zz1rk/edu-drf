@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeFormatError
 from apps.commons.pagination import CustomPagination
-from apps.commons.permissions.is_administrators import IsAdministrators
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.response import ResponseUtils
 from apps.edu.selectors.schedule import TeachersFilter, user_teachers_queryset
@@ -19,7 +19,7 @@ from apps.journal.exceptions.api_process_error import APIProcessError
 
 class TeacherViewSet(viewsets.ModelViewSet):
     """API для работы с преподавателями"""
-    permission_classes = [IsAuthenticated, IsAdministrators]
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
 
     queryset = user_teachers_queryset()
     lookup_field = "object_id"

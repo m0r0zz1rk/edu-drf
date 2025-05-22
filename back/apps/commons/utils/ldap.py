@@ -1,11 +1,10 @@
-import codecs
 from typing import Optional
 
 from django.contrib.auth.models import User
 from ldap3 import Server, Connection, SUBTREE
 
 from apps.commons.decorators.ldap_utils_journal_decorator import ldap_utils_journal_decorator
-from apps.commons.services.ad.ad_centre import AdCentreService
+from apps.commons.services.ad.ad_centre import ad_centre_service
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.settings import settings_utils
 from apps.journal.consts.journal_modules import COMMON
@@ -98,7 +97,7 @@ class LdapUtils:
         )
         deps = self.connection.entries
         for dep in deps:
-            AdCentreService().add_ad_centre(
+            ad_centre_service.add_ad_centre(
                 {
                     'display_name': dep.DisplayName,
                     'object_guid': dep.ObjectGUID
@@ -109,7 +108,7 @@ class LdapUtils:
         'Подразделение успешно записано в модель AdCentreCokoUser',
         'Ошибка при записи подразделения в модель  AdCentreCokoUser'
     )
-    def get_ad_user_centre(self, user: User) -> Optional[str]:
+    def get_ad_user_centre(self, user: User) -> Optional[tuple]:
         """
         Получение подразделения-центра из AD сотрудника ЦОКО и запись в модель AdCentreCokoUser
         :param user: Пользователь Django
@@ -150,10 +149,10 @@ class LdapUtils:
             'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
             f"(info={data[0].department})",
             SUBTREE,
-            attributes=['displayName']
+            attributes=['ObjectGUID', 'displayName']
         )
         data = self.connection.entries
-        return str(data[0].displayName)
+        return str(data[0].displayName), str(data[0].ObjectGUID)
 
     @ldap_utils_journal_decorator(
         'Центры с менеджерами успешно получены',

@@ -16,22 +16,37 @@
 
               <v-tab class="coko-tab" value="group">Учебные группы</v-tab>
               <v-tab class="coko-tab" value="dpp">ДПП</v-tab>
-              <v-tab class="coko-tab" value="planning">Планирование</v-tab>
+              <v-tab class="coko-tab" value="planning" v-if="userRole !== 'dep'">Планирование</v-tab>
               <v-tab class="coko-tab" value="ou">Курсы (ОУ)</v-tab>
               <v-tab class="coko-tab" value="iku">Мероприятия (ИКУ)</v-tab>
 
 
             </v-tabs>
 
-            <EduDpp v-if="eduTab === 'dpp'" />
+            <EduDpp
+              v-if="eduTab === 'dpp'"
+              :userRole="userRole"
+              :userDep="userDep"
+              :userDepDisplay="userDepDisplay"
+            />
 
-            <EduPlanningParameter v-if="eduTab === 'planning'" />
+            <EduPlanningParameter v-if="eduTab === 'planning' && userRole !== 'dep'" />
 
-            <EducationService v-if="eduTab === 'ou'" />
+            <EducationService
+              v-if="eduTab === 'ou'"
+              :userRole="userRole"
+              :userDep="userDep"
+              :userDepDisplay="userDepDisplay"
+            />
 
-            <EduInformationService v-if="eduTab === 'iku'" />
+            <EduInformationService
+              v-if="eduTab === 'iku'"
+              :userRole="userRole"
+              :userDep="userDep"
+              :userDepDisplay="userDepDisplay"
+            />
 
-            <EduStudentGroup v-if="eduTab === 'group'" />
+            <EduStudentGroup v-if="eduTab === 'group'" :userRole="userRole" />
 
           </div>
         </v-card-text>
@@ -47,6 +62,7 @@ import EduPlanningParameter from "@/views/administrator/edu/EduPlanningParameter
 import EducationService from "@/views/administrator/edu/EducationService.vue";
 import EduInformationService from "@/views/administrator/edu/EduInformationService.vue";
 import EduStudentGroup from "@/views/administrator/edu/EduStudentGroup.vue";
+import {getCookie} from "@/commons/cookie";
 
 export default {
   name: "Edu",
@@ -56,7 +72,13 @@ export default {
   },
   data() {
     return {
-      eduTab: 'group'
+      eduTab: 'group',
+      // Роль пользователя
+      userRole: getCookie('cokoRole'),
+      // ObjectGUID подразделения пользователя
+      userDep: getCookie('cokoDep'),
+      // DisplayName подразделения пользователя
+      userDepDisplay: getCookie('cokoDepDisplay')
     }
   },
   mounted() {

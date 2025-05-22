@@ -5,6 +5,7 @@ from django.db.models import QuerySet, Q
 from django_filters import rest_framework as filters
 
 from apps.commons.orm.base_orm import BaseORM
+
 from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES
 
 # Модель учебных групп
@@ -24,6 +25,7 @@ def student_group_queryset() -> QuerySet:
 
 class StudentGroupFilter(filters.FilterSet):
     """Поля для фильтрации ДПП"""
+    dep = filters.CharFilter(method="filter_dep")
     code = filters.CharFilter(lookup_expr='icontains')
     service_name = filters.CharFilter(method="filter_service_name")
     date_start = filters.CharFilter(method="filter_date_start")
@@ -32,6 +34,13 @@ class StudentGroupFilter(filters.FilterSet):
     curator = filters.CharFilter(method='filter_curator')
     apps_count = filters.CharFilter(method='filter_apps_count')
     status = filters.CharFilter(method='filter_status')
+
+    def filter_dep(self, queryset, name, value):
+        """Фильтрация по подразделению (для сотрудников центров)"""
+        return queryset.filter(
+            Q(ou__program__department__object_guid=value) |
+            Q(iku__department__object_guid=value)
+        )
 
     def filter_service_name(self, queryset, name, value):
         """Фильтрация по наименованию услуги"""

@@ -1,8 +1,9 @@
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.guides.api.guide_viewset import GuideViewSet
 from apps.guides.selectors.event_type import event_type_queryset, event_type_orm
 from apps.guides.selectors.name_field import NameFieldFilter
@@ -12,6 +13,7 @@ from apps.journal.consts.journal_modules import GUIDES
 
 
 class EventTypeViewSet(GuideViewSet):
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
     orm = event_type_orm
     queryset = event_type_queryset()
     serializer_class = EventTypeListUpdateSerializer

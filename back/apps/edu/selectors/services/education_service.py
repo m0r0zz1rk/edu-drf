@@ -21,10 +21,15 @@ def education_service_queryset() -> QuerySet:
 
 class EducationServiceFilter(filters.FilterSet):
     """Поля для фильтрации образовательных услуг (курсов)"""
+    dep = filters.CharFilter(method='filter_dep')
     program = filters.CharFilter(method='filter_program')
     location = filters.CharFilter(lookup_expr='icontains')
     date_start = filters.DateFilter()
     date_end = filters.DateFilter()
+
+    def filter_dep(self, queryset, name, value):
+        """Фильтрация по подразделению (для сотрудников центров)"""
+        return queryset.filter(program__department__object_guid=value)
 
     def filter_program(self, queryset, name, value):
         return queryset.filter(program__name__icontains=value)

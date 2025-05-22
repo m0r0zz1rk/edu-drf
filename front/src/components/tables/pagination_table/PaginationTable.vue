@@ -32,6 +32,7 @@
         :onChangeEvent="searchRecs"
         :defaultBody="defaultBody"
         :tableLoading="tableLoading"
+        :userRole="userRole"
       />
     </template>
 
@@ -334,6 +335,8 @@ export default {
     PaginationTableManage
   },
   props: {
+    // Роль пользователя (centre или dep)
+    userRole: String,
     // Возможность выборки нескольких строк таблицы (checkbox)
     selection: Boolean,
     tableTitle: String, // Заголовок таблицы

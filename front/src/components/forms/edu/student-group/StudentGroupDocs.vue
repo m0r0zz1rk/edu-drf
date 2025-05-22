@@ -59,6 +59,7 @@
         >
 
           <v-btn
+            v-if="userRole === 'centre'"
             color="coko-blue"
             :loading="loading"
             @click="e => {getDoc('service_order', 'docx')}"
@@ -75,6 +76,7 @@
     </v-expansion-panel>
 
     <v-expansion-panel
+      v-if="userRole === 'centre'"
       color="coko-blue"
       title="Договор оферты"
     >
@@ -178,7 +180,7 @@
     </v-expansion-panel>
 
     <v-expansion-panel
-      v-if="studentGroupInfo?.service_type === 'ou'"
+      v-if="studentGroupInfo?.service_type === 'ou' && userRole === 'centre'"
       color="coko-blue"
       title="Приказы"
     >
@@ -247,7 +249,7 @@
     </v-expansion-panel>
 
     <v-expansion-panel
-      v-if="studentGroupInfo?.service_type === 'ou'"
+      v-if="studentGroupInfo?.service_type === 'ou' && userRole === 'centre'"
       color="coko-blue"
       title="Закрывной документ"
     >
@@ -267,7 +269,7 @@
     </v-expansion-panel>
 
     <v-expansion-panel
-      v-if="studentGroupInfo?.service_type === 'ou'"
+      v-if="studentGroupInfo?.service_type === 'ou' && userRole === 'centre'"
       color="coko-blue"
       title="Ведомость удостоверений"
     >
@@ -365,6 +367,8 @@ export default {
     groupId: String, // object_id учебной группы
     // Информация по учебной группы из родителя
     studentGroupInfo: Object, // Тип услуги учебной группы
+    // Роль пользователя (centre или dep)
+    userRole: String
   },
   data() {
     return {

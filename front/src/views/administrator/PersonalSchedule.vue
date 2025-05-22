@@ -17,7 +17,7 @@
                 style="text-align: center"
             >
               Личное расписание
-            </b>
+            </b><br/><br/>
 
             <b
                 v-if="schedule === null"

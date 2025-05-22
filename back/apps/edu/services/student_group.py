@@ -64,7 +64,6 @@ class StudentGroupService:
         :param service_type: Тип услуги (ou, iku)
         :return: сгенерированный код
         """
-        code = '-'
         try:
             dep_letters = re.split(' |-', department)
             short_name = ''
@@ -78,14 +77,15 @@ class StudentGroupService:
                 month = '0' + month
             year = str(datetime.datetime.now().year)
             code = short_name
-            if service_type == 'ou':
-                code += '-ПК' + str(EducationServiceService.service_count(department))
-            else:
-                code += '-С' + str(InformationServiceService.service_count(department))
-            code += '-' + month + '-' + year[2:]
+            service_count = EducationServiceService.service_count(department)
+            type_sign = 'ПК'
+            if service_type != 'ou':
+                service_count = InformationServiceService.service_count(department)
+                type_sign = 'С'
+            code += f'-{type_sign}{str(service_count+1)}' if service_count != 0 else f'-{type_sign}1'
+            code += f'-{month}-{year[2:]}'
             if self.is_group_exists('code', code):
-                count = student_group_model.objects.filter(code=code).count()
-                code += '-' + str(count)
+                code += f'-{str(student_group_model.objects.filter(code=code).count())}'
         except RuntimeError:
             raise GenerateCodeError
         return code

@@ -1,7 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
 
 from apps.celery_app.tasks import (email_report_dpp, email_report_service_chart, email_report_pk_one,
-                                   email_report_fis_frdo)
+                                   email_report_fis_frdo, email_report_year_forms)
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.utils.django.response import response_utils
 from apps.journal.consts.journal_modules import REPORTS
@@ -9,6 +9,7 @@ from apps.reports.api.reports_viewset import ReportsViewSet
 from apps.reports.serializers.dpp_serializer import DppSerializer
 from apps.reports.serializers.fis_frdo_serializer import FisFrdoSerializer
 from apps.reports.serializers.pk_one_serializer import PKOneSerializer
+from apps.reports.serializers.year_forms_serializer import YearFormsSerializer
 
 # Словарь ответов на запросы
 responses = {
@@ -93,4 +94,22 @@ class ReportMainViewSet(ReportsViewSet):
         if serialize.is_valid():
             email_report_fis_frdo.delay(request.user.email, serialize.validated_data)
             return response_utils.ok_response("Запрос обработан, отчет будет отправлен на почту")
+        return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Отчеты', ],
+        operation_description="Получение анкет за год",
+        request_body=YearFormsSerializer,
+        responses=responses
+    )
+    @view_set_journal_decorator(
+        REPORTS,
+        f'Запрос на получение анкет за год успешно обработан',
+        f'Ошибка при обработке запроса на получение анкет за год'
+    )
+    def year_forms(self, request, *args, **kwargs):
+        serialize = YearFormsSerializer(data=request.data)
+        if serialize.is_valid():
+            email_report_year_forms.delay(request.user.email, serialize.validated_data)
+            return response_utils.ok_response("Запрос обработан, файл будет отправлен на почту")
         return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')

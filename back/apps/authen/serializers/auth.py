@@ -32,6 +32,18 @@ class AuthorizationResponseSerializer(serializers.Serializer):
         allow_blank=False,
         label='Роль пользователя'
     )
+    coko_dep = serializers.CharField(
+        max_length=300,
+        allow_null=False,
+        allow_blank=False,
+        label='ObjectGUID подразделения пользователя'
+    )
+    coko_dep_display = serializers.CharField(
+        max_length=1500,
+        allow_null=False,
+        allow_blank=False,
+        label='Наименование подразделения пользователя'
+    )
     coko_user_id = serializers.IntegerField(
         label='ID пользователя'
     )

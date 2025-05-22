@@ -1,7 +1,9 @@
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated
 
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
+from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.guides.api.guide_viewset import GuideViewSet
 from apps.guides.selectors.audience_category import audience_category_queryset, audience_category_orm
 from apps.guides.selectors.name_field import NameFieldFilter
@@ -11,6 +13,7 @@ from apps.journal.consts.journal_modules import GUIDES
 
 
 class AudienceCategoryViewSet(GuideViewSet):
+    permission_classes = [IsAuthenticated, IsAdminOrCoko]
     orm = audience_category_orm
     queryset = audience_category_queryset()
     serializer_class = AudienceCategoryListUpdateSerializer

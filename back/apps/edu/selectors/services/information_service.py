@@ -23,12 +23,17 @@ def information_service_queryset() -> QuerySet:
 
 class InformationServiceFilter(filters.FilterSet):
     """Поля для фильтрации образовательных услуг (курсов)"""
+    dep = filters.CharFilter(method='filter_dep')
     department = filters.CharFilter(method='filter_department')
     type = filters.CharFilter(method='filter_type')
     name = filters.CharFilter(lookup_expr='icontains')
     location = filters.CharFilter(lookup_expr='icontains')
     date_start = filters.DateFilter()
     date_end = filters.DateFilter()
+
+    def filter_dep(self, queryset, name, value):
+        """Фильтрация по подразделению (для сотрудников центров)"""
+        return queryset.filter(department__object_guid=value)
 
     def filter_department(self, queryset, name, value):
         return queryset.filter(department__display_name__icontains=value)
