@@ -36,8 +36,8 @@ def email_survey_report(email: str, report_parameters: dict):
             "АИС «Учебный центр»: Отчет по результатам опроса",
             f"Во вложении находится сформированный отчет по результатам опроса",
             None,
-            # [email, ]
-            [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
+            [email, ]
+            # [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
         )
         message.attach_file(os.path.join(report_folder, file_name))
         message.send()

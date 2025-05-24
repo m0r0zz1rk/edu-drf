@@ -41,8 +41,8 @@ def email_report_pk_one(email: str, report_parameters: dict):
             "АИС «Учебный центр»: Отчет ПК-1",
             f"Во вложении находится сформированный отчет ПК-1",
             None,
-            # [email, ]
-            [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
+            [email, ]
+            # [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
         )
         message.attach_file(os.path.join(report_folder, file_name))
         message.send()

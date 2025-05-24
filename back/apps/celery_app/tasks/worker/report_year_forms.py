@@ -42,8 +42,8 @@ def email_report_year_forms(email: str, report_parameters: dict):
             f"Во вложении находится сформированный файл с данными по "
             f"анкетам за {report_parameters.get('report_year')} год",
             None,
-            # [email, ]
-            [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
+            [email, ]
+            # [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
         )
         message.attach_file(os.path.join(report_folder, file_name))
         message.send()

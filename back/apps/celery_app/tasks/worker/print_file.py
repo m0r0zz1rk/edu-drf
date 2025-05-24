@@ -117,8 +117,8 @@ def email_print_file(group_id: uuid, admin_email: str, to_print_office: bool):
             composer.save(os.path.join(group_path, 'Печать.docx'))
             # Удаление временного файла
             os.remove(os.path.join(group_path, "new_cert.docx"))
-        # email_address = [admin_email, ]
-        email_address = [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
+        email_address = [admin_email, ]
+        # email_address = [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
         if to_print_office:
             email_address.append(settings_utils.get_parameter_from_settings('PRINT_OFFICE_EMAIL'))
         email = EmailMessage(

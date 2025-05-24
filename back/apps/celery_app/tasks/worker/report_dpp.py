@@ -41,8 +41,8 @@ def email_report_dpp(email: str, report_parameters: dict):
             "АИС «Учебный центр»: Отчет ДПП",
             f"Во вложении находится сформированный отчет ДПП",
             None,
-            # [email, ]
-            [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
+            [email, ]
+            # [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
         )
         message.attach_file(os.path.join(report_folder, file_name))
         message.send()
