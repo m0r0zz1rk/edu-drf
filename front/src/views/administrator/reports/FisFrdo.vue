@@ -12,8 +12,8 @@
 
     <v-col
         cols="12"
-        md="12"
-        sm="12"
+        md="6"
+        sm="6"
     >
 
       <v-select
@@ -25,6 +25,24 @@
           item-value="key"
           label="Месяц"
           :loading="loading"
+      />
+
+    </v-col>
+
+    <v-col
+      cols="12"
+      md="6"
+      sm="6"
+    >
+
+      <v-number-input
+        label="Год"
+        bg-color="white"
+        variant="solo"
+        v-model="reportYear"
+        min="2020"
+        max="2100"
+        :loading="loading"
       />
 
     </v-col>
@@ -42,7 +60,7 @@
         :noTab="false"
         :addButton="false"
         :xlsxButton="false"
-        :getRecsURL="'/backend/api/v1/edu/student_group/?month='+backendMonthNumber"
+        :getRecsURL="`/backend/api/v1/edu/student_group/?month=${backendMonthNumber}&year=${reportYear}`"
         :tableHeaders="tableHeaders"
         :fieldsArray="fieldsArray"
     />
@@ -78,6 +96,8 @@ export default {
       loading: false,
       //Список месяцев с возможностью выбора всех
       months: monthList,
+      // Выбранный год,
+      reportYear: new Date().getFullYear(),
       // Выбранный месяц
       reportMonth: 'all',
       // Номер месяца, для получения учебных групп
@@ -176,6 +196,7 @@ export default {
         this.key += 1
       }
     },
+    reportYear: function() { this.key += 1}
   }
 }
 

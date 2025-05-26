@@ -14,7 +14,6 @@
     :tableHeaders="tableHeaders"
     :fieldsArray="fieldsArray"
     :itemSelectEvent="groupSelect"
-    :userRole="userRole"
   />
 
   <StudentGroupCreateDialog

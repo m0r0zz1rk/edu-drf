@@ -31,6 +31,7 @@ class StudentGroupFilter(filters.FilterSet):
     date_start = filters.CharFilter(method="filter_date_start")
     date_end = filters.CharFilter(method='filter_date_end')
     month = filters.CharFilter(method="filter_month")
+    year = filters.CharFilter(method="filter_year")
     curator = filters.CharFilter(method='filter_curator')
     apps_count = filters.CharFilter(method='filter_apps_count')
     status = filters.CharFilter(method='filter_status')
@@ -65,13 +66,22 @@ class StudentGroupFilter(filters.FilterSet):
 
     def filter_month(self, queryset, name, value):
         """Фильтрация по месяцу (для отчета ФИС ФРДО)"""
-        print(value)
         int_value = int(value)
         if int_value == 0:
             return queryset
         return queryset.filter(
             Q(ou__date_start__month=int_value) |
             Q(ou__date_end__month=int_value)
+        )
+
+    def filter_year(self, queryset, name, value):
+        """Фильтрация по году (для отчета ФИС ФРДО)"""
+        int_value = int(value)
+        if int_value == 0:
+            return queryset
+        return queryset.filter(
+            Q(ou__date_start__year=int_value) |
+            Q(ou__date_end__year=int_value)
         )
 
     def filter_curator(self, queryset, name, value):

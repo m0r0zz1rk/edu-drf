@@ -321,6 +321,7 @@ import {useDisplay} from "vuetify";
 import specialFieldsList from "@/components/tables/pagination_table/special_fields/SpecialFieldsList";
 import SpecialField from "@/components/tables/pagination_table/special_fields/SpecialField.vue";
 import PaginationTableEditDialog from "@/components/tables/pagination_table/dialogs/PaginationTableEditDialog.vue";
+import {getCookie} from "@/commons/cookie";
 
 // Компонент пагинационной таблицы
 export default {
@@ -335,8 +336,6 @@ export default {
     PaginationTableManage
   },
   props: {
-    // Роль пользователя (centre или dep)
-    userRole: String,
     // Возможность выборки нескольких строк таблицы (checkbox)
     selection: Boolean,
     tableTitle: String, // Заголовок таблицы
@@ -390,6 +389,8 @@ export default {
   },
   data() {
     return {
+      // Роль пользователя
+      userRole: getCookie('cokoRole'),
       // Список выбранных строк таблицы (для selection)
       itemsList: [],
       specialFieldsList: specialFieldsList,
