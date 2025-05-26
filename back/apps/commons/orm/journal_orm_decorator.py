@@ -27,21 +27,22 @@ def journal_orm_decorator(
                 status=None,
                 description=''
             )
-            res = None
+            res = output = None
             try:
                 res = function(*args, **kwargs)  # noqa
-                journal_info['status'] = SUCCESS
-                journal_info['description'] = f'Запрос на "{request_type}" к модели {model} выполнен успешно'
-                output = repr(res)
+                # journal_info['status'] = SUCCESS
+                # journal_info['description'] = f'Запрос на "{request_type}" к модели {model} выполнен успешно'
+                # output = repr(res)
             except Exception as e:
                 journal_info['status'] = ERROR
                 journal_info['description'] = f'Запрос на "{request_type}" к модели {model} завершился ошибкой'
                 output = ExceptionHandling.get_traceback()
-            journal_service.create_journal_rec(
-                data=journal_info,
-                payload=payload,
-                output=output
-            )
+            if journal_info['status'] == ERROR:
+                journal_service.create_journal_rec(
+                    data=journal_info,
+                    payload=payload,
+                    output=output
+                )
             return res
         return wrapper
     return inner_decorator
