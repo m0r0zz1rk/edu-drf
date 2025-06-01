@@ -99,26 +99,26 @@ class EventApplicationAdminViewSet(ApplicationsViewSet):
 
     @swagger_auto_schema(
         tags=[f'Заявки. {swagger_object_name}', ],
-        operation_description="Перемещение заявки группы",
+        operation_description="Перемещение выбранных заявок группы",
         request_body=AppMoveSerializer,
         responses={
             '403': 'Пользователь не авторизован или не является администратором',
-            '400': 'Ошибка при переносе заявки',
+            '400': 'Ошибка при переносе заявок',
             '200': 'Сообщение "Перемещение выполнено"'
         },
     )
     @view_set_journal_decorator(
         APPLICATIONS,
-        'Заявка на курс успешно перенесена',
-        'Ошибка при переносе заявки на курс"'
+        'Заявки на мероприятие успешно перенесены',
+        'Ошибка при переносе заявок на мероприятие"'
     )
-    def one_move(self, request, *args, **kwargs):
+    def select_move(self, request, *args, **kwargs):
         serialize = AppMoveSerializer(data=request.data)
         if serialize.is_valid():
             base_application_service.move_application(
                 event_application_orm,
-                serialize.validated_data.get('application_id'),
-                serialize.validated_data.get('group_id')
+                serialize.validated_data.get('apps'),
+                serialize.validated_data.get('destination_group_id')
             )
             return response_utils.ok_response('Перемещение выполнено')
         else:

@@ -10,6 +10,7 @@
     :getRecsURL="'/backend/api/v1/applications/course_certificate?group='+groupCode"
     :tableHeaders="tableHeaders"
     :onEditClick="selectCertificate"
+    :openDocViewerFunction="openDocViewer"
     :fieldsArray="fieldsArray"
   />
 
@@ -103,7 +104,9 @@ export default {
   components: {CokoDialog, DocViewer, PaginationTable},
   props: {
     // Код учебной группы
-    groupCode: String
+    groupCode: String,
+    // Функция для открытия просмотрщика документа
+    openDocViewer: Function
   },
   data() {
     return {
@@ -124,6 +127,10 @@ export default {
         {
           'title': 'Номер бланка удостоверения',
           'key': 'blank_number'
+        },
+        {
+          'title': 'Скан удостоверения',
+          'key': 'scan'
         },
         {
           'title': 'Управление',
@@ -154,6 +161,11 @@ export default {
           type: 'text',
           key: 'blank_number',
           addRequired: true
+        },
+        {
+          ui: 'appCertificateScan',
+          key: 'scan',
+          addRequired: false
         },
         {
           ui: 'actions',

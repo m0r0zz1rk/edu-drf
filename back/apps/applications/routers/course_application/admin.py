@@ -8,7 +8,7 @@ course_application_admin_router.register('course_application_admin', CourseAppli
 
 urlpatterns = [
     path('course_pay_denied/<uuid:object_id>/', CourseApplicationAdminViewSet.as_view({'post': 'pay_denied'})),
-    path('course_one_move/', CourseApplicationAdminViewSet.as_view({'post': 'one_move'})),
+    path('course_select_move/', CourseApplicationAdminViewSet.as_view({'post': 'select_move'})),
     path('course_all_move/', CourseApplicationAdminViewSet.as_view({'post': 'all_move'})),
 ]
 

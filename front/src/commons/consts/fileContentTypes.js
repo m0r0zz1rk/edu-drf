@@ -17,6 +17,10 @@ const fileContentTypes = [
         mime: 'image/jpeg'
     },
     {
+      extension: 'peg',
+      mime: 'image/jpeg'
+    },
+    {
         extension: 'jpg',
         mime: 'image/jpeg'
     },

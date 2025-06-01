@@ -5,11 +5,11 @@ class AppMoveSerializer(serializers.Serializer):
     """
     Сериализация данных для переноса одной заявки из учебной группы в другую
     """
-    application_id = serializers.UUIDField(
-        allow_null=False,
-        label='object_id заявки для переноса'
+    apps = serializers.ListSerializer(
+        child=serializers.CharField(),
+        label='Список object_id заявок для переноса'
     )
-    group_id = serializers.UUIDField(
+    destination_group_id = serializers.UUIDField(
         allow_null=False,
         label='object_id учебной группы назначения'
     )

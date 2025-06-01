@@ -17,13 +17,9 @@
     :fieldsArray="fieldsArray"
     :openDocViewerFunction="openDocViewer"
     :selectGroupAppFunction="getAppInfo"
-    :appMoveFunction="prependForAppMove"
   />
 
-  <CokoDialog
-    ref="appFormDialog"
-    :cardActions="true"
-  >
+  <CokoDialog ref="appFormDialog" :cardActions="true">
 
     <template v-slot:title>
       <p v-if="!mobileDisplay">Анкета обучающегося {{formFIO}}</p>
@@ -61,48 +57,6 @@
     </template>
 
   </CokoDialog>
-
-  <CokoDialog
-    ref="appMoveDialog"
-    :cardActions="true"
-  >
-
-    <template v-slot:title>
-      Выбор группы для переноса заявки "{{appForMove.student.display_name}}"
-    </template>
-
-    <template v-slot:text>
-
-      <template v-if="groupForMove">
-        <b>Выбранная группа для переноса: {{groupForMove.code}}</b>
-      </template>
-
-      <PaginationTable
-        tableTitle="Учебные группы"
-        tableWidth="98"
-        :noTab="false"
-        :addButton="false"
-        :xlsxButton="false"
-        getRecsURL="/backend/api/v1/edu/student_group/"
-        :tableHeaders="groupTableHeaders"
-        :fieldsArray="groupFieldsArray"
-        :itemSelectEvent="setMoveAppGroup"
-      />
-
-    </template>
-
-    <template v-slot:actions>
-      <v-btn
-        :disabled="groupForMove === null"
-        :loading="loading"
-        color="coko-blue"
-        text="Переместить"
-        @click="appMove()"
-      />
-    </template>
-
-  </CokoDialog>
-
 </template>
 
 <script>
@@ -138,16 +92,16 @@ export default {
       // Список столбцов таблицы
       tableHeaders: [
         {
+          'title': 'checkbox',
+          'key': 'checkbox'
+        },
+        {
           'title': 'Обучающийся',
           'key': 'student'
         },
         {
           'title': 'Дата подачи',
           'key': 'date_create'
-        },
-        {
-          'title': 'Перенос заявки',
-          'key': 'app_move'
         },
         {
           'title': 'Статус',
@@ -173,6 +127,10 @@ export default {
       // Список описаний столбцов таблицы
       fieldsArray: [
         {
+          ui: 'checkbox',
+          key: 'checkbox'
+        },
+        {
           ui: 'appStudentInfo',
           key: 'student',
           addRequired: false,
@@ -180,11 +138,6 @@ export default {
         {
           ui: 'date',
           key: 'date_create',
-          addRequired: false,
-        },
-        {
-          ui: 'appMove',
-          key: 'app_move',
           addRequired: false,
         },
         {
@@ -225,86 +178,6 @@ export default {
       formFIO: '',
       // Выбранная анкета
       selectedApp: null,
-      // Выбранная заявка для переноса
-      appForMove: null,
-      // ФИО студента из заявки для переноса
-      studentMove: '',
-      // object_id выбранной группы для переноса
-      groupForMove: null,
-      // Заголовки таблицы для выбора учебной группы
-      groupTableHeaders: [
-        {
-          'title': 'Шифр',
-          'key': 'code'
-        },
-        {
-          'title': 'Статус',
-          'key': 'status'
-        },
-        {
-          'title': 'Наименование услуги',
-          'key': 'service_name'
-        },
-        {
-          'title': 'Начало обучения',
-          'key': 'date_start'
-        },
-        {
-          'title': 'Окончание обучения',
-          'key': 'date_end'
-        },
-        {
-          'title': 'Куратор',
-          'key': 'curator'
-        },
-        {
-          'title': 'Количество заявок',
-          'key': 'apps_count'
-        }
-      ],
-      // Описание столбцов таблицы для выбора учебной группы
-      groupFieldsArray: [
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'code',
-          addRequired: true,
-        },
-        {
-          ui: 'studentGroupStatus',
-          items: [...studentGroupStatuses.map((status) => { return status.title })],
-          key: 'status',
-          addRequired: false
-        },
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'service_name',
-          addRequired: true,
-        },
-        {
-          ui: 'date',
-          key: 'date_start',
-          addRequired: true,
-        },
-        {
-          ui: 'date',
-          key: 'date_end',
-          addRequired: true,
-        },
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'curator',
-          addRequired: true,
-        },
-        {
-          ui: 'input',
-          type: 'number',
-          key: 'apps_count',
-          addRequired: true,
-        }
-      ],
     }
   },
   methods: {
@@ -401,45 +274,6 @@ export default {
       this.loading = false
       this.$refs.appFormDialog.close()
     },
-    // Подготовка к переносу заявки
-    prependForAppMove(application) {
-      this.appForMove = application
-      this.$refs.appMoveDialog.dialog = true
-    },
-    // Фиксация группы назначения для переноса заявки
-    setMoveAppGroup(group) {
-      this.groupForMove = group
-    },
-    // Перенос заявки в другую группу
-    async appMove() {
-      this.loading = true
-      let url = '/backend/api/v1/applications/'
-      url += this.serviceType === 'ou' ? 'course_one_move/' : 'event_one_move/'
-      try {
-        const oneMoveRequest = await apiRequest(
-          url,
-          'POST',
-          true,
-          {
-            application_id: this.appForMove.object_id,
-            group_id: this.groupForMove.object_id
-          },
-          true
-        )
-        if (oneMoveRequest.status === 200) {
-          showAlert('success', 'Перенос заявки', 'Заявка успешно перенесена')
-          this.$refs.appMoveDialog.dialog = false
-          this.$refs.mainAppsTable.getRecs()
-        } else {
-          showAlert('error', 'Пернеос заявки', 'Произошла ошибка в процессе переноса заявки')
-        }
-      } catch(e) {
-        console.log('Ошибка при переносе заявки: ', e)
-        showAlert('error', 'Пернеос заявки', 'Произошла ошибка в процессе переноса заявки')
-      }
-
-      this.loading = false
-    }
   },
   mounted() {
     this.appendOoColumn()

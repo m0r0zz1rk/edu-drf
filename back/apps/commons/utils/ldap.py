@@ -1,3 +1,4 @@
+import codecs
 from typing import Optional
 
 from django.contrib.auth.models import User
@@ -33,8 +34,11 @@ class LdapUtils:
         self.AD_PASSWORD = settings_utils.get_parameter_from_settings('AD_PASSWORD')
         self.AD_USER_SEARCH_TREE = settings_utils.get_parameter_from_settings('AD_USER_SEARCH_TREE')
         self.AD_GROUP_SEARCH_TREE = settings_utils.get_parameter_from_settings('AD_GROUP_SEARCH_TREE')
+
+    def ldap_connect(self):
+        """Функция инициализации подключения к LDAP"""
         try:
-            self.connection = Connection(
+            return Connection(
                 Server(self.AD_SERVER),
                 user=self.AD_USER,
                 password=self.AD_PASSWORD
@@ -54,7 +58,6 @@ class LdapUtils:
                 }),
                 ExceptionHandling.get_traceback()
             )
-            self.connection = None
 
     @ldap_utils_journal_decorator(
         'Атрибут сотрудника ЦОКО успешно получен',
@@ -67,20 +70,21 @@ class LdapUtils:
         :param username: имя пользователя (sAMAccountName)
         :return: значение атрибута (пустая строка - если атрибут не найден)
         """
-        if len(username) > 0 and self.connection is not None:
-            self.connection.bind()
-            self.connection.search(
-                self.AD_USER_SEARCH_TREE,
-                '(sAMAccountName=' + username + ')',
-                SUBTREE,
-                attributes=[attribute]
-            )
-            users = self.connection.entries
-            if len(users) > 0:
-                if users[0][attribute].value is None:
-                    return ''
-                return users[0][attribute].value
-        return ''
+        with self.ldap_connect() as conn:
+            if len(username) > 0 and conn is not None:
+                # conn.bind()
+                conn.search(
+                    self.AD_USER_SEARCH_TREE,
+                    '(sAMAccountName=' + username + ')',
+                    SUBTREE,
+                    attributes=[attribute]
+                )
+                users = conn.entries
+                if len(users) > 0:
+                    if users[0][attribute].value is None:
+                        return ''
+                    return users[0][attribute].value
+            return ''
 
     @ldap_utils_journal_decorator(
         'Подразделения Центры успешно получены',
@@ -88,21 +92,22 @@ class LdapUtils:
     )
     def set_ad_centres(self):
         """Получение подразделений уровня Центра из AD COKO"""
-        self.connection.bind()
-        self.connection.search(
-            'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
-            '(cn=centre_*)',
-            SUBTREE,
-            attributes=['ObjectGUID', 'DisplayName']
-        )
-        deps = self.connection.entries
-        for dep in deps:
-            ad_centre_service.add_ad_centre(
-                {
-                    'display_name': dep.DisplayName,
-                    'object_guid': dep.ObjectGUID
-                }
+        with self.ldap_connect() as conn:
+            # conn.bind()
+            conn.search(
+                'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
+                '(cn=centre_*)',
+                SUBTREE,
+                attributes=['ObjectGUID', 'DisplayName']
             )
+            deps = conn.entries
+            for dep in deps:
+                ad_centre_service.add_ad_centre(
+                    {
+                        'display_name': dep.DisplayName,
+                        'object_guid': dep.ObjectGUID
+                    }
+                )
 
     @ldap_utils_journal_decorator(
         'Подразделение успешно записано в модель AdCentreCokoUser',
@@ -114,45 +119,46 @@ class LdapUtils:
         :param user: Пользователь Django
         :return:
         """
-        self.connection.bind()
-        self.connection.search(
-            self.AD_USER_SEARCH_TREE,
-            f'(sAMAccountName={user.username})',
-            SUBTREE,
-            attributes=['department', 'title', 'manager']
-        )
-        data = self.connection.entries
-        if not any(s in str(data[0].title) for s in self.high_positions):
-            self.connection.search(
+        with self.ldap_connect() as conn:
+            # conn.bind()
+            conn.search(
                 self.AD_USER_SEARCH_TREE,
-                f"(distinguishedName={str(data[0].manager)})",
+                f'(sAMAccountName={user.username})',
                 SUBTREE,
-                attributes=['manager', 'department', 'title'])
-            data = self.connection.entries
-            if any(s in str(data[0].title) for s in ['Заведующий', 'заведующий']):
-                self.connection.search(
+                attributes=['department', 'title', 'manager']
+            )
+            data = conn.entries
+            if not any(s in str(data[0].title) for s in self.high_positions):
+                conn.search(
                     self.AD_USER_SEARCH_TREE,
-                    f"(distinguishedName={data[0].manager})",
+                    f"(distinguishedName={str(data[0].manager)})",
                     SUBTREE,
-                    attributes=['manager', 'title', 'department']
-                )
-                data = self.connection.entries
-                if not any(s in str(data[0].title) for s in self.high_positions):
-                    self.connection.search(
+                    attributes=['manager', 'department', 'title'])
+                data = conn.entries
+                if any(s in str(data[0].title) for s in ['Заведующий', 'заведующий']):
+                    conn.search(
                         self.AD_USER_SEARCH_TREE,
                         f"(distinguishedName={data[0].manager})",
                         SUBTREE,
-                        attributes=['department']
+                        attributes=['manager', 'title', 'department']
                     )
-                    data = self.connection.entries
-        self.connection.search(
-            'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
-            f"(info={data[0].department})",
-            SUBTREE,
-            attributes=['ObjectGUID', 'displayName']
-        )
-        data = self.connection.entries
-        return str(data[0].displayName), str(data[0].ObjectGUID)
+                    data = conn.entries
+                    if not any(s in str(data[0].title) for s in self.high_positions):
+                        conn.search(
+                            self.AD_USER_SEARCH_TREE,
+                            f"(distinguishedName={data[0].manager})",
+                            SUBTREE,
+                            attributes=['department']
+                        )
+                        data = conn.entries
+            conn.search(
+                'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
+                f"(info={data[0].department})",
+                SUBTREE,
+                attributes=['ObjectGUID', 'displayName']
+            )
+            data = conn.entries
+            return str(data[0].displayName), str(data[0].ObjectGUID)
 
     @ldap_utils_journal_decorator(
         'Центры с менеджерами успешно получены',
@@ -163,24 +169,29 @@ class LdapUtils:
         Получение словаря подразделений Центров с менеджерами
         :return: словарь с информацией о Центрах
         """
-        self.connection.bind()
-        self.connection.search(
-            self.AD_GROUP_SEARCH_TREE,
-            '(cn=centre_*)',
-            SUBTREE,
-            attributes=['displayName', 'managedBy']
-        )
-        deps = self.connection.entries
-        voc = {}
-        for dep in deps:
-            dn = dep.displayName
-            # mngby = codecs.decode(str(dep.managedBy), 'unicode-escape')
-            # manager = mngby[3:mngby.find(',')]
-            managed_by = str(dep.managedBy)
-            manager = managed_by[3:managed_by.find(',')]
-            if len(str(dn)) > 2:
-                voc[str(dn)] = manager
-        return voc
+        with Connection(Server(self.AD_SERVER), user=self.AD_USER, password=self.AD_PASSWORD) as conn:
+            # conn.bind()
+            conn.search(
+                self.AD_GROUP_SEARCH_TREE,
+                '(cn=centre_*)',
+                SUBTREE,
+                attributes=['displayName', 'managedBy']
+            )
+            deps = conn.entries
+            voc = {}
+            for dep in deps:
+                dn = str(dep.displayName)
+                if "\\u" in dn:
+                    dn = codecs.decode(str(dep.displayName), 'unicode-escape')
+                # mngby = codecs.decode(str(dep.managedBy), 'unicode-escape')
+                # manager = mngby[3:mngby.find(',')]
+                managed_by = str(dep.managedBy)
+                if "\\u" in managed_by:
+                    managed_by = codecs.decode(str(dep.managedBy), 'unicode-escape')
+                manager = managed_by[3:managed_by.find(',')]
+                if len(str(dn)) > 2:
+                    voc[str(dn)] = manager
+            return voc
 
 
 ldap_utils = LdapUtils()

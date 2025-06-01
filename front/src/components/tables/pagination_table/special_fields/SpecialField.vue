@@ -45,14 +45,14 @@
     v-if="ui === 'file'"
   >
     <v-icon
-        v-if="item.pay_doc_id !== null"
-        color="coko-blue"
-        icon="mdi-file-document-outline"
-        @click="openDocViewerFunction(
-          'Просмотр документа',
-          item.object_id,
-          'Документ',
-          'student'
+      v-if="item.pay_doc_id !== null"
+      color="coko-blue"
+      icon="mdi-file-document-outline"
+      @click="openDocViewerFunction(
+        'Просмотр документа',
+        item.object_id,
+        'Документ',
+        'student'
       )"
     />
   </div>
@@ -92,6 +92,24 @@
           item.student.display_name,
           item.education_doc_id,
           item.education_doc_name,
+          'student'
+      )"
+    />
+
+  </div>
+
+  <div
+    v-if="ui === 'appCertificateScan'"
+  >
+    <BooleanBadge :bool="item.scan !== null" />&nbsp;
+    <v-icon
+      v-if="item.scan !== null"
+      color="coko-blue"
+      icon="mdi-file-document-outline"
+      @click="openDocViewerFunction(
+          item.student.display_name,
+          item.scan,
+          'Скан удостоверения',
           'student'
       )"
     />

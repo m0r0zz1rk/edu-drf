@@ -27,6 +27,9 @@ class CourseCertificateListSerializer(CourseCertificateUpdateSerializer):
     student = serializers.SerializerMethodField(
         label='ФИО обучающегося'
     )
+    scan = serializers.SerializerMethodField(
+        label='Скан удостоверения'
+    )
 
     def get_student(self, obj):
         profile = obj.application.profile
@@ -39,8 +42,12 @@ class CourseCertificateListSerializer(CourseCertificateUpdateSerializer):
             'phone': profile.phone
         }
 
+    def get_scan(self, obj):
+        if obj.application.certificate_doc:
+            return obj.application.certificate_doc_id
+
     class Meta(CourseCertificateUpdateSerializer.Meta):
-        fields = CourseCertificateUpdateSerializer.Meta.fields + ('student', )
+        fields = CourseCertificateUpdateSerializer.Meta.fields + ('student', 'scan')
 
 
 class CourseCertificateGenerateSerializer(serializers.Serializer):

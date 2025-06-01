@@ -182,20 +182,18 @@ class BaseApplicationService:
     @staticmethod
     def move_application(
             orm: BaseORM,
-            application_id: uuid,
+            apps: list,
             destination_group_id: uuid
     ):
         """
-        Перенос заявки из одной учебной группы в другую
+        Перенос выбранных заявок из одной учебной группы в другую
         :param orm: Класс ORM для работы с заявками
-        :param application_id: object_id заявки для переноса
+        :param apps: список object_id заявок для переноса
         :param destination_group_id: object_id учебной группы назначения
         :return:
         """
-        orm.update_record(
-            dict(object_id=application_id),
-            dict(group_id=destination_group_id)
-        )
+        for app in apps:
+            orm.update_record(dict(object_id=app), dict(group_id=destination_group_id))
 
     @staticmethod
     def move_group_applications(

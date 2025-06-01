@@ -101,7 +101,14 @@
           </td>
 
         </template>
-
+        <td
+          v-if="haveChooseButton"
+          style="
+            text-align: center;
+            background-color: #373c59;
+            color: white;
+          "
+        >Выбор строки</td>
       </tr>
 
       <tr
@@ -117,8 +124,8 @@
       <tr
         v-bind:class="{
           'v-data-table__tr v-data-table__tr--mobile': mobileDisplay,
-          'table-row-click': itemSelectEvent,
-          'selected-row': itemSelectEvent && selectedItemObjectID === item.object_id
+          'table-row-click': itemSelectEvent && !haveChooseButton,
+          'selected-row': itemSelectEvent && selectedItemObjectID === item.object_id && !haveChooseButton
         }"
         @click="itemSelectEvent && itemSelectEvent(item)"
       >
@@ -217,9 +224,7 @@
 
           </template>
 
-          <template
-              v-if="header.key === 'checkbox'"
-          >
+          <template v-if="header.key === 'checkbox'">
             <v-checkbox
                 :model-value="itemsList.includes(item.object_id)"
                 @click="itemAddOrDeleteInList(item.object_id)"
@@ -259,6 +264,14 @@
           </template>
 
 
+        </td>
+        <td v-if="haveChooseButton" style="text-align: center;">
+          <v-btn
+            color="coko-blue"
+            @click="itemSelectEvent(item)"
+          >
+            Выбрать
+          </v-btn>
         </td>
       </tr>
     </template>
@@ -385,7 +398,9 @@ export default {
     // Функция для получения полной заявки в группе и просмотра анкеты
     selectGroupAppFunction: Function,
     // Функция для выбора заявки и подготовки к ее переносу
-    appMoveFunction: Function
+    appMoveFunction: Function,
+    // Наличие кнопки выбора строки
+    haveChooseButton: Boolean
   },
   data() {
     return {

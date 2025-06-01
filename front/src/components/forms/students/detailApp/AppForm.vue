@@ -327,19 +327,16 @@
           :hideSearchButton="true"
           :addButton="true"
           :xlsxButton="false"
-          :getRecsURL="
-            internalApp.education_level === 'student' ?
-              '/backend/api/v1/docs/student_docs/?doc_type=training_certificate'
-              :
-              '/backend/api/v1/docs/student_docs/?doc_type=diploma'
-          "
+          :getRecsURL="internalApp.education_level === 'student' ? getTrainingURL : getDiplomaURL"
           addRecURL="/backend/api/v1/docs/upload_student_doc/"
+          :openDocViewerFunction="openDocViewer"
           :tableHeaders="docTableHeaders"
           :fieldsArray="docFieldsArray"
           :itemSelectEvent="selectEduDoc"
           :defaultBody="{
             'doc_type': internalApp.education_level === 'student' ? 'training_certificate' : 'diploma'
           }"
+          :haveChooseButton="true"
       />
     </template>
 
@@ -362,14 +359,14 @@
           :hideSearchButton="true"
           :addButton="true"
           :xlsxButton="false"
-          getRecsURL="/backend/api/v1/docs/student_docs/?doc_type=change_surname"
+          :getRecsURL="getChangeSurnameURL"
           addRecURL="/backend/api/v1/docs/upload_student_doc/"
+          :openDocViewerFunction="openDocViewer"
           :tableHeaders="docTableHeaders"
           :fieldsArray="docFieldsArray"
           :itemSelectEvent="selectSurnameDoc"
-          :defaultBody="{
-            'doc_type': 'change_surname'
-          }"
+          :defaultBody="{'doc_type': 'change_surname'}"
+          :haveChooseButton="true"
       />
     </template>
 
@@ -428,13 +425,19 @@ export default {
     positionCategories: Array,
     // Список должностей
     positions: Array,
-      },
+  },
   data() {
     return {
       // Параметр проверки мобильного устройства
       mobileDisplay: useDisplay().smAndDown,
       // Выбранный документ
       docId: null,
+      // URL для получения списка справок об обучении
+      getTrainingURL: '',
+      // URL для получения списка дипломов
+      getDiplomaURL: '',
+      // URL для получения списка документов о смене фамилии
+      getChangeSurnameURL: '',
       // Тип документа
       docType: null,
       // Параметр отображения анимации загрузки на элементах формы
@@ -514,6 +517,17 @@ export default {
     }
   },
   methods: {
+    // Сформировать URL на получение документов
+    generateURLs() {
+      this.getTrainingURL = '/backend/api/v1/docs/student_docs/?doc_type=training_certificate'
+      this.getDiplomaURL = '/backend/api/v1/docs/student_docs/?doc_type=diploma'
+      this.getChangeSurnameURL = '/backend/api/v1/docs/student_docs/?doc_type=change_surname'
+      if (!([undefined, null].includes(this.studentApp.profile_id))) {
+        this.getTrainingURL += `&profile_id=${this.studentApp.profile_id}`
+        this.getDiplomaURL += `&profile_id=${this.studentApp.profile_id}`
+        this.getChangeSurnameURL += `&profile_id=${this.studentApp.profile_id}`
+      }
+    },
     // Открыть окно для просмотра документа
     openDocViewer(fio, docId, docName, docType) {
       this.docId = docId
@@ -747,6 +761,7 @@ export default {
     }
   },
   mounted() {
+    this.generateURLs()
     this.setInternalApp()
     this.getOoTypes()
   }

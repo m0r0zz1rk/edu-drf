@@ -11,7 +11,7 @@
               :noTab="true"
               tableWidth="98"
               :addButton="false"
-              :xlsxButton="true"
+              :xlsxButton="false"
               getRecsURL="/backend/api/v1/journal/journal/"
               :tableHeaders="tableHeaders"
               :fieldsArray="fieldsArray"

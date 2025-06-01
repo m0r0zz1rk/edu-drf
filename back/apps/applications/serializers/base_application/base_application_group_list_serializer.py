@@ -26,6 +26,7 @@ class BaseApplicationGroupListSerializer(serializers.ModelSerializer):
 
     def get_student(self, obj):
         return {
+            'profile_id': obj.profile.object_id,
             'display_name': obj.profile.display_name,
             'email': obj.profile.django_user.email,
             'phone': obj.profile.phone,

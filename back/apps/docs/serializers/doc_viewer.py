@@ -23,5 +23,5 @@ class DocViewerSerializer(serializers.Serializer):
             with obj['file'].open(mode='rb') as doc_file:
                 doc_data = doc_file.read()
             return base64.b64encode(doc_data).decode('utf-8')
-        except Exception:
+        except Exception as e:
             return None

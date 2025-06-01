@@ -111,6 +111,7 @@
           ref="studentGroupCertificates"
           v-if="studentGroupInfo?.service_type === 'ou' && groupTab === 'certificate' && userRole === 'centre'"
           :groupCode="studentGroupInfo?.code"
+          :openDocViewer="openDocViewer"
         />
 
       </template>
@@ -136,9 +137,9 @@
         <v-btn
           v-if="groupTab === 'apps' && userRole === 'centre'"
           color="coko-blue"
-          text="Перенос всех"
+          text="Перенос заявок"
           :loading="loading"
-          @click="$refs.appMoveDialog.dialog = true"
+          @click="getAppsToMove(); $refs.appMoveDialog.dialog = true"
         />
 
         <v-btn
@@ -187,9 +188,7 @@
 
   </v-card>
 
-  <CokoDialog
-    ref="docViewerDialog"
-  >
+  <CokoDialog ref="docViewerDialog">
 
     <template v-slot:title>
       <p v-if="!mobileDisplay">{{docName}} обучающегося {{docFIO}}</p>
@@ -205,10 +204,7 @@
 
   </CokoDialog>
 
-  <CokoDialog
-    ref="checkDataDialog"
-    v-if="checkData !== null"
-  >
+  <CokoDialog ref="checkDataDialog" v-if="checkData !== null">
 
     <template v-slot:title>
       {{ checkDialogTitle }}
@@ -244,20 +240,26 @@
 
   </CokoDialog>
 
-  <CokoDialog
-    v-if="userRole === 'centre'"
-    ref="appMoveDialog"
-    :cardActions="true"
-  >
+  <CokoDialog v-if="userRole === 'centre'" ref="appMoveDialog" :cardActions="true">
 
     <template v-slot:title>
-      Перенос всех заявок группы "{{studentGroupInfo?.code}}"
+      <div v-if="appsToMove.length === 0">
+        Перенос всех заявок группы "{{studentGroupInfo?.code}}"
+      </div>
+      <div v-else>
+        Перенос выбранных заявок группы "{{studentGroupInfo?.code}}"
+      </div>
+
     </template>
 
     <template v-slot:text>
 
+      <template v-if="appsToMove.length !== 0">
+        Количество выбранных заявок: <b>{{appsToMove.length}}</b><br/>
+      </template>
+
       <template v-if="groupForMove">
-        <b>Выбранная группа для переноса: {{groupForMove.code}}</b>
+       Выбранная группа для переноса:  <b>{{groupForMove.code}}</b>
       </template>
 
       <PaginationTable
@@ -286,11 +288,7 @@
 
   </CokoDialog>
 
-  <CokoDialog
-    v-if="userRole === 'centre'"
-    ref="generateCertificate"
-    :cardActions="true"
-  >
+  <CokoDialog v-if="userRole === 'centre'" ref="generateCertificate" :cardActions="true">
 
     <template v-slot:title>
       Генерация данных об удостоверениях
@@ -501,7 +499,9 @@ export default {
         registration_number: '',
         blank_serial: '',
         blank_number: ''
-      }
+      },
+      // Список выбранных заявок для переноса на вкладке "Заявки"
+      appsToMove: []
     }
   },
   methods: {
@@ -583,31 +583,36 @@ export default {
     // Перенос заявок в другую группу
     async appMove() {
       this.loading = true
-      let url = '/backend/api/v1/applications/'
-      url += this.serviceType === 'ou' ? 'course_all_move/' : 'event_all_move/'
+      const baseUrl = '/backend/api/v1/applications/'
+      let additionalUrl = this.serviceType === 'ou' ? 'course_all_move/' : 'event_all_move/'
+      let body = {
+        source_group_id: this.studentGroupInfo.object_id,
+        destination_group_id: this.groupForMove.object_id
+      }
+      if (this.appsToMove.length > 0) {
+        additionalUrl = this.serviceType === 'ou' ? 'course_select_move/' : 'event_select_move/'
+        delete body.source_group_id
+        body.apps = this.appsToMove
+      }
       try {
         const oneMoveRequest = await apiRequest(
-          url,
+          `${baseUrl}${additionalUrl}`,
           'POST',
           true,
-          {
-            source_group_id: this.studentGroupInfo.object_id,
-            destination_group_id: this.groupForMove.object_id
-          },
+          body,
           true
         )
         if (oneMoveRequest.status === 200) {
-          showAlert('success', 'Перенос заявки', 'Заявка успешно перенесена')
+          showAlert('success', 'Перенос заявки', 'Заявки успешно перенесены')
           this.$refs.appMoveDialog.dialog = false
           this.$refs.studentGroupAppModule.$refs.mainAppsTable.getRecs()
         } else {
-          showAlert('error', 'Пернеос заявки', 'Произошла ошибка в процессе переноса заявки')
+          showAlert('error', 'Пернеос заявки', 'Произошла ошибка в процессе переноса заявок')
         }
       } catch(e) {
         console.log('Ошибка при переносе заявки: ', e)
-        showAlert('error', 'Пернеос заявки', 'Произошла ошибка в процессе переноса заявки')
+        showAlert('error', 'Пернеос заявки', 'Произошла ошибка в процессе переноса заявок')
       }
-
       this.loading = false
     },
     // Открыть диалоговое окно для генерации удостоверений
@@ -682,6 +687,10 @@ export default {
         )
       }
       this.loading = false
+    },
+    // Получение списка заявок для переноса из таблицы на вкладке "Заявки"
+    getAppsToMove() {
+      this.appsToMove = this.$refs.studentGroupAppModule.$refs.mainAppsTable.itemsList
     }
   },
   mounted() {

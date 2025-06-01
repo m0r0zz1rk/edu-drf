@@ -101,6 +101,7 @@ class BaseApplicationSerializer(serializers.ModelSerializer):
         model = course_application_model
         fields = (
             'object_id',
+            'profile_id',
             'date_create',
             'group_code',
             'department',
