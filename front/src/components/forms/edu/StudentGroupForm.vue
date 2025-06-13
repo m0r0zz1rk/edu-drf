@@ -182,6 +182,14 @@
           @click="printFile()"
         />
 
+        <v-btn
+          v-if="groupTab === 'certificate' && userRole === 'centre'"
+          color="coko-blue"
+          text="Подгрузка"
+          :loading="loading"
+          @click="openUploadLicense()"
+        />
+
       </template>
 
     </v-card-actions>
@@ -359,6 +367,47 @@
 
   </CokoDialog>
 
+  <CokoDialog v-if="userRole === 'centre'" ref="uploadLicense" :cardActions="true">
+
+    <template v-slot:title>Подгрузка сканов удостоверений</template>
+
+    <template v-slot:text>
+      Для корректной загрузки сканов удостоверений пользователей необходимо подгрузить архив в формате .rar, в
+      котором располагаются сканы удостоверений пользователей cо следующим форматом имени файла:
+      (регистрационный номер).pdf
+      <v-row
+        dense
+      >
+
+        <v-col
+          cols="12"
+          md="12"
+          sm="12"
+        >
+          <v-file-input
+            :loading="loading"
+            label="Архив со сканами удостоверений"
+            v-model="licenseArchive"
+          />
+        </v-col>
+
+      </v-row>
+
+    </template>
+
+    <template v-slot:actions>
+
+      <v-btn
+        :loading="loading"
+        color="coko-blue"
+        text="Отправить"
+        @click="uploadLicenses()"
+      />
+
+    </template>
+
+  </CokoDialog>
+
 </template>
 
 <script>
@@ -501,7 +550,9 @@ export default {
         blank_number: ''
       },
       // Список выбранных заявок для переноса на вкладке "Заявки"
-      appsToMove: []
+      appsToMove: [],
+      // Архив со сканами удостоверений
+      licenseArchive: null,
     }
   },
   methods: {
@@ -619,6 +670,10 @@ export default {
     openCertGenerate() {
       this.$refs.generateCertificate.dialog = true
     },
+    // Открыть диалоговое окно для подгрузки сканов удостоверений
+    openUploadLicense() {
+      this.$refs.uploadLicense.dialog = true
+    },
     // Отправить запрос на генерацию удостоверений
     async certificateGenerate() {
       if ((this.certificate.registration_number === '') ||
@@ -691,6 +746,47 @@ export default {
     // Получение списка заявок для переноса из таблицы на вкладке "Заявки"
     getAppsToMove() {
       this.appsToMove = this.$refs.studentGroupAppModule.$refs.mainAppsTable.itemsList
+    },
+    // Функция подгрузки сканов удостоверений
+    async uploadLicenses() {
+      if (this.licenseArchive === null) {
+        showAlert('error', 'Архив', 'Выберите файл формата .rar')
+        return
+      }
+      this.loading = true
+      try {
+        let formData = new FormData()
+        formData.append('file', this.licenseArchive)
+        formData.append('group_id', this.groupId)
+        const uploadLicensesRequest = await apiRequest(
+          '/backend/api/v1/docs/upload_license/',
+          'POST',
+          true,
+          formData,
+          false,
+          true
+        )
+        if (uploadLicensesRequest.success) {
+          showAlert('success', 'Сканы удостоверений', uploadLicensesRequest.success)
+          this.$refs.studentGroupCertificates.$refs.mainCertificateTable.getRecs()
+          this.$refs.uploadLicense.close()
+        } else if (uploadLicensesRequest.error) {
+          showAlert('error', 'Сканы удостоверений', uploadLicensesRequest.error)
+        } else {
+          showAlert(
+            'error',
+            'Сканы удостоверений',
+            'Произошла ошибка при подгрузке сканов удостоверений'
+          )
+        }
+      } catch (e) {
+        showAlert(
+          'error',
+          'Файл печати',
+          'Произошла ошибка при отправке запроса на получение файла печати'
+        )
+      }
+      this.loading = false
     }
   },
   mounted() {

@@ -6,9 +6,7 @@
 
       <div>
 
-        <StudentGroupForm
-          :groupId="$route.params.groupId"
-        />
+        <StudentGroupForm :groupId="$route.params.groupId"/>
 
       </div>
 

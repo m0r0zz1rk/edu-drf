@@ -273,7 +273,8 @@
                   profileUuid ?
                     '/backend/api/v1/docs/student_docs/?profile_id='+profileUuid
                     :
-                    '/backend/api/v1/docs/student_docs/'
+                    //'/backend/api/v1/docs/student_docs/'
+                    '/backend/api/v1/docs/upload_student_doc/'
                 "
                 :tableHeaders="tableHeaders"
                 :fieldsArray="fieldsArray"

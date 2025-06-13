@@ -32,6 +32,25 @@ class CourseCertificateService:
             )).count() > 0
 
     @staticmethod
+    def get_certificate_by_all_parameters(
+            registration_number: str,
+            blank_serial: str,
+            blank_number: str
+    ) -> Optional[course_certificate_model]:
+        """
+        Получение сертификата по трем параметрам
+        :param registration_number: Порядковый регистрационный номер
+        :param blank_serial: Серия бланка удостоверения
+        :param blank_number: Номер бланка удостоверения
+        :return: Запись из БД или None если запись не найдена
+        """
+        return course_certificate_orm.get_one_record_or_none(dict(
+            registration_number=registration_number,
+            blank_serial=blank_serial,
+            blank_number=blank_number
+        ))
+
+    @staticmethod
     def get_certificate(attribute_name: str, value) -> Optional[course_certificate_model]:
         """
         Получение записи об удостоверении обучающегося

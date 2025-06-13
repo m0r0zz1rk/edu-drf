@@ -9,5 +9,6 @@ urlpatterns = [
     path('upload_student_doc/', StudentDocViewSet.as_view({'post': 'create_student_doc'})),
     path('doc_viewer/<str:file_type>/<uuid:file_id>/', DovViewerViewSet.as_view({'get': 'doc_view'})),
     path('group_offer/<uuid:group_id>/', StudentGroupDocsViewSet.as_view({'patch': 'partial_update'})),
-    path('print_file/', StudentGroupDocsViewSet.as_view({'post': 'print_file'}))
+    path('print_file/', StudentGroupDocsViewSet.as_view({'post': 'print_file'})),
+    path('upload_license/', StudentGroupDocsViewSet.as_view({'post': 'upload_licenses'}))
 ]

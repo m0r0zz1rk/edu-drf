@@ -33,7 +33,7 @@ class StudentDocService:
         except Exception:
             raise StudentNotExist
 
-    def create_student_doc(self, user_id: int, doc_info: dict):
+    def create_student_doc(self, user_id: int, doc_info: dict) -> uuid:
         """
         Добавление нового документа обучающегося
         :param user_id: ID пользователя Django
@@ -53,7 +53,25 @@ class StudentDocService:
         for sdt in STUDENT_DOC_TYPES:
             if sdt[1] == doc_info['doc_type']:
                 doc_info['doc_type'] = sdt[0]
+        object_id = uuid.uuid4()
         student_doc_model.objects.update_or_create(
-            object_id=uuid.uuid4(),
+            object_id=object_id,
             **doc_info
         )
+        return object_id
+
+    @staticmethod
+    def delete_student_doc(object_id: str):
+        """
+        Удаление документа пользователя
+        :param object_id: object_id документа в базе
+        :return:
+        """
+        try:
+            doc = student_doc_model.objects.get(object_id=object_id)
+            doc.delete()
+        except Exception:
+            pass
+
+
+student_doc_service = StudentDocService()
