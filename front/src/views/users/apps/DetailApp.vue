@@ -6,7 +6,7 @@
       <v-card
           color="coko-blue"
           class="lk-full-page-card"
-          :title="'Заявка на курс '+(this.app ? this.app.group_code : '')"
+          :title="`Заявка на ${appType} ${this.app ? this.app.group_code : ''}`"
       >
 
         <v-card-text
@@ -173,7 +173,9 @@ export default {
       // Параметр проверки на крайний день проведения услуги
       serviceLastDay: false,
       // Параметр оторбажения анимации загрузки на элементах формы
-      loading: false
+      loading: false,
+      // Тип услуги в заявке
+      appType: this.$route.params.serviceType === 'course' ? 'курс' : 'мероприятие'
     }
   },
   methods: {

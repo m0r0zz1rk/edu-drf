@@ -5,6 +5,7 @@ from apps.users.api.form_data.oo import FormDataOoViewSet
 from apps.users.api.form_data.oo_type import FormDataOoTypeViewSet
 from apps.users.api.service import ServicesViewSet
 from apps.users.routers.course_application import course_application_router
+from apps.users.routers.event_application import event_application_router
 
 urlpatterns = [
     path('courses/', ServicesViewSet.as_view({'get': 'get_courses_list'})),
@@ -16,3 +17,4 @@ urlpatterns = [
 ]
 
 urlpatterns += course_application_router.urls
+urlpatterns += event_application_router.urls

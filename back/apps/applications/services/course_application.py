@@ -119,5 +119,4 @@ class CourseApplicationService:
         """
 
 
-
 course_application_service = CourseApplicationService()
