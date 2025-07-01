@@ -2,11 +2,12 @@ from typing import Union, Optional
 from django.contrib.auth.models import User
 
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.user import UserUtils
+from apps.commons.utils.django.user import user_utils
 from apps.commons.utils.validate import ValidateUtils
 from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.guides.selectors.state import state_model
 from apps.guides.selectors.profiles.student import student_profile_model
+from apps.users.services.apps import apps_service
 
 
 class ProfileService:
@@ -32,8 +33,6 @@ class ProfileService:
         'internal_phone',
         'curator_groups'
     ]
-
-    uu = UserUtils()
 
     def is_profile_exist(self, attribute_name: str, value) -> bool:
         """
@@ -87,7 +86,7 @@ class ProfileService:
                 if output == 'profile':
                     return prof
                 elif output == 'username':
-                    return UserUtils().get_username_by_id(prof.django_user_id)
+                    return user_utils.get_username_by_id(prof.django_user_id)
                 elif output == 'user_id':
                     return prof.django_user_id
                 elif output == 'email':
@@ -161,12 +160,13 @@ class ProfileService:
                 user_id,
                 'profile'
             )
-            user = self.uu.get_user('id', user_id)
+            user = user_utils.get_user('id', user_id)
             return {
                 'fio': prof.display_name,
                 'email': user.email,
                 'phone': prof.phone,
-                'snils': prof.snils
+                'snils': prof.snils,
+                'active_apps': apps_service.get_active_apps(user_id)
             }
         return None
 

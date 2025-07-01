@@ -18,3 +18,6 @@ APPLICATION_STATUSES = (
     (STUDY_COMPLETE, 'Обучение завершено'),
     (ARCHIVE, 'Архив'),
 )
+
+# Статусы для активных заявок
+ACTIVE_STATUSES = (DRAFT, WORK, WAIT_PAY, CHECK, PAY, STUDY, STUDY_COMPLETE)

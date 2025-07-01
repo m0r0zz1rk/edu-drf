@@ -53,7 +53,7 @@
         <v-card-title
           class="login-card-title"
         >
-          Активные заявки
+          Крайние активные заявки
         </v-card-title>
         <v-card-text
           style="background-color: white"
@@ -62,18 +62,18 @@
                class="adaptive-main-card-text-height">
             <v-list >
               <template v-for="app in lastActiveApps">
-                <v-list-item
-                  :title="app.event_name"
-                >
+                <v-list-item :title="app.name">
                   <template v-slot:subtitle>
-                    {{app.status}}
+                    <AppTypeBadge :appType="app.app_type" />
+                    <AppStatusBadge :appStatus="app.status" />
                   </template>
 
                   <template v-slot:append>
                     <v-btn
                       icon="mdi-chevron-right"
                       variant="text"
-                    ></v-btn>
+                      @click="goToApp(app.app_type, app.object_id)"
+                    />
                   </template>
                 </v-list-item>
                 <v-divider inset></v-divider>
@@ -91,23 +91,15 @@
 <script>
 import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
+import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
+import AppTypeBadge from "@/components/badges/students/AppTypeBadge.vue";
 
 export default {
   name: "StudentMainPage",
+  components: {AppTypeBadge, AppStatusBadge},
   data() {
     return {
-      lastActiveApps: [
-        {
-          'object_id': 1,
-          'event_name': 'Первое мероприятие',
-          'status': 'На проверке'
-        },
-        {
-          'object_id': 2,
-          'event_name': 'Второй курс',
-          'status': 'Подтверждена'
-        }
-      ],
+      lastActiveApps: [],
       profileInfo: {}
     }
   },
@@ -128,8 +120,13 @@ export default {
             )
           } else {
             this.profileInfo = data
+            this.lastActiveApps = data.active_apps
           }
         })
+    },
+    // Переход к заявке
+    goToApp(type, object_id) {
+      this.$router.push(`/student/app/${type}/${object_id}`)
     }
   },
   mounted() {

@@ -10,23 +10,18 @@ from apps.authen.serializers.profile import (ProfileInputSerializer,
                                              ProfileOutputSerializer, ProfileChangePasswordSerializer)
 from apps.authen.serializers.registration import RegistrationUniquePhoneSerializer, \
     RegistrationUniqueEmailSerializer, RegistrationUniqueSnilsSerializer
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.response import ResponseUtils
-from apps.commons.utils.django.user import UserUtils
+from apps.commons.utils.django.response import ResponseUtils, response_utils
+from apps.commons.utils.django.user import user_utils
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR, JOURNAL_REC_STATUSES, SUCCESS
-from apps.journal.services.journal import JournalService
+from apps.journal.services.journal import journal_service
 
 
 class ProfileViewSet(ViewSet):
     """Работа с профилем пользователя"""
     permission_classes = [IsAuthenticated, ]
-
-    ju = JournalService()
-    pu = ProfileService()
-    uu = UserUtils()
-    respu = ResponseUtils()
 
     def _endpoint_rec_journal(
         self,
@@ -45,9 +40,9 @@ class ProfileViewSet(ViewSet):
         :param output: выходные данные (при наличии
         :return:
         """
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
-                'source': self.pu.get_profile_or_info_by_attribute(
+                'source': profile_service.get_profile_or_info_by_attribute(
                     'django_user_id',
                     user_id,
                     'display_name'
@@ -80,7 +75,7 @@ class ProfileViewSet(ViewSet):
         """
         serialize = serializer(data=request_data)
         if serialize.is_valid():
-            check = self.pu.check_unique_data_for_profile(
+            check = profile_service.check_unique_data_for_profile(
                 user_id,
                 attr_name,
                 serialize.data[attr_name]
@@ -98,7 +93,7 @@ class ProfileViewSet(ViewSet):
             '200': StudentMainPageSerializer}
     )
     def get_main_page_student(self, request, *args, **kwargs):
-        output_data = self.pu.get_profile_main_page_info(request.user.id)
+        output_data = profile_service.get_profile_main_page_info(request.user.id)
         if output_data is None:
             self._endpoint_rec_journal(
                 request.user.id,
@@ -106,7 +101,7 @@ class ProfileViewSet(ViewSet):
                 'Ошибка при получении информации из профиля для главной страницы - профиль не найден',
                 f'ID пользователя: {request.user.id}'
             )
-            return self.respu.sorry_try_again_response()
+            return response_utils.sorry_try_again_response()
         try:
             serialize = StudentMainPageSerializer(output_data)
             return ResponseUtils.ok_response_dict(serialize.data)
@@ -130,7 +125,7 @@ class ProfileViewSet(ViewSet):
     )
     def get_profile_info(self, request, *args, **kwargs):
         """Получение информации из профиля пользователя"""
-        prof = self.pu.get_profile_or_info_by_attribute(
+        prof = profile_service.get_profile_or_info_by_attribute(
             'django_user_id',
             request.user.id,
             'profile'
@@ -142,7 +137,7 @@ class ProfileViewSet(ViewSet):
                 'Ошибка при получении информации из профиля - профиль не найден',
                 f'ID пользователя: {request.user.id}'
             )
-            return self.respu.sorry_try_again_response()
+            return response_utils.sorry_try_again_response()
         try:
             serialize = ProfileOutputSerializer(prof)
             self._endpoint_rec_journal(
@@ -285,7 +280,7 @@ class ProfileViewSet(ViewSet):
         """Сохранение полученной информации в профиль пользователя"""
         serialize = ProfileInputSerializer(data=request.data)
         if serialize.is_valid():
-            prof = self.pu.get_profile_or_info_by_attribute(
+            prof = profile_service.get_profile_or_info_by_attribute(
                 'django_user_id',
                 request.user.id,
                 'profile'
@@ -304,9 +299,9 @@ class ProfileViewSet(ViewSet):
                 request
             )
             if update_profile_proc.update_profile_complete:
-                return self.respu.ok_response('Информация успешно обновлена')
+                return response_utils.ok_response('Информация успешно обновлена')
             else:
-                return self.respu.bad_request_response('Произошла системная ошибка, обратитесь к администратору')
+                return response_utils.bad_request_response('Произошла системная ошибка, обратитесь к администратору')
         else:
             self._endpoint_rec_journal(
                 request.user.id,
@@ -333,7 +328,7 @@ class ProfileViewSet(ViewSet):
         """Смена пароля пользователя"""
         serialize = ProfileChangePasswordSerializer(data=request.data)
         if serialize.is_valid():
-            process = self.uu.password_change(request.user.id, serialize.data['password'])
+            process = user_utils.password_change(request.user.id, serialize.data['password'])
             if process is True:
                 self._endpoint_rec_journal(
                     request.user.id,
@@ -341,7 +336,7 @@ class ProfileViewSet(ViewSet):
                     'Пароль пользователя успешно изменен',
                     '-'
                 )
-                return self.respu.ok_response('Пароль успешно изменен')
+                return response_utils.ok_response('Пароль успешно изменен')
             else:
                 self._endpoint_rec_journal(
                     request.user.id,
@@ -356,4 +351,4 @@ class ProfileViewSet(ViewSet):
                 'Ошибка при смене пароля - данные не прошли валидацию',
                 repr(request.data)
             )
-        return self.respu.ok_response('Пароль успешно изменен')
+        return response_utils.ok_response('Пароль успешно изменен')

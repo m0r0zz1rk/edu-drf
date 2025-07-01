@@ -110,5 +110,14 @@ class CourseApplicationService:
         """
         return course_application_orm.get_filter_records().count()
 
+    @staticmethod
+    def get_last_active_app(user_id: int) -> Optional[course_application_model]:
+        """
+        Получение крайней активной заявки у обучающегося
+        :param user_id: ID пользователя Django
+        :return: Последняя активная заявки или None, если таковых нет
+        """
+
+
 
 course_application_service = CourseApplicationService()
