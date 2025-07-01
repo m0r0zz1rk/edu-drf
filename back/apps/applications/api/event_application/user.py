@@ -4,7 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.event_application import event_application_orm, event_application_queryset, \
     event_application_model
-from apps.applications.serializers.base_application import ResponseApplicationCreateSerializer
+from apps.applications.serializers.base_application.response_application_create_serializer import \
+    ApplicationCreateSerializer
 from apps.applications.serializers.event_application import EventApplicationListSerializer, \
     EventApplicationDetailSerializer, EventApplicationUpdateSerializer
 from apps.applications.services.base_application import base_application_service
@@ -22,7 +23,7 @@ class EventApplicationUserViewSet(ApplicationsViewSet):
     queryset = event_application_queryset()
     serializer_class = EventApplicationListSerializer
     base_serializer = EventApplicationDetailSerializer
-    create_serializer = ResponseApplicationCreateSerializer
+    create_serializer = ApplicationCreateSerializer
     update_serializer = EventApplicationUpdateSerializer
     swagger_object_name = 'Заявка на мероприятие (ИКУ) (обучающийся)'
 
