@@ -1,9 +1,7 @@
 <template>
   <LkPage :usePreLoader="usePreLoader">
     <slot>
-      <v-card
-          variant="outlined"
-      >
+      <v-card variant="outlined">
         <v-card-text>
           <div style="background-color: white; overflow: auto;" class="adaptive-no-tab-table-card-text">
             <v-tabs

@@ -67,7 +67,8 @@ class ProfileService:
             display_name - ФИО пользователя,
             email - Email пользователя,
             user_id - ID пользователя Django,
-            phone - Телефон пользователя
+            phone - Телефон пользователя,
+            profile_id - object_id профиля пользователя
         :return: None - профиль не найден, Profile - найденный профиль, str - информация из профиля
         """
         if self.is_profile_exist(attribute_name, value):
@@ -82,19 +83,20 @@ class ProfileService:
                         filter(**find).first())
             else:
                 prof = coko_profile_model.objects.select_related('django_user').filter(**find).first()
-            if output in ['profile', 'username', 'display_name', 'email', 'phone', 'user_id']:
-                if output == 'profile':
-                    return prof
-                elif output == 'username':
-                    return user_utils.get_username_by_id(prof.django_user_id)
-                elif output == 'user_id':
-                    return prof.django_user_id
-                elif output == 'email':
-                    return prof.django_user.email
-                elif output == 'phone':
-                    return prof.internal_phone
-                else:
-                    return prof.display_name
+            if output == 'profile':
+                return prof
+            elif output == 'username':
+                return user_utils.get_username_by_id(prof.django_user_id)
+            elif output == 'user_id':
+                return prof.django_user_id
+            elif output == 'email':
+                return prof.django_user.email
+            elif output == 'phone':
+                return prof.internal_phone
+            elif output == 'profile_id':
+                return prof.object_id
+            else:
+                return prof.display_name
         return None
 
     def set_student_profile_data(

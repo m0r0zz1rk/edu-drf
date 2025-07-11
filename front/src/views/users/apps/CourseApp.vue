@@ -1,93 +1,16 @@
 <template>
 
-  <div
-      style="text-align: center"
-      v-if="apps === null"
-  >
-    <b>Пожалуйста подождите...</b>
-  </div>
-
-  <div
-      v-if="apps"
-  >
-
-    <v-expansion-panels
-        style="padding-top: 5px"
-        v-model="departmentsPanels"
-        color="coko-blue"
-        multiple
-    >
-
-      <v-expansion-panel
-          v-for="dep in apps"
-      >
-
-        <v-expansion-panel-title
-            color="coko-blue"
-        >
-          <div style="font-size: 18px">
-            {{dep.department}}
-          </div>
-        </v-expansion-panel-title>
-
-        <v-expansion-panel-text>
-
-          <v-row
-              dense
-          >
-
-            <v-col
-                v-for="app in dep.apps"
-                cols="12"
-                md="3"
-                sm="6"
-            >
-
-              <v-card
-                  color="coko-blue"
-                  @click="openApp(app.object_id)"
-                  variant="tonal"
-              >
-                <v-card-title>
-
-                  <div style="text-align: center">
-                    {{app.group_code}}<br/>
-                    <AppStatusBadge
-                        :appStatus="app.status"
-                    />
-                  </div>
-
-                </v-card-title>
-
-                <v-card-text
-                    class="internal-card-text"
-                >
-                  <div
-                      style="color: black; text-align: center;"
-                  >
-                    <b>{{app.service_title}}</b>
-                    <br/><br/>
-                    Сроки обучения:<br/>
-                    <b>{{app.service_date_range}}</b>
-                    <br/>
-                    Тип программы:<br/>
-                    <b>{{app.service_type}}</b>
-
-                  </div>
-
-                </v-card-text>
-              </v-card>
-
-            </v-col>
-          </v-row>
-
-        </v-expansion-panel-text>
-
-      </v-expansion-panel>
-
-    </v-expansion-panels>
-
-  </div>
+    <PaginationTable
+      tableTitle="Заявки на курсы"
+      tableWidth="100"
+      :noTab="false"
+      :addButton="false"
+      :xlsxButton="false"
+      getRecsURL="/backend/api/v1/applications/course_application_user/"
+      :tableHeaders="tableHeaders"
+      :fieldsArray="fieldsArray"
+      :itemSelectEvent="openApp"
+    />
 
 </template>
 
@@ -97,6 +20,7 @@
 import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
+import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 
 export default {
   name: 'CourseApp',
@@ -104,47 +28,37 @@ export default {
     // Функция для показа анимации загрузки
     usePreLoader: Function,
   },
-  components: {AppStatusBadge},
+  components: {PaginationTable, AppStatusBadge},
   data() {
     return {
       // Список подразделений с заявками
       apps: null,
       // Массив для открытых раскрывающихся панелей с заявками
-      departmentsPanels: []
+      departmentsPanels: [],
+      // Столбцы таблицы для просмотра заявок
+      tableHeaders: [
+        {title: 'Дата подачи заявки', key: 'date_create'},
+        {title: 'Тип услуги', key: 'service_type'},
+        {title: 'Наименование', key: 'service_title'},
+        {title: 'Сроки проведения', key: 'service_date_range'},
+        {title: 'Статус', key: 'status'},
+      ],
+      // Описание столбцов таблицы
+      fieldsArray: [
+        {ui: 'input', type: 'text', key: 'date_create', addRequired: false},
+        {ui: 'input', type: 'text', key: 'service_type', addRequired: false},
+        {ui: 'input', type: 'text', key: 'service_title', addRequired: false},
+        {ui: 'input', type: 'text', key: 'service_date_range', addRequired: false},
+        {ui: 'appStatus', key: 'status', addRequired: false},
+      ]
     }
   },
   methods: {
-    // Получение списка заявок на курсы, сгруппированных по поздразделениям
-    async getCourseApps() {
-      let courseAppsRequest = await apiRequest(
-          '/backend/api/v1/applications/course_application_user/',
-          'GET',
-          true,
-          null
-      )
-      if (courseAppsRequest.error) {
-        showAlert(
-            'error',
-            'Получение заявок',
-            courseAppsRequest.error
-        )
-      } else {
-        this.apps = courseAppsRequest
-        for (let i=0;i<this.apps.length;i++) {
-          this.departmentsPanels.push(i)
-        }
-      }
-    },
     // Перейти на страницу заявки
-    openApp(app_id) {
+    openApp(app) {
       this.usePreLoader()
-      this.$router.push({
-        path: '/student/app/course/'+app_id
-      })
+      this.$router.push({path: '/student/app/course/'+app.object_id})
     }
-  },
-  mounted() {
-    this.getCourseApps()
   }
 }
 

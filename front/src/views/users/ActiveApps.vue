@@ -2,29 +2,15 @@
 
   <LkPage :usePreLoader="usePreLoader">
     <slot>
-      <v-card
-          color="coko-blue"
-          class="lk-full-page-card"
-      >
-        <v-card-title>
-          Активные заявки
-          <v-tabs
-              v-model="activeAppTab"
-              bg-color="coko-blue"
-              show-arrows
-          >
-            <v-tab class="coko-tab" value="course">Курсы</v-tab>
-            <v-tab class="coko-tab" value="event">Мероприятия</v-tab>
-          </v-tabs>
-        </v-card-title>
-        <v-card-text
-          class="adaptive-no-tab-table-card-text"
-        >
+      <v-card color="coko-blue">
+        <v-card-text class="adaptive-no-tab-table-card-text">
 
-          <CourseApp
-              v-if="activeAppTab === 'course'"
-              :usePreLoader="usePreLoader"
-          />
+          <v-tabs v-model="activeAppTab" bg-color="coko-blue" show-arrows>
+            <v-tab class="coko-tab" value="course">Заявки на курсы</v-tab>
+            <v-tab class="coko-tab" value="event">Заявки на мероприятия</v-tab>
+          </v-tabs>
+
+          <CourseApp v-if="activeAppTab === 'course'" :usePreLoader="usePreLoader"/>
 
         </v-card-text>
       </v-card>

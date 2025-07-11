@@ -52,6 +52,15 @@ class CourseApplicationService:
         """
         return course_application_orm.get_filter_records(filter_by={'profile_id': profile_id})
 
+    def get_active_apps(self, profile_id: uuid) -> QuerySet:
+        """
+        Получение активных заявок на курсы (для ЛК пользователя)
+        :param profile_id: object_id профиля пользователя
+        :return: QuerySet с заявками
+        """
+        all_apps = self.get_all_apps(profile_id)
+        return all_apps.exclude(status=ARCHIVE).order_by('-date_create')
+
     @staticmethod
     def get_departments_apps(user_id: int, archive: bool = False) -> list:
         """
