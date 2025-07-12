@@ -37,22 +37,6 @@ class EventService:
         for dep in res:
             del dep['department_id']
         return res
-        # res = []
-        # deps = {department for department in
-        #         group_queryset.values_list('iku__department_id', flat=True)}
-        # for dep in deps:
-        #     res.append({
-        #         'department': ad_centre_service.get_ad_centre(
-        #             'object_id',
-        #             dep
-        #         ).display_name,
-        #         'services': group_queryset.filter(
-        #             iku__in=self._info_service_qs.filter(
-        #                 department_id=dep
-        #             )
-        #         )
-        #     })
-        # return res
 
 
 event_service = EventService()
