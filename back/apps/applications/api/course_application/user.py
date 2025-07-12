@@ -3,12 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.course_application import course_application_orm, course_application_queryset, \
-    course_application_model
+    course_application_model, CourseApplicationFilter
 from apps.applications.serializers.base_application import BaseApplicationSerializer
 from apps.applications.serializers.base_application.response_application_create_serializer import \
     ApplicationCreateSerializer
-from apps.applications.serializers.course_application import CourseApplicationListSerializer, \
-    CourseApplicationDetailSerializer, CourseApplicationUpdateSerializer
+from apps.applications.serializers.course_application import CourseApplicationDetailSerializer, CourseApplicationUpdateSerializer
 from apps.applications.services.base_application import base_application_service
 from apps.applications.services.course_application import course_application_service
 from apps.authen.services.profile import profile_service
@@ -23,7 +22,7 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
 
     orm = course_application_orm
     queryset = course_application_queryset()
-    # serializer_class = CourseApplicationListSerializer
+    filterset_class = CourseApplicationFilter
     serializer_class = BaseApplicationSerializer
     base_serializer = CourseApplicationDetailSerializer
     create_serializer = ApplicationCreateSerializer
@@ -51,11 +50,12 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
         )
         # apps = course_application_service.get_departments_apps(request.user.id)
         apps = course_application_service.get_active_apps(profile_id)
-        page = self.paginate_queryset(apps)
+        queryset = self.filter_queryset(apps)
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(apps, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(

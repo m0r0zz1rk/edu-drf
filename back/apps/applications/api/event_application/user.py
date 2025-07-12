@@ -3,13 +3,14 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.event_application import event_application_orm, event_application_queryset, \
-    event_application_model
+    event_application_model, EventApplicationFilter
+from apps.applications.serializers.base_application import BaseApplicationSerializer
 from apps.applications.serializers.base_application.response_application_create_serializer import \
     ApplicationCreateSerializer
-from apps.applications.serializers.event_application import EventApplicationListSerializer, \
-    EventApplicationDetailSerializer, EventApplicationUpdateSerializer
+from apps.applications.serializers.event_application import EventApplicationDetailSerializer, EventApplicationUpdateSerializer
 from apps.applications.services.base_application import base_application_service
 from apps.applications.services.event_application import event_application_service
+from apps.authen.services.profile import profile_service
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
 from apps.commons.utils.django.response import response_utils
@@ -21,7 +22,8 @@ class EventApplicationUserViewSet(ApplicationsViewSet):
 
     orm = event_application_orm
     queryset = event_application_queryset()
-    serializer_class = EventApplicationListSerializer
+    filterset_class = EventApplicationFilter
+    serializer_class = BaseApplicationSerializer
     base_serializer = EventApplicationDetailSerializer
     create_serializer = ApplicationCreateSerializer
     update_serializer = EventApplicationUpdateSerializer
@@ -41,8 +43,19 @@ class EventApplicationUserViewSet(ApplicationsViewSet):
         f'Ошибка при получении списка "{swagger_object_name}"'
     )
     def list(self, request, *args, **kwargs):
-        apps = event_application_service.get_departments_apps(request.user.id)
-        serializer = self.get_serializer(apps, many=True)
+        profile_id = profile_service.get_profile_or_info_by_attribute(
+            'django_user_id',
+            request.user.id,
+            'profile_id'
+        )
+        # apps = event_application_service.get_departments_apps(request.user.id)
+        apps = event_application_service.get_active_apps(profile_id)
+        queryset = self.filter_queryset(apps)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
         return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(

@@ -11,6 +11,7 @@
           </v-tabs>
 
           <CourseApp v-if="activeAppTab === 'course'" :usePreLoader="usePreLoader"/>
+          <EventApp v-if="activeAppTab === 'event'" :usePreLoader="usePreLoader"/>
 
         </v-card-text>
       </v-card>
@@ -24,10 +25,11 @@
 // Страница просмотра активных заявок обучающегося
 import LkPage from "@/components/LkPage.vue";
 import CourseApp from "@/views/users/apps/CourseApp.vue";
+import EventApp from "@/views/users/apps/EventApp.vue";
 
 export default {
   name: 'ActiveApps',
-  components: {CourseApp, LkPage},
+  components: {EventApp, CourseApp, LkPage},
   props: {
     // Функция отображения/скрытия анимации загрузки
     usePreLoader: Function,

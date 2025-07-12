@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.db.models import QuerySet
+from django_filters import rest_framework as filters
 
 from apps.commons.orm.base_orm import BaseORM
 
@@ -30,3 +31,19 @@ def event_application_queryset() -> QuerySet:
     return event_application_orm.get_filter_records(
         order_by=['profile__surname', 'profile__name', 'profile__patronymic']
     )
+
+
+class EventApplicationFilter(filters.FilterSet):
+    """Поля для фильтрации заявок на курсы (ЛК пользователя)"""
+    service_type = filters.CharFilter(method='filter_service_type')
+    group_code = filters.CharFilter(method='filter_group_code')
+    service_title = filters.CharFilter(method='filter_service_title')
+
+    def filter_service_type(self, queryset, name, value):
+        return queryset.filter(group__iku__type__name__icontains=value)
+
+    def filter_group_code(self, queryset, name, value):
+        return queryset.filter(group__code__icontains=value)
+
+    def filter_service_title(self, queryset, name, value):
+        return queryset.filter(group__iku__name__icontains=value)
