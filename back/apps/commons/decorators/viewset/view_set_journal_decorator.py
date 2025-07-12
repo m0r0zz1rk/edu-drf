@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
 
+from apps.authen.services.profile import profile_service
 from apps.commons.utils.django.exception import exception_handling
 from apps.commons.utils.django.response import response_utils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
@@ -26,12 +27,17 @@ def view_set_journal_decorator(module: JOURNAL_MODULES, success_description: str
             source = 'Анонимный пользователь'
             request_object = args[1]
             if not isinstance(request_object.user, AnonymousUser):
-                source = 'Зарегистрированный пользователь '
-                if request_object.user.last_name:
-                    source = f'{request_object.user.last_name} '
-                if request_object.user.first_name:
-                    source += request_object.user.first_name
-
+                # print('Пользователь: ', request_object.user.id)
+                # source = 'Зарегистрированный пользователь '
+                source = profile_service.get_profile_or_info_by_attribute(
+                    'django_user_id',
+                    request_object.user.id,
+                    'display_name'
+                )
+                # if request_object.user.last_name:
+                #     source = f'{request_object.user.last_name} '
+                # if request_object.user.first_name:
+                #     source += request_object.user.first_name
             try:
                 res = function(*args, **kwargs)
                 journal_service.create_journal_rec(
