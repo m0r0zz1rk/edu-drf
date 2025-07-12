@@ -2,7 +2,6 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from apps.authen.services.profile import ProfileService
 from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.services.journal_request import JournalRequestBuilder
 from apps.commons.utils.django.response import ResponseUtils
@@ -17,7 +16,6 @@ class PersonalScheduleViewSet(viewsets.ViewSet):
     _schedule_service = ScheduleService(None)
     _resp_utils = ResponseUtils()
     _journal_request_builder = JournalRequestBuilder()
-    _profile_service = ProfileService()
 
     @swagger_auto_schema(
         tags=['Администраторы. Личное расписание', ],

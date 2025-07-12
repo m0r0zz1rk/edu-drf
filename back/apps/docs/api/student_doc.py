@@ -3,7 +3,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.commons.pagination import CustomPagination
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
 from apps.commons.utils.django.response import ResponseUtils
@@ -21,7 +21,6 @@ class StudentDocViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, ]
 
     _journal_request_builder = JournalRequestBuilder()
-    _profile_service = ProfileService()
     _student_doc_service = StudentDocService()
     _response_utils = ResponseUtils()
 
@@ -61,7 +60,7 @@ class StudentDocViewSet(viewsets.ModelViewSet):
                         .set_response_message('Отказано в доступе')
                     )
                     return journal_request.create_response()
-                user_id = self._profile_service.get_profile_or_info_by_attribute(
+                user_id = profile_service.get_profile_or_info_by_attribute(
                     'object_id',
                     request.GET['profile_id'],
                     'user_id'
@@ -113,7 +112,7 @@ class StudentDocViewSet(viewsets.ModelViewSet):
                         .set_response_message('Отказано в доступе')
                     )
                     return journal_request.create_response()
-                user_id = self._profile_service.get_profile_or_info_by_attribute(
+                user_id = profile_service.get_profile_or_info_by_attribute(
                     'object_id',
                     request.GET['profile_id'],
                     'user_id'

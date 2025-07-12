@@ -1,11 +1,9 @@
 from rest_framework import serializers
 
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.surveys.exceptions.survey import SurveyNotExist
 from apps.surveys.selectors.survey import survey_model
 from apps.surveys.services.survey_question import SurveyQuestionService
-
-profile_service = ProfileService()
 
 
 class SurveyBaseSerializer(serializers.ModelSerializer):

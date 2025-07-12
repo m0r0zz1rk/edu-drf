@@ -1,10 +1,9 @@
 from rest_framework import serializers
 
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.commons.utils.data_types.date import DateUtils
 from apps.edu.selectors.schedule import schedule_model
 
-profile_service = ProfileService()
 date_utils = DateUtils()
 
 

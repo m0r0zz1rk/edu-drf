@@ -1,9 +1,7 @@
 from rest_framework import serializers
 
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.edu.selectors.student_group import student_group_model
-
-profile_service = ProfileService()
 
 
 class CoursesDepartmentSerializer(serializers.ModelSerializer):

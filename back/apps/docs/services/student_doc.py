@@ -3,7 +3,7 @@ import uuid
 from django.db.models import QuerySet
 
 from apps.authen.exceptions.student_profile import StudentNotExist
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.commons.utils.django.settings import SettingsUtils
 from apps.docs.consts.student_doc_types import STUDENT_DOC_TYPES
 from apps.docs.exceptions.student_doc import StudentDocNotValidInfo
@@ -15,7 +15,6 @@ class StudentDocService:
     """Класс методов для работы с документами обучающегося"""
 
     _su = SettingsUtils()
-    _profile_service = ProfileService()
 
     _doc_info_keys = ('doc_type', 'file')
 
@@ -42,7 +41,7 @@ class StudentDocService:
         for key in self._doc_info_keys:
             if key not in doc_info:
                 raise StudentDocNotValidInfo
-        profile = self._profile_service.get_profile_or_info_by_attribute(
+        profile = profile_service.get_profile_or_info_by_attribute(
             'django_user_id',
             user_id,
             'profile'

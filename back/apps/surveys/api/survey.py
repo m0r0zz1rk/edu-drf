@@ -3,7 +3,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from apps.authen.services.profile import ProfileService
+from apps.authen.services.profile import profile_service
 from apps.commons.pagination import CustomPagination
 from apps.commons.permissions.is_administrators import IsAdministrators
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
@@ -23,7 +23,6 @@ class SurveyViewSet(viewsets.ModelViewSet):
 
     """Класс эндпоинтов для работы с опросами"""
     permission_classes = [IsAuthenticated, IsAdministrators]
-    _profile_service = ProfileService()
     _respu = ResponseUtils()
     _js = JournalService()
     _journal_request_builder = JournalRequestBuilder()
@@ -88,7 +87,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
                 journal_request = JournalRequest(
                     self._journal_request_builder
                     .set_source(
-                        self._profile_service.get_profile_or_info_by_attribute(
+                        profile_service.get_profile_or_info_by_attribute(
                             'django_user_id',
                             request.user.id,
                             'display_name'
@@ -106,7 +105,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
                 journal_request = JournalRequest(
                     self._journal_request_builder
                     .set_source(
-                        self._profile_service.get_profile_or_info_by_attribute(
+                        profile_service.get_profile_or_info_by_attribute(
                             'django_user_id',
                             request.user.id,
                             'display_name'
@@ -163,7 +162,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
                 journal_request = JournalRequest(
                     self._journal_request_builder
                     .set_source(
-                        self._profile_service.get_profile_or_info_by_attribute(
+                        profile_service.get_profile_or_info_by_attribute(
                             'django_user_id',
                             request.user.id,
                             'display_name'
@@ -181,7 +180,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
                 journal_request = JournalRequest(
                     self._journal_request_builder
                     .set_source(
-                        self._profile_service.get_profile_or_info_by_attribute(
+                        profile_service.get_profile_or_info_by_attribute(
                             'django_user_id',
                             request.user.id,
                             'display_name'
