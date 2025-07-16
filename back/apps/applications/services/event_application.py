@@ -58,6 +58,15 @@ class EventApplicationService:
         all_apps = self.get_all_apps(profile_id)
         return all_apps.exclude(status=ARCHIVE).order_by('-date_create')
 
+    def get_archive_apps(self, profile_id: uuid) -> QuerySet:
+        """
+        Получение архивных заявок на мероприятия
+        :param profile_id: object_id профиля пользователя
+        :return: QuerySet с заявками
+        """
+        all_apps = self.get_all_apps(profile_id)
+        return all_apps.filter(status=ARCHIVE).order_by('-date_create')
+
     @staticmethod
     def get_departments_apps(user_id: int, archive: bool = False) -> list:
         """

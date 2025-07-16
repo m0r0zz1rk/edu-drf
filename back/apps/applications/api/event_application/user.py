@@ -48,8 +48,35 @@ class EventApplicationUserViewSet(ApplicationsViewSet):
             request.user.id,
             'profile_id'
         )
-        # apps = event_application_service.get_departments_apps(request.user.id)
         apps = event_application_service.get_active_apps(profile_id)
+        queryset = self.filter_queryset(apps)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return response_utils.ok_response_dict(serializer.data)
+
+    @swagger_auto_schema(
+        tags=[f'Заявки. {swagger_object_name}', ],
+        operation_description="Получение списка архивных заявок",
+        responses={
+            **SWAGGER_TEXT['list'],
+            '200': serializer_class(many=True)
+        }
+    )
+    @view_set_journal_decorator(
+        APPLICATIONS,
+        f'Список "{swagger_object_name}" получен',
+        f'Ошибка при получении списка "{swagger_object_name}"'
+    )
+    def archive_list(self, request, *args, **kwargs):
+        profile_id = profile_service.get_profile_or_info_by_attribute(
+            'django_user_id',
+            request.user.id,
+            'profile_id'
+        )
+        apps = event_application_service.get_archive_apps(profile_id)
         queryset = self.filter_queryset(apps)
         page = self.paginate_queryset(queryset)
         if page is not None:
