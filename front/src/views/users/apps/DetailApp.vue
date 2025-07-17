@@ -6,67 +6,23 @@
       <v-card
           color="coko-blue"
           class="lk-full-page-card"
-          :title="`Заявка на ${appType} ${this.app ? this.app.group_code : ''}`"
+          :title="`Заявка ${this.app ? this.app.group_code : ''}`"
       >
 
-        <v-card-text
-            class="adaptive-tab-table-card-text"
-            style="padding: 0;"
-        >
-          <template
-            v-if="app === null"
-          >
+        <v-card-text class="adaptive-tab-table-card-text" style="padding: 0;">
+          <template v-if="app === null">
             <b>Загружаем информацию о заявке...</b>
           </template>
 
-          <template
-            v-if="app !== null"
-          >
+          <template v-if="app !== null">
 
-            <v-tabs
-                style="width: 100%; top: 0; z-index: 10; position: sticky"
-                v-model="appTab"
-                bg-color="coko-blue"
-                show-arrows
-            >
+            <v-tabs style="width: 100%; top: 0; z-index: 10; position: sticky" v-model="appTab" bg-color="coko-blue" show-arrows>
 
-              <v-tab
-                  class="coko-tab"
-                  value="info"
-              >
-                Информация
-              </v-tab>
-
-              <v-tab
-                  class="coko-tab"
-                  value="form"
-              >
-                Анкета
-              </v-tab>
-
-              <v-tab
-                  v-if="(app.status === 'wait_pay') && (app.physical)"
-                  class="coko-tab"
-                  value="payment"
-              >
-                Оплата
-              </v-tab>
-
-              <v-tab
-                  v-if="!(app.check_survey) && serviceLastDay"
-                  class="coko-tab"
-                  value="survey"
-              >
-                Опрос
-              </v-tab>
-
-              <v-tab
-                  v-if="(app.status === 'Архив') && (app.certificate_doc_id)"
-                  class="coko-tab"
-                  value="schedule"
-              >
-                Сертификат
-              </v-tab>
+              <v-tab class="coko-tab" value="info">Информация</v-tab>
+              <v-tab class="coko-tab" value="form">Анкета</v-tab>
+              <v-tab v-if="(app.status === 'wait_pay') && (app.physical)" class="coko-tab" value="payment">Оплата</v-tab>
+              <v-tab v-if="!(app.check_survey) && serviceLastDay" class="coko-tab" value="survey">Опрос</v-tab>
+              <v-tab v-if="(app.status === 'Архив') && (app.certificate_doc_id)" class="coko-tab" value="schedule">Сертификат</v-tab>
 
             </v-tabs>
 
@@ -74,27 +30,19 @@
               style="padding-left: 5px; padding-top: 5px"
             >
 
-              <AppInfo
-                  v-if="appTab === 'info'"
-                  :app="app"
-              />
+              <AppInfo v-if="appTab === 'info'" :app="app"/>
 
-              <template
-                v-if="appTab === 'form'"
-              >
-                <div
-                  v-if="formData === null"
-                >
+              <template v-if="appTab === 'form'">
+
+                <div v-if="formData === null">
                   <b>Подождите, получаем данные для заполнения анкеты...</b>
                 </div>
 
-                <div
-                  v-if="(formData !== null) && (app !== null)"
-                >
+                <div v-if="(formData !== null) && (app !== null)">
                   <AppForm
                     ref="appForm"
-                    :disabled="app.status !== 'draft'"
                     :studentApp="app"
+                    :appType="appType"
                     :mos="formData.mo"
                     :positionCategories="formData.position_category"
                     :positions="formData.position"
@@ -133,7 +81,7 @@
               color="coko-blue"
               text="В работу"
               :loading="loading"
-              @click="changeStatusApp()"
+              @click="saveApp(true)"
           ></v-btn>
 
         </v-card-actions>
@@ -175,14 +123,14 @@ export default {
       // Параметр оторбажения анимации загрузки на элементах формы
       loading: false,
       // Тип услуги в заявке
-      appType: this.$route.params.serviceType === 'course' ? 'курс' : 'мероприятие'
+      appType: this.$route.params.serviceType === 'course' ? 'ou' : 'iku'
     }
   },
   methods: {
     // Проверка на крайний день проведения услуги
     checkServiceLastDay() {
       let dates = this.app.service_date_range.split(' - ')
-      this.serviceLastDay = convertBackendDate(dates[1]) >= new Date()
+      this.serviceLastDay = convertBackendDate(dates[1]) <= new Date()
     },
     // Проверка на черновик заявки (если статус заявки "Черновик" - то открыть вкладку "Анкета")
     checkAppDraft(){
@@ -236,36 +184,32 @@ export default {
       this.app[field] = value
     },
     // Сохранение изменений в заявке
-    async saveApp() {
-      if (this.app.education_date !== null && this.app.education_date instanceof Date) {
-        this.app.education_date = convertDateToBackend(this.app.education_date)
-      }
-      this.$refs.appForm.loading = true
-      let saveAppRequest = await apiRequest(
-          '/backend/api/v1/applications/course_application_user/'+this.app.object_id+'/',
+    async saveApp(inWork = false) {
+      if (confirm('Вы уверены, что хотите сохранить информацию?')) {
+        if (this.app.education_date !== null && this.app.education_date instanceof Date) {
+          this.app.education_date = convertDateToBackend(this.app.education_date)
+        }
+        this.app.in_work = inWork
+        this.$refs.appForm.loading = true
+        const saveAppRequest = await apiRequest(
+          `/backend/api/v1/applications/${this.$route.params.serviceType}_application_user/${this.app.object_id}/`,
           'PATCH',
           true,
           this.app
-      )
-      if (saveAppRequest.error) {
-        showAlert(
-            'error',
-            'Сохранение заявки',
-            saveAppRequest.error
         )
-      } else {
-        showAlert(
-            'success',
-            'Сохранение заявки',
-            saveAppRequest.success
-        )
+        if (saveAppRequest.error) {
+          showAlert('error', 'Сохранение заявки', saveAppRequest.error)
+        } else {
+          showAlert('success', 'Сохранение заявки', saveAppRequest.success)
+        }
+        if (inWork) {
+          this.usePreLoader()
+          await this.getAppInfo()
+          this.usePreLoader(true)
+        }
+        this.$refs.appForm.loading = false
       }
-      this.$refs.appForm.loading = false
     },
-    // Изменить статус заявки
-    async changeStatusApp() {
-
-    }
   },
   mounted() {
     this.getFormData()

@@ -1,8 +1,9 @@
 import uuid
+from typing import Optional
 
 from django.db.models import QuerySet
 
-from apps.applications.consts.application_statuses import ARCHIVE
+from apps.applications.consts.application_statuses import ARCHIVE, DRAFT
 from apps.applications.selectors.event_application import event_application_model, event_application_orm
 from apps.authen.services.profile import profile_service
 from apps.commons.services.ad.ad_centre import ad_centre_service
@@ -57,6 +58,18 @@ class EventApplicationService:
         """
         all_apps = self.get_all_apps(profile_id)
         return all_apps.exclude(status=ARCHIVE).order_by('-date_create')
+
+    def get_last_app(self, profile_id: uuid) -> Optional[event_application_model]:
+        """
+        Получение крайней заявки обучающегося на курс со стаусом не равным "Черновик"
+        :param profile_id: object_id профиля обучающегося
+        :return: Заявка или None (в случае если заявки нет)
+        """
+        all_apps = self.get_all_apps(profile_id)
+        if all_apps.count() > 0:
+            not_draft_apps = all_apps.exclude(status=DRAFT)
+            if not_draft_apps.count() > 0:
+                return not_draft_apps.order_by('-date_create').first()
 
     def get_archive_apps(self, profile_id: uuid) -> QuerySet:
         """

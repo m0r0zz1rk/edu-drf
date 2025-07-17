@@ -45,6 +45,11 @@ class EventApplicationUpdateSerializer(EventApplicationDetailSerializer):
         allow_null=True,
         label='object_id должности'
     )
+    in_work = serializers.BooleanField(
+        allow_null=False,
+        default=False,
+        label='Установить статус "В работе"'
+    )
 
     class Meta:
         model = event_application_model
@@ -53,7 +58,8 @@ class EventApplicationUpdateSerializer(EventApplicationDetailSerializer):
             'mo_id',
             'oo_id',
             'position_category_id',
-            'position_id'
+            'position_id',
+            'in_work'
         )
 
 

@@ -45,10 +45,36 @@ class BaseApplicationService:
         'mo',
         'position_category',
         'position',
+        'education_doc',
+        'surname_doc'
     ]
 
-    @staticmethod
-    def create_app(user_id: int, group_id: uuid, application_model: Model) -> uuid:
+    _new_event_app_fields = [
+        'work_less',
+        'region_id',
+        'mo_id',
+        'oo_id',
+        'oo_new',
+        'position_category_id',
+        'position_id',
+        'physical'
+    ]
+
+    _new_course_app_fields = [
+        *_new_event_app_fields,
+        'education_level',
+        'education_category',
+        'education_doc_id',
+        'diploma_surname',
+        'surname_doc',
+        'education_serial',
+        'education_number',
+        'education_date',
+        'certificate_mail',
+        'mail_address'
+    ]
+
+    def create_app(self, user_id: int, group_id: uuid, application_model: Model) -> uuid:
         """
         Создание заявки
         :param user_id: ID пользователя Django
@@ -57,18 +83,28 @@ class BaseApplicationService:
         :return: object_id созданной заявки
         """
         try:
-            profile = profile_service.get_profile_or_info_by_attribute(
+            profile_id = profile_service.get_profile_or_info_by_attribute(
                 'django_user_id',
                 user_id,
-                'profile'
+                'profile_id'
             )
             new_app, _ = application_model.objects.update_or_create(
-                profile_id=profile.object_id,
+                profile_id=profile_id,
                 group_id=group_id,
                 region=irkutsk_state_object(),
             )
+            last_app = course_application_service.get_last_app(profile_id)
+            if application_model.__name__ == 'EventApplication':
+                last_app = event_application_service.get_last_app(profile_id)
+            if last_app:
+                fields = self._new_course_app_fields
+                if application_model.__name__ == 'EventApplication':
+                    fields = self._new_event_app_fields
+                for field in fields:
+                    setattr(new_app, field, getattr(last_app, field))
+            new_app.save()
             return new_app.object_id
-        except Exception:
+        except Exception as e:
             raise ApplicationCreateError
 
     @staticmethod
@@ -174,10 +210,9 @@ class BaseApplicationService:
                     updated_app[field.name+'_new'] = ''
             else:
                 updated_app[field.name] = app_info.get(field.name, getattr(app, field.name))
-        orm.update_record(
-            filter_by={'object_id': app_id},
-            update_object=updated_app
-        )
+        if app_info['in_work']:
+            updated_app['status'] = WORK
+        orm.update_record(filter_by={'object_id': app_id},update_object=updated_app)
 
     @staticmethod
     def move_application(

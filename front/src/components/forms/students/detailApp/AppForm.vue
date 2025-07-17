@@ -38,9 +38,7 @@
         :loading="loading"
     />
 
-    <template
-      v-if="!(internalApp.work_less)"
-    >
+    <template v-if="!(internalApp.work_less)">
 
       Образовательная организация:<br/>
       <v-btn
@@ -89,9 +87,7 @@
 
     </template>
 
-    <template
-      v-if="appType === 'ou'"
-    >
+    <template v-if="appType === 'ou'">
 
       <v-select
         color="coko-blue"
@@ -409,8 +405,6 @@ export default {
   name: 'AppForm',
   components: {PaginationTable, CokoDialog, AppStatusBadge},
   props: {
-    // Только для чтения
-    disabled: Boolean,
     // Объект заявки обучающегося
     studentApp: Object,
     // Тип заявки (ou, iku)
@@ -428,30 +422,26 @@ export default {
   },
   data() {
     return {
+      // Параметр блокировки редактирования элементов формы
+      disabled: this.studentApp.status !== 'draft',
       // Параметр проверки мобильного устройства
       mobileDisplay: useDisplay().smAndDown,
       // Выбранный документ
       docId: null,
       // URL для получения списка справок об обучении
-      getTrainingURL: '',
+      getTrainingURL: '/backend/api/v1/docs/student_docs/?doc_type=training_certificate',
       // URL для получения списка дипломов
-      getDiplomaURL: '',
+      getDiplomaURL: '/backend/api/v1/docs/student_docs/?doc_type=diploma',
       // URL для получения списка документов о смене фамилии
-      getChangeSurnameURL: '',
+      getChangeSurnameURL: '/backend/api/v1/docs/student_docs/?doc_type=change_surname',
       // Тип документа
       docType: null,
       // Параметр отображения анимации загрузки на элементах формы
       loading: false,
       // Варианты для выпадающего списка "Безработный" и "Физическое лицо"
       booleanOptions: [
-        {
-          key: true,
-          title: 'Да'
-        },
-        {
-          key: false,
-          title: 'Нет'
-        },
+        {key: true, title: 'Да'},
+        {key: false, title: 'Нет'},
       ],
       // Внутренний объект заявки
       internalApp: null,
@@ -459,18 +449,9 @@ export default {
       oo: '',
       // Список столбцов для таблицы справочника ОО
       ooTableHeaders: [
-        {
-          'title': 'Краткое наименование',
-          'key': 'short_name'
-        },
-        {
-          'title': 'Полное наименование',
-          'key': 'full_name'
-        },
-        {
-          'title': 'Тип ОО',
-          'key': 'oo_type'
-        }
+        {'title': 'Краткое наименование', 'key': 'short_name'},
+        {'title': 'Полное наименование', 'key': 'full_name'},
+        {'title': 'Тип ОО', 'key': 'oo_type'}
       ],
       // Список описаний столбцов таблицы справочника ОО
       ooFieldsArray: null,
@@ -482,28 +463,13 @@ export default {
       eduDoc: '',
       // Список столбцов таблицы выбора документа об образовании / документа о смене фамилии
       docTableHeaders: [
-        {
-          'title': 'Дата добавления',
-          'key': 'date_create'
-        },
-        {
-          'title': 'Документ',
-          'key': 'file'
-        }
+        {title: 'Дата добавления', key: 'date_create'},
+        {title: 'Документ', key: 'file'}
       ],
       // Список описаний столбцов таблицы выбора документа об образовании / документа о смене фамилии
       docFieldsArray: [
-        {
-          ui: 'date',
-          key: 'date_create',
-          readOnly: true,
-          addRequired: false,
-        },
-        {
-          ui: 'file',
-          key: 'file',
-          addRequired: true
-        }
+        {ui: 'date', key: 'date_create', readOnly: true, addRequired: false,},
+        {ui: 'file', key: 'file', addRequired: true}
       ],
       // Регулярное выражение для серии диплома
       educationSerialRegEx: /^[а-яА-ЯёЁ0-9]+$/,
@@ -517,17 +483,6 @@ export default {
     }
   },
   methods: {
-    // Сформировать URL на получение документов
-    generateURLs() {
-      this.getTrainingURL = '/backend/api/v1/docs/student_docs/?doc_type=training_certificate'
-      this.getDiplomaURL = '/backend/api/v1/docs/student_docs/?doc_type=diploma'
-      this.getChangeSurnameURL = '/backend/api/v1/docs/student_docs/?doc_type=change_surname'
-      if (!([undefined, null].includes(this.studentApp.profile_id))) {
-        this.getTrainingURL += `&profile_id=${this.studentApp.profile_id}`
-        this.getDiplomaURL += `&profile_id=${this.studentApp.profile_id}`
-        this.getChangeSurnameURL += `&profile_id=${this.studentApp.profile_id}`
-      }
-    },
     // Открыть окно для просмотра документа
     openDocViewer(fio, docId, docName, docType) {
       this.docId = docId
@@ -761,7 +716,6 @@ export default {
     }
   },
   mounted() {
-    this.generateURLs()
     this.setInternalApp()
     this.getOoTypes()
   }

@@ -27,7 +27,7 @@ class EventService:
         for group in not_apps_group:
             dep = group.iku.department_id
             if len(list(filter(lambda el: el['department_id'] == dep, res))) > 0:
-                list(filter(lambda el: el['department_id'] == dep, res))[0]['services'].push(group)
+                list(filter(lambda el: el['department_id'] == dep, res))[0]['services'].append(group)
             else:
                 res.append({
                     'department': ad_centre_service.get_ad_centre('object_id', dep).display_name,

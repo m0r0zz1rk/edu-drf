@@ -105,6 +105,7 @@ class CourseApplicationDetailSerializer(FullBaseApplicationSerializer):
 
 
 class CourseBaseUpdateSerializer(CourseApplicationDetailSerializer):
+    """"""
     region_id = serializers.UUIDField(
         allow_null=False,
         label='object_id региона РФ'
@@ -151,13 +152,19 @@ class CourseApplicationUpdateSerializer(CourseBaseUpdateSerializer):
         allow_null=True,
         label='object_id скана удостоверения'
     )
+    in_work = serializers.BooleanField(
+        allow_null=False,
+        default=False,
+        label='Установить статус "В работе"'
+    )
 
     class Meta:
         model = course_application_model
         fields = CourseBaseUpdateSerializer.Meta.fields + (
             'education_doc_id',
             'surname_doc_id',
-            'certificate_doc_id'
+            'certificate_doc_id',
+            'in_work'
         )
 
 

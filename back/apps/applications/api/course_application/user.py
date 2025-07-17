@@ -145,9 +145,7 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
         f'Ошибка при обновлении записи "{swagger_object_name}"'
     )
     def partial_update(self, request, *args, **kwargs):
-        serialize = self.update_serializer(
-            data=request.data
-        )
+        serialize = self.update_serializer(data=request.data)
         if serialize.is_valid():
             base_application_service.save_app(
                 self.orm,
