@@ -229,7 +229,7 @@
           prepend-icon=""
           prepend-inner-icon="$calendar"
           variant="solo"
-          :readonly="disabled"
+          :disabled="disabled"
           :loading="loading"
           clearable
         />

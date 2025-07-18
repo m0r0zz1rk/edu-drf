@@ -94,9 +94,7 @@ class StudentDocViewSet(viewsets.ModelViewSet):
     )
     def create_student_doc(self, request, *args, **kwargs):
         try:
-            serialize = StudentDocCreateSerializer(
-                data=request.data
-            )
+            serialize = StudentDocCreateSerializer(data=request.data)
             if not serialize.is_valid():
                 raise APIProcessError
             user_id = request.user.id

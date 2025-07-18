@@ -5,6 +5,7 @@ from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.course_application import course_application_orm, course_application_queryset, \
     course_application_model, CourseApplicationFilter
 from apps.applications.serializers.base_application import BaseApplicationSerializer
+from apps.applications.serializers.base_application.payment_data_serializer import PaymentDataSerializer
 from apps.applications.serializers.base_application.response_application_create_serializer import \
     ApplicationCreateSerializer
 from apps.applications.serializers.course_application import CourseApplicationDetailSerializer, CourseApplicationUpdateSerializer
@@ -104,6 +105,25 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.base_serializer(instance)
+        return response_utils.ok_response_dict(serializer.data)
+
+    @swagger_auto_schema(
+        tags=[f'Заявки. {swagger_object_name}', ],
+        operation_description="Получение данных об оплате",
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при получении объекта',
+            '200': PaymentDataSerializer
+        }
+    )
+    @view_set_journal_decorator(
+        APPLICATIONS,
+        f'Данные об оплате "{swagger_object_name}" получены',
+        f'Ошибка при получении данных об оплате "{swagger_object_name}"'
+    )
+    def payment(self, request, *args, **kwargs):
+        data = base_application_service.get_payment_data(course_application_orm, self.kwargs['app_id'])
+        serializer = PaymentDataSerializer(data)
         return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(

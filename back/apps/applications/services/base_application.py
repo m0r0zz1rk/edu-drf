@@ -9,9 +9,11 @@ from apps.applications.selectors.course_application import course_application_or
 from apps.applications.selectors.event_application import event_application_orm
 from apps.applications.services.course_application import course_application_service
 from apps.applications.services.event_application import event_application_service
+from apps.applications.services.pay_denied_message import pay_denied_message_service
 from apps.authen.services.profile import profile_service
 from apps.commons.orm.base_orm import BaseORM
 from apps.commons.utils.django.settings import settings_utils
+from apps.docs.selectors.student_group_offer import student_group_offer_orm
 from apps.edu.services.student_group import student_group_service
 from apps.guides.selectors.region import irkutsk_state_object
 
@@ -37,7 +39,8 @@ class BaseApplicationService:
         'group',
         'profile',
         'oo_new',
-        'coursecertificate'
+        'coursecertificate',
+        'paydeniedmessage'
     ]
 
     _fk_fields = [
@@ -210,7 +213,7 @@ class BaseApplicationService:
                     updated_app[field.name+'_new'] = ''
             else:
                 updated_app[field.name] = app_info.get(field.name, getattr(app, field.name))
-        if app_info['in_work']:
+        if 'in_work' in app_info and app_info['in_work']:
             updated_app['status'] = WORK
         orm.update_record(filter_by={'object_id': app_id},update_object=updated_app)
 
@@ -276,6 +279,27 @@ class BaseApplicationService:
                         'url': f'{base_url}{prefix}{str(app.object_id)}'
                     })
         return recipients
+
+    @staticmethod
+    def get_payment_data(orm: BaseORM, application_id: uuid) -> dict:
+        """
+        Получение информации об оплате для заявки
+        :param orm - класс ORM для работы с соответствующим типом заявки
+        :param application_id: object_id заявки
+        :return: словарь с данными об оплате
+        """
+        payment_data = {
+            'pay_doc_id': None,
+            'offer_id': None,
+            'message': None
+        }
+        app = orm.get_one_record_or_none(filter_by=dict(object_id=application_id))
+        if app:
+            payment_data['pay_doc_id'] = app.pay_doc_id
+            offer = student_group_offer_orm.get_one_record_or_none(filter_by=dict(group_id=app.group_id))
+            payment_data['offer_id'] = offer.object_id
+            payment_data['message'] = pay_denied_message_service.get_message(application_id)
+        return payment_data
 
 
 base_application_service = BaseApplicationService()

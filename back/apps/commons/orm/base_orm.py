@@ -100,7 +100,8 @@ class BaseORM:
             payload=repr(create_object)
         )
         def function():
-            self.model.objects.create(**create_object)
+            new_obj = self.model.objects.create(**create_object)
+            return new_obj
 
         return function()
 

@@ -12,6 +12,7 @@ from apps.applications.serializers.course_application import CourseAppGroupListS
     CourseApplicationDetailSerializer, CourseApplicationUpdateSerializer, CourseApplicationEduUpdateSerializer
 from apps.applications.services.base_application import base_application_service
 from apps.applications.services.course_application import course_application_service
+from apps.applications.services.pay_denied_message import pay_denied_message_service
 from apps.celery_app.tasks import email_pay_accept, email_pay_denied
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
@@ -85,9 +86,7 @@ class CourseApplicationAdminViewSet(ApplicationsViewSet):
         # При подтверждении оплаты
         if len(request.data.keys()) == 1 and 'status' in request.data.keys():
             serializer = ApplicationPayAcceptSerializer
-        serialize = serializer(
-            data=request.data
-        )
+        serialize = serializer(data=request.data)
         if serialize.is_valid():
             base_application_service.save_app(
                 course_application_orm,
@@ -95,8 +94,9 @@ class CourseApplicationAdminViewSet(ApplicationsViewSet):
                 self.kwargs['object_id'],
                 serialize.validated_data
             )
-            # Отправка письма об успешной оплате
+            # Отправка письма об успешной оплате и удаление комментария об отклоненной оплате (при наличии)
             if serializer == ApplicationPayAcceptSerializer:
+                pay_denied_message_service.delete_message('course', self.kwargs['object_id'])
                 email_pay_accept.delay(self.kwargs['object_id'])
             return response_utils.ok_response('Обновление выполнено')
         else:
@@ -174,16 +174,15 @@ class CourseApplicationAdminViewSet(ApplicationsViewSet):
     def pay_denied(self, request, *args, **kwargs):
         serialize = ApplicationPayDenySerializer(data=request.data)
         if serialize.is_valid():
+            message = serialize.validated_data.get('message')
             base_application_service.save_app(
                 course_application_orm,
                 course_application_service.get_course_app,
                 self.kwargs['object_id'],
                 {'status': WAIT_PAY}
             )
-            email_pay_denied.delay(
-                self.kwargs['object_id'],
-                serialize.validated_data.get('message')
-            )
+            pay_denied_message_service.save_message('course', self.kwargs['object_id'], message)
+            email_pay_denied.delay(self.kwargs['object_id'], message)
             return response_utils.ok_response('Оплата успешно отклонена')
         else:
             return response_utils.bad_request_response(f'Ошибка сериализации: {repr(serialize.errors)}')

@@ -10,25 +10,19 @@
       >
 
         <v-card-text class="adaptive-tab-table-card-text" style="padding: 0;">
-          <template v-if="app === null">
-            <b>Загружаем информацию о заявке...</b>
-          </template>
+          <template v-if="app === null"><b>Загружаем информацию о заявке...</b></template>
 
           <template v-if="app !== null">
 
             <v-tabs style="width: 100%; top: 0; z-index: 10; position: sticky" v-model="appTab" bg-color="coko-blue" show-arrows>
-
               <v-tab class="coko-tab" value="info">Информация</v-tab>
               <v-tab class="coko-tab" value="form">Анкета</v-tab>
-              <v-tab v-if="(app.status === 'wait_pay') && (app.physical)" class="coko-tab" value="payment">Оплата</v-tab>
+              <v-tab v-if="!(['draft', 'work'].includes(app.status)) && app.physical" class="coko-tab" value="payment">Оплата</v-tab>
               <v-tab v-if="!(app.check_survey) && serviceLastDay" class="coko-tab" value="survey">Опрос</v-tab>
               <v-tab v-if="(app.status === 'Архив') && (app.certificate_doc_id)" class="coko-tab" value="schedule">Сертификат</v-tab>
-
             </v-tabs>
 
-            <div
-              style="padding-left: 5px; padding-top: 5px"
-            >
+            <div style="padding-left: 5px; padding-top: 5px">
 
               <AppInfo v-if="appTab === 'info'" :app="app"/>
 
@@ -52,6 +46,13 @@
                 </div>
 
               </template>
+
+              <AppPayment
+                v-if="appTab === 'payment'"
+                :app="this.app"
+                :appType="this.$route.params.serviceType"
+                :updateAppForm="updateAppForm"
+              />
 
             </div>
 
@@ -102,10 +103,11 @@ import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import AppInfo from "@/components/forms/students/detailApp/AppInfo.vue";
 import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
+import AppPayment from "@/components/forms/students/detailApp/AppPayment.vue";
 
 export default {
   name: 'DetailApp',
-  components: {AppForm, AppInfo, LkPage},
+  components: {AppPayment, AppForm, AppInfo, LkPage},
   props: {
     // Функция для работы с анимацией загрузки
     usePreLoader: Function,
@@ -202,14 +204,17 @@ export default {
         } else {
           showAlert('success', 'Сохранение заявки', saveAppRequest.success)
         }
-        if (inWork) {
-          this.usePreLoader()
-          await this.getAppInfo()
-          this.usePreLoader(true)
-        }
+        if (inWork) { await this.updateAppForm() }
         this.$refs.appForm.loading = false
       }
     },
+    // Обновить форму с заявкой
+    async updateAppForm() {
+      this.usePreLoader()
+      this.appTab = 'info'
+      await this.getAppInfo()
+      this.usePreLoader(true)
+    }
   },
   mounted() {
     this.getFormData()
