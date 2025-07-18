@@ -17,7 +17,18 @@
             <v-tabs style="width: 100%; top: 0; z-index: 10; position: sticky" v-model="appTab" bg-color="coko-blue" show-arrows>
               <v-tab class="coko-tab" value="info">Информация</v-tab>
               <v-tab class="coko-tab" value="form">Анкета</v-tab>
-              <v-tab v-if="!(['draft', 'work'].includes(app.status)) && app.physical" class="coko-tab" value="payment">Оплата</v-tab>
+              <v-tab
+                v-if="!(['draft', 'work'].includes(app.status)) && app.physical"
+                class="coko-tab"
+                value="payment"
+                text="Оплата"
+              />
+              <v-tab
+                v-if="!(['draft', 'work', 'wait_pay', 'check'].includes(app.status)) && app.physical"
+                class="coko-tab"
+                value="study"
+                text="Обучение"
+              />
               <v-tab v-if="!(app.check_survey) && serviceLastDay" class="coko-tab" value="survey">Опрос</v-tab>
               <v-tab v-if="(app.status === 'Архив') && (app.certificate_doc_id)" class="coko-tab" value="schedule">Сертификат</v-tab>
             </v-tabs>
@@ -53,6 +64,8 @@
                 :appType="this.$route.params.serviceType"
                 :updateAppForm="updateAppForm"
               />
+
+              <AppStudy v-if="appTab === 'study'" :serviceType="this.$route.params.serviceType" :app="this.app" />
 
             </div>
 
@@ -104,10 +117,11 @@ import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import AppInfo from "@/components/forms/students/detailApp/AppInfo.vue";
 import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
 import AppPayment from "@/components/forms/students/detailApp/AppPayment.vue";
+import AppStudy from "@/components/forms/students/detailApp/AppStudy.vue";
 
 export default {
   name: 'DetailApp',
-  components: {AppPayment, AppForm, AppInfo, LkPage},
+  components: {AppStudy, AppPayment, AppForm, AppInfo, LkPage},
   props: {
     // Функция для работы с анимацией загрузки
     usePreLoader: Function,
@@ -125,7 +139,7 @@ export default {
       // Параметр оторбажения анимации загрузки на элементах формы
       loading: false,
       // Тип услуги в заявке
-      appType: this.$route.params.serviceType === 'course' ? 'ou' : 'iku'
+      appType: this.$route.params.serviceType === 'course' ? 'ou' : 'iku',
     }
   },
   methods: {

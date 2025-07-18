@@ -62,6 +62,7 @@ import {showAlert} from "@/commons/alerts";
 import {getBase64} from "@/commons/files";
 
 export default {
+  // Компонент для работы с документами об оплате
   name: "AppPayment",
   props: {
     // Объект заявки

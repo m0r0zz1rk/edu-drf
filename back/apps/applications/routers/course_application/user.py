@@ -9,6 +9,7 @@ course_application_user_router.register('course_application_user', CourseApplica
 course_urls = [
     path('course_application_user/archive/', CourseApplicationUserViewSet.as_view({'get': 'archive_list'})),
     path('course_application_user/payment/<uuid:app_id>/', CourseApplicationUserViewSet.as_view({'get': 'payment'})),
+    path('course_application_user/study_url/<uuid:app_id>/', CourseApplicationUserViewSet.as_view({'get': 'study_url'}))
 ]
 
 course_urls += course_application_user_router.urls

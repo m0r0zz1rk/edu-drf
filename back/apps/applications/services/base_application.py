@@ -1,9 +1,9 @@
 import uuid
-from typing import Callable
+from typing import Callable, Optional
 
 from django.db.models import Model
 
-from apps.applications.consts.application_statuses import CHECK, WORK, WAIT_PAY
+from apps.applications.consts.application_statuses import CHECK, WORK, WAIT_PAY, PAY, STUDY, STUDY_COMPLETE
 from apps.applications.exceptions.application import ApplicationCreateError
 from apps.applications.selectors.course_application import course_application_orm
 from apps.applications.selectors.event_application import event_application_orm
@@ -300,6 +300,19 @@ class BaseApplicationService:
             payment_data['offer_id'] = offer.object_id
             payment_data['message'] = pay_denied_message_service.get_message(application_id)
         return payment_data
+
+    @staticmethod
+    def get_study_url(orm: BaseORM, application_id: uuid) -> Optional[dict]:
+        """
+        Получение ссылки на обучение
+        :param orm: класс ORM для работы с заявками
+        :param application_id: object_id заявки
+        :return: Ссылка или None если статус заявки некорректен
+        """
+        app = orm.get_one_record_or_none(filter_by=dict(object_id=application_id))
+        if app:
+            if app.status in [PAY, STUDY, STUDY_COMPLETE]:
+                return {'study_url': app.group.event_url}
 
 
 base_application_service = BaseApplicationService()

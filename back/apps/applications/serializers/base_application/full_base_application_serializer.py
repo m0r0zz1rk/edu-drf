@@ -6,9 +6,6 @@ from apps.applications.serializers.base_application import BaseApplicationSerial
 
 class FullBaseApplicationSerializer(BaseApplicationSerializer):
     """Расширенный сериализатор для базовых полей заявок обучающихся"""
-    study_url = serializers.SerializerMethodField(
-        label='Ссылка на обучение'
-    )
     region_name = serializers.SerializerMethodField(
         label='Наименование региона РФ'
     )
@@ -39,9 +36,6 @@ class FullBaseApplicationSerializer(BaseApplicationSerializer):
     position_id = serializers.SerializerMethodField(
         label='object_id должности'
     )
-
-    def get_study_url(self, obj):
-        return obj.group.event_url
 
     def get_region_name(self, obj):
         if obj.region:
@@ -96,7 +90,6 @@ class FullBaseApplicationSerializer(BaseApplicationSerializer):
     class Meta(BaseApplicationSerializer.Meta):
         model = course_application_model
         fields = BaseApplicationSerializer.Meta.fields + (
-            'study_url',
             'check_survey',
             'work_less',
             'region_name',

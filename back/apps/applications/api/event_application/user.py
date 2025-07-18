@@ -8,6 +8,7 @@ from apps.applications.serializers.base_application import BaseApplicationSerial
 from apps.applications.serializers.base_application.payment_data_serializer import PaymentDataSerializer
 from apps.applications.serializers.base_application.response_application_create_serializer import \
     ApplicationCreateSerializer
+from apps.applications.serializers.base_application.study_url_serializer import StudyUrlSerializer
 from apps.applications.serializers.event_application import EventApplicationDetailSerializer, EventApplicationUpdateSerializer
 from apps.applications.services.base_application import base_application_service
 from apps.applications.services.event_application import event_application_service
@@ -122,6 +123,25 @@ class EventApplicationUserViewSet(ApplicationsViewSet):
     def payment(self, request, *args, **kwargs):
         data = base_application_service.get_payment_data(event_application_orm, self.kwargs['app_id'])
         serializer = PaymentDataSerializer(data)
+        return response_utils.ok_response_dict(serializer.data)
+
+    @swagger_auto_schema(
+        tags=[f'Заявки. {swagger_object_name}', ],
+        operation_description="Получение ссылки на обучение",
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при получении ссылки',
+            '200': 'Ссылка на обучение'
+        }
+    )
+    @view_set_journal_decorator(
+        APPLICATIONS,
+        'Ссылка на обучение получена',
+        'Ошибка при получении ссылки на обучение'
+    )
+    def study_url(self, request, *args, **kwargs):
+        data = base_application_service.get_study_url(event_application_orm, self.kwargs['app_id'])
+        serializer = StudyUrlSerializer(data)
         return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(
