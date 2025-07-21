@@ -15,8 +15,16 @@
           <template v-if="app !== null">
 
             <v-tabs style="width: 100%; top: 0; z-index: 10; position: sticky" v-model="appTab" bg-color="coko-blue" show-arrows>
-              <v-tab class="coko-tab" value="info">Информация</v-tab>
-              <v-tab class="coko-tab" value="form">Анкета</v-tab>
+              <v-tab
+                class="coko-tab"
+                value="info"
+                text="Информация"
+              />
+              <v-tab
+                class="coko-tab"
+                value="form"
+                text="Анекта"
+              />
               <v-tab
                 v-if="!(['draft', 'work'].includes(app.status)) && app.physical"
                 class="coko-tab"
@@ -29,8 +37,18 @@
                 value="study"
                 text="Обучение"
               />
-              <v-tab v-if="!(app.check_survey) && serviceLastDay" class="coko-tab" value="survey">Опрос</v-tab>
-              <v-tab v-if="(app.status === 'Архив') && (app.certificate_doc_id)" class="coko-tab" value="schedule">Сертификат</v-tab>
+              <v-tab
+                v-if="!(app.check_survey) && serviceLastDay"
+                class="coko-tab"
+                value="survey"
+                text="Опрос"
+              />
+              <v-tab
+                v-if="(app.status === 'archive') && (app.certificate_doc_id)"
+                class="coko-tab"
+                value="certificate"
+                text="Сертификат"
+              />
             </v-tabs>
 
             <div style="padding-left: 5px; padding-top: 5px">
@@ -75,6 +93,11 @@
                 ref="appSurvey"
                 v-if="appTab === 'survey'"
                 :appId="this.app.object_id"
+              />
+
+              <AppCertificate
+                v-if="appTab === 'certificate'"
+                :certificateId="app.certificate_doc_id"
               />
 
             </div>
@@ -137,10 +160,11 @@ import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
 import AppPayment from "@/components/forms/students/detailApp/AppPayment.vue";
 import AppStudy from "@/components/forms/students/detailApp/AppStudy.vue";
 import AppSurvey from "@/components/forms/students/detailApp/AppSurvey.vue";
+import AppCertificate from "@/components/forms/students/detailApp/AppCertificate.vue";
 
 export default {
   name: 'DetailApp',
-  components: {AppSurvey, AppStudy, AppPayment, AppForm, AppInfo, LkPage},
+  components: {AppCertificate, AppSurvey, AppStudy, AppPayment, AppForm, AppInfo, LkPage},
   props: {
     // Функция для работы с анимацией загрузки
     usePreLoader: Function,

@@ -8,6 +8,7 @@ import rarfile
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from apps.applications.consts.application_statuses import ARCHIVE
 from apps.applications.selectors.course_application import course_application_orm
 from apps.applications.services.course_application import course_application_service
 from apps.applications.services.course_certificate import course_certificate_service
@@ -95,7 +96,7 @@ class LicenseScanService:
                         )
                         course_application_orm.update_record(
                             dict(object_id=app.object_id),
-                            dict(certificate_doc_id=new_license_id)
+                            dict(certificate_doc_id=new_license_id, status=ARCHIVE)
                         )
                     else:
                       continue
