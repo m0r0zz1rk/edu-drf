@@ -1,5 +1,7 @@
 import uuid
 
+from django.db.models import QuerySet
+
 from apps.surveys.exceptions.survey_question_answer import IncorrectAnswerData, AnswerDoesNotExists
 from apps.surveys.selectors.survey_question_answer import survey_question_answer_model
 
@@ -22,6 +24,15 @@ class SurveyQuestionAnswerService:
             if key not in data:
                 return False
         return True
+
+    @staticmethod
+    def get_answers_for_question(question_id: uuid) -> QuerySet:
+        """
+        Получение возможных вариантов ответов для вопроса
+        :param question_id: object_id вопроса
+        :return: QuerySet с возможными вариантами ответов
+        """
+        return survey_question_answer_model.objects.filter(survey_question=question_id)
 
     def add_edit_answer(self, answer_data):
         """
@@ -48,3 +59,6 @@ class SurveyQuestionAnswerService:
             survey_question_answer_model.objects.get(object_id=answer_id).delete()
         except Exception:
             raise AnswerDoesNotExists
+
+
+survey_question_answer_service = SurveyQuestionAnswerService()

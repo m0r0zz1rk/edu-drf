@@ -10,7 +10,7 @@ const surveyQuestionTypes = [
     },
     {
         key: 'short',
-        title: 'Короткий ответ'
+        title: 'Краткий ответ'
     }
 ]
 

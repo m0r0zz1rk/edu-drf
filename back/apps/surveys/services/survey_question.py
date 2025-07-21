@@ -1,11 +1,14 @@
 import uuid
 
-from apps.surveys.consts.survey_question_type import SURVEY_QUESTION_TYPES
+from apps.applications.services.course_application import course_application_service
+from apps.applications.services.event_application import event_application_service
+from apps.surveys.consts.survey_question_type import SURVEY_QUESTION_TYPES, ONE, MANY
 from apps.surveys.exceptions.survey import SurveyNotExist
 from apps.surveys.exceptions.survey_question import IncorrectQuestionInfo, QuestionCreateUpdateError, \
     QuestionDoesNotExist
 from apps.surveys.selectors.survey_question import survey_question_model
 from apps.surveys.services.survey import survey_service
+from apps.surveys.services.survey_question_answer import survey_question_answer_service
 
 
 class SurveyQuestionService:
@@ -100,9 +103,9 @@ class SurveyQuestionService:
                     question_info['sequence_number'],
                     question_info['sequence_number']
                 )
-            for type in SURVEY_QUESTION_TYPES:
-                if type[0] == question_info['question_type']:
-                    question_info['question_type'] = type[1]
+            for question_type in SURVEY_QUESTION_TYPES:
+                if question_type[1] == question_info['question_type']:
+                    question_info['question_type'] = question_type[0]
             survey_question_model.objects.update_or_create(
                 object_id=obj_id,
                 defaults=question_info
@@ -117,3 +120,35 @@ class SurveyQuestionService:
         """
         if self.check_question_exists('object_id', question_id):
             survey_question_model.objects.filter(object_id=question_id).first().delete()
+
+    @staticmethod
+    def get_questions_for_application(app_id: uuid) -> list:
+        """
+        Получение списка вопросов опроса для заявки обучающегося
+        :param app_id: object_id заявки
+        :return: список объектов с ключами:
+            text - формулировка вопроса
+            type - тип вопроса (one, many, short)
+            options - список допустимых вариантов ответов (для типа one или many)
+        """
+        questions = []
+        app = course_application_service.get_course_app(app_id)
+        if not app:
+            app = event_application_service.get_event_app(app_id)
+        survey_id = survey_service.get_survey_id_for_group(app.group_id)
+        for question in survey_question_model.objects.filter(survey_id=survey_id).order_by('sequence_number'):
+            question_options = []
+            if question.question_type in [ONE, MANY]:
+                question_options = [
+                    answer.text for answer in survey_question_answer_service.get_answers_for_question(question.object_id)
+                ]
+            questions.append({
+                'object_id': question.object_id,
+                'text': question.text,
+                'type': question.question_type,
+                'options': question_options
+            })
+        return questions
+
+
+survey_question_service = SurveyQuestionService()

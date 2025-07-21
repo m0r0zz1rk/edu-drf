@@ -18,7 +18,7 @@ class SurveyQuestion(BaseTable):
     )
     question_type = models.CharField(
         choices=SURVEY_QUESTION_TYPES,
-        max_length=12,
+        max_length=17,
         default='short',
         verbose_name='Тип вопроса'
     )

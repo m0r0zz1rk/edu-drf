@@ -1,6 +1,7 @@
 import uuid
+from typing import Optional
 
-from apps.surveys.consts.survey_target_types import SURVEY_TARGET_TYPES, NOT_SET
+from apps.surveys.consts.survey_target_types import SURVEY_TARGET_TYPES, NOT_SET, EDU, INFO, ALL
 from apps.surveys.exceptions.survey_target import TargetInfoNotCorrect, TargetNotExists
 from apps.surveys.selectors.survey_target import survey_target_model
 
@@ -26,16 +27,61 @@ class SurveyTargetService:
         return True
 
     @staticmethod
-    def remove_exist_survey_type(type: str):
+    def check_special_survey_for_group(group_id: uuid) -> bool:
+        """
+        Проверка наличия специального опроса для учебной группы
+        :param group_id: object_id учебной группы
+        :return: True - опрос найден, False - опрос не найден
+        """
+        return survey_target_model.objects.filter(group_id=group_id).exists()
+
+    def get_special_survey_id_for_group(self, group_id: uuid) -> Optional[uuid.uuid4]:
+        """
+        Получение object_id специального опроса для учебной группы (при наличии)
+        :param group_id: object_id учебной группы
+        :return: object_id опроса или None, если такой опрос не существует
+        """
+        if self.check_special_survey_for_group(group_id):
+            return survey_target_model.objects.filter(group_id=group_id).first().object_id
+
+    @staticmethod
+    def check_service_survey_for_type(survey_type: SURVEY_TARGET_TYPES) -> bool:
+        """
+        Проверка наличия опроса по услуге
+        :param survey_type: тип опроса (EDU или INFO)
+        :return: True - опрос найден, False - опрос не найден
+        """
+        return survey_target_model.objects.filter(type=survey_type).exists()
+
+    def get_service_survey_id_for_group(self, group_type: str) -> Optional[uuid.uuid4]:
+        """
+        Получение опроса по услуге
+        :param group_type: тип услуги учебной группы (ou или iku)
+        :return: object_id опроса или None, если опроса по услуге нет
+        """
+        survey_type = EDU if group_type == 'ou' else INFO
+        if self.check_service_survey_for_type(survey_type):
+            return survey_target_model.objects.filter(type=survey_type).first().object_id
+
+    @staticmethod
+    def get_all_survey_id() -> uuid:
+        """
+        Получение object_id для опроса для всех групп
+        :return: object_id опроса
+        """
+        return survey_target_model.objects.filter(type=ALL).first().survey_id
+
+    @staticmethod
+    def remove_exist_survey_type(survey_type: str):
         """
         Удаление полученного типа таргетирования у существующих записей в БД
-        :param type: Тип таргетирования
+        :param survey_type: Тип таргетирования
         """
-        if type in ['all', 'edu', 'info']:
+        if survey_type in ['all', 'edu', 'info']:
             for target in (survey_target_model.objects.
                            select_related('survey').
                            select_related('group').
-                           filter(type=type)):
+                           filter(type=survey_type)):
                 target.type = NOT_SET
                 target.save()
 
@@ -66,3 +112,6 @@ class SurveyTargetService:
             survey_target_model.objects.get(object_id=target_id).delete()
         except Exception:
             raise TargetNotExists
+
+
+survey_target_service = SurveyTargetService()

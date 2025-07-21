@@ -1,5 +1,8 @@
+import uuid
+
 from apps.surveys.exceptions.survey import SurveyNotExist, SurveyDataNotValid
 from apps.surveys.selectors.survey import survey_model
+from apps.surveys.services.survey_target import survey_target_service
 
 
 class SurveyService:
@@ -41,6 +44,21 @@ class SurveyService:
         if self.is_survey_exists(attribute_name, value):
             return survey_model.objects.filter(**{attribute_name: value}).first()
         raise SurveyNotExist
+
+    @staticmethod
+    def get_survey_id_for_group(group_id: uuid) -> uuid:
+        """
+        Получение опроса для учебной группы
+        :param group_id: object_id учебной группы
+        :return: объект опроса
+        """
+        survey_id = survey_target_service.get_special_survey_id_for_group(group_id)
+        if not survey_id:
+            survey_id = survey_target_service.get_service_survey_id_for_group(group_id)
+            if not survey_id:
+                survey_id = survey_target_service.get_all_survey_id()
+        return survey_id
+
 
     def create_survey(self, user_id: int, serialize_data: dict):
         """

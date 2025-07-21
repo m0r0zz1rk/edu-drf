@@ -24,7 +24,7 @@
                 text="Оплата"
               />
               <v-tab
-                v-if="!(['draft', 'work', 'wait_pay', 'check'].includes(app.status)) && app.physical"
+                v-if="['pay', 'study'].includes(app.status) && app.physical"
                 class="coko-tab"
                 value="study"
                 text="Обучение"
@@ -65,7 +65,17 @@
                 :updateAppForm="updateAppForm"
               />
 
-              <AppStudy v-if="appTab === 'study'" :serviceType="this.$route.params.serviceType" :app="this.app" />
+              <AppStudy
+                v-if="appTab === 'study'"
+                :serviceType="this.$route.params.serviceType"
+                :app="this.app"
+              />
+
+              <AppSurvey
+                ref="appSurvey"
+                v-if="appTab === 'survey'"
+                :appId="this.app.object_id"
+              />
 
             </div>
 
@@ -88,7 +98,7 @@
               text="Сохранить"
               :loading="loading"
               @click="saveApp()"
-          ></v-btn>
+          />
 
           <v-btn
               v-if="app.status === 'draft'"
@@ -96,7 +106,15 @@
               text="В работу"
               :loading="loading"
               @click="saveApp(true)"
-          ></v-btn>
+          />
+
+          <v-btn
+            v-if="appTab === 'survey'"
+            color="coko-blue"
+            text="Завершить"
+            :loading="loading"
+            @click="saveSurvey()"
+          />
 
         </v-card-actions>
 
@@ -118,10 +136,11 @@ import AppInfo from "@/components/forms/students/detailApp/AppInfo.vue";
 import AppForm from "@/components/forms/students/detailApp/AppForm.vue";
 import AppPayment from "@/components/forms/students/detailApp/AppPayment.vue";
 import AppStudy from "@/components/forms/students/detailApp/AppStudy.vue";
+import AppSurvey from "@/components/forms/students/detailApp/AppSurvey.vue";
 
 export default {
   name: 'DetailApp',
-  components: {AppStudy, AppPayment, AppForm, AppInfo, LkPage},
+  components: {AppSurvey, AppStudy, AppPayment, AppForm, AppInfo, LkPage},
   props: {
     // Функция для работы с анимацией загрузки
     usePreLoader: Function,
@@ -228,6 +247,35 @@ export default {
       this.appTab = 'info'
       await this.getAppInfo()
       this.usePreLoader(true)
+    },
+    // Отправить данные по опросу
+    async saveSurvey() {
+      const appSurvey = this.$refs.appSurvey
+      if (confirm('Вы уверены, что хотите завершить опрос?')) {
+        if (appSurvey.surveyAnswers.filter((ans) => ans.value === null).length > 0) {
+          showAlert('error', 'Опрос', 'Ответьте на все вопросы')
+          return
+        }
+        appSurvey.loading = true
+        // Преобразование массивов к вопросам с несколькими вариантами ответов в строку
+        const manyIds = [...appSurvey.surveyQuestions.filter((quest) => quest.type === 'many').map((quest) => quest.object_id)]
+        appSurvey.surveyAnswers.filter((ans) => manyIds.includes(ans.question_id)).map((ans) => {
+          if ((ans.value !== null) && Array.isArray(ans.value)) {ans.value = ans.value.toString()}
+        })
+        const saveAnswersRequest = await apiRequest(
+          `/backend/api/v1/users/application/survey_answers/${this.app.object_id}/`,
+          'POST',
+          true,
+          {data: appSurvey.surveyAnswers}
+        )
+        if (saveAnswersRequest.success) {
+          showAlert('success', 'Опросы', 'Опрос успешно пройден')
+          this.updateAppForm()
+        } else {
+          showAlert('error', 'Опросы', saveAnswersRequest.error)
+        }
+        appSurvey.loading = false
+      }
     }
   },
   mounted() {

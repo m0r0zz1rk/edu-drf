@@ -1,5 +1,6 @@
 from django.urls import path
 
+from apps.users.api.application.base_application import BaseApplicationViewSet
 from apps.users.api.form_data.form_data import FormDataViewSet
 from apps.users.api.form_data.oo import FormDataOoViewSet
 from apps.users.api.form_data.oo_type import FormDataOoTypeViewSet
@@ -14,6 +15,9 @@ urlpatterns = [
     path('form_data/', FormDataViewSet.as_view({'get': 'get_form_data'})),
     path('oos/<uuid:mo_id>/', FormDataOoViewSet.as_view({'get': 'list'})),
     path('oo_types/', FormDataOoTypeViewSet.as_view({'get': 'list'})),
+
+    path('application/survey_questions/<uuid:app_id>/', BaseApplicationViewSet.as_view({'get': 'get_questions'})),
+    path('application/survey_answers/<uuid:app_id>/', BaseApplicationViewSet.as_view({'post': 'save_answers'}))
 ]
 
 urlpatterns += course_application_router.urls

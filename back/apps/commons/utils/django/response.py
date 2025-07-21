@@ -49,6 +49,14 @@ class ResponseUtils:
         )
 
     @staticmethod
+    def ok_response_list(arr: list) -> Response:
+        """Генерация ответа с кодом 200 и телом полученного словаря"""
+        return Response(
+            arr,
+            status=status.HTTP_200_OK
+        )
+
+    @staticmethod
     def bad_request_no_data() -> Response:
         """Генерация ответа с кодом 400 без данных"""
         return Response(status=status.HTTP_400_BAD_REQUEST)
