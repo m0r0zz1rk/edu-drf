@@ -2,14 +2,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from apps.commons.utils.django.settings import SettingsUtils
+from apps.commons.utils.django.settings import settings_utils
 from web_app.yasg import urlpatterns as yasg_urls
 
-du = SettingsUtils()
-static_url = du.get_parameter_from_settings('STATIC_URL')
-static_root = du.get_parameter_from_settings('STATIC_ROOT')
-media_url = du.get_parameter_from_settings('MEDIA_URL')
-media_root = du.get_parameter_from_settings('MEDIA_ROOT')
+static_url = settings_utils.get_parameter_from_settings('STATIC_URL')
+static_root = settings_utils.get_parameter_from_settings('STATIC_ROOT')
+media_url = settings_utils.get_parameter_from_settings('MEDIA_URL')
+media_root = settings_utils.get_parameter_from_settings('MEDIA_ROOT')
 
 urlpatterns = [
     path('backend/admin/', admin.site.urls),
@@ -24,7 +23,7 @@ urlpatterns = [
     path('backend/api/v1/surveys/', include('apps.surveys.urls')),
     path('backend/api/v1/reports/', include('apps.reports.urls')),
     path('backend/api/v1/users/', include('apps.users.urls')),
-    # path('api/v1/password_reset/', include('django_rest_passwordreset.routes', namespace='password_reset')),
+    path('backend/api/v1/password_reset/', include('django_rest_passwordreset.urls')),
 ]
 
 urlpatterns += static(static_url, document_root=static_root)

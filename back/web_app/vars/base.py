@@ -23,10 +23,10 @@ DJANGO_APPS = [
 REQ_APPS = [
     'corsheaders',
     'django_filters',
-    'django_rest_passwordreset',
     'drf_yasg',
     'import_export',
     'rest_framework',
+    'django_rest_passwordreset',
     'tinymce'
 ]
 

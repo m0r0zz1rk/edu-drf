@@ -54,7 +54,7 @@ class PlanningParameterViewSet(EduViewSet):
         return response_utils.ok_response_dict(serializer.data)
 
     @swagger_auto_schema(
-        tags=['Учебная часть. Планирование', ],
+        tags=[f'Учебная часть. {swagger_object_name}', ],
         operation_description="Обновление параметра планирования",
         request_body=PlanningParameterSerializer,
         responses={
@@ -63,5 +63,10 @@ class PlanningParameterViewSet(EduViewSet):
             '200': 'Сообщение "Параметр успешно обновлен"'
         }
     )
-    def update(self, request, *args, **kwargs):
+    @view_set_journal_decorator(
+        EDU,
+        f'"{swagger_object_name}" обновлен',
+        f'Ошибка при обновлении "{swagger_object_name}"'
+    )
+    def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)

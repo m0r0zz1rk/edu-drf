@@ -64,6 +64,7 @@
       <v-btn
           color="coko-blue"
           text="Изменить"
+          :loading="formLoading"
           @click="changePassword()"
       ></v-btn>
     </template>

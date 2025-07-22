@@ -5,9 +5,7 @@
         <PreLoader ref="preLoader" />
       </keep-alive>
       <router-view :usePreLoader="usePreLoader"/>
-      <notifications
-        position="top right"
-      />
+      <notifications position="top right"/>
     </v-app>
   </div>
 </template>

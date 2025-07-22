@@ -1,39 +1,28 @@
 <template>
   <div class="login-background-img adaptive-login-background-img"></div>
-  <v-card
-    class="login-card adaptive-login-card"
-    variant="outlined"
-  >
-    <v-card-title class="login-card-title">
-      АИС "Учебный центр". Вход
-    </v-card-title>
+  <v-card class="login-card adaptive-login-card" variant="outlined">
+
+    <v-card-title class="login-card-title">АИС "Учебный центр". Вход</v-card-title>
+
     <v-card-text class="login-card-text adaptive-login-card-text">
-      <v-tabs class="login-tabs"
-              v-model="loginTab"
-              align-tabs="center"
-              bg-color="coko-blue"
-      >
+
+      <v-tabs class="login-tabs" v-model="loginTab" align-tabs="center" bg-color="coko-blue">
         <v-tab class="coko-tab" value="student">Обучающийся</v-tab>
         <v-tab class="coko-tab" value="coko">Сотрудник центра</v-tab>
       </v-tabs>
+
       <v-tabs-window v-model="loginTab">
         <v-tabs-window-item value="student">
           <div class="login-form adaptive-login-form">
             <v-radio-group v-model="loginStudentType" inline>
               <v-radio color="coko-red" value="phone">
-                <template v-slot:label>
-                  <b class="login-radio-label">Телефон</b>
-                </template>
+                <template v-slot:label><b class="login-radio-label">Телефон</b></template>
               </v-radio>
               <v-radio class="login-student-radio-button" color="coko-red" value="email">
-                <template v-slot:label>
-                  <b class="login-radio-label">Почта</b>
-                </template>
+                <template v-slot:label><b class="login-radio-label">Почта</b></template>
               </v-radio>
               <v-radio class="login-student-radio-button" color="coko-red" value="snils">
-                <template v-slot:label>
-                  <b class="login-radio-label">СНИЛС</b>
-                </template>
+                <template v-slot:label><b class="login-radio-label">СНИЛС</b></template>
               </v-radio>
             </v-radio-group>
             <v-form @submit.prevent="userLogin(false)">
@@ -45,8 +34,8 @@
                             label="Номер телефона"
                             variant="solo"
                             :loading="formLoading"
-                            clearable>
-              </v-text-field>
+                            clearable
+              />
               <v-text-field v-if="loginStudentType === 'email'"
                             id="emailTextField"
                             bg-color="white"
@@ -54,8 +43,8 @@
                             :rules="[rules.required, rules.email]"
                             variant="solo"
                             :loading="formLoading"
-                            clearable>
-              </v-text-field>
+                            clearable
+              />
               <v-text-field v-if="loginStudentType === 'snils'"
                             id="snilsTextField"
                             bg-color="white"
@@ -64,8 +53,8 @@
                             :rules="[rules.required, rules.snils]"
                             variant="solo"
                             :loading="formLoading"
-                            clearable>
-              </v-text-field>
+                            clearable
+              />
               <v-text-field
                 id="userPassword"
                 :append-inner-icon="passVisible ? 'mdi-eye-off' : 'mdi-eye'"
@@ -77,13 +66,14 @@
                 @click:append-inner="passVisible = !passVisible"
                 :loading="formLoading"
                 clearable
-              ></v-text-field>
+              />
               <v-btn
                 class="login-button adaptive-login-button"
                 color="coko-blue"
                 :loading="formLoading"
                 type="submit"
-              >Войти</v-btn>
+                text="Войти"
+              />
             </v-form>
             <v-btn
                 style="margin-top: 5px;"
@@ -92,23 +82,23 @@
                 text="Регистрация"
                 @click="$refs.regDialog.openDialog()"
                 :loading="formLoading"
-            ></v-btn>
-            <RegistrationDialog
-                ref="regDialog"
-                :usePreLoader="usePreLoader"
             />
+            <RegistrationDialog ref="regDialog" :usePreLoader="usePreLoader"/>
             <v-btn
               style="margin-top: 5px;"
               class="login-button adaptive-login-button"
               color="coko-blue"
               :loading="formLoading"
-            >Инструкция</v-btn><br/>
+              text="Инструкция"
+            /><br/>
             <v-btn
               style="margin-top: 5px;"
               class="login-button adaptive-login-button"
               color="coko-blue"
               :loading="formLoading"
-            >Восстановить пароль</v-btn>
+              text="Восстановить пароль"
+              @click="$refs.passwordResetDialog.dialog = true"
+            />
           </div>
         </v-tabs-window-item>
         <v-tabs-window-item value="coko">
@@ -147,25 +137,50 @@
       </v-tabs-window>
     </v-card-text>
   </v-card>
+
+  <CokoDialog ref="passwordResetDialog" :cardActions="true">
+    <template v-slot:title>Сброс пароля</template>
+    <template v-slot:text>
+      <v-text-field
+        label="Email для сброса пароля"
+        v-model="passwordResetEmail"
+        :rules="[rules.required, rules.email]"
+        variant="solo"
+        :loading="formLoading"
+        clearable
+      />
+    </template>
+    <template v-slot:actions>
+      <v-btn color="coko-blue" text="Сбросить" :loading="formLoading" @click="passwordResetRequest()"/>
+    </template>
+  </CokoDialog>
 </template>
 
 <script>
 import {showAlert} from "@/commons/alerts";
 import RegistrationDialog from "@/components/dialogs/authen/RegistrationDialog.vue";
 import {getUrlParameter} from "@/commons/getUrlParameter";
+import DocViewer from "@/components/DocViewer.vue";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
+import {apiRequest} from "@/commons/apiRequest";
 
 export default {
   name: 'Login',
-  components: {RegistrationDialog},
+  components: {CokoDialog, DocViewer, RegistrationDialog},
   props: {
     usePreLoader: Function,
   },
   data() {
     return {
+      // Выбранная вкладка на форме логина
       loginTab: 'student',
+      // Тип авторизации для обучающегося
       loginStudentType: 'email',
+      // Отображение пароля
       passVisible: false,
+      // Индикатор активных элементов формы
       formLoading: false,
+      // Правила обработки полей
       rules: {
         required: value => !!value || 'Обязательно для заполнения.',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
@@ -175,6 +190,8 @@ export default {
           return pattern.test(value) || 'Некорректный e-mail.'
         },
       },
+      // Email для сброса пароля
+      passwordResetEmail: ''
     }
   },
   methods: {
@@ -269,6 +286,35 @@ export default {
               this.formLoading = false
               this.usePreLoader()
             })
+      }
+    },
+    // Отправка запроса на смену пароля
+    async passwordResetRequest() {
+      if (confirm('Вы уверены, что хотите сбросить пароль?')) {
+        if (this.passwordResetEmail === null || this.passwordResetEmail.length === 0) {
+          showAlert('error', 'Сброс пароля', 'Введите email')
+          return
+        }
+        if (this.rules.email(this.passwordResetEmail) === 'Некорректный e-mail.') {
+          showAlert('error', 'Сброс пароля', 'Введите корректный email')
+          return
+        }
+        this.formLoading = true
+        const passwordResetReq = await apiRequest(
+          `/backend/api/v1/password_reset/`,
+          'POST',
+          false,
+          {email: this.passwordResetEmail},
+          true
+        )
+        console.log('passwordResetReq: ', passwordResetReq)
+        if (passwordResetReq.status === 200) {
+          showAlert('success', 'Сброс пароля', 'На почту будет отправлено письмо с дальнейшими инструкциями')
+          this.$refs.passwordResetDialog.close()
+        } else {
+          showAlert('error', 'Сброс пароля', 'Ошибка: указан некорректный email')
+        }
+        this.formLoading = false
       }
     }
   },
