@@ -93,6 +93,7 @@
 
     <v-date-input
       v-if="field.ui === 'date'"
+      v-mask="'##.##.####'"
       v-model="localValue"
       :label="fieldTitle ?
                 !checkRequired ?

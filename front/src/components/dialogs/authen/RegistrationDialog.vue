@@ -136,6 +136,7 @@
             >
               <v-date-input
                   id="registrationBirthday"
+                  v-mask="'##.##.####'"
                   bg-color="white"
                   :rules="[rules.required,]"
                   label="Дата рождения*"
@@ -144,7 +145,7 @@
                   variant="solo"
                   :loading="formLoading"
                   clearable
-              ></v-date-input>
+              />
             </v-col>
 
             <v-col

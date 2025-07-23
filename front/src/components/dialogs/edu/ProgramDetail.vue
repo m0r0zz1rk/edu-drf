@@ -210,6 +210,7 @@
                     id="orderDate"
                     bg-color="white"
                     label="Дата приказа"
+                    v-mask="'##.##.####'"
                     v-model="orderObject['order_date']"
                     prepend-icon=""
                     prepend-inner-icon="$calendar"

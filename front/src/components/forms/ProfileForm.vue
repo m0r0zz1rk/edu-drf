@@ -191,6 +191,7 @@
                   bg-color="white"
                   label="Дата рождения*"
                   v-model="profileData['birthday']"
+                  v-mask="'##.##.####'"
                   prepend-icon=""
                   prepend-inner-icon="$calendar"
                   variant="solo"

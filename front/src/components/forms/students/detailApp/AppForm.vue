@@ -224,6 +224,7 @@
 
         <v-date-input
           color="coko-blue"
+          v-mask="'##.##.####'"
           v-model="internalApp.education_date"
           label="Дата выдачи диплома*"
           prepend-icon=""

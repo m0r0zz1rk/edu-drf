@@ -239,6 +239,7 @@
           bg-color="white"
           label="Дата приказа о зачислении"
           v-model="enrollDate"
+          v-mask="'##.##.####'"
           prepend-icon=""
           prepend-inner-icon="$calendar"
           variant="solo"
@@ -258,6 +259,7 @@
 
         <v-date-input
           bg-color="white"
+          v-mask="'##.##.####'"
           label="Дата приказа об отчислении"
           v-model="expDate"
           prepend-icon=""

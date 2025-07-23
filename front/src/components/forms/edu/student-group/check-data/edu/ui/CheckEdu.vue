@@ -66,6 +66,7 @@
 
       <v-date-input
         format="DD.MM.YYYY"
+        v-mask="'##.##.####'"
         bg-color="white"
         label="Дата выдачи документа"
         v-model="eduApp.education_date"
