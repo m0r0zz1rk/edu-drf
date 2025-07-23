@@ -4,13 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
 from apps.commons.services.journal_request import JournalRequestBuilder, JournalRequest
-from apps.commons.utils.django.exception import ExceptionHandling
-from apps.commons.utils.django.response import ResponseUtils
+from apps.commons.utils.django.exception import exception_handling
+from apps.commons.utils.django.response import response_utils
 from apps.edu.exceptions.schedule.day_info_validate_error import DayInfoValidateError
 from apps.edu.exceptions.schedule.schedule_generate_error import ScheduleGenerateError
 from apps.edu.serializers.schedule import ScheduleListSerializer, GenerateScheduleSerializer, DayInfoSerializer
 from apps.edu.services.schedule import ScheduleService
-from apps.guides.services.user import UserService
 from apps.journal.consts.journal_modules import EDU
 from apps.journal.consts.journal_rec_statuses import ERROR
 from apps.journal.decorators.journal_api import journal_api
@@ -21,8 +20,6 @@ class ScheduleViewSet(viewsets.ViewSet):
     """Работа с расписаниями занятий учебных групп"""
     permission_classes = [IsAuthenticated, IsAdminOrCoko]
 
-    __response_utils = ResponseUtils()
-    _user_service = UserService()
     _journal_request_builder = JournalRequestBuilder()
 
     @swagger_auto_schema(
@@ -44,7 +41,7 @@ class ScheduleViewSet(viewsets.ViewSet):
         try:
             schedule = ScheduleService(self.kwargs['group_id']).get_group_schedule()
             serializer = ScheduleListSerializer(schedule, many=True)
-            return self.__response_utils.ok_response_dict(serializer.data)
+            return response_utils.ok_response_dict(serializer.data)
         except Exception:
             raise APIProcessError
 
@@ -69,9 +66,9 @@ class ScheduleViewSet(viewsets.ViewSet):
             serialize = GenerateScheduleSerializer(data=request.data)
             if serialize.is_valid():
                 ScheduleService(serialize.data['group_id']).generate_schedule(serialize.data['generate'])
-                return self.__response_utils.ok_response('Расписание успешно сгенерировано')
+                return response_utils.ok_response('Расписание успешно сгенерировано')
             else:
-                raise APIProcessError
+                return response_utils.bad_request_response(f'Ошибка сериализации:{repr(serialize.errors)}')
         except ScheduleGenerateError:
             journal_request = JournalRequest(
                 self._journal_request_builder
@@ -79,11 +76,12 @@ class ScheduleViewSet(viewsets.ViewSet):
                 .set_status(ERROR)
                 .set_description('Системная ошибка при генерации расписания занятий')
                 .set_payload(repr(request.data))
-                .set_output(ExceptionHandling.get_traceback())
+                .set_output(exception_handling.get_traceback())
                 .set_response_message('Произошла системная ошибка, повторите попытку позже')
             )
             return journal_request.create_response()
         except RuntimeError:
+            print(exception_handling.get_traceback())
             raise APIProcessError
 
     @swagger_auto_schema(
@@ -109,7 +107,7 @@ class ScheduleViewSet(viewsets.ViewSet):
             )
             if serialize.is_valid():
                 ScheduleService(serialize.data['group_id']).save_day_info(serialize.data)
-                return self.__response_utils.ok_response('Расписание успешно сохранено')
+                return response_utils.ok_response('Расписание успешно сохранено')
             else:
                 journal_request = JournalRequest(
                     self._journal_request_builder
