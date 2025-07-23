@@ -98,12 +98,12 @@ class ScheduleDoc(BaseStudentGroupDoc):
                 'date': lesson.date.strftime('%d.%m.%Y'),
                 'time': f'{time_start} - {time_end}',
                 'theme': lesson.kug_theme.name if lesson.kug_theme else lesson.theme,
-                'lecture': '+' if lesson.type == LECTURE else '-',
-                'practice': '+' if lesson.type == PRACTICE else '-',
+                'lecture': '1' if lesson.type == LECTURE else '0',
+                'practice': '1' if lesson.type == PRACTICE else '0',
                 'teacher': teacher
             }
             if self.student_group.ou:
-                obj['individual'] = '+' if lesson.type == INDIVIDUAL else '-'
+                obj['individual'] = '1' if lesson.type == INDIVIDUAL else '0'
             result.append(obj)
         return result
 
@@ -138,7 +138,7 @@ class ScheduleDoc(BaseStudentGroupDoc):
             info['total_individual'] = hours.get('individual', 0)
         else:
             info['name'] = self.student_group.iku.name
-        writer.render_sheet(info, 'список', 1)
+        writer.render_sheet(info, 'Расписание', 1)
 
     def _generate_wb(self):
         """
