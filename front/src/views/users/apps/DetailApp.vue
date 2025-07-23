@@ -23,7 +23,7 @@
               <v-tab
                 class="coko-tab"
                 value="form"
-                text="Анекта"
+                text="Анкета"
               />
               <v-tab
                 v-if="!(['draft', 'work'].includes(app.status)) && app.physical"
@@ -65,6 +65,7 @@
                   <AppForm
                     ref="appForm"
                     :studentApp="app"
+                    :disabled="!(editStatuses.includes(app.status))"
                     :appType="appType"
                     :mos="formData.mo"
                     :positionCategories="formData.position_category"
@@ -117,7 +118,7 @@
 
           <v-btn
             variant="flat"
-              v-if="app.status === 'draft'"
+              v-if="appTab === 'form' && editStatuses.includes(app.status)"
               color="coko-blue"
               text="Сохранить"
               :loading="loading"
@@ -126,7 +127,7 @@
 
           <v-btn
             variant="flat"
-              v-if="app.status === 'draft'"
+              v-if="appTab === 'form' && app.status === 'draft'"
               color="coko-blue"
               text="В работу"
               :loading="loading"
@@ -186,6 +187,8 @@ export default {
       loading: false,
       // Тип услуги в заявке
       appType: this.$route.params.serviceType === 'course' ? 'ou' : 'iku',
+      // Статусы, при которых доступно редактирование анкеты
+      editStatuses: ['draft', 'work', 'wait_pay', 'check', 'pay']
     }
   },
   methods: {

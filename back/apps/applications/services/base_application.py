@@ -215,7 +215,7 @@ class BaseApplicationService:
                 updated_app[field.name] = app_info.get(field.name, getattr(app, field.name))
         if 'in_work' in app_info and app_info['in_work']:
             updated_app['status'] = WORK
-        orm.update_record(filter_by={'object_id': app_id},update_object=updated_app)
+        orm.update_record(filter_by={'object_id': app_id}, update_object=updated_app)
 
     @staticmethod
     def move_application(

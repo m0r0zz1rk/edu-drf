@@ -408,6 +408,8 @@ export default {
   props: {
     // Объект заявки обучающегося
     studentApp: Object,
+    // Параметр блокировки редактирования элементов формы
+    disabled: Boolean,
     // Тип заявки (ou, iku)
     appType: String,
     // Функция изменения атрибутов объекта заявки в родительском компоненте
@@ -423,8 +425,6 @@ export default {
   },
   data() {
     return {
-      // Параметр блокировки редактирования элементов формы
-      disabled: this.studentApp.status !== 'draft',
       // Параметр проверки мобильного устройства
       mobileDisplay: useDisplay().smAndDown,
       // Выбранный документ
