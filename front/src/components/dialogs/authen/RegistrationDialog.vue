@@ -125,6 +125,7 @@
             >
               <v-select
                   :items="states"
+                  v-model="selectedState"
                   id="registrationState"
                   bg-color="white"
                   label="Государство*"
@@ -336,6 +337,8 @@ export default {
         password: value => value.length >= 8 || 'Минимальная длина пароля - 8 символов'
       },
       states: ['Россия', 'Украина', 'Беларусь', 'Казахстан'],
+      // Выбранное государство
+      selectedState: 'Россия',
       sex: ['Мужской', 'Женский'],
       health: ['Да', 'Нет'],
       agreementCheckbox: false
@@ -358,7 +361,7 @@ export default {
           data.map((state) => {
             this.states.push(state.name)
           })
-          this.usePreLoader()
+          this.usePreLoader(true)
         })
     },
     verifyData() {
