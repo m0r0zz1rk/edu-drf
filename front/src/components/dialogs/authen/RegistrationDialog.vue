@@ -308,7 +308,6 @@ export default {
     return {
       // Проверка на мобильное устройство
       mobileDisplay: useDisplay().smAndDown,
-      agreementDialog: false,
       dialog: false,
       uniqFailed: false,
       uniqueData: [
@@ -503,6 +502,11 @@ export default {
   },
   mounted() {
     this.getStates()
+  },
+  watch: {
+    agreementCheckbox: function(newValue) {
+      if (newValue)  { this.$refs.agreementDialog.close() }
+    }
   }
 }
 
