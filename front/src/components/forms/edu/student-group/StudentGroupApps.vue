@@ -49,6 +49,7 @@
 
     <template v-slot:actions>
       <v-btn
+        variant="flat"
         :loading="loading"
         color="coko-blue"
         text="Сохранить"

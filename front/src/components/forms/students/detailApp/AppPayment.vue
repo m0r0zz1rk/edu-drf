@@ -48,7 +48,7 @@
       <v-file-input :loading="loading" v-model="payDocFile"/>
     </template>
     <template v-slot:actions>
-      <v-btn color="coko-blue" text="Загрузить" :loading="loading" @click="savePayDoc()"/>
+      <v-btn variant="flat" color="coko-blue" text="Загрузить" :loading="loading" @click="savePayDoc()"/>
     </template>
   </CokoDialog>
 

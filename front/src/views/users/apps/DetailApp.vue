@@ -116,6 +116,7 @@
           <v-spacer></v-spacer>
 
           <v-btn
+            variant="flat"
               v-if="app.status === 'draft'"
               color="coko-blue"
               text="Сохранить"
@@ -124,6 +125,7 @@
           />
 
           <v-btn
+            variant="flat"
               v-if="app.status === 'draft'"
               color="coko-blue"
               text="В работу"
@@ -132,6 +134,7 @@
           />
 
           <v-btn
+            variant="flat"
             v-if="appTab === 'survey'"
             color="coko-blue"
             text="Завершить"

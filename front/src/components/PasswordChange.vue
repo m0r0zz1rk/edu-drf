@@ -1,6 +1,7 @@
 <template>
 
   <v-btn
+    variant="flat"
       color="coko-blue"
       text="Смена пароля"
       :loading="formLoading"
@@ -62,6 +63,7 @@
 
     <template v-slot:actions>
       <v-btn
+        variant="flat"
           color="coko-blue"
           text="Изменить"
           :loading="formLoading"

@@ -51,7 +51,7 @@
     <template v-slot:actions>
       <v-btn
           color="coko-blue"
-          variant="text"
+          variant="flat"
           @click="editItem()"
           :loading="loading"
       >

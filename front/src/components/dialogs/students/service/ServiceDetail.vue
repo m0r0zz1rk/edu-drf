@@ -45,6 +45,7 @@
 
     <template v-slot:actions>
       <v-btn
+        variant="flat"
           color="coko-blue"
           text="Подать заявку"
           :loading="loading"

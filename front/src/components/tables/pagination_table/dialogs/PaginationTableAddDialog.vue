@@ -68,7 +68,7 @@
         <v-spacer></v-spacer>
         <v-btn
           color="coko-blue"
-          variant="text"
+          variant="flat"
           @click="addItem"
           :loading="loading"
         >

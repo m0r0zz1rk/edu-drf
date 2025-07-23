@@ -286,6 +286,7 @@
 
     <template v-slot:actions>
       <v-btn
+        variant="flat"
         :disabled="groupForMove === null"
         :loading="loading"
         color="coko-blue"
@@ -357,6 +358,7 @@
     <template v-slot:actions>
 
       <v-btn
+        variant="flat"
         :loading="loading"
         color="coko-blue"
         text="Сохранить"
@@ -398,6 +400,7 @@
     <template v-slot:actions>
 
       <v-btn
+        variant="flat"
         :loading="loading"
         color="coko-blue"
         text="Отправить"

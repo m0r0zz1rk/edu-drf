@@ -315,6 +315,7 @@
       />
 
       <v-btn
+        variant="flat"
         v-if="userInfoTab === 'profile'"
         color="coko-blue"
         text="Сохранить"

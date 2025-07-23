@@ -271,7 +271,7 @@
 
     <template v-slot:actions>
 
-      <v-btn color="coko-blue" text="Регистрация" @click="registration()"/>
+      <v-btn variant="flat" color="coko-blue" text="Регистрация" @click="registration()"/>
 
     </template>
 

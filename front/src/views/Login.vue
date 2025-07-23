@@ -152,7 +152,7 @@
       />
     </template>
     <template v-slot:actions>
-      <v-btn color="coko-blue" text="Сбросить" :loading="formLoading" @click="passwordResetRequest()"/>
+      <v-btn variant="flat" color="coko-blue" text="Сбросить" :loading="formLoading" @click="passwordResetRequest()"/>
     </template>
   </CokoDialog>
 </template>
