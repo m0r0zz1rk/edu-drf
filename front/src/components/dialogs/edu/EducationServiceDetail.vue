@@ -323,7 +323,7 @@ export default {
           "program": null,
           "date_start": null,
           "date_end": null,
-          "location": null
+          "location": 'ГАУ ИО ЦОПМКиМКО'
         }
       }
       this.dialog = true

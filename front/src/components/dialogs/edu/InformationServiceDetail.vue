@@ -273,7 +273,7 @@ export default {
           "type": null,
           "name": null,
           "categories": null,
-          "location": null,
+          "location": 'ГАУ ИО ЦОПМКиМКО',
           "duration": null,
           "price": null,
           "date_start": null,
