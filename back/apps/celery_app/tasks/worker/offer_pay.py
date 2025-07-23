@@ -25,12 +25,12 @@ def email_offer_pay(group_id: uuid):
     def wrapper():
         event_type, name, date_start, deadline = student_group_service.get_data_for_offer_pay_task(group_id)
         subject = 'АИС "Учебный Центр": Изменен статус Вашей заявки'
-        msg = (f'Статус вашей заявки на участие в {event_type} "{name}" изменен на "Ждем оплату".\n'
-               f'Оплата должна быть произведена не позднее {deadline.strftime("%d.%m.%Y")} года.'
-               f' Для ознакомления с договором оферты и загрузки документа об оплате перейдите по ссылке: ')
+        source = (f'Статус вашей заявки на участие в {event_type} "{name}" изменен на "Ждем оплату".\n'
+                  f'Оплата должна быть произведена не позднее {deadline.strftime("%d.%m.%Y")} года.'
+                  f' Для ознакомления с договором оферты и загрузки документа об оплате перейдите по ссылке: ')
         recipients = base_application_service.get_recipients_for_offer_pay(group_id)
         for recipient in recipients:
-            msg += f'{recipient.get("url")}\nС уважением,\nкоманда АИС "Учебный Центр"'
+            msg = f'{source}{recipient.get("url")}\nС уважением,\nкоманда АИС "Учебный Центр"'
             send_mail(
                 subject,
                 msg,

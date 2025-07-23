@@ -105,6 +105,7 @@
                   bg-color="white"
                   label="Отчество"
                   v-model="profileData['patronymic']"
+                  :rules="[rules.patronymic,]"
                   variant="solo"
                   :loading="formLoading"
                   @change="e => profileData['patronymic'] = e.target.value"
@@ -412,6 +413,7 @@ export default {
       // Правила обработки значений полей формы
       rules: {
         required: value => !!value || 'Обязательно для заполнения.',
+        patronymic: value => value.length >=0 || 'Некорректное значение',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
         email: value => emailPattern.test(value) || 'Некорректный e-mail.'
@@ -636,6 +638,9 @@ export default {
   watch: {
     profileData: {
       handler() {
+        this.profileData.surname = this.profileData.surname.replace(/[^А-Яа-я]/ig, '')
+        this.profileData.name = this.profileData.name.replace(/[^А-Яа-я]/ig, '')
+        this.profileData.patronymic = this.profileData.patronymic.replace(/[^А-Яа-я]/ig, '')
         if (['+7 (8', '+7 (7'].includes(this.profileData['phone'])) {this.profileData['phone'] = '+7 ('}
         if (this.profileData['sex']) {
           this.profileData['sex'] = 'Мужской'

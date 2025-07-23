@@ -23,6 +23,7 @@
             >
               <v-text-field
                   id="registrationSurname"
+                  v-model="fio.surname"
                   bg-color="white"
                   label="Фамилия*"
                   :rules="[rules.required,]"
@@ -39,6 +40,7 @@
             >
               <v-text-field
                   id="registrationName"
+                  v-model="fio.name"
                   bg-color="white"
                   label="Имя*"
                   :rules="[rules.required,]"
@@ -55,8 +57,10 @@
             >
               <v-text-field
                   id="registrationPatronymic"
+                  v-model="fio.patronymic"
                   bg-color="white"
                   label="Отчество"
+                  :rules="[rules.patronymic, ]"
                   variant="solo"
                   :loading="formLoading"
                   clearable
@@ -298,6 +302,12 @@ export default {
       mobileDisplay: useDisplay().smAndDown,
       // Номер телефона
       phone: '',
+      // Объект ФИО (для обработки вводимых символов - допустимы только русские символы)
+      fio: {
+        surname: '',
+        name: '',
+        patronymic: ''
+      },
       dialog: false,
       uniqFailed: false,
       uniqueData: [
@@ -319,6 +329,7 @@ export default {
       pass2Visible: false,
       rules: {
         required: value => !!value || 'Обязательно для заполнения.',
+        patronymic: value => value.length >=0 || 'Некорректное значение',
         phone: value => value.length === 18 || 'Некорректный номер телефона',
         snils: value => value.length === 14 || 'Некорректный СНИЛС',
         email: value => emailPattern.test(value) || 'Некорректный e-mail.',
@@ -499,6 +510,14 @@ export default {
     },
     phone: function(newValue) {
       if (['+7 (8', '+7 (7'].includes(newValue)) {this.phone = '+7 ('}
+    },
+    fio: {
+      handler() {
+        this.fio.surname = this.fio.surname.replace(/[^А-Яа-я]/ig, '')
+        this.fio.name = this.fio.name.replace(/[^А-Яа-я]/ig, '')
+        this.fio.patronymic = this.fio.patronymic.replace(/[^А-Яа-я]/ig, '')
+      },
+      deep: true
     }
   }
 }
