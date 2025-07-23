@@ -89,6 +89,7 @@
               class="login-button adaptive-login-button"
               color="coko-blue"
               :loading="formLoading"
+              @click="getManual()"
               text="Инструкция"
             /><br/>
             <v-btn
@@ -316,6 +317,28 @@ export default {
         }
         this.formLoading = false
       }
+    },
+    // Получение руководства пользователя
+    async getManual() {
+      this.formLoading = true
+      const manualRequest = await apiRequest(
+        `/backend/api/v1/docs/manual/`,
+        'GET',
+        false,
+        null
+      )
+      if (manualRequest.file) {
+        const linkSource = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${manualRequest.file}`;
+        const downloadLink = document.createElement('a');
+        document.body.appendChild(downloadLink);
+        downloadLink.href = linkSource;
+        downloadLink.target = '_self';
+        downloadLink.download = 'Инструкция.docx';
+        downloadLink.click();
+      } else {
+        showAlert('error', 'Инструкция', 'Ошибка при получении файла инструкции')
+      }
+      this.formLoading = false
     }
   },
 }

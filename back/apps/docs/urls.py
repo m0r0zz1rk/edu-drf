@@ -1,6 +1,7 @@
 from django.urls import path
 
 from apps.docs.api.doc_viewer import DovViewerViewSet
+from apps.docs.api.manual import ManualViewSet
 from apps.docs.api.pay_doc import PayDocViewSet
 from apps.docs.api.student_doc import StudentDocViewSet
 from apps.docs.api.student_group_docs import StudentGroupDocsViewSet
@@ -13,5 +14,6 @@ urlpatterns = [
     path('print_file/', StudentGroupDocsViewSet.as_view({'post': 'print_file'})),
     path('upload_license/', StudentGroupDocsViewSet.as_view({'post': 'upload_licenses'})),
 
-    path('pay_doc/create/', PayDocViewSet.as_view({'post': 'create'}))
+    path('pay_doc/create/', PayDocViewSet.as_view({'post': 'create'})),
+    path('manual/', ManualViewSet.as_view({'get': 'get_manual'}))
 ]

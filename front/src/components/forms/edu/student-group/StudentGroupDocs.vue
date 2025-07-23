@@ -1,41 +1,22 @@
 <template>
 
-  <v-expansion-panels
-    style="padding-top: 10px"
-    variant="accordion"
-    color="coko-blue"
-  >
+  <v-expansion-panels style="padding-top: 10px" variant="accordion" color="coko-blue">
 
-    <v-expansion-panel
-      color="coko-blue"
-      title="Информационное письмо"
+    <v-expansion-panel color="coko-blue" title="Информационное письмо"
     >
-
       <v-expansion-panel-text>
-
         <v-btn
           color="coko-blue"
           :loading="loading"
           @click="e => {getDoc('information_letter', 'docx')}"
-        >
-          Сформировать
-        </v-btn>
-
+          text="Сформировать"
+        />
       </v-expansion-panel-text>
-
     </v-expansion-panel>
 
-    <v-expansion-panel
-      color="coko-blue"
-      title="Документы об оказании услуги"
-    >
-
+    <v-expansion-panel color="coko-blue" title="Документы об оказании услуги">
       <v-expansion-panel-text>
-
-        <v-row
-        dense
-      >
-
+        <v-row dense>
         <v-col
           cols="12"
           md="6"
@@ -72,27 +53,12 @@
       </v-row>
 
       </v-expansion-panel-text>
-
     </v-expansion-panel>
 
-    <v-expansion-panel
-      v-if="userRole === 'centre'"
-      color="coko-blue"
-      title="Договор оферты"
-    >
-
+    <v-expansion-panel v-if="userRole === 'centre'" color="coko-blue" title="Договор оферты">
       <v-expansion-panel-text>
-
-        <v-row
-          dense
-        >
-
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-
+        <v-row dense>
+          <v-col cols="12" md="4" sm="6">
             <v-btn
               color="coko-blue"
               :loading="loading"
@@ -100,15 +66,8 @@
             >
               Сформировать проект
             </v-btn>
-
           </v-col>
-
-          <v-col
-            cols="12"
-            md="4"
-            sm="6"
-          >
-
+          <v-col cols="12" md="4" sm="6">
             <v-dialog
               color="coko-blue"
               :fullscreen="mobileDisplay"
@@ -154,23 +113,13 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-
           </v-col>
-
           <v-col
             cols="12"
             md="4"
             sm="6"
           >
-
-            <v-btn
-              color="coko-blue"
-              :loading="loading"
-              @click="e => getOffer()"
-            >
-              Скачать
-            </v-btn>
-
+            <v-btn color="coko-blue" :loading="loading" @click="e => getOffer()">Скачать</v-btn>
           </v-col>
 
         </v-row>
