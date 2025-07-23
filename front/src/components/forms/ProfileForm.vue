@@ -634,30 +634,32 @@ export default {
     }
   },
   watch: {
-    profileData: function() {
-      if (this.profileData['sex']) {
-        this.profileData['sex'] = 'Мужской'
-      } else {
-        this.profileData['sex'] = 'Женский'
-      }
-      if (this.profileData['health']) {
-        this.profileData['health'] = 'Да'
-      } else {
-        this.profileData['health'] = 'Нет'
-      }
-      if (this.profileUuid) {
-        if (this.profileData['teacher']) {
-          this.profileData['teacher'] = 'Да'
+    profileData: {
+      handler() {
+        if (['+7 (8', '+7 (7'].includes(this.profileData['phone'])) {this.profileData['phone'] = '+7 ('}
+        if (this.profileData['sex']) {
+          this.profileData['sex'] = 'Мужской'
         } else {
-          this.profileData['teacher'] = 'Нет'
+          this.profileData['sex'] = 'Женский'
         }
-      }
-      this.profileData['birthday'] = convertBackendDate(this.profileData['birthday'])
+        if (this.profileData['health']) {
+          this.profileData['health'] = 'Да'
+        } else {
+          this.profileData['health'] = 'Нет'
+        }
+        if (this.profileUuid) {
+          if (this.profileData['teacher']) {
+            this.profileData['teacher'] = 'Да'
+          } else {
+            this.profileData['teacher'] = 'Нет'
+          }
+        }
+        this.profileData['birthday'] = convertBackendDate(this.profileData['birthday'])
+      },
+      deep: true
     }
   },
-  mounted() {
-    this.setData()
-  }
+  mounted() {this.setData()}
 }
 </script>
 

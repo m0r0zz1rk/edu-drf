@@ -70,6 +70,7 @@
             >
               <v-text-field
                   id="registrationPhone"
+                  v-model="phone"
                   bg-color="white"
                   v-mask="'+7 (###) ###-##-##'"
                   :rules="[rules.required, rules.phone]"
@@ -224,14 +225,8 @@
               @click="$refs.agreementDialog.dialog = true"
           >Согласие на обработку ПДн</v-btn><br/>
 
-          <CokoDialog
-            ref="agreementDialog"
-          >
-
-            <template v-slot:title>
-              Согласие на обработку ПДН
-            </template>
-
+          <CokoDialog ref="agreementDialog">
+            <template v-slot:title>Согласие на обработку ПДН</template>
             <template v-slot:text>
               <p>
                 Нажимая кнопку «Регистрация» я даю свое согласие Государственному автономному учреждению
@@ -258,18 +253,11 @@
                 обезличивание, блокирование, удаление, уничтожение персональных данных.
               </p>
               <v-checkbox v-model="agreementCheckbox">
-                <template v-slot:label>
-                  <div>
-                    Я даю свое согласие на обработку персональных данных*
-                  </div>
-                </template>
+                <template v-slot:label><div>Я даю свое согласие на обработку персональных данных*</div></template>
               </v-checkbox>
             </template>
-
           </CokoDialog>
-
         </slot>
-
       </DialogContentWithError>
 
       <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
@@ -308,6 +296,8 @@ export default {
     return {
       // Проверка на мобильное устройство
       mobileDisplay: useDisplay().smAndDown,
+      // Номер телефона
+      phone: '',
       dialog: false,
       uniqFailed: false,
       uniqueData: [
@@ -506,6 +496,9 @@ export default {
   watch: {
     agreementCheckbox: function(newValue) {
       if (newValue)  { this.$refs.agreementDialog.close() }
+    },
+    phone: function(newValue) {
+      if (['+7 (8', '+7 (7'].includes(newValue)) {this.phone = '+7 ('}
     }
   }
 }
