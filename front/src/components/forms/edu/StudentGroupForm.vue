@@ -226,6 +226,7 @@
         :serviceType="studentGroupInfo?.service_type"
         :ooData="checkData.oo"
         :changeCheckData="changeCheckData"
+        :updateApps="updateApps"
       />
 
       <CheckEdu
@@ -234,6 +235,7 @@
         :serviceType="studentGroupInfo?.service_type"
         :eduData="checkData.edu"
         :changeCheckData="changeCheckData"
+        :updateApps="updateApps"
       />
 
       <CheckPay
@@ -242,6 +244,7 @@
         :serviceType="studentGroupInfo?.service_type"
         :payData="checkData.pay"
         :changeCheckData="changeCheckData"
+        :updateApps="updateApps"
       />
 
     </template>
@@ -596,6 +599,8 @@ export default {
         return false
       } else {
         showAlert('success', 'Обновление информации', updateRequest.success)
+        this.studentGroupInfo = null
+        this.getGroupInfo()
         this.groupTab = 'info'
       }
       this.loading = false
@@ -790,6 +795,10 @@ export default {
         )
       }
       this.loading = false
+    },
+    // Обновить данные на вкладке "Заявки"
+    updateApps() {
+      this.$refs.studentGroupAppModule.$refs.mainAppsTable.getRecs()
     }
   },
   mounted() {

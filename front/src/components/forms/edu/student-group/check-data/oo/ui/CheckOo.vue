@@ -140,7 +140,9 @@ export default {
     // Список данных для проверки
     ooData: Array,
     // Функция изменения объекта со списками заявок на проверку данных
-    changeCheckData: Function
+    changeCheckData: Function,
+    // Функция обновления таблицы на вкладке "Заявки"
+    updateApps: Function
   },
   data() {
     return {
@@ -210,6 +212,7 @@ export default {
       )
       if (ooSaveRequest.status === 200) {
         showAlert('success', 'Проверка ОО', 'Информация успешно сохранена')
+        this.updateApps()
         this.internalOoData = this.internalOoData.filter((rec) => rec.app_id !== this.ooApp.app_id)
         this.correctOoId = null
         this.correctOoName = ''

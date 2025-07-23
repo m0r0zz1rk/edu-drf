@@ -27,7 +27,7 @@ def email_pay_accept(app_id: uuid):
             application = event_application_service.get_event_app(app_id)
         subject = 'АИС "Учебный Центр": Оплата успешно подтверждена'
         group_type = 'курсе' if application.group.ou else 'мероприятии'
-        name = application.group.ou.program.name if application.group.ou else application.group.event.name
+        name = application.group.ou.program.name if application.group.ou else application.group.iku.name
         url = f'{settings_utils.get_parameter_from_settings("AIS_ADDRESS")}student/app/'
         if application.group.ou:
             url += f'course/{app_id}'

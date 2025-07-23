@@ -151,7 +151,9 @@ export default {
     // Список данных для проверки
     eduData: Array,
     // Функция изменения объекта со списками заявок на проверку данных
-    changeCheckData: Function
+    changeCheckData: Function,
+    // Функция обновления таблицы на вкладке "Заявки"
+    updateApps: Function
   },
   data() {
     return {
@@ -209,6 +211,7 @@ export default {
         true
       )
       if (ooSaveRequest.status === 200) {
+        this.updateApps()
         showAlert('success', 'Проверка ОО', 'Информация успешно сохранена')
         this.internalEduData = this.internalEduData.filter((rec) => rec.app_id !== this.eduApp.app_id)
         this.loading = false
