@@ -265,6 +265,7 @@ export default {
     getDayOfWeek,
     // Получение расписания учебной группы
     async getSchedule() {
+      this.schedule = []
       let scheduleRequest = await apiRequest(
           '/backend/api/v1/edu/schedule/'+this.groupId+'/',
           'GET',
