@@ -95,6 +95,7 @@
       v-if="field.ui === 'date'"
       v-mask="'##.##.####'"
       v-model="localValue"
+      @input="e => e.target.value.length === 10 ? localValue = e.target.value : ''"
       :label="fieldTitle ?
                 !checkRequired ?
                   fieldTitle

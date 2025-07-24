@@ -50,6 +50,7 @@
       <v-date-input
           bg-color="white"
           v-model="reportInfo.start_period"
+          @input="e => e.target.value.length === 10 ? reportInfo.start_period = e.target.value : ''"
           label="Начало периода"
           v-mask="'##.##.####'"
           prepend-icon=""
@@ -71,6 +72,7 @@
       <v-date-input
           bg-color="white"
           v-model="reportInfo.end_period"
+          @input="e => e.target.value.length === 10 ? reportInfo.end_period = e.target.value : ''"
           label="Окончание периода"
           v-mask="'##.##.####'"
           prepend-icon=""

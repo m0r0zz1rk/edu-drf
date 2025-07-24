@@ -191,7 +191,8 @@
                 <v-date-input
                   bg-color="white"
                   label="Дата рождения*"
-                  v-model="profileData['birthday']"
+                  v-model="profileData.birthday"
+                  @input="e => e.target.value.length === 10 ? profileData.birthday = e.target.value : ''"
                   v-mask="'##.##.####'"
                   prepend-icon=""
                   prepend-inner-icon="$calendar"

@@ -70,6 +70,7 @@
         bg-color="white"
         label="Дата выдачи документа"
         v-model="eduApp.education_date"
+        @input="e => e.target.value.length === 10 ? eduApp.education_date = e.target.value : ''"
         prepend-icon=""
         prepend-inner-icon="$calendar"
         variant="solo"

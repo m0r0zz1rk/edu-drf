@@ -132,6 +132,7 @@
                       label="Дата начала проведения*"
                       v-mask="'##.##.####'"
                       v-model="educationService.date_start"
+                      @input="e => e.target.value.length === 10 ? educationService.date_start = e.target.value : ''"
                       prepend-icon=""
                       prepend-inner-icon="$calendar"
                       variant="solo"
@@ -151,6 +152,7 @@
                       label="Дата окончания проведения*"
                       v-mask="'##.##.####'"
                       v-model="educationService.date_end"
+                      @input="e => e.target.value.length === 10 ? educationService.date_end = e.target.value : ''"
                       prepend-icon=""
                       prepend-inner-icon="$calendar"
                       variant="solo"
@@ -353,6 +355,7 @@ export default {
     async saveEducationService() {
       this.$refs["content-error"].hideContentError()
       let checkData = true
+      console.log('educationService: ', this.educationService)
       Object.keys(this.educationService).map((key) => {
         if ((key !== 'object_id') && (
           ([undefined, null].includes(this.educationService[key]) ||
@@ -407,21 +410,25 @@ export default {
   },
   watch: {
     // Преобразование даты форма дд.мм.гггг в объект Date при изменении информации о приказе ДПП
-    educationService: function() {
-      if (this.educationService.date_start !== null) {
-        try {
-          this.educationService.date_start = convertBackendDate(this.educationService.date_start)
-        } catch (e) {
-          this.educationService.date_start = new Date(this.educationService.date_start)
+    educationService: {
+      handler() {
+        console.log('educationService watch: ', this.educationService)
+        if (this.educationService.date_start !== null && this.educationService.date_start.length === 10) {
+          try {
+            this.educationService.date_start = convertBackendDate(this.educationService.date_start)
+          } catch (e) {
+            this.educationService.date_start = new Date(this.educationService.date_start)
+          }
         }
-      }
-      if (this.educationService.date_end !== null) {
-        try {
-          this.educationService.date_end = convertBackendDate(this.educationService.date_end)
-        } catch (e) {
-          this.educationService.date_end = new Date(this.educationService.date_end)
+        if (this.educationService.date_end !== null) {
+          try {
+            this.educationService.date_end = convertBackendDate(this.educationService.date_end)
+          } catch (e) {
+            this.educationService.date_end = new Date(this.educationService.date_end)
+          }
         }
-      }
+      },
+      deep: true
     },
     educationServiceID: async function() {
       await this.setEducationService()

@@ -226,6 +226,7 @@
           color="coko-blue"
           v-mask="'##.##.####'"
           v-model="internalApp.education_date"
+          @input="e => e.target.value.length === 10 ? internalApp.education_date = e.target.value : ''"
           label="Дата выдачи диплома*"
           prepend-icon=""
           prepend-inner-icon="$calendar"
