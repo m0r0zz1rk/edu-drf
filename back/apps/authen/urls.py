@@ -21,7 +21,7 @@ registration_urlpatterns = [
 profile_urlpatterns = [
     path('student_main_page_info/', ProfileViewSet.as_view({'get': 'get_main_page_student'})),
     path('get_profile/', ProfileViewSet.as_view({'get': 'get_profile_info'})),
-    path('save_profile/', ProfileViewSet.as_view({'post': 'save_profile_info'})),
+    path('save_profile/', ProfileViewSet.as_view({'patch': 'save_profile_info'})),
     path('check_profile_email/', ProfileViewSet.as_view({'post': 'check_profile_email'})),
     path('check_profile_phone/', ProfileViewSet.as_view({'post': 'check_profile_phone'})),
     path('check_profile_snils/', ProfileViewSet.as_view({'post': 'check_profile_snils'})),

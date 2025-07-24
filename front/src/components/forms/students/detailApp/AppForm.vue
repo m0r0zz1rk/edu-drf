@@ -160,7 +160,7 @@
         <v-text-field
           color="coko-blue"
           v-model="internalApp.diploma_surname"
-          label="Фамиилия в дипломе*"
+          label="Фамилия в дипломе*"
           :readonly="disabled"
           :loading="loading"
         />
@@ -498,9 +498,6 @@ export default {
       try {
         this.internalApp.education_date = convertBackendDate(this.internalApp.education_date)
       } catch (e) {}
-      if (this.studentApp.diploma_surname === '') {
-        this.internalApp.diploma_surname = this.internalApp.profile_surname
-      }
     },
     // Получение списка типов ОО и установка списка описаний столбцов таблицы справочника ОО
     async getOoTypes() {

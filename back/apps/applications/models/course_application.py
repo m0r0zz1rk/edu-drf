@@ -11,13 +11,15 @@ class CourseApplication(BaseApplication):
     education_level = models.CharField(
         max_length=75,
         choices=EDUCATION_LEVELS,
-        default=HIGHER,
+        blank=True,
+        default='',
         verbose_name='Уровень образования'
     )
     education_category = models.CharField(
         max_length=75,
         choices=EDUCATION_CATEGORIES,
-        default=HIGHER,
+        blank=True,
+        default='',
         verbose_name='Категория получаемого образования (при уровне образования - студент)'
     )
     education_doc = models.ForeignKey(
@@ -59,7 +61,8 @@ class CourseApplication(BaseApplication):
         verbose_name='Номер документа об образовании'
     )
     education_date = models.DateField(
-        default=datetime.date.today,
+        default=None,
+        null=True,
         verbose_name='Дата выдачи документа об образовании'
     )
     certificate_doc = models.ForeignKey(

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 
 from apps.authen.models.student_profile import StudentProfile
 
@@ -16,16 +15,14 @@ class StudentProfileAdmin(admin.ModelAdmin):
         'birthday',
         'sex_alias',
         'phone',
-        'snils',
-        'email'
+        'snils'
     )
     search_fields = (
         'surname',
         'name',
         'patronymic',
         'phone',
-        'snils',
-        'email'
+        'snils'
     )
 
     def state_name(self, obj):
@@ -40,10 +37,5 @@ class StudentProfileAdmin(admin.ModelAdmin):
             return 'М'
         return 'Ж'
 
-    def email(self, obj):
-        """Отображение пользовательского email из модели пользователей Django"""
-        return User.objects.get(id=obj.django_user_id).email
-
     state_name.short_description = 'Государство'
     sex_alias.short_description = 'Пол'
-    email.short_description = 'Email'
