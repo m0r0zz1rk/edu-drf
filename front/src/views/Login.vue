@@ -109,7 +109,7 @@
               <v-text-field
                 id="cokoLogin"
                 bg-color="white"
-                label="Логин"
+                label="Логин (в формате: a.adminov)"
                 :rules="[rules.required,]"
                 variant="solo"
                 :loading="formLoading"
