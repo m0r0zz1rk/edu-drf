@@ -29,6 +29,7 @@
               <v-text-field v-if="loginStudentType === 'phone'"
                             id="phoneTextField"
                             bg-color="white"
+                            v-model="phone"
                             v-mask="'+7 (###) ###-##-##'"
                             :rules="[rules.required, rules.phone]"
                             label="Номер телефона"
@@ -175,6 +176,8 @@ export default {
     return {
       // Выбранная вкладка на форме логина
       loginTab: 'student',
+      // Номер телефона на форме
+      phone: '',
       // Тип авторизации для обучающегося
       loginStudentType: 'email',
       // Отображение пароля
@@ -340,6 +343,11 @@ export default {
       this.formLoading = false
     }
   },
+  watch: {
+    phone: function(newValue) {
+      if (['+7 (8', '+7 (7'].includes(newValue)) {this.phone = '+7 ('}
+    },
+  }
 }
 </script>
 
