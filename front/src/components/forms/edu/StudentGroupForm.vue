@@ -127,6 +127,7 @@
       <template v-if=" studentGroupInfo !== null">
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'manage'"
           color="coko-blue"
           text="Сохранить"
@@ -135,6 +136,7 @@
         />
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'apps' && userRole === 'centre'"
           color="coko-blue"
           text="Перенос заявок"
@@ -143,6 +145,7 @@
         />
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'apps' && checkData?.oo?.length !== 0"
           color="coko-blue"
           text="ОО"
@@ -151,6 +154,7 @@
         />
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'apps' && checkData?.edu?.length !== 0"
           color="coko-blue"
           text="Образование"
@@ -159,6 +163,7 @@
         />
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'apps' && checkData?.pay?.length !== 0"
           color="coko-blue"
           text="Оплата"
@@ -167,6 +172,7 @@
         />
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'certificate' && userRole === 'centre'"
           color="coko-blue"
           text="Генерация"
@@ -175,6 +181,7 @@
         />
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'certificate' && userRole === 'centre'"
           color="coko-blue"
           text="Файл печати"
@@ -183,6 +190,7 @@
         />
 
         <v-btn
+          variant="flat"
           v-if="groupTab === 'certificate' && userRole === 'centre'"
           color="coko-blue"
           text="Подгрузка"

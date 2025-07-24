@@ -162,7 +162,7 @@ class BaseApplicationService:
                 obj = {**base_obj}
                 for field in self._check_edu_fields:
                     if field == 'education_date':
-                        obj[field] = getattr(app, field).strftime('%d.%m.%Y')
+                        obj[field] = getattr(app, field).strftime('%d.%m.%Y') if getattr(app, field) else None
                     else:
                         obj[field] = getattr(app, field)
                 data.get('edu').append(obj)
