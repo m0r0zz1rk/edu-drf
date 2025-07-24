@@ -81,7 +81,6 @@ class ScheduleViewSet(viewsets.ViewSet):
             )
             return journal_request.create_response()
         except RuntimeError:
-            print(exception_handling.get_traceback())
             raise APIProcessError
 
     @swagger_auto_schema(

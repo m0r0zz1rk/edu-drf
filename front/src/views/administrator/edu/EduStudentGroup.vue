@@ -83,8 +83,6 @@ export default {
     // Получить URL эндпоинта в зависимости от роли
     getURL() {
       let urlGet = "/backend/api/v1/edu/student_group/"
-      console.log('userRole: ', this.userRole)
-      console.log('userDep: ', this.userDep)
       if (this.userRole === 'dep') {
         urlGet += `?dep=${this.userDep}`
       }

@@ -10,7 +10,6 @@ def check_survey_exist(survey: Optional[survey_model]):
     def inner_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            print(survey)
             if survey is None:
                 raise SurveyNotExist
             return func(*args, **kwargs)

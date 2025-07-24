@@ -308,7 +308,6 @@ export default {
           {email: this.passwordResetEmail},
           true
         )
-        console.log('passwordResetReq: ', passwordResetReq)
         if (passwordResetReq.status === 200) {
           showAlert('success', 'Сброс пароля', 'На почту будет отправлено письмо с дальнейшими инструкциями')
           this.$refs.passwordResetDialog.close()

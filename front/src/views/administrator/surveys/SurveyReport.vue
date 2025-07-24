@@ -398,7 +398,6 @@ export default {
           showAlert('error', 'Отчет по опросу', 'Произошла ошибка при формировании отчета по опросу')
         }
       } catch(e) {
-        console.log('report error: ', e)
         showAlert('error', 'Отчет по опросу', 'Произошла ошибка при формировании отчета по опросу')
       }
       this.loading = false

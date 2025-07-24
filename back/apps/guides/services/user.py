@@ -86,7 +86,6 @@ class UserService:
                 data[k] = state_orm.get_one_record_or_none({'name': v})
             else:
                 data[k] = v
-        print('update_profile data: ', repr(data))
         student_profile_orm.update_record({'object_id': profile_id}, data)
 
     @staticmethod

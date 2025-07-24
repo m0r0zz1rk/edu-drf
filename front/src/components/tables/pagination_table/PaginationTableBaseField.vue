@@ -169,9 +169,7 @@ export default {
         if (this.field.ui === 'date') {
           this.localValue = null
         }
-      } catch(e) {
-        console.log(e)
-      }
+      } catch(e) {}
     },
   },
   mounted() {

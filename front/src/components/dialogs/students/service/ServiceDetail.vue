@@ -122,7 +122,6 @@ export default {
           })
         }
       } catch(e) {
-        console.log('ou_service save error: ', e)
         showAlert(
           'error',
           'Подача заявки',

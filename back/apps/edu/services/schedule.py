@@ -241,12 +241,10 @@ class ScheduleService:
         """
         for key in day_info_object:
             if key not in self.__day_info_keys:
-                print(key)
                 raise DayInfoValidateError
         for lesson in day_info_object['lessons']:
             for key in lesson:
                 if key not in self.__lesson_keys:
-                    print(key)
                     raise DayInfoValidateError
 
     def save_lesson(

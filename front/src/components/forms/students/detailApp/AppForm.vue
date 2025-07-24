@@ -662,59 +662,59 @@ export default {
     'internalApp.education_level': function(newValue, oldValue) {
       try {
         this.changeAppAttribute('education_level', newValue)
-      } catch (e) {console.log('internalApp.education_level error: ', e)}
+      } catch (e) {}
     },
     'internalApp.education_category': function(newValue, oldValue) {
       try {
         this.changeAppAttribute('education_category', newValue)
-      } catch (e) {console.log('internalApp.education_category error: ', e)}
+      } catch (e) {}
     },
     'internalApp.education_doc_id': function (newValue, oldValue) {
       try {
         this.changeAppAttribute('education_doc_id', newValue)
         this.changeAppAttribute('education_doc_name', this.internalApp.education_doc_name)
         this.changeAppAttribute('education_doc_file', this.internalApp.education_doc_file)
-      } catch (e) {console.log('internalApp.education_doc_id error: ', e)}
+      } catch (e) {}
     },
     'internalApp.diploma_surname': function (newValue, oldValue) {
       try {
         this.changeAppAttribute('diploma_surname', newValue)
-      } catch (e) {console.log('internalApp.diploma_surname error: ', e)}
+      } catch (e) {}
     },
     'internalApp.surname_doc_id': function (newValue, oldValue) {
       try {
         this.changeAppAttribute('surname_doc_id', newValue)
         this.changeAppAttribute('surname_doc_name', this.internalApp.surname_doc_name)
         this.changeAppAttribute('surname_doc_file', this.internalApp.surname_doc_file)
-      } catch (e) {console.log('internalApp.surname_doc_id error: ', e)}
+      } catch (e) {}
     },
     'internalApp.education_serial': function (newValue, oldValue) {
       try {
         this.changeAppAttribute('education_serial', newValue)
-      } catch (e) {console.log('internalApp.education_serial error: ', e)}
+      } catch (e) {}
     },
     'internalApp.education_number': function (newValue, oldValue) {
       try {
         this.changeAppAttribute('education_number', newValue)
-      } catch(e) {console.log('internalApp.education_number error: ', e)}
+      } catch(e) {}
     },
     'internalApp.education_date': function (newValue, oldValue) {
       try {
         if (!(newValue instanceof Date)) {
           this.changeAppAttribute('education_date', convertDateToBackend(newValue))
         }
-      } catch(e) {console.log('internalApp.education_date error: ', e)}
+      } catch(e) {}
 
     },
     'internalApp.certificate_mail': function (newValue, oldValue) {
       try {
         this.changeAppAttribute('certificate_mail', newValue)
-      } catch(e) {console.log('internalApp.certificate_mail error: ', e)}
+      } catch(e) {}
     },
     'internalApp.mail_address': function(newValue, oldValue) {
       try {
         this.changeAppAttribute('mail_address', newValue)
-      } catch(e) {console.log('internalApp.mail_address error: ', e)}
+      } catch(e) {}
     }
   },
   mounted() {

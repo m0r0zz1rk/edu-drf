@@ -37,8 +37,6 @@ class TeacherService:
         if lessons.count() == 0:
             return True
         if lessons.count() == 1:
-            print(lessons.first().group_id)
-            print(group_id)
             if str(lessons.first().group_id) == str(group_id):
                 return True
         return False

@@ -355,7 +355,6 @@ export default {
     async saveEducationService() {
       this.$refs["content-error"].hideContentError()
       let checkData = true
-      console.log('educationService: ', this.educationService)
       Object.keys(this.educationService).map((key) => {
         if ((key !== 'object_id') && (
           ([undefined, null].includes(this.educationService[key]) ||
@@ -412,7 +411,6 @@ export default {
     // Преобразование даты форма дд.мм.гггг в объект Date при изменении информации о приказе ДПП
     educationService: {
       handler() {
-        console.log('educationService watch: ', this.educationService)
         if (this.educationService.date_start !== null && this.educationService.date_start.length === 10) {
           try {
             this.educationService.date_start = convertBackendDate(this.educationService.date_start)

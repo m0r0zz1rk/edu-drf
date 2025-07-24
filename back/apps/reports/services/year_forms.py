@@ -117,7 +117,6 @@ class YearFormsReport:
                     result = getattr(result, attr)
                 return result if result is not None else '-'
         except Exception:
-            print(f'Ошибка выполнения {value}: {exception_handling.get_traceback()}')
             return '-'
 
     def _set_data(self, ws):
