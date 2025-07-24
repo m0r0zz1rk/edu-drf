@@ -10,7 +10,7 @@ def password_reset_email_task(email, html_message):
     """Отправка пользователю письма со ссылкой на сброс пароля"""
     try:
         send_mail(
-            'АИС "Мероприятия ИОХК": Сброс пароля',
+            'АИС "Учебный центр": Сброс пароля',
             None,
             settings.EMAIL_HOST_USER,
             [email, ],
