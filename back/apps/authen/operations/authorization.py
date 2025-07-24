@@ -114,10 +114,11 @@ class Authorization(MainProcessing):
             )
             if self.auth_user.is_staff and not self.auth_user.is_superuser:
                 centre_info = ldap_utils.get_ad_user_centre(self.auth_user)
-                ad_centre_coko_user_utils.add_rec(
-                    self.auth_user,
-                    centre_info[1]
-                )
+                if centre_info:
+                    ad_centre_coko_user_utils.add_rec(
+                        self.auth_user,
+                        centre_info[1]
+                    )
             if profile.surname == 'Фамилия':
                 profile_service.set_coko_profile_data(
                     profile,

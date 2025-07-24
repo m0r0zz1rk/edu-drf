@@ -127,6 +127,7 @@ class LdapUtils:
                 SUBTREE,
                 attributes=['department', 'title', 'manager']
             )
+            print('dep title manager:', conn.entries)
             data = conn.entries
             if not any(s in str(data[0].title) for s in self.high_positions):
                 conn.search(
@@ -134,6 +135,7 @@ class LdapUtils:
                     f"(distinguishedName={str(data[0].manager)})",
                     SUBTREE,
                     attributes=['manager', 'department', 'title'])
+                print('ruk dep title manager:', conn.entries)
                 data = conn.entries
                 if any(s in str(data[0].title) for s in ['Заведующий', 'заведующий']):
                     conn.search(
@@ -142,15 +144,17 @@ class LdapUtils:
                         SUBTREE,
                         attributes=['manager', 'title', 'department']
                     )
+                    print('not zav dep title manager:', conn.entries)
                     data = conn.entries
-                    if not any(s in str(data[0].title) for s in self.high_positions):
-                        conn.search(
-                            self.AD_USER_SEARCH_TREE,
-                            f"(distinguishedName={data[0].manager})",
-                            SUBTREE,
-                            attributes=['department']
-                        )
-                        data = conn.entries
+                if not any(s in str(data[0].title) for s in self.high_positions):
+                    conn.search(
+                        self.AD_USER_SEARCH_TREE,
+                        f"(distinguishedName={data[0].manager})",
+                        SUBTREE,
+                        attributes=['department']
+                    )
+                    data = conn.entries
+                    print('last dep title manager:', conn.entries)
             conn.search(
                 'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
                 f"(info={data[0].department})",
