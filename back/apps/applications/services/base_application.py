@@ -65,14 +65,6 @@ class BaseApplicationService:
 
     _new_course_app_fields = [
         *_new_event_app_fields,
-        'education_level',
-        'education_category',
-        'education_doc_id',
-        'diploma_surname',
-        'surname_doc',
-        'education_serial',
-        'education_number',
-        'education_date',
         'certificate_mail',
         'mail_address'
     ]
