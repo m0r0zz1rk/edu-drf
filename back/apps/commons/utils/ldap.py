@@ -6,6 +6,7 @@ from ldap3 import Server, Connection, SUBTREE
 
 from apps.commons.decorators.ldap_utils_journal_decorator import ldap_utils_journal_decorator
 from apps.commons.services.ad.ad_centre import ad_centre_service
+from apps.commons.utils.data_types.string import string_utils
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.settings import settings_utils
 from apps.journal.consts.journal_modules import COMMON
@@ -119,50 +120,46 @@ class LdapUtils:
         :param user: Пользователь Django
         :return:
         """
-        with self.ldap_connect() as conn:
-            # conn.bind()
+        with (self.ldap_connect() as conn):
             conn.search(
                 self.AD_USER_SEARCH_TREE,
                 f'(sAMAccountName={user.username})',
                 SUBTREE,
                 attributes=['department', 'title', 'manager']
             )
-            print('dep title manager:', conn.entries)
             data = conn.entries
-            if not any(s in str(data[0].title) for s in self.high_positions):
+            if not any(s in string_utils.decode_ldap(data[0].title) for s in self.high_positions):
                 conn.search(
                     self.AD_USER_SEARCH_TREE,
-                    f"(distinguishedName={str(data[0].manager)})",
+                    f"(distinguishedName={string_utils.decode_ldap(data[0].manager)})",
                     SUBTREE,
                     attributes=['manager', 'department', 'title'])
-                print('ruk dep title manager:', conn.entries)
                 data = conn.entries
-                if any(s in str(data[0].title) for s in ['Заведующий', 'заведующий']):
+                if any(s in string_utils.decode_ldap(data[0].title) for s in ['Заведующий', 'заведующий']):
                     conn.search(
                         self.AD_USER_SEARCH_TREE,
-                        f"(distinguishedName={data[0].manager})",
+                        f"(distinguishedName={string_utils.decode_ldap(str(data[0].manager))})",
                         SUBTREE,
                         attributes=['manager', 'title', 'department']
                     )
-                    print('not zav dep title manager:', conn.entries)
                     data = conn.entries
-                if not any(s in str(data[0].title) for s in self.high_positions):
+                if not any(s in string_utils.decode_ldap(data[0].title) for s in self.high_positions):
                     conn.search(
                         self.AD_USER_SEARCH_TREE,
-                        f"(distinguishedName={data[0].manager})",
+                        f"(distinguishedName={string_utils.decode_ldap(data[0].manager)})",
                         SUBTREE,
                         attributes=['department']
                     )
                     data = conn.entries
-                    print('last dep title manager:', conn.entries)
             conn.search(
                 'ou=Groups,ou=CMN,ou=COKO,dc=coko38,dc=ru',
-                f"(info={data[0].department})",
+                f"(info={string_utils.decode_ldap(data[0].department)})",
                 SUBTREE,
                 attributes=['ObjectGUID', 'displayName']
             )
             data = conn.entries
-            return str(data[0].displayName), str(data[0].ObjectGUID)
+            return (string_utils.decode_ldap(data[0].displayName),
+                    string_utils.decode_ldap(data[0].ObjectGUID))
 
     @ldap_utils_journal_decorator(
         'Центры с менеджерами успешно получены',
