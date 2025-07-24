@@ -135,7 +135,7 @@ class GenerateDaySerializer(serializers.Serializer):
         label='Время начала первого занятия'
     )
     hours_count = serializers.IntegerField(
-        max_value=6,
+        max_value=9,
         min_value=1,
         label='Количество академических часов'
     )
