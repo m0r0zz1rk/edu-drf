@@ -292,7 +292,7 @@
                           </div>
                         </template>
 
-                        <template v-if="serviceType !== 'ou'">
+                        <template v-else>
                           <div :title="item[header.key]">
                             <v-text-field
                               v-model="item[header.key]"

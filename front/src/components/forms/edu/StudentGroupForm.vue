@@ -103,7 +103,7 @@
         <StudentGroupSchedule
           v-if="groupTab === 'schedule'"
           :groupId="groupId"
-          :serviceType="studentGroupInfo?.serviceType"
+          :serviceType="studentGroupInfo?.service_type"
           :code="studentGroupInfo?.code"
         />
 
