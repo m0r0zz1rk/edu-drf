@@ -122,16 +122,7 @@
               color="coko-blue"
               text="Сохранить"
               :loading="loading"
-              @click="saveApp()"
-          />
-
-          <v-btn
-            variant="flat"
-              v-if="appTab === 'form' && app.status === 'draft'"
-              color="coko-blue"
-              text="В работу"
-              :loading="loading"
-              @click="saveApp(true)"
+              @click="saveApp(app.status === 'draft')"
           />
 
           <v-btn
