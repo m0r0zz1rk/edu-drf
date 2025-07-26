@@ -1,15 +1,6 @@
 <template>
-
-  <template
-    v-if="internalPayData === null"
-  >
-    Пожалуйста, подождите..
-  </template>
-
-  <template
-    v-else
-  >
-
+  <template v-if="internalPayData === null">Пожалуйста, подождите..</template>
+  <template v-else>
     <v-alert
       v-if="internalPayData.length === 0"
       color="success"
@@ -17,85 +8,44 @@
       title="Проверка ОО"
       text="Все документы были проверены"
     />
-
-    <template
-      v-if="internalPayData.length > 0 & payApp !== null"
-    >
-
-      <v-text-field
-        readonly
-        label="ФИО обучающегося"
-        v-model="payApp.student"
-        :loading="loading"
-      />
-
-      <v-text-field
-        readonly
-        label="Документ об оплате"
-        v-model="docText"
-        :loading="loading"
-        @click="e => openDocViewerDialog()"
-      />
-
-      <v-text-field
-        label="Причина отказа"
-        v-model="rejectReason"
-        :loading="loading"
-      />
-
-      <v-card
-        v-if="internalPayData.length > 0 & payApp !== null"
-      >
-
-        <v-card-actions>
-
-          <v-spacer />
-
-          <v-btn
-            color="coko-blue"
-            text="Пропустить"
-            :loading="loading"
-            @click="getNext()"
-          />
-
-          <v-btn
-            color="coko-blue"
-            text="Отклонить"
-            :loading="loading"
-            @click="payReject()"
-          />
-
-          <v-btn
-            color="coko-blue"
-            text="Подтвердить"
-            :loading="loading"
-            @click="saveData()"
-          />
-
-
-        </v-card-actions>
-
-      </v-card>
-
-      <CokoDialog
-        ref="docViewerDialog"
-        v-if="payApp !== null"
-      >
-
-        <template v-slot:title>
-          Документ об оплате {{payApp.student}}
-        </template>
-
-        <template v-slot:text>
-
-          <DocViewer
-            fileType="pay"
-            :fileId="payApp.pay_doc_id"
-          />
-
-        </template>
-
-      </CokoDialog>
+    <template v-if="internalPayData.length > 0 & payApp !== null">
+      <table style="width: 100%">
+        <tr>
+          <td style="width: 50%; align-content: flex-start">
+            <v-text-field readonly label="ФИО обучающегося" v-model="payApp.student" :loading="loading"/>
+            <v-text-field
+              v-if="mobileDisplay"
+              readonly
+              label="Документ об оплате"
+              v-model="docText"
+              :loading="loading"
+              @click="e => openDocViewerDialog()"
+            />
+            <v-text-field label="Причина отказа" v-model="rejectReason" :loading="loading"/>
+            <v-card v-if="internalPayData.length > 0 & payApp !== null">
+              <v-card-actions>
+                <v-spacer />
+                <v-btn color="coko-blue" text="Пропустить" :loading="loading" @click="getNext()" />
+                <v-btn color="coko-blue" text="Отклонить" :loading="loading" @click="payReject()" />
+                <v-btn color="coko-blue" text="Подтвердить" :loading="loading" @click="saveData()" />
+              </v-card-actions>
+            </v-card>
+            <CokoDialog ref="docViewerDialog" v-if="mobileDisplay && payApp !== null">
+              <template v-slot:title>Документ об оплате {{payApp.student}}</template>
+              <template v-slot:text>
+                <DocViewer fileType="pay" :fileId="payApp.pay_doc_id"/>
+              </template>
+            </CokoDialog>
+          </td>
+          <td style="width: 50%; align-content: flex-start" v-if="!mobileDisplay">
+            <b style="top: 0">Документ об оплате</b><br/>
+            <b v-if="payApp.pay_doc_id === null">Нет документа</b>
+            <div v-else :key="key" style="width: 100%; height: 60vh; overflow: auto">
+              <DocViewer fileType="pay" :fileId="payApp.pay_doc_id"/>
+            </div>
+          </td>
+        </tr>
+      </table>
 
     </template>
 
@@ -110,6 +60,7 @@ import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import DocViewer from "@/components/DocViewer.vue";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
+import {useDisplay} from "vuetify";
 
 export default {
   name: "CheckPay",
@@ -128,6 +79,8 @@ export default {
   },
   data() {
     return {
+      // Параметр проверки мобильного устройства
+      mobileDisplay: useDisplay().smAndDown,
       // Индекс для массива данных
       index: 0,
       // Текущая заявка на редактирование
@@ -139,7 +92,8 @@ export default {
       // Текст поля для просмотра документа об оплате
       docText: 'Нажмите для просмотра',
       // Текст с причиной отказа, отправляемый пользователю по email
-      rejectReason: ''
+      rejectReason: '',
+      key: 0
     }
   },
   methods: {
@@ -220,6 +174,7 @@ export default {
     this.setFirstAppAndInternalPayData()
   },
   watch: {
+    payApp: function() {this.key += 1},
     internalPayData: function(newValue, oldValue) {
       if (!([newValue, oldValue].includes(null)) && newValue !== this.payData) {
         this.changeCheckData('pay', newValue)

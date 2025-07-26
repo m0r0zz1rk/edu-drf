@@ -1,15 +1,8 @@
 <template>
 
-  <template
-    v-if="internalEduData === null"
-  >
-    Пожалуйста, подождите..
-  </template>
+  <template v-if="internalEduData === null">Пожалуйста, подождите..</template>
 
-  <template
-    v-else
-  >
-
+  <template v-else>
     <v-alert
       v-if="internalEduData.length === 0"
       color="success"
@@ -17,114 +10,74 @@
       title="Проверка ОО"
       text="Все документы были проверены"
     />
-
-    <template
-      v-if="internalEduData.length > 0 & eduApp !== null"
-    >
-
-      <v-text-field
-        readonly
-        label="ФИО обучающегося"
-        v-model="eduApp.student"
-        :loading="loading"
-      />
-
-      <v-text-field
-        readonly
-        label="Документ об образовании"
-        v-model="docInputText"
-        :loading="loading"
-        @click="e => openDocViewerDialog('edu')"
-      />
-
-      <v-text-field
-        v-if="eduApp.surname_doc_id !== null"
-        readonly
-        label="Документ о смене фамилии"
-        v-model="docInputText"
-        :loading="loading"
-        @click="e => openDocViewerDialog('surname')"
-      />
-
-      <v-text-field
-        label="Указанная фамилия"
-        v-model="eduApp.diploma_surname"
-        :loading="loading"
-      />
-
-      <v-text-field
-        label="Серия документа"
-        v-model="eduApp.education_serial"
-        :loading="loading"
-      />
-
-      <v-text-field
-        label="Номер документа"
-        v-model="eduApp.education_number"
-        :loading="loading"
-      />
-
-      <v-date-input
-        format="DD.MM.YYYY"
-        v-mask="'##.##.####'"
-        bg-color="white"
-        label="Дата выдачи документа"
-        v-model="eduApp.education_date"
-        @input="e => e.target.value.length === 10 ? eduApp.education_date = e.target.value : ''"
-        prepend-icon=""
-        prepend-inner-icon="$calendar"
-        variant="solo"
-        :loading="loading"
-        clearable
-      />
-
-      <v-card
-        v-if="internalEduData.length > 0 & eduApp !== null"
-      >
-
-        <v-card-actions>
-
-          <v-spacer />
-
-          <v-btn
-            color="coko-blue"
-            text="Пропустить"
-            :loading="loading"
-            @click="getNext()"
-          />
-
-          <v-btn
-            color="coko-blue"
-            text="Подтвердить"
-            :loading="loading"
-            @click="saveData()"
-          />
-
-
-        </v-card-actions>
-
-      </v-card>
-
-      <CokoDialog
-        ref="docViewerDialog"
-        v-if="eduApp !== null"
-      >
-
-        <template v-slot:title>
-          {{ dialogTitle }} {{eduApp.student}}
-        </template>
-
-        <template v-slot:text>
-
-          <DocViewer
-            fileType="student"
-            :fileId="dialogTitle === 'Документ об образовании' ? eduApp.education_doc_id : eduApp.surname_doc_id"
-          />
-
-        </template>
-
-      </CokoDialog>
-
+    <template v-if="internalEduData.length > 0 & eduApp !== null">
+      <table style="width: 100%">
+        <tr>
+          <td style="width: 50%">
+            <v-text-field readonly label="ФИО обучающегося" v-model="eduApp.student" :loading="loading"/>
+            <v-text-field
+              readonly
+              label="Документ об образовании"
+              v-model="docInputText"
+              :loading="loading"
+              @click="e => openDocViewerDialog('edu')"
+            />
+            <v-text-field
+              v-if="eduApp.surname_doc_id !== null"
+              readonly
+              label="Документ о смене фамилии"
+              v-model="docInputText"
+              :loading="loading"
+              @click="e => openDocViewerDialog('surname')"
+            />
+            <v-text-field label="Указанная фамилия" v-model="eduApp.diploma_surname" :loading="loading"/>
+            <v-text-field label="Серия документа" v-model="eduApp.education_serial" :loading="loading"/>
+            <v-text-field label="Номер документа" v-model="eduApp.education_number" :loading="loading"/>
+            <v-date-input
+              format="DD.MM.YYYY"
+              v-mask="'##.##.####'"
+              bg-color="white"
+              label="Дата выдачи документа"
+              v-model="eduApp.education_date"
+              @input="e => e.target.value.length === 10 ? eduApp.education_date = e.target.value : ''"
+              prepend-icon=""
+              prepend-inner-icon="$calendar"
+              variant="solo"
+              :loading="loading"
+              clearable
+            />
+            <v-card v-if="internalEduData.length > 0 & eduApp !== null">
+              <v-card-actions>
+                <v-spacer />
+                <v-btn color="coko-blue" text="Пропустить" :loading="loading" @click="getNext()"/>
+                <v-btn color="coko-blue" text="Подтвердить" :loading="loading" @click="saveData()"/>
+              </v-card-actions>
+            </v-card>
+            <CokoDialog ref="docViewerDialog" v-if="mobileDisplay && eduApp !== null">
+              <template v-slot:title>
+                {{ dialogTitle }} {{eduApp.student}}
+              </template>
+              <template v-slot:text>
+                <DocViewer
+                  fileType="student"
+                  :fileId="dialogTitle === 'Документ об образовании' ? eduApp.education_doc_id : eduApp.surname_doc_id"
+                />
+              </template>
+            </CokoDialog>
+          </td>
+          <td style="width: 50%; align-content: flex-start" v-if="!mobileDisplay">
+            <b style="top: 0">{{ dialogTitle }}</b><br/>
+            <b v-if="dialogTitle === 'Документ об образовании' && eduApp.education_doc_id === null">Нет документа</b>
+            <b v-else-if="dialogTitle === 'Документ о смене фамилии' && eduApp.surname_doc_id === null">Нет документа</b>
+            <div v-else :key="key" style="width: 100%; height: 60vh; overflow: auto">
+              <DocViewer
+                fileType="student"
+                :fileId="dialogTitle === 'Документ об образовании' ? eduApp.education_doc_id : eduApp.surname_doc_id"
+              />
+            </div>
+          </td>
+        </tr>
+      </table>
     </template>
 
   </template>
@@ -140,6 +93,7 @@ import {endpoints} from "@/commons/endpoints";
 import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
+import {useDisplay} from "vuetify";
 
 export default {
   name: "CheckEdu",
@@ -158,6 +112,8 @@ export default {
   },
   data() {
     return {
+      // Параметр проверки мобильного устройства
+      mobileDisplay: useDisplay().smAndDown,
       // Индекс для массива данных
       index: 0,
       // Текущая заявка на редактирование
@@ -169,7 +125,8 @@ export default {
       // Текст поля для просмотра документа об образовании
       docInputText: 'Нажмите для просмотра документа',
       // Заголовок диалогового окна
-      dialogTitle: 'Документ об образовании'
+      dialogTitle: 'Документ об образовании',
+      key: 0,
     }
   },
   methods: {
@@ -228,13 +185,15 @@ export default {
       if (type === 'surname') {
         this.dialogTitle = 'Документ о смене фамилии'
       }
-      this.$refs.docViewerDialog.dialog = true
+      if (this.mobileDisplay) {this.$refs.docViewerDialog.dialog = true}
     }
   },
   mounted() {
     this.setFirstAppAndInternalEduData()
   },
   watch: {
+    dialogTitle: function() { this.key += 1 },
+    eduApp: function() {this.key += 1},
     internalEduData: function(newValue, oldValue) {
       if (!([newValue, oldValue].includes(null)) && newValue !== this.eduData) {
         this.changeCheckData('edu', newValue)
