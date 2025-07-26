@@ -205,6 +205,7 @@ class EduData:
             sql = 'SELECT * from dbo.centre_stschedule where parent_id is not NULL'
             data_query = conn.execute(text(sql))
             data = data_query.all()
+        print('themes data: ', data)
         for theme in data:
             if len(list(filter(lambda th: th.old_id == theme[0], exists))) > 0:
                 continue

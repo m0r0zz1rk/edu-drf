@@ -242,7 +242,7 @@
 
     <v-select
         color="coko-blue"
-        v-model="payAttr"
+        v-model="internalApp.physical"
         :items="payOptions"
         item-title="title"
         item-value="key"
@@ -450,8 +450,6 @@ export default {
         {key: true, title: 'Физическое лицо'},
         {key: false, title: 'Юридическое лицо'}
       ],
-      // Значение оплаты
-      payAttr: null,
       // Внутренний объект заявки
       internalApp: null,
       // Выбранная ОО
@@ -570,9 +568,6 @@ export default {
     },
   },
   watch: {
-    payAttr: function(newValue) {
-      this.internalApp.physical = newValue
-    },
     'internalApp.region_id': function (newValue, oldValue) {
       if (oldValue !== null) {
         const newRegName = this.regions.filter((reg) => reg.object_id === newValue)[0].name
