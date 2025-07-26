@@ -42,7 +42,7 @@ def get_all_edu_data():
 
     # Модуль docs
     print('### Начало работы с модулем Документы')
-    docs_data.get_program_orders()
+    # docs_data.get_program_orders()
     # docs_data.get_student_docs()
     # docs_data.get_pay_docs()
     print('### Окончание работы с модулем Документы')
@@ -51,17 +51,17 @@ def get_all_edu_data():
     print('### Начало работы с модулем Учебная часть')
     # edu_data.get_information_services()
     # edu_data.get_info_service_categories()
-    edu_data.get_programs()
-    edu_data.get_program_calendar_chapters()
-    edu_data.get_program_calendar_themes()
+    # edu_data.get_programs()
+    # edu_data.get_program_calendar_chapters()
+    # edu_data.get_program_calendar_themes()
     # edu_data.get_program_categories()
     # edu_data.get_education_services()
     # edu_data.get_student_groups()
     # edu_data.set_group_curator()
-    # edu_data.get_course_schedule()
-    # edu_data.set_course_schedule_theme_teacher()
-    # edu_data.get_event_schedule()
-    # edu_data.set_event_schedule_teacher()
+    edu_data.get_course_schedule()
+    edu_data.set_course_schedule_theme_teacher()
+    edu_data.get_event_schedule()
+    edu_data.set_event_schedule_teacher()
     print('### Окончание работы с модулем Учебная часть')
 
     # Получение договоров оферт для учебных групп

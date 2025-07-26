@@ -364,6 +364,10 @@ class JournalDoc(BaseStudentGroupDoc):
         _, manager = self._get_department_and_manager()
         control_lessons = self._lessons.exclude(control='').order_by('date')
         for index, lesson in enumerate(control_lessons, start=1):
+            theme = lesson.theme
+            if lesson.kug_theme_id:
+                kug_el = self._schedule_service.get_kug_element_by_theme_id(lesson.kug_theme_id)
+                theme = kug_el.name
             context = {
                 'cats': self._get_categories(),
                 'day_lesson': lesson.date.strftime('%d'),
@@ -371,7 +375,7 @@ class JournalDoc(BaseStudentGroupDoc):
                 'year_lesson': lesson.date.strftime('%Y'),
                 'control_form': lesson.control,
                 'manager': manager,
-                'theme': lesson.kug_theme.name if lesson.kug_theme else lesson.theme,
+                'theme': theme,
                 'students': self._get_students_list()
             }
             if index != len(control_lessons):

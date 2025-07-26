@@ -13,7 +13,7 @@ schedule_model = apps.get_model('edu', 'Schedule')
 # Класс ORM для работы с моделью занятий расписания
 schedule_model_orm = BaseORM(
     model=schedule_model,
-    select_related=['group', 'kug_theme']
+    select_related=['group', ]
 )
 
 

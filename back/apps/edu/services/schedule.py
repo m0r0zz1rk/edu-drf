@@ -13,6 +13,8 @@ from apps.edu.exceptions.calendar_chart.incorrect_theme_dict_format import Incor
 from apps.edu.exceptions.schedule.day_info_validate_error import DayInfoValidateError
 from apps.edu.exceptions.schedule.schedule_generate_error import ScheduleGenerateError
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
 from apps.edu.selectors.schedule import schedule_model, schedule_model_orm
 from apps.edu.selectors.student_group import student_group_orm
 from apps.edu.services.service.education_service import EducationServiceService
@@ -120,9 +122,7 @@ class ScheduleService:
         ).filter(
             group_id=self.__group.object_id
         ).order_by('time_start'):
-            voc = dict({
-                'kug_theme_id': lesson.kug_theme_id
-            })
+            voc = dict({'kug_theme_id': lesson.kug_theme_id})
             for field in schedule_model._meta.get_fields():
                 if field.name in ['object_id', 'date_create', 'group', 'date']:
                     continue
@@ -247,11 +247,7 @@ class ScheduleService:
                 if key not in self.__lesson_keys:
                     raise DayInfoValidateError
 
-    def save_lesson(
-            self,
-            lesson_info: dict,
-            day: datetime.date
-    ):
+    def save_lesson(self, lesson_info: dict, day: datetime.date):
         """
         Сохранение занятия в расписание
         :param lesson_info: объект с информацией по занятию
@@ -298,13 +294,11 @@ class ScheduleService:
         )
         days = {lesson.date for lesson in (schedule_model.objects.
                                            select_related('group').
-                                           select_related('kug_theme').
                                            filter(teacher=profile.object_id)) if lesson.date > datetime.date.today()}
         schedule = []
         for day in days:
             day_lessons = (schedule_model.objects.
                            select_related('group').
-                           select_related('kug_theme').
                            filter(
                                date=day,
                                teacher=profile.object_id
@@ -321,8 +315,9 @@ class ScheduleService:
                 for t in LESSON_TYPES:
                     if t[0] == lesson.type:
                         obj['type'] = t[1]
-                if lesson.kug_theme:
-                    obj['lesson_theme'] = lesson.kug_theme.name
+                if lesson.kug_theme_id:
+                    kug_el = self.get_kug_element_by_theme_id(lesson.kug_theme_id)
+                    obj['lesson_theme'] = kug_el.name
                 else:
                     obj['lesson_theme'] = lesson.theme
                 lessons.append(obj)
@@ -341,3 +336,14 @@ class ScheduleService:
             filter_by={'group_id': self.__group.object_id},
             order_by=['date', 'time_start']
         )
+
+    @staticmethod
+    def get_kug_element_by_theme_id(theme_id: uuid) -> calendar_chart_chapter_model | calendar_chart_theme_model:
+        """
+        Получение элемента КУГ (тема или раздел) по полученному object_id
+        :param theme_id: object_id элемента КУГ
+        :return: Раздел или тема КУГ
+        """
+        if calendar_chart_chapter_model.objects.filter(object_id=theme_id).exists():
+            return calendar_chart_chapter_model.objects.filter(object_id=theme_id).first()
+        return calendar_chart_theme_model.objects.filter(object_id=theme_id).first()

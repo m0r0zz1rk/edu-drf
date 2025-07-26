@@ -30,7 +30,6 @@ class TeacherService:
         time_start = self._date_utils.convert_time_string_to_seconds(time_start_str)
         lessons = (schedule_model.objects.
                    select_related('group').
-                   select_related('kug_theme').
                    filter(date=day).
                    filter(Q(time_start__lte=time_start) & Q(time_end__gt=time_start)).
                    filter(teacher=teacher_id))

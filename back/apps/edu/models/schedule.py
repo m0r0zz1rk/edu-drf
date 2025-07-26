@@ -28,9 +28,7 @@ class Schedule(BaseTable):
         default=0,
         verbose_name='Время окончания занятия (в секундах)'
     )
-    kug_theme = models.ForeignKey(
-        'edu.CalendarChartTheme',
-        on_delete=models.SET_NULL,
+    kug_theme_id = models.UUIDField(
         null=True,
         default=None,
         verbose_name='Тема из КУГ (для групп по курсам)'

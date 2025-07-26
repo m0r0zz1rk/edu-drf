@@ -405,7 +405,6 @@ class EduData:
         """
         exists = (schedule_model.objects.
                   select_related('group').
-                  select_related('kug_theme').
                   all())
         groups = (student_group_model.objects.
                   select_related('ou').
@@ -469,7 +468,6 @@ class EduData:
         """
         exists = (schedule_model.objects.
                   select_related('group').
-                  select_related('kug_theme').
                   all())
         student_profiles = (student_profile_model.objects.
                             select_related('django_user').
@@ -515,7 +513,6 @@ class EduData:
         """
         exists = (schedule_model.objects.
                   select_related('group').
-                  select_related('kug_theme').
                   all())
         groups = (student_group_model.objects.
                   select_related('ou').
@@ -571,7 +568,6 @@ class EduData:
         """
         exists = (schedule_model.objects.
                   select_related('group').
-                  select_related('kug_theme').
                   all())
         student_profiles = (student_profile_model.objects.
                             select_related('django_user').

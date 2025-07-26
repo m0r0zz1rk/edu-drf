@@ -86,6 +86,10 @@ class ScheduleDoc(BaseStudentGroupDoc):
         """
         result = []
         for lesson in self._lessons:
+            theme = lesson.theme
+            if lesson.kug_theme_id:
+                kug_el = self._schedule_service.get_kug_element_by_theme_id(lesson.kug_theme_id)
+                theme = kug_el.name
             time_start = date_utils.convert_seconds_to_time_string(lesson.time_start)
             time_end = date_utils.convert_seconds_to_time_string(lesson.time_end)
             teacher = '-' if not lesson.teacher else profile_service.get_profile_or_info_by_attribute(
@@ -97,7 +101,7 @@ class ScheduleDoc(BaseStudentGroupDoc):
                 'weekday': self._week_days.get(lesson.date.weekday()),
                 'date': lesson.date.strftime('%d.%m.%Y'),
                 'time': f'{time_start} - {time_end}',
-                'theme': lesson.kug_theme.name if lesson.kug_theme else lesson.theme,
+                'theme': theme,
                 'lecture': '1' if lesson.type == LECTURE else '0',
                 'practice': '1' if lesson.type == PRACTICE else '0',
                 'teacher': teacher

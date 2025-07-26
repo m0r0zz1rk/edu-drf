@@ -130,9 +130,7 @@ class CalendarChartViewSet(viewsets.ViewSet):
     def get_remain_hours(self, request, *args, **kwargs):
         try:
             try:
-                kug_remain = self.ccu.get_kug_remains_for_schedule(
-                    self.kwargs['group_id']
-                )
+                kug_remain = self.ccu.get_kug_remains_for_schedule(self.kwargs['group_id'])
             except StudentGroupNotFound:
                 journal_request = JournalRequest(
                     self._journal_request_builder
@@ -179,9 +177,7 @@ class CalendarChartViewSet(viewsets.ViewSet):
                     .set_response_message('Системная ошибка при получении остаточных часов КУГ')
                 )
                 return journal_request.create_response()
-            serialize = CalendarChartRemainHoursSerializer(
-                data={'kug_remain': kug_remain}
-            )
+            serialize = CalendarChartRemainHoursSerializer(data={'kug_remain': kug_remain})
             if serialize.is_valid():
                 return self.respu.ok_response_dict(serialize.data)
             journal_request = JournalRequest(

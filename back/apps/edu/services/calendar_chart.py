@@ -263,19 +263,34 @@ class CalendarChartService:
         kug = self.get_program_calendar_chart(group.ou.program_id, 0)
         ss = ScheduleService(group_id)
         hour_types = ('lecture', 'practice', 'trainee', 'individual')
+        print('kug: ', kug)
         for number, chapter in enumerate(kug['chapters'], start=1):
             chapter_info = {
                 'chapter': f'Раздел {number}. {chapter["name"]}'
             }
             themes = []
-            for theme in chapter['themes']:
+            if len(chapter.get('themes')) > 0:
+                for theme in chapter['themes']:
+                    theme_info = {
+                        'chapter': chapter['name'],
+                        'theme': theme['name'],
+                        'theme_id': theme['object_id']
+                    }
+                    for ht in hour_types:
+                        theme_info[ht] = theme[ht + '_hours']
+                    try:
+                        theme_info = ss.get_remain_hours_for_kug_theme(theme_info)
+                    except IncorrectThemeDictFormat:
+                        raise GetKugRemainsError
+                    themes.append(theme_info)
+            else:
                 theme_info = {
-                    'chapter': chapter['name'],
-                    'theme': theme['name'],
-                    'theme_id': theme['object_id']
+                    'chapter': chapter.get('name'),
+                    'theme': chapter.get('name'),
+                    'theme_id': chapter.get('object_id')
                 }
                 for ht in hour_types:
-                    theme_info[ht] = theme[ht + '_hours']
+                    theme_info[ht] = chapter.get(f'{ht}_hours')
                 try:
                     theme_info = ss.get_remain_hours_for_kug_theme(theme_info)
                 except IncorrectThemeDictFormat:

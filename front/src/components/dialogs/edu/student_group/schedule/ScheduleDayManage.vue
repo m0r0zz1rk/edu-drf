@@ -86,23 +86,10 @@
               </template>
 
               <template v-slot:item="{ item, index }">
-
-                <tr
-                    v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay}"
-                >
-
+                <tr v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay}">
                   <template v-for="header in headers">
-
-                    <td
-                        style="text-align: center;"
-                    >
-
-                      <div v-if="mobileDisplay" class="v-data-table__td-title">
-
-                        {{header.title}}
-
-                      </div>
-
+                    <td style="text-align: center;">
+                      <div v-if="mobileDisplay" class="v-data-table__td-title">{{header.title}}</div>
                       <template v-if="['time_start_str', 'time_end_str'].includes(header.key)">
 
                         <v-text-field
@@ -150,7 +137,6 @@
                       </template>
 
                       <template v-if="header.key === 'theme'">
-
                         <template v-if="serviceType === 'ou'">
                           <div :title="item[header.key]">
                             <v-text-field
@@ -159,31 +145,23 @@
                                 :focused="lessonsDialogs.filter((rec) => rec.lessonId === index)[0]['theme']"
                                 readonly
                             >
-
                               <v-dialog
                                   v-model="lessonsDialogs.filter((rec) => rec.lessonId === index)[0]['theme']"
                                   activator="parent"
                                   width="auto"
                               >
-
-                                <v-card
-                                    class="lk-full-page-card"
-                                >
-
+                                <v-card class="lk-full-page-card">
                                   <v-card-title class="d-flex justify-space-between align-center">
                                     Оставшиеся часы КУГ
                                   </v-card-title>
-
                                   <v-card-text>
                                     <v-expansion-panels>
-
                                       <v-expansion-panel
                                           color="coko-blue"
                                           v-for="chapter in kugRemainHours"
                                           :title="chapter.chapter"
                                           readonly
                                       >
-
                                         <v-data-table
                                             sticky
                                             style="overflow: auto; width: 100%;"
@@ -212,15 +190,14 @@
                                                 <td
                                                     v-if="column.key !== 'theme'"
                                                     style="
-                          text-align: center;
-                          background-color: #373c59;
-                          color: white;
-                        "
+                                                      text-align: center;
+                                                      background-color: #373c59;
+                                                      color: white;
+                                                    "
                                                 >
-                                                  <b>
-                                                    {{column.title}}
-                                                  </b>
+                                                  <b>{{column.title}}</b>
                                                 </td>
+
                                               </template>
                                             </tr>
                                             <tr v-if="mobileDisplay" style="position: sticky; top: 0; z-index: 5">
@@ -228,27 +205,14 @@
                                           </template>
 
                                           <template v-slot:item="{ index: kugIndex, item: kugItem }">
-                                            <tr
-                                                v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay}"
-                                            >
-                                              <td
-                                                  style="text-align: center; width: 60%"
-                                              >
-                                                <div v-if="mobileDisplay" class="v-data-table__td-title">
-                                                  Тема
-                                                </div>
+                                            <tr v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay}">
+                                              <td style="text-align: center; width: 60%">
+                                                <div v-if="mobileDisplay" class="v-data-table__td-title">Тема</div>
                                                 {{ kugItem['theme'] }}
                                               </td>
-
                                               <template v-for="header in remainHoursHeaders">
-                                                <td
-                                                    v-if="header.key !== 'theme'"
-                                                    style="text-align: center"
-                                                >
-                                                  <div
-                                                      v-if="mobileDisplay"
-                                                      class="v-data-table__td-title"
-                                                  >
+                                                <td v-if="header.key !== 'theme'" style="text-align: center">
+                                                  <div v-if="mobileDisplay" class="v-data-table__td-title">
                                                     {{lTypes.filter((type) => type.key === header.key)[0].name}}
                                                   </div>
                                                   <template v-if="header.key !== 'theme'">
@@ -275,23 +239,15 @@
 
                                           <template v-slot:bottom></template>
 
-
                                         </v-data-table>
-
-
                                       </v-expansion-panel>
-
                                     </v-expansion-panels>
                                   </v-card-text>
                                 </v-card>
-
-
                               </v-dialog>
-
                             </v-text-field>
                           </div>
                         </template>
-
                         <template v-else>
                           <div :title="item[header.key]">
                             <v-text-field
@@ -299,7 +255,6 @@
                             />
                           </div>
                         </template>
-
                       </template>
 
                       <template v-if="header.key === 'type'">
@@ -329,16 +284,12 @@
                           <v-text-field
                               :class="lessonsDialogs[index].teacher_busy && 'text-red'"
                               v-model="item['teacher_fio']"
-                              :active="teacherDialog"
-                              :focused="teacherDialog"
+                              :active="teacherDialog[`teacher_${index}`]"
+                              :focused="teacherDialog[`teacher_${index}`]"
                               @update:focused="selectedLessonID = index"
                               readonly
                           >
-                            <v-dialog
-                                persistent
-                                activator="parent"
-                                v-model="teacherDialog"
-                            >
+                            <v-dialog persistent activator="parent" v-model="teacherDialog[`teacher_${index}`]">
 
                               <v-card class="lk-full-page-card">
                                 <v-card-title class="d-flex justify-space-between align-center">
@@ -465,9 +416,7 @@
 
               </template>
 
-              <template v-slot:loading>
-                <v-skeleton-loader :type="'table-row@10'"></v-skeleton-loader>
-              </template>
+              <template v-slot:loading><v-skeleton-loader :type="'table-row@10'"></v-skeleton-loader></template>
 
               <template v-slot:bottom></template>
 
@@ -589,7 +538,7 @@ export default {
           'key': 'individual'
         },
       ], // Список заголовков таблицы для выбора занятия из оставшихся часов КУГ
-      teacherDialog: false, // Параметр отображения диалогового окна для выбора преподавателя
+      teacherDialog: {}, // Параметр отображения диалогового окна для выбора преподавателя
       selectedLessonID: 0, // Номер выбранного для редактирования занятия
       teacherTableHeaders: [
         {
@@ -629,6 +578,12 @@ export default {
     }
   },
   methods: {
+    // Формирование объекта teacherDialog для показа диалогового окна выбора преподавателя на занятии
+    generateTeacherDialog() {
+      this.dayInfo.lessons.forEach((lesson, index) => {
+        this.teacherDialog[`teacher_${index}`] = false
+      })
+    },
     convertTimeStrToSeconds,
     convertSecondsToTimeStr,
     // Создание объекта для управления отображением окон для выбора времени начала и окончания занятия
@@ -775,6 +730,7 @@ export default {
     }
   },
   mounted() {
+    this.generateTeacherDialog()
     this.createTimePickerDialogs()
   }
 }
