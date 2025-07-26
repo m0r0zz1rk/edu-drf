@@ -414,6 +414,7 @@ class EduData:
         themes = (calendar_chart_theme_model.objects.
                   select_related('chapter').
                   all())
+        chapters = calendar_chart_chapter_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
             sql = ('SELECT *'
                    ' from dbo.centre_courselessons')
@@ -436,7 +437,12 @@ class EduData:
                 theme = th.name
                 theme_id = th.object_id
             except Exception:
-                theme_id = None
+                try:
+                    th = list(filter(lambda th: th.old_id == lesson[10], chapters))[0]
+                    theme = th.name
+                    theme_id = th.object_id
+                except Exception:
+                    theme_id = None
             les_type = LECTURE
             if lesson[2]:
                 les_type = PRACTICE

@@ -7,6 +7,7 @@ from django.db.models import QuerySet
 
 from apps.authen.services.profile import ProfileService
 from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeFormatError
+from apps.commons.models import BaseTable
 from apps.commons.utils.data_types.date import DateUtils
 from apps.edu.consts.lesson_types import LESSON_TYPES
 from apps.edu.exceptions.calendar_chart.incorrect_theme_dict_format import IncorrectThemeDictFormat
@@ -338,7 +339,7 @@ class ScheduleService:
         )
 
     @staticmethod
-    def get_kug_element_by_theme_id(theme_id: uuid) -> calendar_chart_chapter_model | calendar_chart_theme_model:
+    def get_kug_element_by_theme_id(theme_id: uuid) -> BaseTable:
         """
         Получение элемента КУГ (тема или раздел) по полученному object_id
         :param theme_id: object_id элемента КУГ
