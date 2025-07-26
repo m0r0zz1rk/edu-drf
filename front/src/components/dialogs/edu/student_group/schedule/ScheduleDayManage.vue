@@ -8,21 +8,11 @@
       :text="!(mobileDisplay) && 'Изменить'"
   />
 
-  <v-dialog
-      persistent
-      v-model="dialog"
-  >
-
+  <v-dialog persistent v-model="dialog">
     <v-card class="lk-full-page-card">
       <v-card-title class="d-flex justify-space-between align-center">
-
         Управление расписанием {{dayInfo.day}}
-
-        <v-btn
-            icon="mdi-close"
-            color="coko-blue"
-            @click="dialog = !(dialog)"
-        />
+        <v-btn icon="mdi-close" color="coko-blue" @click="dialog = !(dialog)"/>
       </v-card-title>
 
       <v-card-text>
@@ -284,127 +274,23 @@
                           <v-text-field
                               :class="lessonsDialogs[index].teacher_busy && 'text-red'"
                               v-model="item['teacher_fio']"
-                              :active="teacherDialog[`teacher_${index}`]"
-                              :focused="teacherDialog[`teacher_${index}`]"
-                              @update:focused="selectedLessonID = index"
+                              @click="selectedLessonID = index; teacherDialog = true"
                               readonly
-                          >
-                            <v-dialog persistent activator="parent" v-model="teacherDialog[`teacher_${index}`]">
-
-                              <v-card class="lk-full-page-card">
-                                <v-card-title class="d-flex justify-space-between align-center">
-
-                                  Выбор преподавателя
-
-                                  <v-btn
-                                      icon="mdi-close"
-                                      color="coko-blue"
-                                      @click="teacherDialog = !(teacherDialog)"
-                                  />
-                                </v-card-title>
-
-                                <v-tabs
-                                    style="width: 100%; top: 0; z-index: 10; position: sticky"
-                                    v-model="teacherTypeTab"
-                                    bg-color="coko-blue"
-                                    show-arrows
-                                >
-
-                                  <v-tab
-                                      class="coko-tab"
-                                      value="coko"
-                                  >
-                                    Сотрудник ЦОКО
-                                  </v-tab>
-
-                                  <v-tab
-                                      class="coko-tab"
-                                      value="user"
-                                  >
-                                    Внешний пользователь
-                                  </v-tab>
-                                </v-tabs>
-
-                                <PaginationTable
-                                    tableTitle="Сотрудник ЦОКО"
-                                    v-if="teacherTypeTab === 'coko'"
-                                    tableWidth="80"
-                                    :noTab="false"
-                                    :addButton="false"
-                                    :xlsxButton="false"
-                                    getRecsURL="/backend/api/v1/guides/coko/"
-                                    :tableHeaders="[
-                                      ...teacherTableHeaders,
-                                      {
-                                        'title': 'Подразделение',
-                                        'key': 'department'
-                                      }
-                                  ]"
-                                    :fieldsArray="[
-                                      ...teacherFieldsArray,
-                                      {
-                                        ui: 'input',
-                                        type: 'text',
-                                        key: 'department',
-                                        addRequired: false,
-                                      }
-                                  ]"
-                                    :itemSelectEvent="chooseTeacher"
-                                />
-
-                                <PaginationTable
-                                    tableTitle="Пользователи"
-                                    v-if="teacherTypeTab === 'user'"
-                                    tableWidth="80"
-                                    :noTab="false"
-                                    :addButton="false"
-                                    :xlsxButton="false"
-                                    getRecsURL="/backend/api/v1/edu/teachers/"
-                                    :tableHeaders="[
-                                      ...teacherTableHeaders,
-                                       {
-                                          'title': 'Телефон',
-                                          'key': 'phone'
-                                       }
-                                  ]"
-                                    :fieldsArray="[
-                                      ...teacherFieldsArray,
-                                      {
-                                        ui: 'phone',
-                                        key: 'phone',
-                                        addRequired: false,
-                                      }
-                                  ]"
-                                    :itemSelectEvent="chooseTeacher"
-                                />
-                              </v-card>
-                            </v-dialog>
-
-                          </v-text-field>
+                          />
                         </div>
                       </template>
 
                       <template v-if="header.key === 'distance'">
-                        <v-switch
-                            color="coko-blue"
-                          v-model="item[header.key]"
-                        />
+                        <v-switch color="coko-blue" v-model="item[header.key]"/>
                       </template>
 
                       <template v-if="header.key === 'control'">
-                        <v-text-field
-                          v-model="item[header.key]"
-                          @change="e => item[header.key] = e.target.value"
-                        />
+                        <v-text-field v-model="item[header.key]" @change="e => item[header.key] = e.target.value"/>
                       </template>
 
                       <template v-if="header.key === 'actions'">
                         <div style="display: inline-block">
-                          <v-icon
-                              icon="mdi-delete"
-                              color="coko-blue"
-                              @click="deleteLesson(index)"
-                          />
+                          <v-icon icon="mdi-delete" color="coko-blue" @click="deleteLesson(index)"/>
                         </div>
                       </template>
 
@@ -446,6 +332,50 @@
 
   </v-dialog>
 
+  <CokoDialog v-model="teacherDialog">
+
+    <template v-slot:title>Выбор преподавателя</template>
+
+    <template v-slot:text>
+      <v-tabs
+        style="width: 100%; top: 0; z-index: 10; position: sticky"
+        v-model="teacherTypeTab"
+        bg-color="coko-blue"
+        show-arrows
+      >
+        <v-tab class="coko-tab" value="coko" text="Сотрудник ЦОКО" />
+        <v-tab class="coko-tab" value="user" text="Внешний пользователь" />
+      </v-tabs>
+
+      <PaginationTable
+        tableTitle="Сотрудник ЦОКО"
+        v-if="teacherTypeTab === 'coko'"
+        tableWidth="80"
+        :noTab="false"
+        :addButton="false"
+        :xlsxButton="false"
+        getRecsURL="/backend/api/v1/guides/coko/"
+        :tableHeaders="[...teacherTableHeaders,{title: 'Подразделение',key: 'department'}]"
+        :fieldsArray="[...teacherFieldsArray,{ui: 'input', type: 'text', key: 'department', addRequired: false}]"
+        :itemSelectEvent="chooseTeacher"
+      />
+
+      <PaginationTable
+        tableTitle="Пользователи"
+        v-if="teacherTypeTab === 'user'"
+        tableWidth="80"
+        :noTab="false"
+        :addButton="false"
+        :xlsxButton="false"
+        getRecsURL="/backend/api/v1/edu/teachers/"
+        :tableHeaders="[...teacherTableHeaders,{title: 'Телефон',key: 'phone'}]"
+        :fieldsArray="[...teacherFieldsArray,{ui: 'phone',key: 'phone',addRequired: false,}]"
+        :itemSelectEvent="chooseTeacher"
+      />
+    </template>
+
+  </CokoDialog>
+
 </template>
 
 <script>
@@ -460,10 +390,12 @@ import {apiRequest} from "@/commons/apiRequest";
 import PaginationTable from "@/components/tables/pagination_table/PaginationTable.vue";
 import {convertBackendDate} from "@/commons/date";
 import {showAlert} from "@/commons/alerts";
+import DocViewer from "@/components/DocViewer.vue";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 
 export default {
   name: 'ScheduleDayManage',
-  components: {PaginationTable, BooleanBadge, DialogContentWithError},
+  components: {CokoDialog, DocViewer, PaginationTable, BooleanBadge, DialogContentWithError},
   props: {
     groupId: String, // object_id учебной группы
     serviceType: String, // Тип услуги учебной группы (ou или iku)
@@ -538,7 +470,7 @@ export default {
           'key': 'individual'
         },
       ], // Список заголовков таблицы для выбора занятия из оставшихся часов КУГ
-      teacherDialog: {}, // Параметр отображения диалогового окна для выбора преподавателя
+      teacherDialog: false, // Параметр отображения диалогового окна для выбора преподавателя
       selectedLessonID: 0, // Номер выбранного для редактирования занятия
       teacherTableHeaders: [
         {
@@ -578,12 +510,6 @@ export default {
     }
   },
   methods: {
-    // Формирование объекта teacherDialog для показа диалогового окна выбора преподавателя на занятии
-    generateTeacherDialog() {
-      this.dayInfo.lessons.forEach((lesson, index) => {
-        this.teacherDialog[`teacher_${index}`] = false
-      })
-    },
     convertTimeStrToSeconds,
     convertSecondsToTimeStr,
     // Создание объекта для управления отображением окон для выбора времени начала и окончания занятия
@@ -729,10 +655,7 @@ export default {
       this.loading = false
     }
   },
-  mounted() {
-    this.generateTeacherDialog()
-    this.createTimePickerDialogs()
-  }
+  mounted() { this.createTimePickerDialogs() }
 }
 
 </script>

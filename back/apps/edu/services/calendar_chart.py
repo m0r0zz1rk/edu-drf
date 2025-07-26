@@ -263,7 +263,6 @@ class CalendarChartService:
         kug = self.get_program_calendar_chart(group.ou.program_id, 0)
         ss = ScheduleService(group_id)
         hour_types = ('lecture', 'practice', 'trainee', 'individual')
-        print('kug: ', kug)
         for number, chapter in enumerate(kug['chapters'], start=1):
             chapter_info = {
                 'chapter': f'Раздел {number}. {chapter["name"]}'
