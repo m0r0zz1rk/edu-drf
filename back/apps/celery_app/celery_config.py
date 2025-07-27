@@ -38,6 +38,10 @@ class CeleryConfig:
                 'task': 'apps.celery_app.tasks.beat.check_registration_end.check_registration_end',
                 'schedule': crontab(minute=0, hour=0)
             },
+            'check-start-event': {
+                'task': 'apps.celery_app.tasks.beat.check_start_event.check_start_event',
+                'schedule': crontab(minute='*/15')
+            },
             'show-survey': {
                 'task': 'apps.celery_app.tasks.beat.show_survey.show_survey',
                 'schedule': crontab(minute=0, hour=0)

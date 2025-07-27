@@ -19,7 +19,7 @@ def show_survey():
         'Задача на проверку отображения опроса завершилась ошибкой'
     )
     def wrapper():
-        groups = student_group_service.get_groups_with_status(PROCESS)
+        groups = student_group_service.get_groups_with_status([PROCESS, ])
         changed = []
         for group in groups:
             date_end = group.ou.date_end if group.ou else group.iku.date_end

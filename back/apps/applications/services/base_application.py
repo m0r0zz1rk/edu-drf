@@ -1,7 +1,7 @@
 import uuid
 from typing import Callable, Optional
 
-from django.db.models import Model
+from django.db.models import Model, QuerySet
 
 from apps.applications.consts.application_statuses import CHECK, WORK, WAIT_PAY, PAY, STUDY, STUDY_COMPLETE
 from apps.applications.exceptions.application import ApplicationCreateError
@@ -305,6 +305,16 @@ class BaseApplicationService:
         if app:
             if app.status in [PAY, STUDY, STUDY_COMPLETE]:
                 return {'study_url': app.group.event_url}
+
+    @staticmethod
+    def get_group_apps(group_id: uuid, orm: BaseORM) -> QuerySet:
+        """
+        Получение заявок учебной группы
+        :param group_id: object_id учебной группы
+        :param orm: Класс ORM для работы с заявками
+        :return: QuerySet с заявками
+        """
+        return orm.get_filter_records(filter_by=dict(group_id=group_id))
 
 
 base_application_service = BaseApplicationService()

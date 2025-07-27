@@ -20,7 +20,7 @@ def check_registration_end():
         'Задача на проверку окончания регистрации завершилась ошибкой'
     )
     def wrapper():
-        groups = student_group_service.get_groups_with_status(REGISTRATION)
+        groups = student_group_service.get_groups_with_status([REGISTRATION, ])
         changed = []
         for group in groups:
             date_start = group.ou.date_start if group.ou else group.iku.date_start

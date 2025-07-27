@@ -1,7 +1,7 @@
 import datetime
 import re
 import uuid
-from typing import Optional
+from typing import Optional, List
 
 from django.db.models import QuerySet
 from django.http import HttpResponse
@@ -193,13 +193,13 @@ class StudentGroupService:
         return event_type, name, date_start, deadline
 
     @staticmethod
-    def get_groups_with_status(status: STUDENT_GROUP_STATUSES) -> QuerySet:
+    def get_groups_with_status(statuses: list[STUDENT_GROUP_STATUSES]) -> QuerySet:
         """
         Получение учебных групп со статусом
-        :param status: Статус учебной группы
+        :param statuses: Статусы учебной группы
         :return: QuerySet с группами
         """
-        return student_group_orm.get_filter_records(filter_by=dict(status=status))
+        return student_group_orm.get_filter_records(filter_by=dict(status__in=statuses))
 
     @staticmethod
     def update_group_status(group_id: uuid, status: STUDENT_GROUP_STATUSES):
