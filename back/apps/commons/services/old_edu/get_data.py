@@ -43,7 +43,7 @@ def get_all_edu_data():
     # Модуль docs
     print('### Начало работы с модулем Документы')
     # docs_data.get_program_orders()
-    # docs_data.get_student_docs()
+    docs_data.get_student_docs()
     # docs_data.get_pay_docs()
     print('### Окончание работы с модулем Документы')
 
