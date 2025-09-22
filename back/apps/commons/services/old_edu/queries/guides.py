@@ -45,11 +45,14 @@ class GuidesData:
         for rec in data:
             if len(list(filter(lambda ex: ex.name == rec[1], exists))) > 0:
                 continue
-            guide_model.objects.update_or_create(
+            _, created = guide_model.objects.update_or_create(
                 old_id=rec[0],
                 name=rec[1]
             )
-            print(f'{title} "{rec[1]}" - добавлено')
+            if created:
+                print(f'{title} "{rec[1]}" - добавлено')
+            else:
+                print(f'{title} "{rec[1]}" - обновлено')
 
     def get_audience_categories(self):
         """
@@ -105,7 +108,10 @@ class GuidesData:
             data = data_query.all()
         for oo in data:
             if len(list(filter(lambda rec: rec.old_id == oo[0], oos))) > 0:
-                continue
+                exist = list(filter(lambda rec: rec.old_id == oo[0], oos))[0]
+                if exist.short_name == oo[1] and exist.full_name == oo[2] and \
+                    exist.form == oo[3]:
+                    continue
             new_oo = {
                 'old_id': oo[0]
             }
@@ -116,10 +122,13 @@ class GuidesData:
                     new_oo[self._oo_simple_fields[i]] = ''
             new_oo['mo_id'] = mo_model.objects.filter(old_id=oo[4]).first().object_id
             new_oo['oo_type_id'] = oo_type_model.objects.filter(old_id=oo[5]).first().object_id
-            oo_model.objects.update_or_create(
+            _, created = oo_model.objects.update_or_create(
                 **new_oo
             )
-            print(f'ОО "{new_oo["full_name"]}" - добавлено')
+            if created:
+                print(f'ОО "{new_oo["full_name"]}" - добавлено')
+            else:
+                print(f'ОО "{new_oo["full_name"]}" - обновлено')
 
     def get_positions(self):
         """

@@ -48,24 +48,26 @@ class AuthenData:
         """
         users = User.objects.all()
         with old_edu_connect_engine.connect() as conn:
-            dj_users_query = conn.execute(
-                text(
-                    'SELECT * from dbo.auth_user'
-                )
-            )
+            dj_users_query = conn.execute(text('SELECT * from dbo.auth_user'))
             dj_users = dj_users_query.all()
         for dj_user in dj_users:
             if len(list(filter(lambda us: us.id == dj_user[0], users))) > 0:
-                continue
+                exist = list(filter(lambda us: us.id == dj_user[0], users))[0]
+                if exist.password == dj_user[1]:
+                    continue
             if len(list(filter(lambda us: us.username == dj_user[4], users))) > 0:
                 continue
-            new_user = {
-                'id': dj_user[0]
-            }
+            new_user = {}
             for i in range(0, len(django_user_fields)):
                 new_user[django_user_fields[i]] = dj_user[i+1]
-            User.objects.update_or_create(**new_user)
-            print(f'Пользователь "{dj_user[4]}" - добавлено')
+            _, created = User.objects.update_or_create(
+                id=dj_user[0],
+                defaults=new_user
+            )
+            if created:
+                print(f'Пользователь "{dj_user[4]}" - добавлено')
+            else:
+                print(f'Пользователь "{dj_user[4]}" - обновлено')
 
     @staticmethod
     def get_student_profile_info():
@@ -77,24 +79,25 @@ class AuthenData:
                 select_related('state').
                 filter(old_id=0).count() > 0):
             with old_edu_connect_engine.connect() as conn:
-                user_profiles_query = conn.execute(
-                    text(
-                        'SELECT * from dbo.authen_profiles'
-                    )
-                )
+                user_profiles_query = conn.execute(text('SELECT * from dbo.authen_profiles'))
                 user_profiles = user_profiles_query.all()
-            for profile in (student_profile_model.objects.
-                            select_related('django_user').
-                            select_related('state').
-                            filter(old_id=0)):
-                profile_user = list(filter(
-                    lambda prof: prof[12] == profile.django_user_id,
-                    user_profiles
-                ))
+            profiles = student_profile_model.objects.select_related('django_user').select_related('state')
+            for profile in profiles:
+                profile_user = list(filter(lambda prof: prof[12] == profile.django_user_id, user_profiles))
                 if len(profile_user) == 0:
                     continue
-                profile_user = profile_user[0]
-                profile.old_id = profile_user[12]
+                exist = profile_user[0]
+                if profile.phone == exist[1] and \
+                        profile.surname == exist[2] and \
+                        profile.name == exist[3] and \
+                        profile.patronymic == exist[4] and \
+                        profile.sex == exist[5] and \
+                        profile.birthday == exist[6] and \
+                        profile.snils == exist[7] and \
+                        profile.teacher == exist[9] and \
+                        profile.health == exist[10]:
+                    continue
+                profile.old_id = exist[12]
                 for i in range(0, len(student_profile_fields)):
                     if student_profile_fields[i] in ['id', 'date_reg']:
                         continue
@@ -102,10 +105,10 @@ class AuthenData:
                         setattr(
                             profile,
                             student_profile_fields[i],
-                            state_model.objects.filter(old_id=profile_user[i]).first().object_id
+                            state_model.objects.filter(old_id=exist[i]).first().object_id
                         )
                     else:
-                        setattr(profile, student_profile_fields[i], profile_user[i])
+                        setattr(profile, student_profile_fields[i], exist[i])
                 profile.save()
                 print(f'Профиль "{profile.surname} {profile.name} '
                       f'{profile.patronymic}" - сохранено')

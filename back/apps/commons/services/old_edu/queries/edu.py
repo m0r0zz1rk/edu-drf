@@ -1,10 +1,11 @@
 import datetime
 
+from django.db import IntegrityError
 from sqlalchemy import text
 
 from apps.commons.serializers.ad_centre import ad_centre_model
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
-from apps.commons.utils.data_types.date import DateUtils
+from apps.commons.utils.data_types.date import DateUtils, date_utils
 from apps.docs.selectors.program_order import program_order_model
 from apps.edu.consts.lesson_types import LECTURE, PRACTICE, TRAINEE, INDIVIDUAL
 from apps.edu.consts.student_group.statuses import REGISTRATION, STATEMENT, OFFER, URL, PROCESS, COMPLETE
@@ -26,7 +27,6 @@ class EduData:
     Класс методов для получения и сохранения данных приложения
     Учебная часть из олдовой базы edu
     """
-    _date_utils = DateUtils()
     _department_qs = ad_centre_model.objects.all()
 
     _group_status_mapping = {
@@ -50,7 +50,14 @@ class EduData:
             data = data_query.all()
         for iku in data:
             if len(list(filter(lambda service: service.old_id == iku[0], exists))) > 0:
-                continue
+                exist = list(filter(lambda service: service.old_id == iku[0], exists))[0]
+                if exist.location == iku[4] and \
+                        exist.date_start == iku[5] and \
+                        exist.date_end == iku[6] and \
+                        exist.name == iku[2] and \
+                        exist.duration == iku[3] and \
+                        exist.price == iku[7]:
+                    continue
             new_iku = {
                 'old_id': iku[0],
                 'location': iku[4],
@@ -72,10 +79,12 @@ class EduData:
                 )[0].object_id
             else:
                 new_iku['type_id'] = None
-            information_service_model.objects.update_or_create(
-                **new_iku
+            _, created = information_service_model.objects.update_or_create(
+                old_id=iku[0],
+                defaults=new_iku
             )
-            print(f'Мероприятие "{new_iku["name"]}" - добавлено')
+            action = 'добавлено' if created else 'обновлено'
+            print(f'Мероприятие "{new_iku["name"]}" - {action}')
 
     @staticmethod
     def get_info_service_categories():
@@ -119,7 +128,13 @@ class EduData:
             data = data_query.all()
         for program in data:
             if len(list(filter(lambda pr: pr.old_id == program[0], exists))) > 0:
-                continue
+                exist = list(filter(lambda pr: pr.old_id == program[0], exists))[0]
+                if exist.name == program[2] and \
+                        exist.type == program[3] and \
+                        exist.duration == program[4] and \
+                        exist.annotation == program[6] and \
+                        exist.price == program[10]:
+                    continue
             new_program = {
                 'old_id': program[0],
                 'name': program[2],
@@ -141,10 +156,12 @@ class EduData:
                 )[0].object_id
             else:
                 new_program['program_order_id'] = None
-            program_model.objects.update_or_create(
-                **new_program
+            _, created = program_model.objects.update_or_create(
+                old_id=program[0],
+                defaults=new_program
             )
-            print(f'ДПП "{new_program["name"]}" - добавлено')
+            action = 'добавлено' if created else 'обновлено'
+            print(f'ДПП "{new_program["name"]}" - {action}')
 
     def get_program_calendar_chapters(self):
         """
@@ -162,8 +179,6 @@ class EduData:
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for chapter in data:
-            if len(list(filter(lambda ch: ch.old_id == chapter[0], exists))) > 0:
-                continue
             try:
                 program = list(filter(lambda pr: pr.old_id == chapter[13], programs))[0]
             except Exception:
@@ -172,6 +187,18 @@ class EduData:
                 position = int(chapter[1][7])
             except ValueError:
                 position = 15
+            if len(list(filter(lambda ch: ch.old_id == chapter[0], exists))) > 0:
+                exist = list(filter(lambda ch: ch.old_id == chapter[0], exists))[0]
+                if exist.position == position and \
+                        exist.name == chapter[1][10:].strip() and \
+                        exist.total_hours == chapter[2] and \
+                        exist.lecture_hours == chapter[3] and \
+                        exist.practice_hours == chapter[4] and \
+                        exist.trainee_hours == chapter[5] and \
+                        exist.individual_hours == chapter[6] and \
+                        exist.control_form == chapter[7] and \
+                        exist.program_id == program.object_id:
+                    continue
             new_chapter = {
                 'old_id': chapter[0],
                 'position': position,
@@ -184,10 +211,12 @@ class EduData:
                 'control_form': chapter[7],
                 'program_id': program.object_id
             }
-            calendar_chart_chapter_model.objects.update_or_create(
-                **new_chapter
+            _, created = calendar_chart_chapter_model.objects.update_or_create(
+                old_id=chapter[0],
+                defaults=new_chapter
             )
-            print(f'Раздел КУГ "{new_chapter["name"]}" ДПП "{program.name}" - добавлено')
+            action = 'добавлено' if created else 'обновлено'
+            print(f'Раздел КУГ "{new_chapter["name"]}" ДПП "{program.name}" - {action}')
 
     def get_program_calendar_themes(self):
         """
@@ -207,8 +236,6 @@ class EduData:
             data = data_query.all()
         print('themes data: ', data)
         for theme in data:
-            if len(list(filter(lambda th: th.old_id == theme[0], exists))) > 0:
-                continue
             try:
                 chapter = list(filter(lambda ch: ch.old_id == theme[12], chapters))[0]
             except Exception:
@@ -218,11 +245,23 @@ class EduData:
             except Exception:
                 continue
             first_dot_index = theme[1].find('.')
-            second_dot_index = theme[1].find('.', first_dot_index+1)
+            second_dot_index = theme[1].find('.', first_dot_index + 1)
+            if len(list(filter(lambda th: th.old_id == theme[0], exists))) > 0:
+                exist = list(filter(lambda th: th.old_id == theme[0], exists))[0]
+                if exist.position == int(theme[1][first_dot_index + 1]) and \
+                        exist.name == theme[1][second_dot_index + 1:].strip() and \
+                        exist.total_hours == theme[2] and \
+                        exist.lecture_hours == theme[3] and \
+                        exist.practice_hours == theme[4] and \
+                        exist.trainee_hours == theme[5] and \
+                        exist.individual_hours == theme[6] and \
+                        exist.control_form == theme[7] and \
+                        exist.chapter_id == chapter.object_id:
+                    continue
             new_theme = {
                 'old_id': theme[0],
-                'position': int(theme[1][first_dot_index+1]),
-                'name': theme[1][second_dot_index+1:].strip(),
+                'position': int(theme[1][first_dot_index + 1]),
+                'name': theme[1][second_dot_index + 1:].strip(),
                 'total_hours': theme[2],
                 'lecture_hours': theme[3],
                 'practice_hours': theme[4],
@@ -231,11 +270,13 @@ class EduData:
                 'control_form': theme[7],
                 'chapter_id': chapter.object_id
             }
-            calendar_chart_theme_model.objects.update_or_create(
-                **new_theme
+            _, created = calendar_chart_theme_model.objects.update_or_create(
+                old_id=theme[0],
+                defaults=new_theme
             )
+            action = 'добавлено' if created else 'обновлено'
             print(f'Тема "{new_theme["name"]}" раздела КУГ "{chapter.name}" '
-                  f'ДПП "{program.name}" - добавлено')
+                  f'ДПП "{program.name}" - {action}')
 
     @staticmethod
     def get_program_categories():
@@ -285,7 +326,11 @@ class EduData:
             data = data_query.all()
         for course in data:
             if len(list(filter(lambda cr: cr.old_id == course[0], exists))) > 0:
-                continue
+                exist = list(filter(lambda cr: cr.old_id == course[0], exists))[0]
+                if exist.location == course[1] and \
+                        exist.date_start == course[2] and \
+                        exist.date_end == course[3]:
+                    continue
             new_course = {
                 'old_id': course[0],
                 'location': course[1],
@@ -301,10 +346,12 @@ class EduData:
                 program_name = program.name
             else:
                 new_course['program_id'] = None
-            education_service_model.objects.update_or_create(
-                **new_course
+            _, created = education_service_model.objects.update_or_create(
+                old_id=course[0],
+                defaults=new_course
             )
-            print(f'Курс "{program_name}" - добавлено')
+            action = 'добавлено' if created else 'обновлено'
+            print(f'Курс "{program_name}" - {action}')
 
     def get_student_groups(self):
         """
@@ -322,19 +369,6 @@ class EduData:
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for group in data:
-            # if len(list(filter(lambda gr: gr.old_id == group[0], exists))) > 0:
-            #     update_gr = {
-            #         'form': group[7],
-            #     }
-            #     student_group_orm.update_record(
-            #         filter_by=dict(object_id=list(filter(lambda gr: gr.old_id == group[0], exists))[0].object_id),
-            #         update_object=update_gr
-            #     )
-            #     print('Обновлена группа: ', repr(list(filter(lambda gr: gr.old_id == group[0], exists))[0]))
-            if len(list(filter(lambda gr: gr.old_id == group[0], exists))) > 0:
-                continue
-            if len(list(filter(lambda gr: gr.code == group[1], exists))) > 0:
-                continue
             course = event = None
             if group[12]:
                 try:
@@ -345,6 +379,19 @@ class EduData:
                 try:
                     event = list(filter(lambda ev: ev.old_id == group[14], iku))[0].object_id
                 except Exception:
+                    continue
+            if len(list(filter(lambda gr: gr.old_id == group[0], exists))) > 0:
+                exist = list(filter(lambda gr: gr.old_id == group[0], exists))[0]
+                if exist.code == group[1] and \
+                        exist.plan_seats_number == group[2] and \
+                        exist.status == self._group_status_mapping[group[15]] and \
+                        exist.form == group[7] and \
+                        exist.event_url == group[4] and \
+                        exist.survey_show == group[5] and \
+                        exist.date_enroll == group[8] and \
+                        exist.date_exp == group[9] and \
+                        exist.enroll_number == group[10] and \
+                        exist.exp_number == group[11]:
                     continue
             new_group = {
                 'old_id': group[0],
@@ -361,10 +408,15 @@ class EduData:
                 'iku_id': event,
                 'ou_id': course
             }
-            student_group_model.objects.update_or_create(
-                **new_group
-            )
-            print(f'Учебная группа "{new_group["code"]}" - добавлено')
+            try:
+                _, created = student_group_model.objects.update_or_create(
+                    old_id=group[0],
+                    defaults=new_group
+                )
+            except IntegrityError:
+                continue
+            action = 'добавлено' if created else 'обновлено'
+            print(f'Учебная группа "{new_group["code"]}" - {action}')
 
     @staticmethod
     def set_group_curator():
@@ -389,15 +441,15 @@ class EduData:
                 group = list(filter(lambda gr: gr.old_id == st_group[0], exists))[0]
             except Exception:
                 continue
-            if group.curator:
-                continue
             try:
                 curator = list(filter(lambda cur: cur.old_id == st_group[1], curators))[0]
             except Exception:
                 continue
+            if group.curator_id == curator.object_id:
+                continue
             group.curator_id = curator.object_id
             group.save()
-            print(f'Куратор "{curator.display_name}" для группы "{group.code}" - добавлено')
+            print(f'Куратор "{curator.display_name}" для группы "{group.code}" - обновлено')
 
     def get_course_schedule(self):
         """
@@ -421,8 +473,6 @@ class EduData:
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for lesson in data:
-            if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) > 0:
-                continue
             try:
                 group = list(filter(lambda gr: gr.old_id == lesson[9], groups))[0]
             except Exception:
@@ -431,7 +481,6 @@ class EduData:
             time_start = (lesson[5] + datetime.timedelta(hours=8)).strftime('%H:%M')
             time_end = (lesson[6] + datetime.timedelta(hours=8)).strftime('%H:%M')
             theme = '(тема из раздела КУГ)'
-            theme_id = None
             try:
                 th = list(filter(lambda th: th.old_id == lesson[10], themes))[0]
                 theme = th.name
@@ -450,11 +499,23 @@ class EduData:
                 les_type = TRAINEE
             if lesson[4]:
                 les_type = INDIVIDUAL
+            if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) > 0:
+                exist = list(filter(lambda sc: sc.old_id == lesson[0], exists))[0]
+                if str(exist.date) == lesson[5].strftime('%Y-%m-%d') and \
+                        exist.time_start == date_utils.convert_time_string_to_seconds(time_start) and \
+                        exist.time_end == date_utils.convert_time_string_to_seconds(time_end) and \
+                        exist.theme == theme and \
+                        exist.type == les_type and \
+                        exist.distance == lesson[7] and \
+                        exist.control == lesson[8] and \
+                        exist.group_id == group.object_id and \
+                        exist.kug_theme_id == theme_id:
+                    continue
             new_course_lesson = {
                 'old_id': lesson[0],
                 'date': lesson[5].strftime('%Y-%m-%d'),
-                'time_start': self._date_utils.convert_time_string_to_seconds(time_start),
-                'time_end': self._date_utils.convert_time_string_to_seconds(time_end),
+                'time_start': date_utils.convert_time_string_to_seconds(time_start),
+                'time_end': date_utils.convert_time_string_to_seconds(time_end),
                 'theme': theme,
                 'type': les_type,
                 'distance': lesson[7],
@@ -462,10 +523,12 @@ class EduData:
                 'group_id': group.object_id,
                 'kug_theme_id': theme_id
             }
-            schedule_model.objects.update_or_create(
-                **new_course_lesson
+            _, created = schedule_model.objects.update_or_create(
+                old_id=lesson[0],
+                defaults=new_course_lesson
             )
-            print(f'Урок для группы "{group.code}" - добавлено')
+            action = 'добавлено' if created else 'обновлено'
+            print(f'Урок для группы "{group.code}" - {action}')
 
     @staticmethod
     def set_course_schedule_theme_teacher():
@@ -504,16 +567,20 @@ class EduData:
                     except Exception:
                         print(f'teacher - {lesson[2]}')
                         continue
-            les.teacher = profile.object_id
             first_dot_index = lesson[1].find('.')
-            les.theme = lesson[1][first_dot_index + 1:].strip()
+            th = lesson[1][first_dot_index + 1:].strip()
             if lesson[1].count('.') >= 2:
                 second_dot_index = lesson[1].find('.', first_dot_index + 1)
-                les.theme = lesson[1][second_dot_index + 1:].strip()
+                th = lesson[1][second_dot_index + 1:].strip()
+            if les.theme == th and les.teacher == profile.object_id:
+                continue
+            les.teacher = profile.object_id
+            les.theme = th
             les.save()
-            print(f'Преподаватель для занятий "{les.theme}" - добавлено')
+            print(f'Преподаватель для занятий "{les.theme}" - обновлено')
 
-    def get_event_schedule(self):
+    @staticmethod
+    def get_event_schedule():
         """
         Получение расписания занятий курсов
         """
@@ -531,8 +598,6 @@ class EduData:
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for lesson in data:
-            if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) > 0:
-                continue
             try:
                 group = list(filter(lambda gr: gr.old_id == lesson[6], groups))[0]
             except Exception:
@@ -550,11 +615,21 @@ class EduData:
                 les_type = PRACTICE
                 if int(lesson[3]) > 1:
                     count = int(lesson[3])
+            if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) > 0:
+                exist = list(filter(lambda sc: sc.old_id == lesson[0], exists))[0]
+                if str(exist.date) == lesson[5].strftime('%Y-%m-%d') and \
+                        exist.time_start == date_utils.convert_time_string_to_seconds(time_start) and \
+                        exist.time_end == date_utils.convert_time_string_to_seconds(time_end) and \
+                        exist.theme == lesson[1] and \
+                        exist.type == les_type and \
+                        exist.control == '' and \
+                        exist.group_id == group.object_id:
+                    continue
             new_event_lesson = {
                 'old_id': lesson[0],
                 'date': lesson[5].strftime('%Y-%m-%d'),
-                'time_start': self._date_utils.convert_time_string_to_seconds(time_start),
-                'time_end': self._date_utils.convert_time_string_to_seconds(time_end),
+                'time_start': date_utils.convert_time_string_to_seconds(time_start),
+                'time_end': date_utils.convert_time_string_to_seconds(time_end),
                 'theme': lesson[1],
                 'type': les_type,
                 'distance': False,
@@ -562,10 +637,12 @@ class EduData:
                 'group_id': group.object_id
             }
             for _ in range(0, count):
-                schedule_model.objects.update_or_create(
-                    **new_event_lesson
+                _, created = schedule_model.objects.update_or_create(
+                    old_id=lesson[0],
+                    defaults=new_event_lesson
                 )
-            print(f'Урок для группы "{group.code}" - добавлено')
+                action = 'добавлено' if created else 'обновлено'
+                print(f'Урок для группы "{group.code}" - {action}')
 
     @staticmethod
     def set_event_schedule_teacher():
@@ -602,6 +679,8 @@ class EduData:
                     except Exception:
                         print(f'teacher - {lesson[2]}')
                         continue
+            if les.teacher == profile.object_id:
+                continue
             les.teacher = profile.object_id
             les.save()
-            print(f'Преподаватель для занятий "{les.theme}" - добавлено')
+            print(f'Преподаватель для занятий "{les.theme}" - обновлено')

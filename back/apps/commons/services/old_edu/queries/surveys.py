@@ -36,22 +36,26 @@ class SurveysData:
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for surv in data:
-            if len(list(filter(lambda survey: survey.old_id == surv[0], exists))) > 0:
-                continue
             try:
                 user_id = list(filter(lambda user: user.id == surv[2], users))[0].id
             except Exception:
                 print(f'profile - {surv[2]}')
                 continue
+            if len(list(filter(lambda survey: survey.old_id == surv[0], exists))) > 0:
+                exist = list(filter(lambda survey: survey.old_id == surv[0], exists))[0]
+                if exist.creator_id == user_id and exist.description == surv[1]:
+                    continue
             new_survey = {
                 'old_id': surv[0],
                 'creator_id': user_id,
                 'description': surv[1]
             }
-            survey_model.objects.update_or_create(
-                **new_survey
+            _, created = survey_model.objects.update_or_create(
+                old_id=surv[0],
+                defaults=new_survey
             )
-            print(f'Опрос "{new_survey["description"]}" - добавлено')
+            action = 'добавлено' if created else 'обновлено'
+            print(f'Опрос "{new_survey["description"]}" - {action}')
 
     def get_survey_questions(self):
         """
@@ -69,13 +73,18 @@ class SurveysData:
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for question in data:
-            if len(list(filter(lambda quest: quest.old_id == question[0], exists))) > 0:
-                continue
             try:
                 survey = list(filter(lambda surv: surv.old_id == question[4], surveys))[0]
             except Exception:
                 print(f'survey - {question[4]}')
                 continue
+            if len(list(filter(lambda quest: quest.old_id == question[0], exists))) > 0:
+                exist = list(filter(lambda quest: quest.old_id == question[0], exists))[0]
+                if exist.survey_id == survey.object_id and \
+                        exist.sequence_number == question[1] and \
+                        exist.question_type == self.question_type_mapping[question[3]] and \
+                        exist.text == question[2]:
+                    continue
             new_survey_question = {
                 'old_id': question[0],
                 'survey_id': survey.object_id,
@@ -83,11 +92,13 @@ class SurveysData:
                 'question_type': self.question_type_mapping[question[3]],
                 'text': question[2]
             }
-            survey_question_model.objects.update_or_create(
-                **new_survey_question
+            _, created = survey_question_model.objects.update_or_create(
+                old_id=question[0],
+                defaults=new_survey_question
             )
+            action = 'добавлено' if created else 'обновлено'
             print(f'Вопрос "{new_survey_question["text"]} для опроса '
-                  f'"{survey.description}" - добавлено')
+                  f'"{survey.description}" - {action}')
 
     def get_student_answers(self):
         """
@@ -124,5 +135,3 @@ class SurveysData:
                 **new_student_answer
             )
             print(f'Ответ к опросу "{survey.description}" - добавлено')
-
-

@@ -41,8 +41,6 @@ class DocsData:
     Документы из олдовой базы edu
     """
 
-
-
     @staticmethod
     def get_program_orders():
         """
@@ -55,7 +53,9 @@ class DocsData:
             data = data_query.all()
         for order in data:
             if len(list(filter(lambda ord: ord.old_id == order[0], exists))) > 0:
-                continue
+                exist = list(filter(lambda ord: ord.old_id == order[0], exists))[0]
+                if exist.date == order[8] and exist.number == order[7]:
+                    continue
             file = open(
                 os.path.join(settings_utils.get_parameter_from_settings('MEDIA_ROOT_OLD'), Path(order[9])),
                 'rb',
@@ -65,15 +65,17 @@ class DocsData:
                 'number': order[7],
                 'date': order[8],
             }
-            order_object, _ = program_order_model.objects.update_or_create(
-                **new_order
+            order_object, created = program_order_model.objects.update_or_create(
+                old_id=order[0],
+                defaults=new_order
             )
             order_object.file.save(
                 f"dpp_order.{order[9][-3:]}",
                 file
             )
+            action = 'Добавлено' if created else 'Обновлено'
             print(f'Приказ ДПП №{new_order["number"]} от {new_order["date"].strftime("%d.%m.%Y")} '
-                  f'- добавлено')
+                  f'- {action}')
             del file
 
     @staticmethod
@@ -215,7 +217,6 @@ class DocsData:
                 'group_id': group.object_id,
                 'file': offer[1],
             }
-            print(new_offer)
             offer_object, _ = student_group_offer_model.objects.update_or_create(
                 **new_offer
             )

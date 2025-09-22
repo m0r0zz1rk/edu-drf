@@ -43,7 +43,7 @@ def get_all_edu_data():
     # Модуль docs
     print('### Начало работы с модулем Документы')
     # docs_data.get_program_orders()
-    docs_data.get_student_docs()
+    # docs_data.get_student_docs()
     # docs_data.get_pay_docs()
     print('### Окончание работы с модулем Документы')
 
@@ -58,10 +58,10 @@ def get_all_edu_data():
     # edu_data.get_education_services()
     # edu_data.get_student_groups()
     # edu_data.set_group_curator()
-    edu_data.get_course_schedule()
-    edu_data.set_course_schedule_theme_teacher()
-    edu_data.get_event_schedule()
-    edu_data.set_event_schedule_teacher()
+    # edu_data.get_course_schedule()
+    # edu_data.set_course_schedule_theme_teacher()
+    # edu_data.get_event_schedule()
+    # edu_data.set_event_schedule_teacher()
     print('### Окончание работы с модулем Учебная часть')
 
     # Получение договоров оферт для учебных групп
@@ -72,7 +72,7 @@ def get_all_edu_data():
     # Модуль applications
     print('### Начало работы с модулем Заявки')
     # application_data.get_course_applications()
-    # application_data.get_course_certificates()
+    application_data.get_course_certificates()
     # application_data.get_event_applications()
     print('### Окончание работы с модулем Заявки')
 
