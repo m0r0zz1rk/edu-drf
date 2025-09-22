@@ -45,7 +45,8 @@ class AdCentreService:
             ad_centre_data
         ):
             ad_centre_model.objects.update_or_create(
-                **ad_centre_data
+                object_guid=ad_centre_data.get('object_guid'),
+                defaults=ad_centre_data
             )
 
 
