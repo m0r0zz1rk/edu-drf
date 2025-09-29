@@ -89,7 +89,7 @@ class BaseORM:
         def function():
             res = self.model.objects.all()
             if self.select_related or self.prefetch_related:
-                res = self.orm_with_select_or_prefetch_related().get(**filter_by)
+                res = self.orm_with_select_or_prefetch_related()
             res = res.filter(**filter_by)
             if res.count() > 0:
                 return res.first()

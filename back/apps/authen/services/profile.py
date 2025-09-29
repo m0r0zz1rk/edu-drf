@@ -47,7 +47,10 @@ class ProfileService:
         data = {attribute_name: value}
         try:
             profile = student_profile_orm.get_one_record_or_none(filter_by=data)
-            return profile is not None
+            if profile:
+                return True
+            profile = coko_profile_model.objects.filter(**data)
+            return profile.count() > 0
         except Exception:
             return False
 

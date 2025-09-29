@@ -77,7 +77,8 @@ class Authorization(MainProcessing):
 
     def _main_process(self):
         username = self.process_data['login']
-        if not self.process_data['centre_auth']:
+        centre_auth = self.process_data.get('centre_auth')
+        if not centre_auth:
             username = profile_service.get_profile_or_info_by_attribute(
                 'phone',
                 self.process_data['login'],
@@ -106,7 +107,7 @@ class Authorization(MainProcessing):
             self._auth_error(True)
             self.process_completed = False
         login(self.process_data['request'], self.auth_user)
-        if self.process_data['centre_auth']:
+        if centre_auth:
             profile = profile_service.get_profile_or_info_by_attribute(
                 'django_user_id',
                 self.auth_user.id,
