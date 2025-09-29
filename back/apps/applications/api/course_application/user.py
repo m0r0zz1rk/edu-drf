@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.course_application import course_application_orm, course_application_queryset, \
-    course_application_model, CourseApplicationFilter
+    CourseApplicationFilter
 from apps.applications.serializers.base_application import BaseApplicationSerializer
 from apps.applications.serializers.base_application.payment_data_serializer import PaymentDataSerializer
 from apps.applications.serializers.base_application.response_application_create_serializer import \
@@ -167,7 +167,7 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
             id_new_app = base_application_service.create_app(
                 request.user.id,
                 serialize.validated_data['group_id'],
-                course_application_model
+                course_application_orm
             )
             return response_utils.ok_response_dict({'app_id': id_new_app})
         else:

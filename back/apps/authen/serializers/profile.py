@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.guides.selectors.state import state_model
+from apps.guides.selectors.state import state_orm
 from apps.guides.selectors.profiles.student import student_profile_model
 
 
@@ -8,7 +8,7 @@ class BaseProfileSerializer(serializers.ModelSerializer):
     """Базовая сериализация данных профиля пользователя"""
     state = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=state_model.objects.all(),
+        queryset=state_orm.get_filter_records(),
         label='Государство'
     )
     email = serializers.SerializerMethodField(label='Email')

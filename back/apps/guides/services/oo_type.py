@@ -17,7 +17,8 @@ class OoTypeService:
         :return: True - существует, False - не существует
         """
         find = {attribute: value}
-        return oo_type_model.objects.filter(**find).exists()
+        oo_type = oo_type_orm.get_one_record_or_none(filter_by=find)
+        return oo_type is not None
 
     def get_oo_type_object_by_name(self, name: str) -> Union[oo_type_model, None]:
         """
@@ -25,11 +26,8 @@ class OoTypeService:
         :param name: наименование типа ОО
         :return: Объект OoType (если не найдено - None)
         """
-        if self.is_oo_type_exist(
-            'name',
-            name
-        ):
-            return oo_type_model.objects.get(name=name)
+        if self.is_oo_type_exist('name', name):
+            return oo_type_orm.get_one_record_or_none(filter_by={'name': name})
         return None
 
     @staticmethod

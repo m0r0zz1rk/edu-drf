@@ -2,9 +2,10 @@ from typing import Union
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.edu.selectors.services.education_service import education_service_model
-from apps.edu.selectors.services.information_service import information_service_model
+from apps.edu.selectors.services.education_service import education_service_orm
+from apps.edu.selectors.services.information_service import information_service_orm
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.services.journal import journal_service
 
 
 class DeleteService(MainProcessing):
@@ -33,16 +34,16 @@ class DeleteService(MainProcessing):
     def _main_process(self):
         """Удаление услуги"""
         try:
-            service_model = information_service_model
+            service_orm = information_service_orm
             if self.service_type == 'edu':
-                service_model = education_service_model
-            service_model.objects.filter(object_id=self.process_data['object_id']).first().delete()
+                service_orm = education_service_orm
+            service_orm.delete_record(filter_by={'object_id': self.process_data['object_id']})
             self.process_completed = True
         except Exception:
             description = 'информационно-консультационной услуги (мероприятия)'
             if self.service_type == 'edu':
                 description = 'образовательной услуги (курса)'
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
@@ -59,7 +60,7 @@ class DeleteService(MainProcessing):
         description = 'Информационно-консультационная услуга (мероприятие)'
         if self.service_type == 'edu':
             description = 'Образовательная услуга (курс)'
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

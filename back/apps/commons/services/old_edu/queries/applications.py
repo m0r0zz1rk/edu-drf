@@ -8,7 +8,6 @@ from apps.applications.selectors.course_application import course_application_mo
 from apps.applications.selectors.course_certificate import course_certificate_orm
 from apps.applications.selectors.event_application import event_application_model
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
-from apps.commons.utils.django.exception import exception_handling
 from apps.docs.selectors.pay_doc import pay_doc_model
 from apps.docs.selectors.student_doc import student_doc_model
 from apps.edu.selectors.student_group import student_group_model
@@ -178,6 +177,8 @@ class ApplicationsData:
                 edu_date = app[23]
             if len(list(filter(lambda course_app: course_app.old_id == app[0], exists))) > 0:
                 exist = list(filter(lambda course_app: course_app.old_id == app[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 oo_n = app[12] if app[12] else ''
                 if exist.profile_id == profile.object_id and \
                         exist.group_id == group.object_id and \
@@ -319,6 +320,8 @@ class ApplicationsData:
             oo_n = app[10] if app[10] else ''
             if len(list(filter(lambda event_app: event_app.old_id == app[0], exists))) > 0:
                 exist = list(filter(lambda event_app: event_app.old_id == app[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.profile_id == profile.object_id and \
                         exist.group_id == group.object_id and \
                         exist.status == self._app_status_mapping[app[3]] and \
@@ -395,6 +398,8 @@ class ApplicationsData:
             }
             if len(list(filter(lambda cert: cert.old_id == certificate[0], _certificates))) > 0:
                 exist = list(filter(lambda cert: cert.old_id == certificate[0], _certificates))[0]
+                if exist.updated_from_new:
+                    continue
                 if (exist.registration_number, exist.blank_serial, exist.blank_number) == \
                         (certificate[1], certificate[2], certificate[3]):
                     continue

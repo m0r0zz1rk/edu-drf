@@ -3,7 +3,7 @@ from typing import Optional
 
 from apps.surveys.consts.survey_target_types import SURVEY_TARGET_TYPES, NOT_SET, EDU, INFO, ALL
 from apps.surveys.exceptions.survey_target import TargetInfoNotCorrect, TargetNotExists
-from apps.surveys.selectors.survey_target import survey_target_model
+from apps.surveys.selectors.survey_target import survey_target_model, survey_target_orm
 
 
 class SurveyTargetService:
@@ -33,7 +33,8 @@ class SurveyTargetService:
         :param group_id: object_id учебной группы
         :return: True - опрос найден, False - опрос не найден
         """
-        return survey_target_model.objects.filter(group_id=group_id).exists()
+        target = survey_target_orm.get_one_record_or_none(filter_by={'group_id': group_id})
+        return target is not None
 
     def get_special_survey_id_for_group(self, group_id: uuid) -> Optional[uuid.uuid4]:
         """
@@ -42,7 +43,8 @@ class SurveyTargetService:
         :return: object_id опроса или None, если такой опрос не существует
         """
         if self.check_special_survey_for_group(group_id):
-            return survey_target_model.objects.filter(group_id=group_id).first().object_id
+            target = survey_target_orm.get_one_record_or_none(filter_by={'group_id': group_id})
+            return target.object_id
 
     @staticmethod
     def check_service_survey_for_type(survey_type: SURVEY_TARGET_TYPES) -> bool:
@@ -51,7 +53,8 @@ class SurveyTargetService:
         :param survey_type: тип опроса (EDU или INFO)
         :return: True - опрос найден, False - опрос не найден
         """
-        return survey_target_model.objects.filter(type=survey_type).exists()
+        survey = survey_target_orm.get_one_record_or_none(filter_by={'type': survey_type})
+        return survey is not None
 
     def get_service_survey_id_for_group(self, group_type: str) -> Optional[uuid.uuid4]:
         """
@@ -61,7 +64,8 @@ class SurveyTargetService:
         """
         survey_type = EDU if group_type == 'ou' else INFO
         if self.check_service_survey_for_type(survey_type):
-            return survey_target_model.objects.filter(type=survey_type).first().object_id
+            target = survey_target_orm.get_one_record_or_none(filter_by={'type': survey_type})
+            return target.object_id
 
     @staticmethod
     def get_all_survey_id() -> uuid:
@@ -69,7 +73,8 @@ class SurveyTargetService:
         Получение object_id для опроса для всех групп
         :return: object_id опроса
         """
-        return survey_target_model.objects.filter(type=ALL).first().survey_id
+        target = survey_target_orm.get_one_record_or_none(filter_by={'type': ALL})
+        return target.survey_id
 
     @staticmethod
     def remove_exist_survey_type(survey_type: str):
@@ -78,12 +83,12 @@ class SurveyTargetService:
         :param survey_type: Тип таргетирования
         """
         if survey_type in ['all', 'edu', 'info']:
-            for target in (survey_target_model.objects.
-                           select_related('survey').
-                           select_related('group').
-                           filter(type=survey_type)):
-                target.type = NOT_SET
-                target.save()
+            targets = survey_target_orm.get_filter_records(filter_by={'type': survey_type})
+            for target in targets:
+                survey_target_orm.update_record(
+                    filter_by={'object_id': target.object_id},
+                    update_object={'type': NOT_SET}
+                )
 
     def add_edit_survey_target(self, target_info: dict):
         """
@@ -98,9 +103,9 @@ class SurveyTargetService:
         self.remove_exist_survey_type(target_info['type'])
         obj_id = target_info['object_id']
         del target_info['object_id']
-        survey_target_model.objects.update_or_create(
-            object_id=obj_id,
-            defaults=target_info
+        survey_target_orm.update_record(
+            filter_by={'object_id': obj_id},
+            update_object=target_info
         )
 
     def delete_survey_target(self, target_id: uuid):
@@ -109,7 +114,7 @@ class SurveyTargetService:
         :param target_id: object_id объекта назнанчения
         """
         try:
-            survey_target_model.objects.get(object_id=target_id).delete()
+            survey_target_orm.delete_record(filter_by={'object_id': target_id})
         except Exception:
             raise TargetNotExists
 

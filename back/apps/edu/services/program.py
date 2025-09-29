@@ -1,4 +1,5 @@
 import uuid
+from random import randint
 from typing import Optional
 
 from apps.authen.services.profile import ProfileService
@@ -22,7 +23,8 @@ class ProgramService:
         """
         try:
             find = {attribute_name: value}
-            return program_model.objects.filter(**find).exists()
+            program = program_orm.get_one_record_or_none(filter_by=find)
+            return program is not None
         except Exception:
             return False
 
@@ -35,7 +37,7 @@ class ProgramService:
         """
         if self.is_program_exists(attribute_name, value):
             find = {attribute_name: value}
-            return program_model.objects.filter(**find).first()
+            return program_orm.get_one_record_or_none(filter_by=find)
         return None
 
     def copy_program(self, program_id: uuid) -> Optional[str]:
@@ -45,12 +47,13 @@ class ProgramService:
         :return: object_id новой ДПП или None
         """
         program = self.get_program('object_id', program_id)
-        if program is None:
-            return False
+        if not program:
+            return None
         fields = [f.name for f in program_model._meta.concrete_fields
                   if f.name not in ['object_id', 'date_create', 'program_order']]
         new_program = {
-            'object_id': None
+            'object_id': None,
+            'old_id': int(program.old_id) + randint(2020, 2030)
         }
         for field in fields:
             if field != 'categories':
@@ -144,11 +147,13 @@ class ProgramService:
         )
         if coko_profile is None:
             return False
-        if program.kug_edit_id == coko_profile.object_id:
-            program.kug_edit = None
-        else:
-            program.kug_edit_id = coko_profile.object_id
-        program.save()
+        program_orm.update_record(
+            filter_by={'object_id': program_id},
+            update_object={
+                'kug_edit_id': None if program.kug_edit_id == coko_profile.object_id else coko_profile.object_id,
+                'updated_from_new': True
+            }
+        )
         return True
 
     @staticmethod

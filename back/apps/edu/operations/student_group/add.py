@@ -3,11 +3,12 @@ from typing import Union
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.edu.exceptions.student_group.generate_code_error import GenerateCodeError
-from apps.edu.selectors.student_group import student_group_model
+from apps.edu.selectors.student_group import student_group_orm
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
 from apps.edu.services.student_group import StudentGroupService
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.services.journal import journal_service
 
 
 class AddStudentGroup(MainProcessing):
@@ -57,10 +58,10 @@ class AddStudentGroup(MainProcessing):
                 self.process_data['type']
             )
             del self.process_data['type']
-            group, _ = student_group_model.objects.update_or_create(**self.process_data)
+            student_group_orm.create_record(self.process_data)
             self.process_completed = True
         except GenerateCodeError:
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
@@ -86,7 +87,7 @@ class AddStudentGroup(MainProcessing):
 
     def _process_success(self):
         """Фиксация сообщения об успешном добавлении учебной группы"""
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

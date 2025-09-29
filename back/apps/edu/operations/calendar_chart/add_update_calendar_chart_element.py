@@ -2,9 +2,10 @@ from typing import Union
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
-from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_orm
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_orm
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.services.journal import journal_service
 
 
 class AddUpdateCalendarChartElement(MainProcessing):
@@ -52,19 +53,16 @@ class AddUpdateCalendarChartElement(MainProcessing):
                 el_type = 'chapter'
             object_id = self.process_data['object_id']
             del self.process_data['object_id']
+            orm = calendar_chart_theme_orm
             if el_type == 'chapter':
-                calendar_chart_chapter_model.objects.update_or_create(
-                    object_id=object_id,
-                    defaults=self.process_data
-                )
-            else:
-                calendar_chart_theme_model.objects.update_or_create(
-                    object_id=object_id,
-                    defaults=self.process_data
-                )
+                orm = calendar_chart_chapter_orm
+            orm.update_record(
+                filter_by={'object_id': object_id},
+                update_object=self.process_data
+            )
             self.process_completed = True
         except Exception:
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
@@ -78,7 +76,7 @@ class AddUpdateCalendarChartElement(MainProcessing):
 
     def _process_success(self):
         """Фиксация сообщения об успешном добавлении/обновлении элемента КУГ в журнале"""
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

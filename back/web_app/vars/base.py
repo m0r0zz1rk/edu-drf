@@ -27,7 +27,8 @@ REQ_APPS = [
     'import_export',
     'rest_framework',
     'django_rest_passwordreset',
-    'tinymce'
+    'tinymce',
+    'django_celery_beat',
 ]
 
 PROJECT_APPS = [
@@ -116,3 +117,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_EXPOSE_HEADERS = (
     'Access-Control-Expose-Headers: Content-Disposition, X-Requested-With',
 )
+
+DEFAULT_UPDATED_AT = env.str('DEFAULT_UPDATED_AT', '')
+
+DJANGO_CELERY_BEAT_TZ_AWARE = False

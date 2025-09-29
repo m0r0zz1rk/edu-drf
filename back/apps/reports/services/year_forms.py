@@ -7,7 +7,6 @@ from openpyxl import Workbook
 from apps.applications.consts.application_statuses import DRAFT, WAIT_PAY, CHECK, WORK
 from apps.applications.selectors.course_application import course_application_orm, course_application_model
 from apps.applications.selectors.event_application import event_application_orm, event_application_model
-from apps.commons.utils.django.exception import exception_handling
 from apps.edu.selectors.student_group import student_group_orm
 
 

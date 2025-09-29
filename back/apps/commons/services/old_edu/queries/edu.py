@@ -5,7 +5,7 @@ from sqlalchemy import text
 
 from apps.commons.serializers.ad_centre import ad_centre_model
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
-from apps.commons.utils.data_types.date import DateUtils, date_utils
+from apps.commons.utils.data_types.date import date_utils
 from apps.docs.selectors.program_order import program_order_model
 from apps.edu.consts.lesson_types import LECTURE, PRACTICE, TRAINEE, INDIVIDUAL
 from apps.edu.consts.student_group.statuses import REGISTRATION, STATEMENT, OFFER, URL, PROCESS, COMPLETE
@@ -15,7 +15,7 @@ from apps.edu.selectors.program import program_model
 from apps.edu.selectors.schedule import schedule_model
 from apps.edu.selectors.services.education_service import education_service_model
 from apps.edu.selectors.services.information_service import information_service_model
-from apps.edu.selectors.student_group import student_group_model, student_group_orm
+from apps.edu.selectors.student_group import student_group_model
 from apps.guides.selectors.audience_category import audience_category_model
 from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.guides.selectors.event_type import event_type_model
@@ -51,6 +51,8 @@ class EduData:
         for iku in data:
             if len(list(filter(lambda service: service.old_id == iku[0], exists))) > 0:
                 exist = list(filter(lambda service: service.old_id == iku[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.location == iku[4] and \
                         exist.date_start == iku[5] and \
                         exist.date_end == iku[6] and \
@@ -101,6 +103,8 @@ class EduData:
             if len(list(filter(lambda ev: ev.old_id == ev_cat[1], exists))) == 0:
                 continue
             event = list(filter(lambda ev: ev.old_id == ev_cat[1], exists))[0]
+            if event.updated_from_new:
+                continue
             try:
                 aud_cat_id = list(filter(lambda cat: cat.old_id == ev_cat[2], audience_categories))[0].object_id
             except Exception:
@@ -129,6 +133,8 @@ class EduData:
         for program in data:
             if len(list(filter(lambda pr: pr.old_id == program[0], exists))) > 0:
                 exist = list(filter(lambda pr: pr.old_id == program[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.name == program[2] and \
                         exist.type == program[3] and \
                         exist.duration == program[4] and \
@@ -163,7 +169,8 @@ class EduData:
             action = 'добавлено' if created else 'обновлено'
             print(f'ДПП "{new_program["name"]}" - {action}')
 
-    def get_program_calendar_chapters(self):
+    @staticmethod
+    def get_program_calendar_chapters():
         """
         Получение разделов КУГ-ов ДПП
         """
@@ -189,6 +196,8 @@ class EduData:
                 position = 15
             if len(list(filter(lambda ch: ch.old_id == chapter[0], exists))) > 0:
                 exist = list(filter(lambda ch: ch.old_id == chapter[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.position == position and \
                         exist.name == chapter[1][10:].strip() and \
                         exist.total_hours == chapter[2] and \
@@ -218,7 +227,8 @@ class EduData:
             action = 'добавлено' if created else 'обновлено'
             print(f'Раздел КУГ "{new_chapter["name"]}" ДПП "{program.name}" - {action}')
 
-    def get_program_calendar_themes(self):
+    @staticmethod
+    def get_program_calendar_themes():
         """
         Получение тем разделов КУГ-ов ДПП
         """
@@ -248,6 +258,8 @@ class EduData:
             second_dot_index = theme[1].find('.', first_dot_index + 1)
             if len(list(filter(lambda th: th.old_id == theme[0], exists))) > 0:
                 exist = list(filter(lambda th: th.old_id == theme[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.position == int(theme[1][first_dot_index + 1]) and \
                         exist.name == theme[1][second_dot_index + 1:].strip() and \
                         exist.total_hours == theme[2] and \
@@ -298,6 +310,8 @@ class EduData:
             if len(list(filter(lambda pr: pr.old_id == pr_cat[1], exists))) == 0:
                 continue
             program = list(filter(lambda pr: pr.old_id == pr_cat[1], exists))[0]
+            if program.updated_from_new:
+                continue
             try:
                 aud_cat_id = list(filter(lambda cat: cat.old_id == pr_cat[2], audience_categories))[0].object_id
             except Exception:
@@ -327,6 +341,8 @@ class EduData:
         for course in data:
             if len(list(filter(lambda cr: cr.old_id == course[0], exists))) > 0:
                 exist = list(filter(lambda cr: cr.old_id == course[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.location == course[1] and \
                         exist.date_start == course[2] and \
                         exist.date_end == course[3]:
@@ -382,6 +398,8 @@ class EduData:
                     continue
             if len(list(filter(lambda gr: gr.old_id == group[0], exists))) > 0:
                 exist = list(filter(lambda gr: gr.old_id == group[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.code == group[1] and \
                         exist.plan_seats_number == group[2] and \
                         exist.status == self._group_status_mapping[group[15]] and \
@@ -440,6 +458,8 @@ class EduData:
             try:
                 group = list(filter(lambda gr: gr.old_id == st_group[0], exists))[0]
             except Exception:
+                continue
+            if group.updated_from_new:
                 continue
             try:
                 curator = list(filter(lambda cur: cur.old_id == st_group[1], curators))[0]
@@ -501,6 +521,8 @@ class EduData:
                 les_type = INDIVIDUAL
             if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) > 0:
                 exist = list(filter(lambda sc: sc.old_id == lesson[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if str(exist.date) == lesson[5].strftime('%Y-%m-%d') and \
                         exist.time_start == date_utils.convert_time_string_to_seconds(time_start) and \
                         exist.time_end == date_utils.convert_time_string_to_seconds(time_end) and \
@@ -554,6 +576,8 @@ class EduData:
             if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) == 0:
                 continue
             les = list(filter(lambda sc: sc.old_id == lesson[0], exists))[0]
+            if les.updated_from_new:
+                continue
             if not lesson[2]:
                 profile = {
                     'object_id': None
@@ -617,6 +641,8 @@ class EduData:
                     count = int(lesson[3])
             if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) > 0:
                 exist = list(filter(lambda sc: sc.old_id == lesson[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if str(exist.date) == lesson[5].strftime('%Y-%m-%d') and \
                         exist.time_start == date_utils.convert_time_string_to_seconds(time_start) and \
                         exist.time_end == date_utils.convert_time_string_to_seconds(time_end) and \
@@ -666,6 +692,8 @@ class EduData:
             if len(list(filter(lambda sc: sc.old_id == lesson[0], exists))) == 0:
                 continue
             les = list(filter(lambda sc: sc.old_id == lesson[0], exists))[0]
+            if les.updated_from_new:
+                continue
             if not lesson[1]:
                 profile = {
                     'object_id': None

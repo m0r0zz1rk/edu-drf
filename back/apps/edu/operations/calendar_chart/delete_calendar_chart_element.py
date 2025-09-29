@@ -2,9 +2,10 @@ from typing import Union
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
-from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_orm
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_orm
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.services.journal import journal_service
 
 
 class DeleteCalendarChartElement(MainProcessing):
@@ -25,10 +26,11 @@ class DeleteCalendarChartElement(MainProcessing):
         :param object_id: uuid элемента
         :return: true - элемент существует, false - элемент не найден
         """
+        orm = calendar_chart_theme_orm
         if el_type == 'chapter':
-            return calendar_chart_chapter_model.objects.filter(object_id=object_id).exists()
-        else:
-            return calendar_chart_theme_model.objects.filter(object_id=object_id).exists()
+            orm = calendar_chart_chapter_orm
+        obj = orm.get_one_record_or_none(filter_by={'object_id': object_id})
+        return obj is not None
 
     def _validate_process_data(self) -> Union[bool, str]:
         """
@@ -56,17 +58,13 @@ class DeleteCalendarChartElement(MainProcessing):
             if 'program' in self.process_data.keys():
                 el_type = 'chapter'
             if self._check_element_exist(el_type, self.process_data['object_id']):
+                orm = calendar_chart_theme_orm
                 if el_type == 'chapter':
-                    calendar_chart_chapter_model.objects.filter(
-                        object_id=self.process_data['object_id']
-                    ).first().delete()
-                else:
-                    calendar_chart_theme_model.objects.filter(
-                        object_id=self.process_data['object_id']
-                    ).first().delete()
+                    orm = calendar_chart_chapter_orm
+                orm.delete_record(filter_by={'object_id': self.process_data['object_id']})
             self.process_completed = True
         except Exception:
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
@@ -80,7 +78,7 @@ class DeleteCalendarChartElement(MainProcessing):
 
     def _process_success(self):
         """Фиксация сообщения об успешном удалении элемента КУГ в журнале"""
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

@@ -2,14 +2,19 @@ from django.apps import apps
 from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
 from apps.docs.consts.student_doc_types import STUDENT_DOC_TYPES
 
+# Модель документов обучающихся
 student_doc_model = apps.get_model('docs', 'StudentDoc')
+
+# Класс ORM для работы с документами обучающихся
+student_doc_orm = BaseORM(model=student_doc_model, select_related=['profile',])
 
 
 def student_doc_queryset() -> QuerySet:
     """QuerySet со всеми документами пользователей"""
-    return student_doc_model.objects.select_related('profile').all().order_by('-date_create')
+    return student_doc_orm.get_filter_records(order_by=['-date_create',])
 
 
 class StudentDocFilter(filters.FilterSet):

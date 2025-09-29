@@ -5,8 +5,8 @@ from apps.applications.selectors.course_application import course_application_or
 from apps.applications.selectors.event_application import event_application_orm
 from apps.applications.services.course_application import course_application_service
 from apps.applications.services.event_application import event_application_service
-from apps.surveys.consts.survey_target_types import EDU, INFO
-from apps.surveys.selectors.student_answer import student_answer_model
+from apps.surveys.consts.survey_target_types import INFO
+from apps.surveys.selectors.student_answer import student_answer_orm
 from apps.surveys.services.survey import survey_service
 from apps.surveys.services.survey_question import SurveyQuestionService
 
@@ -34,13 +34,14 @@ class StudentAnswerService:
         sq_service = SurveyQuestionService(survey_id)
         for answer in answers:
             question = sq_service.get_question('object_id', answer.get('question_id'))
-            student_answer_model.objects.create(
-                survey_id=survey_id,
-                group_code=group.code,
-                group_type='ПК' if group.ou else INFO,
-                question=question.text,
-                answer=answer.get('value')
-            )
+            ans_data = {
+                'survey_id': survey_id,
+                'group_code': group.code,
+                'group_type': 'ПК' if group.ou else INFO,
+                'question': question.text,
+                'answer': answer.get('value')
+            }
+            student_answer_orm.create_record(ans_data)
         orm.update_record(
             filter_by=dict(object_id=app_id),
             update_object={'status': STUDY_COMPLETE, 'check_survey': True}

@@ -2,8 +2,9 @@ from typing import Union
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.edu.selectors.student_group import student_group_model
+from apps.edu.selectors.student_group import student_group_orm
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.services.journal import journal_service
 
 
 class UpdateStudentGroup(MainProcessing):
@@ -28,13 +29,13 @@ class UpdateStudentGroup(MainProcessing):
         try:
             group_id = self.process_data['group_id']
             del self.process_data['group_id']
-            group, _ = student_group_model.objects.update_or_create(
-                object_id=group_id,
-                defaults=self.process_data
+            student_group_orm.update_record(
+                filter_by={'object_id': group_id},
+                update_object=self.process_data
             )
             self.process_completed = True
         except Exception:
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
@@ -48,7 +49,7 @@ class UpdateStudentGroup(MainProcessing):
 
     def _process_success(self):
         """Фиксация сообщения об успешном обновлении учебной группы"""
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

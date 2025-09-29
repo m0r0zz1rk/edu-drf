@@ -34,6 +34,8 @@ def get_student_doc_upload_path(instance, filename) -> str:
             user_folder += f' {spl[2][0]}'
         except Exception:
             pass
+    if instance.profile.birthday:
+        user_folder += f'-{instance.profile.birthday.strftime("%d-%m-%Y")}'
     for subfolder in ['Документы пользователей', doc_type_folder, user_folder]:
         doc_path = os.path.join(doc_path, subfolder)
         if not os.path.exists(doc_path):

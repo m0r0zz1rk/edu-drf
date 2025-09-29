@@ -17,7 +17,8 @@ class MoService:
         :return: True - существует, False - не существует
         """
         find = {attribute: value}
-        return mo_model.objects.filter(**find).exists()
+        mo = mo_orm.get_filter_records(filter_by=find)
+        return mo is not None
 
     def get_mo_object_by_name(self, name: str) -> Union[mo_model, None]:
         """
@@ -25,11 +26,8 @@ class MoService:
         :param name: Наименование МО
         :return: Объект Mo (если не найден - None)
         """
-        if self.is_mo_exist(
-            'name',
-            name
-        ):
-            return mo_model.objects.get(name=name)
+        if self.is_mo_exist('name', name):
+            return mo_orm.get_one_record_or_none(filter_by={'name': name})
         return None
 
     @staticmethod

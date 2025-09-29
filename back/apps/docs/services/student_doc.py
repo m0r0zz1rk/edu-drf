@@ -3,12 +3,12 @@ import uuid
 from django.db.models import QuerySet
 
 from apps.authen.exceptions.student_profile import StudentNotExist
+from apps.authen.selectors.student_profile import student_profile_orm
 from apps.authen.services.profile import profile_service
 from apps.commons.utils.django.settings import SettingsUtils
 from apps.docs.consts.student_doc_types import STUDENT_DOC_TYPES
-from apps.docs.exceptions.student_doc import StudentDocNotValidInfo
-from apps.docs.selectors.student_doc import student_doc_model
-from apps.guides.selectors.profiles.student import student_profile_model
+from apps.docs.exceptions.student_doc import StudentDocNotValidInfo, StudentDocNotFound
+from apps.docs.selectors.student_doc import student_doc_orm
 
 
 class StudentDocService:
@@ -26,9 +26,10 @@ class StudentDocService:
         :return: QuerySet с документами пользователя
         """
         try:
-            return student_doc_model.objects.select_related('profile').filter(
-                profile_id=student_profile_model.objects.get(django_user_id=user_id).object_id
-            )
+            profile = student_profile_orm.get_one_record_or_none(filter_by={'django_user_id': user_id})
+            if not profile:
+                raise StudentNotExist
+            return student_doc_orm.get_filter_records(filter_by={'profile_id': profile.object_id})
         except Exception:
             raise StudentNotExist
 
@@ -41,23 +42,15 @@ class StudentDocService:
         for key in self._doc_info_keys:
             if key not in doc_info:
                 raise StudentDocNotValidInfo
-        profile = profile_service.get_profile_or_info_by_attribute(
-            'django_user_id',
-            user_id,
-            'profile'
-        )
+        profile = profile_service.get_profile_or_info_by_attribute('django_user_id', user_id, 'profile')
         if not profile:
             raise StudentNotExist
         doc_info['profile'] = profile
         for sdt in STUDENT_DOC_TYPES:
             if sdt[1] == doc_info['doc_type']:
                 doc_info['doc_type'] = sdt[0]
-        object_id = uuid.uuid4()
-        student_doc_model.objects.update_or_create(
-            object_id=object_id,
-            **doc_info
-        )
-        return object_id
+        doc = student_doc_orm.create_record(doc_info)
+        return doc.object_id
 
     @staticmethod
     def delete_student_doc(object_id: str):
@@ -67,10 +60,9 @@ class StudentDocService:
         :return:
         """
         try:
-            doc = student_doc_model.objects.get(object_id=object_id)
-            doc.delete()
+            student_doc_orm.delete_record(filter_by={'object_id': object_id})
         except Exception:
-            pass
+            raise StudentDocNotFound
 
 
 student_doc_service = StudentDocService()

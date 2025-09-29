@@ -69,12 +69,12 @@ class BaseApplicationService:
         'mail_address'
     ]
 
-    def create_app(self, user_id: int, group_id: uuid, application_model: Model) -> uuid:
+    def create_app(self, user_id: int, group_id: uuid, application_orm: BaseORM) -> uuid:
         """
         Создание заявки
         :param user_id: ID пользователя Django
         :param group_id: object_id учебной группы
-        :param application_model: модель заявок (CourseApplication или EventApplication)
+        :param application_orm: Класс ORM для работы с заявками
         :return: object_id созданной заявки
         """
         try:
@@ -83,21 +83,21 @@ class BaseApplicationService:
                 user_id,
                 'profile_id'
             )
-            new_app, _ = application_model.objects.update_or_create(
-                profile_id=profile_id,
-                group_id=group_id,
-                region=irkutsk_state_object(),
-            )
+            app = {
+                'profile_id': profile_id,
+                'group_id': group_id,
+                'region': irkutsk_state_object()
+            }
             last_app = course_application_service.get_last_app(profile_id)
-            if application_model.__name__ == 'EventApplication':
+            if application_orm.model.__name__ == 'EventApplication':
                 last_app = event_application_service.get_last_app(profile_id)
             if last_app:
                 fields = self._new_course_app_fields
-                if application_model.__name__ == 'EventApplication':
+                if application_orm.model.__name__ == 'EventApplication':
                     fields = self._new_event_app_fields
                 for field in fields:
-                    setattr(new_app, field, getattr(last_app, field))
-            new_app.save()
+                    setattr(app, field, getattr(last_app, field))
+            new_app = application_orm.create_record(app)
             return new_app.object_id
         except Exception as e:
             raise ApplicationCreateError

@@ -10,7 +10,7 @@ from apps.commons.utils.django.user import UserUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import AUTHEN
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-from apps.journal.services.journal import JournalService
+from apps.journal.services.journal import journal_service
 
 
 class Registration(MainProcessing):
@@ -29,7 +29,6 @@ class Registration(MainProcessing):
         'health',
         'password'
     ]
-    ju = JournalService()
     pu = ProfileService()
     gu = GroupUtils()
     uu = UserUtils()
@@ -48,7 +47,7 @@ class Registration(MainProcessing):
         создании пользователя и его профиля
         :return:
         """
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': 'Регистрация нового пользователя',
                 'module': AUTHEN,
@@ -153,7 +152,7 @@ class Registration(MainProcessing):
         self.process_completed = False
 
     def _process_success(self):
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': 'Регистрация нового пользователя',
                 'module': AUTHEN,

@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Optional, Union, Type
 
+from django.contrib.auth.models import User
 from django.db.models import QuerySet
 
 from apps.commons.models import BaseTable
@@ -9,7 +10,9 @@ from apps.commons.orm.journal_orm_decorator import journal_orm_decorator
 class BaseORM:
     """Базовый класс для работы с БД через ORM"""
 
-    def __init__(self, model: BaseTable, select_related: list = None, prefetch_related: list = None):
+    model = None
+
+    def __init__(self, model: Union[BaseTable, Type[User]], select_related: list = None, prefetch_related: list = None):
         """
         Инициализация класса - установка модели, параметров select_related и prefetch_related
         :param model: модель БД
@@ -29,14 +32,17 @@ class BaseORM:
             return self.model.objects.select_related(*self.select_related).all()
         return self.model.objects.prefetch_related(*self.prefetch_related).all()
 
-    def get_filter_records(
-            self,
-            filter_by: dict = None,
-            exclude: dict = None,
-            order_by: list = None) -> QuerySet:
+    def get_all_objects_count(self) -> int:
+        """
+        Получение количества объектов в таблице БД
+        """
+        return self.model.objects.count()
+
+    def get_filter_records(self, filter_by: dict = None, exclude: dict = None, order_by: list = None) -> QuerySet:
         """
         Получение списка записей
-        :param filter_by: Словарь с параметрами фильтрации
+        :param filter_by: Словарь с параметрами фильтрации объектов
+        :param exclude: Словарь с параметрами исключения объектов
         :param order_by: Список полей для сортировки
         :return: QuerySet
         """
@@ -81,17 +87,20 @@ class BaseORM:
             payload=repr(filter_by)
         )
         def function():
+            res = self.model.objects.all()
             if self.select_related or self.prefetch_related:
-                return self.orm_with_select_or_prefetch_related().get(**filter_by)
-            return self.model.objects.get(**filter_by)
+                res = self.orm_with_select_or_prefetch_related().get(**filter_by)
+            res = res.filter(**filter_by)
+            if res.count() > 0:
+                return res.first()
 
         return function()
 
-    def create_record(self, create_object: dict):
+    def create_record(self, create_object: dict) -> model:
         """
         Создание новой записи в БД
         :param create_object: Словарь с данными новой записи
-        :return: None
+        :return: Созданный объект
         """
 
         @journal_orm_decorator(
@@ -100,7 +109,11 @@ class BaseORM:
             payload=repr(create_object)
         )
         def function():
-            new_obj = self.model.objects.create(**create_object)
+            create_object['updated_from_new'] = True
+            if self.model.__name__ == 'User':
+                new_obj = self.model.objects.create_user(**create_object)
+            else:
+                new_obj = self.model.objects.create(**create_object)
             return new_obj
 
         return function()
@@ -122,6 +135,7 @@ class BaseORM:
         def function():
             if 'object_id' in update_object:
                 del update_object['object_id']
+            update_object['updated_from_new'] = True
             if self.select_related or self.prefetch_related:
                 records = self.orm_with_select_or_prefetch_related().filter(**filter_by)
             else:

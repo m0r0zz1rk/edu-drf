@@ -2,6 +2,7 @@ from sqlalchemy import text
 
 from apps.commons.models import BaseTable
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
+from apps.commons.utils.data_types.date import date_utils
 from apps.guides.selectors.audience_category import audience_category_model
 from apps.guides.selectors.event_type import event_type_model
 from apps.guides.selectors.mo import mo_model
@@ -44,6 +45,9 @@ class GuidesData:
             data = data_query.all()
         for rec in data:
             if len(list(filter(lambda ex: ex.name == rec[1], exists))) > 0:
+                exist = list(filter(lambda ex: ex.name == rec[1], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 continue
             _, created = guide_model.objects.update_or_create(
                 old_id=rec[0],
@@ -109,6 +113,8 @@ class GuidesData:
         for oo in data:
             if len(list(filter(lambda rec: rec.old_id == oo[0], oos))) > 0:
                 exist = list(filter(lambda rec: rec.old_id == oo[0], oos))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.short_name == oo[1] and exist.full_name == oo[2] and \
                     exist.form == oo[3]:
                     continue
@@ -123,7 +129,8 @@ class GuidesData:
             new_oo['mo_id'] = mo_model.objects.filter(old_id=oo[4]).first().object_id
             new_oo['oo_type_id'] = oo_type_model.objects.filter(old_id=oo[5]).first().object_id
             _, created = oo_model.objects.update_or_create(
-                **new_oo
+                old_id=oo[0],
+                defaults=new_oo
             )
             if created:
                 print(f'ОО "{new_oo["full_name"]}" - добавлено')

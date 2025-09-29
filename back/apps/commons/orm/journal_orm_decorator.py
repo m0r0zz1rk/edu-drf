@@ -1,10 +1,8 @@
 from apps.commons.models import BaseTable
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.journal.consts.journal_modules import ORM
-from apps.journal.consts.journal_rec_statuses import SUCCESS, ERROR
-from apps.journal.services.journal import JournalService
-
-journal_service = JournalService()
+from apps.journal.consts.journal_rec_statuses import ERROR
+from apps.journal.services.journal import journal_service
 
 
 def journal_orm_decorator(

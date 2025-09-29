@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from apps.authen.models.base_profile import BaseProfile
+from apps.authen.selectors.user import user_orm
 from apps.commons.utils.django.group import GroupUtils
 from apps.guides.models import State
 
@@ -69,7 +70,7 @@ def create_user_profile(instance, created, **kwargs):
 def check_groups_and_set_first_user_admin(instance, created, **kwargs):
     """Проверка на регистрацию первого пользователя и наличие групп пользователей"""
     if created:
-        if User.objects.count() == 1:
+        if user_orm.get_all_objects_count() == 1:
             instance.is_superuser = True
             instance.is_staff = True
             instance.save()

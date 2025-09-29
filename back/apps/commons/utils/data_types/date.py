@@ -4,6 +4,7 @@ import time
 from typing import Optional
 
 from apps.commons.exceptions.date.incorrect_time_format import IncorrectTimeFormatError
+from apps.commons.utils.django.settings import settings_utils
 
 
 class DateUtils:
@@ -137,6 +138,19 @@ class DateUtils:
         return (f'{date.strftime("%d")} '
                f'{self.get_month_genitive_case(date.strftime("%B"))} '
                f'{date.strftime("%Y")} года')
+
+    @staticmethod
+    def compare_update_at_with_default(dt: datetime) -> bool:
+        """
+        Сравнение времени обновления записи с дефолтным значением (для переноса данных из старой БД)
+        Если время обновления записи позднее дефолтного (True) - запись изменена в новой версии АИС,
+            перенос из старой БД не требуется
+        Если время обновления записи раньше дефолтного (False) - запись не обновлялась в новой версии АИС,
+            нужен перенос из старой БД
+        """
+        default = settings_utils.get_parameter_from_settings('DEFAULT_UPDATED_AT')
+        default_updated_at = datetime.datetime.strptime(default, '%Y-%m-%d %H:%M:%S')
+        return dt.timestamp() > default_updated_at.timestamp()
 
 
 date_utils = DateUtils()

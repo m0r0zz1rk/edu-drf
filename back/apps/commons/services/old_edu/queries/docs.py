@@ -16,22 +16,10 @@ settings_utils = SettingsUtils()
 
 # Маппинг наименований типов документов обучающихся
 _student_doc_types_mapper = {
-        1: {
-            'key': DIPLOMA,
-            'title': 'Диплом'
-        },
-        2: {
-            'key': CHANGE_SURNAME,
-            'title': 'Документ о смене фамилии'
-        },
-        3: {
-            'key': TRAINING_CERTIFICATE,
-            'title': 'Справка об обучении'
-        },
-        6: {
-            'key': LICENSE_SCAN,
-            'title': 'Скан удостоверения'
-        }
+        1: {'key': DIPLOMA, 'title': 'Диплом'},
+        2: {'key': CHANGE_SURNAME, 'title': 'Документ о смене фамилии'},
+        3: {'key': TRAINING_CERTIFICATE, 'title': 'Справка об обучении'},
+        6: {'key': LICENSE_SCAN, 'title': 'Скан удостоверения'}
     }
 
 
@@ -54,6 +42,8 @@ class DocsData:
         for order in data:
             if len(list(filter(lambda ord: ord.old_id == order[0], exists))) > 0:
                 exist = list(filter(lambda ord: ord.old_id == order[0], exists))[0]
+                if exist.updated_from_new:
+                    continue
                 if exist.date == order[8] and exist.number == order[7]:
                     continue
             file = open(

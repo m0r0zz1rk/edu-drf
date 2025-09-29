@@ -5,9 +5,6 @@ from apps.commons.utils.django.exception import exception_handling
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES
 from apps.journal.exceptions.api_process_error import APIProcessError
-from apps.journal.services.journal import JournalService
-
-journal_service = JournalService()
 
 
 def journal_api(

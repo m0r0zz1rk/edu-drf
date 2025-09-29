@@ -2,7 +2,7 @@ import os
 
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.base_doc import BaseDocOperation
-from apps.docs.selectors.program_order import program_order_model
+from apps.docs.selectors.program_order import program_order_orm
 
 
 class DeleteProgramOrderOperation(BaseDocOperation):
@@ -12,12 +12,12 @@ class DeleteProgramOrderOperation(BaseDocOperation):
         """Действие удаления"""
         try:
             if 'object_id' in process_data['process_data']['document_data'].keys():
-                order = program_order_model.objects.get(
-                    object_id=process_data['process_data']['document_data']['object_id']
+                doc = program_order_orm.get_one_record_or_none(
+                    filter_by={'object_id': process_data['process_data']['document_data']['object_id']}
                 )
-                if order.file:
-                    os.remove(order.file.path)
-                order.delete()
+                if doc.file:
+                    os.remove(doc.file.path)
+                program_order_orm.delete_record(filter_by={'object_id': doc.object_id})
                 self.process_completed = True
                 self.success_message = 'Документ успешно удален'
                 self._doc_operation_success()

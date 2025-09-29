@@ -3,7 +3,7 @@ import uuid
 from django.db.models import QuerySet
 
 from apps.surveys.exceptions.survey_question_answer import IncorrectAnswerData, AnswerDoesNotExists
-from apps.surveys.selectors.survey_question_answer import survey_question_answer_model
+from apps.surveys.selectors.survey_question_answer import survey_question_answer_orm
 
 
 class SurveyQuestionAnswerService:
@@ -32,7 +32,7 @@ class SurveyQuestionAnswerService:
         :param question_id: object_id вопроса
         :return: QuerySet с возможными вариантами ответов
         """
-        return survey_question_answer_model.objects.filter(survey_question=question_id)
+        return survey_question_answer_orm.get_filter_records(filter_by={'survey_question': question_id})
 
     def add_edit_answer(self, answer_data):
         """
@@ -44,9 +44,9 @@ class SurveyQuestionAnswerService:
         if 'object_id' in answer_data:
             obj_id = answer_data['object_id']
             del answer_data['object_id']
-        survey_question_answer_model.objects.update_or_create(
-            object_id=obj_id,
-            defaults=answer_data
+        survey_question_answer_orm.update_record(
+            filter_by={'object_id': obj_id},
+            update_object=answer_data
         )
 
     @staticmethod
@@ -56,7 +56,7 @@ class SurveyQuestionAnswerService:
         :param answer_id: object_id объекта возможного ответа вопроса
         """
         try:
-            survey_question_answer_model.objects.get(object_id=answer_id).delete()
+            survey_question_answer_orm.delete_record(filter_by={'object_id': answer_id})
         except Exception:
             raise AnswerDoesNotExists
 

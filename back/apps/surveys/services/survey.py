@@ -1,7 +1,7 @@
 import uuid
 
 from apps.surveys.exceptions.survey import SurveyNotExist, SurveyDataNotValid
-from apps.surveys.selectors.survey import survey_model
+from apps.surveys.selectors.survey import survey_model, survey_orm
 from apps.surveys.services.survey_target import survey_target_service
 
 
@@ -32,7 +32,9 @@ class SurveyService:
         :param value: значение атрибута для поиска
         :return: True - объект найден, False - объект не найден
         """
-        return survey_model.objects.filter(**{attribute_name: value}).exists()
+        find = {attribute_name: value}
+        survey = survey_orm.get_one_record_or_none(filter_by=find)
+        return survey is not None
 
     def get_survey(self, attribute_name: str, value) -> survey_model:
         """
@@ -42,7 +44,7 @@ class SurveyService:
         :return: объект модели Survey
         """
         if self.is_survey_exists(attribute_name, value):
-            return survey_model.objects.filter(**{attribute_name: value}).first()
+            return survey_orm.get_one_record_or_none(filter_by={attribute_name: value})
         raise SurveyNotExist
 
     @staticmethod
@@ -68,10 +70,7 @@ class SurveyService:
         """
         if not self.validate_data_for_create_update(serialize_data):
             raise SurveyDataNotValid
-        survey_model.objects.create(**{
-            'creator_id': user_id,
-            **serialize_data
-        })
+        survey_orm.create_record({'creator_id': user_id, **serialize_data})
 
     def update_survey(self, survey_id: int, serialize_data: dict):
         """
@@ -81,9 +80,11 @@ class SurveyService:
         """
         if 'description' not in serialize_data:
             raise SurveyDataNotValid
-        survey = self.get_survey('object_id', survey_id)
-        survey.description = serialize_data['description']
-        survey.save()
+        self.get_survey('object_id', survey_id)
+        survey_orm.update_record(
+            filter_by={'object_id': survey_id},
+            update_object={'description': serialize_data['description']}
+        )
 
 
 survey_service = SurveyService()

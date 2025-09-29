@@ -3,18 +3,21 @@ from django.db.models import QuerySet
 
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
 from apps.surveys.consts.survey_question_type import SURVEY_QUESTION_TYPES
 
+# Модель вопросов опроса
 survey_question_model = apps.get_model('surveys', 'SurveyQuestion')
+
+# Класс ORM для работы с вопросами опроса
+survey_question_orm = BaseORM(model=survey_question_model, select_related=['survey'])
 
 
 def survey_question_queryset() -> QuerySet:
     """
     Получение всех вопросов опросов
     """
-    return (survey_question_model.objects.
-            select_related('survey').
-            all().order_by('sequence_number'))
+    return survey_question_orm.get_filter_records(order_by=['sequence_number'])
 
 
 class SurveyQuestionFilter(filters.FilterSet):

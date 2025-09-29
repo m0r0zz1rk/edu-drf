@@ -1,7 +1,7 @@
 import datetime
 import re
 import uuid
-from typing import Optional, List
+from typing import Optional
 
 from django.db.models import QuerySet
 from django.http import HttpResponse
@@ -15,7 +15,7 @@ from apps.edu.consts.student_group.doc_type_class_mapping import STUDENT_GROUP_D
 from apps.edu.consts.student_group.doc_type_path_mapping import STUDENT_GROUP_DOC_TYPE_PATH_MAPPING
 from apps.edu.consts.student_group.doc_types import STUDENT_GROUP_DOC_TYPES, FORMS, STUDENT_JOURNAL, SCHEDULE, \
     CERTIFICATES_LIST
-from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES, REGISTRATION
+from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES
 from apps.edu.exceptions.student_group.generate_code_error import GenerateCodeError
 from apps.edu.selectors.student_group import student_group_model, student_group_orm
 from apps.edu.services.service.education_service import EducationServiceService, education_service_service
@@ -34,7 +34,8 @@ class StudentGroupService:
         :return: True - объекты существуют, False - объекты не найдены
         """
         find = {attribute_name: value}
-        return student_group_model.objects.filter(**find).exists()
+        group = student_group_orm.get_one_record_or_none(filter_by=find)
+        return group is not None
 
     def get_student_group(self, attribute_name: str, value: str) -> Optional[student_group_model]:
         """
@@ -45,7 +46,7 @@ class StudentGroupService:
         """
         if self.is_group_exists(attribute_name, value):
             find = {attribute_name: value}
-            return student_group_model.objects.filter(**find).first()
+            return student_group_orm.get_one_record_or_none(filter_by=find)
         return None
 
     @staticmethod
@@ -84,8 +85,9 @@ class StudentGroupService:
                 type_sign = 'С'
             code += f'-{type_sign}{str(service_count+1)}' if service_count != 0 else f'-{type_sign}1'
             code += f'-{month}-{year[2:]}'
+            groups = student_group_orm.get_filter_records(filter_by={'code': code})
             if self.is_group_exists('code', code):
-                code += f'-{str(student_group_model.objects.filter(code=code).count())}'
+                code += f'-{str(groups.count())}'
         except RuntimeError:
             raise GenerateCodeError
         return code

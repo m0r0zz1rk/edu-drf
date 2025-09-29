@@ -9,7 +9,7 @@ from apps.commons.utils.django.model import ModelUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
-from apps.journal.services.journal import JournalService
+from apps.journal.services.journal import journal_service
 
 
 class AddUpdateDataBaseRecord(MainProcessing):
@@ -55,7 +55,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
             if isinstance(model_exist, str):
                 description = 'Системная ошибка'
                 output = model_exist
-            JournalService().create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': 'Добавление/обновление записи',
                     'module': self.module,
@@ -84,7 +84,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
         Фиксация ошибки валидации полей модели в журнале событий
         :return:
         """
-        JournalService().create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,
@@ -101,7 +101,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
         :param traceback: traceback возникшей в процессе ошибки
         :return:
         """
-        JournalService().create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': 'Процесс добавления/обновления записи в БД',
                 'module': COMMON,
@@ -133,21 +133,31 @@ class AddUpdateDataBaseRecord(MainProcessing):
                 if 'object_id' in self.process_data['object'].keys():
                     object_id = self.process_data['object']['object_id']
                     del self.process_data['object']['object_id']
+                    defaults = {
+                        'updated_from_new': True,
+                        **self.process_data['object']
+                    }
                     self.model.objects.update_or_create(
                         object_id=object_id,
-                        defaults=self.process_data['object']
+                        defaults=defaults
                     )
                 elif 'id' in self.process_data['object'].keys():
                     id = self.process_data['object']['id']
                     del self.process_data['object']['id']
+                    defaults = {
+                        'updated_from_new': True,
+                        **self.process_data['object']
+                    }
                     self.model.objects.update_or_create(
                         id=id,
-                        defaults=self.process_data['object']
+                        defaults=defaults
                     )
                 else:
-                    self.model.objects.update_or_create(
+                    defaults = {
+                        'updated_from_new': True,
                         **self.process_data['object']
-                    )
+                    }
+                    self.model.objects.update_or_create(defaults)
                 return None
             except Exception:
                 self._main_process_error(ExceptionHandling.get_traceback())
@@ -161,7 +171,7 @@ class AddUpdateDataBaseRecord(MainProcessing):
         Фиксация сообщения об успешном добавлении/обновлении записи в БД
         :return:
         """
-        JournalService().create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

@@ -3,16 +3,19 @@ from django.db.models import QuerySet, Q
 
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
 from apps.guides.selectors.profiles.coko import coko_profile_model
 
+# Модель опросов
 survey_model = apps.get_model('surveys', 'Survey')
+
+# Класс ORM для работы с опросами
+survey_orm = BaseORM(model=survey_model, select_related=['creator', ])
 
 
 def survey_queryset() -> QuerySet:
     """Получение списка опросов"""
-    return (survey_model.objects.
-            select_related('creator').
-            all())
+    return survey_orm.get_filter_records()
 
 
 class SurveyFilter(filters.FilterSet):

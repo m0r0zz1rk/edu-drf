@@ -3,8 +3,8 @@ import uuid
 from typing import Optional
 
 from apps.edu.exceptions.planning_parameter.planning_days_error import PlanningDaysError
-from apps.edu.selectors.program import program_model
-from apps.edu.selectors.services.education_service import education_service_model, education_service_orm
+from apps.edu.selectors.program import program_orm
+from apps.edu.selectors.services.education_service import education_service_orm
 from apps.edu.services.planning_parameter import planning_parameter_service
 
 
@@ -16,7 +16,7 @@ class EducationServiceService:
         """
         Получение общего количества курсов в АИС
         """
-        return education_service_model.objects.count()
+        return education_service_orm.get_all_objects_count()
 
     @staticmethod
     def is_service_exists(attribute_name: str, value: str) -> bool:
@@ -27,7 +27,8 @@ class EducationServiceService:
         :return: True - существует, False - не существует
         """
         find = {attribute_name: value}
-        return education_service_model.objects.filter(**find).exists()
+        service = education_service_orm.get_one_record_or_none(filter_by=find)
+        return service is not None
 
     def get_info_by_service(self, attribute_name: str, value: str, info: str) -> Optional[str]:
         """
@@ -39,7 +40,7 @@ class EducationServiceService:
         """
         if self.is_service_exists(attribute_name, value):
             find = {attribute_name: value}
-            service = education_service_model.objects.filter(**find).first()
+            service = education_service_orm.get_one_record_or_none(filter_by=find)
             if info == 'dep_name':
                 return service.program.department.display_name
             elif info == 'date_start':
@@ -57,17 +58,11 @@ class EducationServiceService:
         :param department: display_name подразделения AD
         :return: количество ОУ (курсов)
         """
-        return education_service_model.objects. \
-            filter(
-                program__in=(program_model.objects.
-                             select_related('department').
-                             select_related('kug_edit').
-                             prefetch_related('categories').
-                             select_related('program_order').
-                             filter(department__display_name=department))
-            ).filter(
-                date_start__year=datetime.datetime.now().year
-            ).count()
+        programs = program_orm.get_filter_records(filter_by={'department__display_name': department})
+        services = education_service_orm.get_filter_records(
+            filter_by={'program__in': programs, 'date_start__year': datetime.datetime.now().year}
+        )
+        return services.count()
 
     @staticmethod
     def create_service(validated_data: dict):

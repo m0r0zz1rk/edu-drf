@@ -1,7 +1,7 @@
 from typing import Optional
 
 from apps.guides.operations.add_update_guides_rec import AddUpdateGuidesRec
-from apps.guides.selectors.state import state_model
+from apps.guides.selectors.state import state_model, state_orm
 
 default_states = [
     'Россия',
@@ -23,7 +23,8 @@ class StateService:
         :return: true - государство существует, false - государство не существует
         """
         find = {attribute_name: value}
-        return state_model.objects.filter(**find).exists()
+        state = state_orm.get_one_record_or_none(filter_by=find)
+        return state is not None
 
     def add_based_states(self):
         """Добавление базовых государств (с проверкой на существующие)"""
@@ -41,5 +42,5 @@ class StateService:
         :return: None - государство не найдено, state_model - сущность государства
         """
         if self.is_state_exist('name', name):
-            return state_model.objects.get(name=name)
+            return state_orm.get_one_record_or_none(filter_by={'name': name})
         return None

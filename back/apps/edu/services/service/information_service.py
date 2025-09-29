@@ -18,7 +18,7 @@ class InformationServiceService:
         """
         Получение общего количества мероприятий в АИС
         """
-        return information_service_model.objects.count()
+        return information_service_orm.get_all_objects_count()
 
     @staticmethod
     def service_count(department: str) -> int:
@@ -27,12 +27,10 @@ class InformationServiceService:
         :param department: display_name подразделения AD
         :return: количество ОУ (курсов)
         """
-        return information_service_model.objects. \
-            filter(
-                department__display_name=department
-            ).filter(
-                date_start__year=datetime.datetime.now().year
-            ).count()
+        services = information_service_orm.get_filter_records(
+            filter_by={'department__display_name': department, 'date_start__year': datetime.datetime.now().year}
+        )
+        return services.count()
 
     @staticmethod
     def is_service_exists(attribute_name: str, value: str) -> bool:
@@ -43,7 +41,8 @@ class InformationServiceService:
         :return: True - существует, False - не существует
         """
         find = {attribute_name: value}
-        return information_service_model.objects.filter(**find).exists()
+        service = information_service_orm.get_one_record_or_none(filter_by=find)
+        return service is not None
 
     def get_info_by_service(self, attribute_name: str, value: str, info: str) -> Optional[str]:
         """
@@ -55,7 +54,7 @@ class InformationServiceService:
         """
         if self.is_service_exists(attribute_name, value):
             find = {attribute_name: value}
-            service = information_service_model.objects.filter(**find).first()
+            service = information_service_orm.get_one_record_or_none(filter_by=find)
             if info == 'dep_name':
                 return service.department.display_name
             elif info == 'date_start':
@@ -74,7 +73,7 @@ class InformationServiceService:
         """
         try:
             if self.is_service_exists('object_id', service_id):
-                service = information_service_model.objects.filter(object_id=service_id).first()
+                service = information_service_orm.get_one_record_or_none(filter_by={'object_id': service_id})
                 cats_str = ''
                 for cat in service.categories.all().order_by('name'):
                     cats_str += f'{cat.name};; '

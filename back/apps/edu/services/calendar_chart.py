@@ -13,8 +13,10 @@ from apps.edu.exceptions.student_group.student_group_incorrect_service import St
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.operations.calendar_chart.add_update_calendar_chart_element import AddUpdateCalendarChartElement
 from apps.edu.operations.calendar_chart.delete_calendar_chart_element import DeleteCalendarChartElement
-from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
-from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model, \
+    calendar_chart_chapter_orm
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_orm
+from apps.edu.selectors.program import program_orm
 from apps.edu.services.program import ProgramService
 from apps.edu.services.schedule import ScheduleService
 from apps.edu.services.student_group import StudentGroupService
@@ -37,7 +39,8 @@ class CalendarChartService:
         :param program_id: uuid ДПП
         :return: true - разделы существуют, false - разделы не найдены
         """
-        return calendar_chart_chapter_model.objects.filter(program_id=program_id).exists()
+        chapter = calendar_chart_chapter_orm.get_one_record_or_none(filter_by={'program_id': program_id})
+        return chapter is not None
 
     def get_chapters_for_program(self, program_id: uuid) -> Optional[QuerySet]:
         """
@@ -46,20 +49,19 @@ class CalendarChartService:
         :return: queryset - разделы КУГ для ДПП, None - разделы не найдены
         """
         if self.is_chapters_exists(program_id):
-            return (calendar_chart_chapter_model.objects.
-                    select_related('program').
-                    filter(program_id=program_id))
+            return calendar_chart_chapter_orm.get_filter_records(filter_by={'program_id': program_id})
         return None
 
     @staticmethod
     def get_themes_for_kug_chapter(chapter_id) -> Optional[QuerySet]:
         """
-        Получение тема для раздела КУГ ДПП
+        Получение тем для раздела КУГ ДПП
         :param chapter_id: object_id раздела КУГ
         :return: None - темы не найдены,
         """
-        if calendar_chart_chapter_model.objects.filter(object_id=chapter_id).exists():
-            return calendar_chart_theme_model.objects.select_related('chapter').filter(chapter_id=chapter_id)
+        chapter = calendar_chart_chapter_orm.get_one_record_or_none(filter_by={'object_id': chapter_id})
+        if chapter:
+            return calendar_chart_theme_orm.get_filter_records(filter_by={'chapter_id': chapter_id})
         return None
 
     def get_program_calendar_chart(self, program_id: uuid, user_id: int) -> Optional[dict]:
@@ -84,18 +86,22 @@ class CalendarChartService:
             else:
                 kug['on_edit'] = program.kug_edit.display_name
         chapters = []
-        for chapter in (calendar_chart_chapter_model.objects.select_related('program').filter(
-                program_id=program_id
-        ).order_by('position')):
+        recs = calendar_chart_chapter_orm.get_filter_records(
+            filter_by={'program_id': program_id},
+            order_by=['position',]
+        )
+        for chapter in recs:
             chapter_obj = {}
             for field in calendar_chart_chapter_model._meta.concrete_fields:
                 if field.name not in ['date_create', 'program']:
                     chapter_obj[field.name] = getattr(chapter, field.name)
             chapter_obj['program'] = chapter.program_id
             themes = []
-            for theme in (calendar_chart_theme_model.objects.select_related('chapter').filter(
-                    chapter_id=chapter.object_id
-            ).order_by('position')):
+            th_recs = calendar_chart_chapter_orm.get_filter_records(
+                filter_by={'chapter_id': chapter.object_id},
+                order_by=['position',]
+            )
+            for theme in th_recs:
                 theme_obj = {}
                 for field in calendar_chart_chapter_model._meta.concrete_fields:
                     if field.name not in ['date_create', 'program']:
@@ -225,8 +231,10 @@ class CalendarChartService:
                         'module': EDU,
                         'process_data': theme
                     })
-            program.kug_edit = None
-            program.save()
+            program_orm.update_record(
+                filter_by={'object_id': program.object_id},
+                update_object={'kug_edit': None}
+            )
             return True
         except Exception:
             self.ju.create_journal_rec(

@@ -5,7 +5,7 @@ from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES, COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.services.journal import JournalService
+from apps.journal.services.journal import journal_service
 
 
 class MainProcessing(ABC):
@@ -19,7 +19,6 @@ class MainProcessing(ABC):
 
     source = module = process_data = None
     process_completed = True
-    ju = JournalService()
 
     def __init__(self, income_data: dict, request=None):
         """
@@ -31,7 +30,7 @@ class MainProcessing(ABC):
             self._set_data(income_data)
             self._processing()
         else:
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': 'Процесс обработки информации',
                     'module': COMMON,
@@ -82,7 +81,7 @@ class MainProcessing(ABC):
         }
         if traceback is not None:
             journal_rec.output = traceback
-        self.ju.create_journal_rec(**journal_rec)
+        journal_service.create_journal_rec(**journal_rec)
 
     @abstractmethod
     def _main_process(self):
@@ -96,7 +95,7 @@ class MainProcessing(ABC):
 
     def _process_error(self, traceback: str):
         """Создание записи об ошибки в процессе обработки в журнале событий"""
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

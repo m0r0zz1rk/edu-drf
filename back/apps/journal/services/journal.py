@@ -8,7 +8,7 @@ from apps.commons.utils.django.settings import SettingsUtils
 from apps.commons.utils.validate import ValidateUtils
 from apps.journal.consts.journal_modules import COMMON
 from apps.journal.consts.journal_rec_statuses import ERROR
-from apps.journal.selectors.journal import journal_model
+from apps.journal.selectors.journal import journal_model, journal_orm
 from apps.journal.services.output import OutputService
 from apps.journal.services.payload import PayloadService
 
@@ -28,14 +28,15 @@ class JournalService:
         :param rec_id: object_id записи
         :return: true - запись существует, false - запись не существует
         """
-        return journal_model.objects.filter(object_id=rec_id).exists()
+        rec = journal_orm.get_one_record_or_none(filter_by={'object_id': rec_id})
+        return rec is not None
 
     def get_journal_size(self) -> int:
         """
         Получение текущего размера журнала
         :return: количество записей в таблице Journal
         """
-        return journal_model.objects.count()
+        return journal_orm.get_all_objects_count()
 
     def create_journal_rec(self, data: dict, payload: str = None, output: str = None):
         """
@@ -49,8 +50,7 @@ class JournalService:
             payload_utils = PayloadService()
             output_utils = OutputService()
             try:
-                new_rec = journal_model(**data)
-                new_rec.save()
+                new_rec = journal_orm.create_record(data)
                 if payload is not None or output is not None:
                     if self.is_journal_rec_exist(new_rec.object_id):
                         description = data['description']
@@ -73,13 +73,13 @@ class JournalService:
                         new_rec.description = description
                         new_rec.save()
             except Exception:
-                error_rec = journal_model(
-                    source='Процесс создания записи в журнале событий',
-                    module=COMMON,
-                    status=ERROR,
-                    description=''
-                )
-                error_rec.save()
+                error_data = {
+                    'soruce': 'Процесс создания записи в журнале событий',
+                    'module': COMMON,
+                    'status': ERROR,
+                    'description': ''
+                }
+                error_rec = journal_orm.create_record(error_data)
                 if self.is_journal_rec_exist(error_rec.object_id):
                     description = 'Произошла ошибка при внесении записи в журнал событий'
                     payload_save_process = payload_utils.create_or_update_payload_rec(
@@ -99,7 +99,8 @@ class JournalService:
 
     def journal_older_delete(self):
         """Удаление самой старой записи в журнале событий"""
-        journal_model.objects.order_by('date_create').first().delete()
+        old_records = journal_orm.get_filter_records(order_by=['date_create'])
+        old_records.first().delete()
 
 
 @receiver(post_save, sender=journal_model)

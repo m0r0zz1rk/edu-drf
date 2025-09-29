@@ -3,16 +3,23 @@ from django.db.models import QuerySet
 
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
+
+# Модель возможных ответов на вопросы опросов
 survey_question_answer_model = apps.get_model('surveys', 'SurveyQuestionAnswer')
+
+# Класс ORM для работы с возможными ответами на вопросы опросов
+survey_question_answer_orm = BaseORM(
+    model=survey_question_answer_model,
+    select_related=['survey_question', ]
+)
 
 
 def survey_question_answer_queryset() -> QuerySet:
     """
     Получение списка возможных ответов на вопросы опросов
     """
-    return (survey_question_answer_model.objects.
-            select_related('survey_question').
-            all())
+    return survey_question_answer_orm.get_filter_records()
 
 
 class SurveyQuestionAnswerFilter(filters.FilterSet):

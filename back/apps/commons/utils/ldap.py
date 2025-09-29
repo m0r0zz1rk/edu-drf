@@ -103,12 +103,7 @@ class LdapUtils:
             )
             deps = conn.entries
             for dep in deps:
-                ad_centre_service.add_ad_centre(
-                    {
-                        'display_name': dep.DisplayName,
-                        'object_guid': dep.ObjectGUID
-                    }
-                )
+                ad_centre_service.add_ad_centre({'display_name': dep.DisplayName, 'object_guid': dep.ObjectGUID})
 
     @ldap_utils_journal_decorator(
         'Подразделение успешно записано в модель AdCentreCokoUser',

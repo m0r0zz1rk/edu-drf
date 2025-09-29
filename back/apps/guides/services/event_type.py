@@ -1,6 +1,6 @@
 from typing import Union
 
-from apps.guides.selectors.event_type import event_type_model
+from apps.guides.selectors.event_type import event_type_model, event_type_orm
 
 
 class EventTypeService:
@@ -15,7 +15,8 @@ class EventTypeService:
         :return: True - существует, False - не существует
         """
         find = {attribute: value}
-        return event_type_model.objects.filter(**find).exists()
+        event_type = event_type_orm.get_filter_records(filter_by=find)
+        return event_type is not None
 
     def get_event_type_object_by_name(self, name: str) -> Union[event_type_model, None]:
         """
@@ -23,11 +24,8 @@ class EventTypeService:
         :param name: наименование типа мероприятий
         :return: Объект EventType (если не найдено - None)
         """
-        if self.is_event_type_exist(
-            'name',
-            name
-        ):
-            return event_type_model.objects.get(name=name)
+        if self.is_event_type_exist('name', name):
+            return event_type_orm.get_one_record_or_none(filter_by={'name': name})
         return None
 
 

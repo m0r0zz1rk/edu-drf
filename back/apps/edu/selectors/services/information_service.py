@@ -18,7 +18,6 @@ information_service_orm = BaseORM(
 def information_service_queryset() -> QuerySet:
     """Получение queryset с информационно-консультационными услугами (мероприятиями)"""
     return information_service_orm.get_filter_records(order_by=['-date_create'])
-    # return information_service_model.objects.all().order_by('-date_create')
 
 
 class InformationServiceFilter(filters.FilterSet):

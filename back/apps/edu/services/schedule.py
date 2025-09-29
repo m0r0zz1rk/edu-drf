@@ -14,9 +14,9 @@ from apps.edu.exceptions.calendar_chart.incorrect_theme_dict_format import Incor
 from apps.edu.exceptions.schedule.day_info_validate_error import DayInfoValidateError
 from apps.edu.exceptions.schedule.schedule_generate_error import ScheduleGenerateError
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
-from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model
-from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_model
-from apps.edu.selectors.schedule import schedule_model, schedule_model_orm
+from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_orm
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_orm
+from apps.edu.selectors.schedule import schedule_model, schedule_orm
 from apps.edu.selectors.student_group import student_group_orm
 from apps.edu.services.service.education_service import EducationServiceService
 from apps.edu.services.service.information_service import InformationServiceService
@@ -118,11 +118,11 @@ class ScheduleService:
         :return: список занятий
         """
         lessons = []
-        for lesson in schedule_model.objects.filter(
-                date=day
-        ).filter(
-            group_id=self.__group.object_id
-        ).order_by('time_start'):
+        recs = schedule_orm.get_filter_records(
+            filter_by={'date': day, 'group_id': self.__group.object_id},
+            order_by=['time_start']
+        )
+        for lesson in recs:
             voc = dict({'kug_theme_id': lesson.kug_theme_id})
             for field in schedule_model._meta.get_fields():
                 if field.name in ['object_id', 'date_create', 'group', 'date']:
@@ -167,11 +167,8 @@ class ScheduleService:
         if not self.__group:
             raise StudentGroupNotFound
         if self.check_day_lessons(day):
-            for lesson in schedule_model.objects.filter(
-                    date=day
-            ).filter(
-                group_id=self.__group.object_id
-            ):
+            recs = schedule_orm.get_filter_records(filter_by={'date': day, 'group_id': self.__group.object_id})
+            for lesson in recs:
                 lesson.delete()
 
     def generate_schedule(self, generate_days: list):
@@ -192,7 +189,7 @@ class ScheduleService:
                     self.__lesson_template['date'] = dt_day
                     self.__lesson_template['time_start'] = time_start
                     self.__lesson_template['time_end'] = time_start + (45 * 60)
-                    schedule_model.objects.create(**self.__lesson_template)
+                    schedule_orm.create_record(self.__lesson_template)
                     if int(day['hours_count']) > 1:
                         for index in range(2, int(day['hours_count']) + 1):
                             if index == 5:
@@ -204,7 +201,7 @@ class ScheduleService:
                                     time_start += 55 * 60  # Между парами перерыв 10 минут
                             self.__lesson_template['time_start'] = time_start
                             self.__lesson_template['time_end'] = time_start + (45 * 60)
-                            schedule_model.objects.create(**self.__lesson_template)
+                            schedule_orm.create_record(self.__lesson_template)
         except RuntimeError:
             raise ScheduleGenerateError
 
@@ -265,7 +262,7 @@ class ScheduleService:
             'time_end': time_end,
             **lesson_info
         }
-        schedule_model.objects.create(**lesson_object)
+        schedule_orm.create_record(lesson_object)
 
     def save_day_info(self, day_info_object: dict):
         """
@@ -293,17 +290,14 @@ class ScheduleService:
             user_id,
             'profile'
         )
-        days = {lesson.date for lesson in (schedule_model.objects.
-                                           select_related('group').
-                                           filter(teacher=profile.object_id)) if lesson.date > datetime.date.today()}
+        recs = schedule_orm.get_filter_records(filter_by={'teacher': profile.object_id})
+        days = {lesson.date for lesson in recs if lesson.date > datetime.date.today()}
         schedule = []
         for day in days:
-            day_lessons = (schedule_model.objects.
-                           select_related('group').
-                           filter(
-                               date=day,
-                               teacher=profile.object_id
-                           ).order_by('date_create'))
+            day_lessons = schedule_orm.get_filter_records(
+                filter_by={'date': day, 'teacher': profile.object_id},
+                order_by=['date_create', ]
+            )
             lessons = []
             for lesson in day_lessons:
                 obj = {
@@ -333,7 +327,7 @@ class ScheduleService:
         Получение QuerySet с занятиями группы
         :return:
         """
-        return schedule_model_orm.get_filter_records(
+        return schedule_orm.get_filter_records(
             filter_by={'group_id': self.__group.object_id},
             order_by=['date', 'time_start']
         )
@@ -342,9 +336,10 @@ class ScheduleService:
     def get_kug_element_by_theme_id(theme_id: uuid) -> BaseTable:
         """
         Получение элемента КУГ (тема или раздел) по полученному object_id
-        :param theme_id: object_id элемента КУГ
+        :param theme_id: theme_id элемента КУГ
         :return: Раздел или тема КУГ
         """
-        if calendar_chart_chapter_model.objects.filter(object_id=theme_id).exists():
-            return calendar_chart_chapter_model.objects.filter(object_id=theme_id).first()
-        return calendar_chart_theme_model.objects.filter(object_id=theme_id).first()
+        chapter = calendar_chart_chapter_orm.get_one_record_or_none(filter_by={'object_id': theme_id})
+        if chapter:
+            return chapter
+        return calendar_chart_theme_orm.get_one_record_or_none(filter_by={'object_id': theme_id})

@@ -1,7 +1,7 @@
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.program_order.delete_program_order import DeleteProgramOrderOperation
 from apps.edu.operations.program.base_program import BaseProgramOperation
-from apps.edu.selectors.program import program_model
+from apps.edu.selectors.program import program_model, program_orm
 
 
 class DeleteProgramOperation(BaseProgramOperation):
@@ -14,16 +14,15 @@ class DeleteProgramOperation(BaseProgramOperation):
 
     def _main_action(self):
         try:
-            dpp = program_model.objects.get(object_id=self.program_data['object_id'])
+            dpp_filter = {'object_id': self.program_data['object_id']}
+            dpp = program_orm.get_one_record_or_none(filter_by=dpp_filter)
             if dpp.program_order:
                 DeleteProgramOrderOperation(
-                    {
-                        'object_id': dpp.program_order.object_id,
-                    },
+                    {'object_id': dpp.program_order.object_id,},
                     'ProgramOrder',
                     None
                 )
-            dpp.delete()
+            program_orm.delete_record(filter_by=dpp_filter)
             self.success_description = 'ДПП успешно удалена'
             self._program_operation_success()
             self.process_completed = True

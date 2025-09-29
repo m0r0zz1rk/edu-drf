@@ -19,6 +19,14 @@ class BaseTable(models.Model):
         auto_now_add=True,
         verbose_name='Время создания'
     )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Время обновления'
+    )
+    updated_from_new = models.BooleanField(
+        default=False,
+        verbose_name='Обновлено в новой версии АИС'
+    )
 
     objects = models.Manager()
 

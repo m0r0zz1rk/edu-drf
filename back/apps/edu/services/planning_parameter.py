@@ -16,10 +16,6 @@ class PlanningParameterService:
         :return: None - параметр не найден, planning_parameter_model - объект параметра
         """
         return planning_parameter_orm.get_one_record_or_none({attribute_name: value})
-        # if self.is_parameter_exist(attribute_name, value):
-        #     find = {attribute_name: value}
-        #     return planning_parameter_model.objects.filter(**find).first()
-        # return None
 
     def check_planning_days(self, date_create: datetime) -> bool:
         """

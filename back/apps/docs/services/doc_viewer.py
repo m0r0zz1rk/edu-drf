@@ -1,8 +1,8 @@
 import os
 import uuid
 
-from apps.docs.selectors.pay_doc import pay_doc_model
-from apps.docs.selectors.student_doc import student_doc_model
+from apps.docs.selectors.pay_doc import pay_doc_orm
+from apps.docs.selectors.student_doc import student_doc_orm
 from apps.docs.selectors.student_group_offer import student_group_offer_orm
 
 
@@ -20,11 +20,13 @@ class DocViewerService:
         :param attr: атрибут записи (name или file)
         """
         if doc_type == 'student':
-            file = student_doc_model.objects.get(object_id=doc_id).file
+            rec = student_doc_orm.get_one_record_or_none({'object_id': doc_id})
+            file = rec.file
         elif doc_type == 'offer':
             file = student_group_offer_orm.get_one_record_or_none(filter_by=dict(object_id=doc_id)).file
         else:
-            file = pay_doc_model.objects.get(object_id=doc_id).file
+            rec = pay_doc_orm.get_one_record_or_none(filter_by={'object_id': doc_id})
+            file = rec.file
         if attr == 'name':
             return os.path.basename(file.name)
         return file

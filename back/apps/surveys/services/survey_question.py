@@ -6,7 +6,7 @@ from apps.surveys.consts.survey_question_type import SURVEY_QUESTION_TYPES, ONE,
 from apps.surveys.exceptions.survey import SurveyNotExist
 from apps.surveys.exceptions.survey_question import IncorrectQuestionInfo, QuestionCreateUpdateError, \
     QuestionDoesNotExist
-from apps.surveys.selectors.survey_question import survey_question_model
+from apps.surveys.selectors.survey_question import survey_question_model, survey_question_orm
 from apps.surveys.services.survey import survey_service
 from apps.surveys.services.survey_question_answer import survey_question_answer_service
 
@@ -40,7 +40,8 @@ class SurveyQuestionService:
         Получение количества вопросов опроса
         :return: количество вопросов
         """
-        return survey_question_model.objects.filter(survey_id=self._survey.object_id).count()
+        surveys = survey_question_orm.get_filter_records(filter_by={'survey_id': self._survey.object_id})
+        return surveys.count()
 
     def check_question_exists(self, attribute_name: str, value: str) -> bool:
         """
@@ -52,7 +53,8 @@ class SurveyQuestionService:
         find = {attribute_name: value}
         if self._survey:
             return self._survey.questions.filter(**find).exists()
-        return survey_question_model.objects.filter(**find).exists()
+        question = survey_question_orm.get_one_record_or_none(filter_by=find)
+        return question is not None
 
     def get_question(self, attribute_name: str, value: str) -> survey_question_model:
         """
@@ -78,6 +80,7 @@ class SurveyQuestionService:
                 self.check_and_change_sequence_number(start_number, seq_number + 1)
             question = self._survey.questions.filter(sequence_number=seq_number).first()
             question.sequence_number = seq_number + 1
+            question.updated_from_new = True
             question.save()
 
     def add_edit_question(self, question_info: dict):
@@ -106,9 +109,9 @@ class SurveyQuestionService:
             for question_type in SURVEY_QUESTION_TYPES:
                 if question_type[1] == question_info['question_type']:
                     question_info['question_type'] = question_type[0]
-            survey_question_model.objects.update_or_create(
-                object_id=obj_id,
-                defaults=question_info
+            survey_question_orm.update_record(
+                filter_by={'object_id': obj_id},
+                update_object=question_info
             )
         except Exception:
             raise QuestionCreateUpdateError
@@ -119,7 +122,7 @@ class SurveyQuestionService:
         :param question_id: object_id вопроса опроса
         """
         if self.check_question_exists('object_id', question_id):
-            survey_question_model.objects.filter(object_id=question_id).first().delete()
+            survey_question_orm.delete_record(filter_by={'object_id': question_id})
 
     @staticmethod
     def get_questions_for_application(app_id: uuid) -> list:
@@ -136,7 +139,11 @@ class SurveyQuestionService:
         if not app:
             app = event_application_service.get_event_app(app_id)
         survey_id = survey_service.get_survey_id_for_group(app.group_id)
-        for question in survey_question_model.objects.filter(survey_id=survey_id).order_by('sequence_number'):
+        recs = survey_question_orm.get_filter_records(
+            filter_by={'survey_id': survey_id},
+            order_by=['sequence_number', ]
+        )
+        for question in recs:
             question_options = []
             if question.question_type in [ONE, MANY]:
                 question_options = [

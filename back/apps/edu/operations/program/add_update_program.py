@@ -5,7 +5,7 @@ from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.docs.opertaions.program_order.add_program_order import AddUpdateProgramOrderOperation
 from apps.edu.operations.program.base_program import BaseProgramOperation
-from apps.edu.selectors.program import program_model
+from apps.edu.selectors.program import program_model, program_orm
 from apps.guides.services.audience_category import AudienceCategoryService
 
 
@@ -61,6 +61,7 @@ class AddUpdateProgramOperation(BaseProgramOperation):
         """
         doc_data = {
             'object_id': self.program_data['order_id'],
+            'old_id': self.program_data['old_id'],
             'number': self.program_data['order_number'],
             'date': self.program_data['order_date']
         }
@@ -112,16 +113,14 @@ class AddUpdateProgramOperation(BaseProgramOperation):
             if self.program_data['object_id'] not in [None, 'null']:
                 object_id = self.program_data['object_id']
                 del self.program_data['object_id']
-                self.dpp, _ = program_model.objects.update_or_create(
-                    object_id=object_id,
-                    defaults=self.program_data
+                program_orm.update_record(
+                    filter_by={'object_id': object_id},
+                    update_object=self.program_data
                 )
+                self.dpp = program_orm.get_one_record_or_none(filter_by={'object_id': object_id})
             else:
                 del self.program_data['object_id']
-                self.dpp, _ = program_model.objects.update_or_create(
-                    object_id=uuid.uuid4(),
-                    **self.program_data
-                )
+                self.dpp = program_orm.create_record(self.program_data)
             self.dpp.categories.clear()
             self.dpp.categories.add(*cat_obj_list)
             self.success_description = 'ДПП успешно добавлена/обновлена'

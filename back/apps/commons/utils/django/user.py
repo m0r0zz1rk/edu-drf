@@ -4,6 +4,7 @@ from typing import Optional, Union
 
 from django.contrib.auth.models import User
 
+from apps.authen.selectors.user import user_orm
 from apps.commons.exceptions.user_not_found import UserNotFound
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.group import GroupUtils
@@ -23,7 +24,7 @@ class UserUtils:
         :return: true - пользователь существует, false - пользователь не существует
         """
         find = {attribute_name: value}
-        return User.objects.filter(**find).exists()
+        return user_orm.get_one_record_or_none(filter_by=find) is not None
 
     def get_user(self, attribute_name: str, value) -> Optional[User]:
         """
@@ -34,7 +35,7 @@ class UserUtils:
         """
         if self.is_user_exists(attribute_name, value):
             find = {attribute_name: value}
-            return User.objects.filter(**find).first()
+            return user_orm.get_one_record_or_none(filter_by=find)
         return None
 
     @staticmethod
@@ -50,8 +51,10 @@ class UserUtils:
         username = f'{tu.translit(surname)}.{tu.translit(name)[:1]}'
         if len(patronymic) > 0:
             username += f'.{tu.translit(patronymic)[:1]}'
-        while User.objects.filter(username=username).exists():
+        check = user_orm.get_one_record_or_none(filter_by={'username': username})
+        while check:
             username += str(random.randint(1, 1000))
+            check = user_orm.get_one_record_or_none(filter_by={'username': username})
         return username
 
     def get_username_by_id(self, user_id: int) -> Optional[str]:
@@ -61,7 +64,8 @@ class UserUtils:
         :return: None - пользователь не найден, str - имя пользователя
         """
         if self.is_user_exists('id', user_id):
-            return User.objects.get(id=user_id).username
+            user = user_orm.get_one_record_or_none(filter_by={'id': user_id})
+            return user.username
         return None
 
     def get_username_by_email(self, email: str) -> Optional[str]:
@@ -71,7 +75,8 @@ class UserUtils:
         :return: None - пользователь не найден, str - имя пользователя
         """
         if self.is_user_exists('email', email):
-            return User.objects.filter(email=email).first().username
+            user = user_orm.get_one_record_or_none(filter_by={'email': email})
+            return user.username
         return None
 
     @staticmethod
@@ -81,12 +86,9 @@ class UserUtils:
         :param data: информация о пользователе (email, username, password)
         :return: true - пользователь создан, false - ошибка валидации, str - traceback при ошибки в процессе создания
         """
-        if ValidateUtils.validate_data(
-            ['email', 'username', 'password'],
-            data
-        ):
+        if ValidateUtils.validate_data(['email', 'username', 'password'], data):
             try:
-                User.objects.create_user(**data)
+                user_orm.create_record(data)
                 return True
             except Exception:
                 return ExceptionHandling.get_traceback()
@@ -99,7 +101,7 @@ class UserUtils:
         :return:
         """
         if self.is_user_exists('username', username):
-            User.objects.get(username=username).delete()
+            user_orm.delete_record(filter_by={'username': username})
 
     def is_user_in_group(self, user_attr: str, attr_value, group_name: str) -> Optional[bool]:
         """
@@ -136,8 +138,9 @@ class UserUtils:
         :return: centre - Администратор, dep - сотрудник подразделения, student - обучающийся, None - не найдено
         """
         if self.is_user_exists('id', user_id):
-            if User.objects.get(id=user_id).groups.exists():
-                group_name = User.objects.prefetch_related('groups').get(id=user_id).groups.first().name
+            user = user_orm.get_one_record_or_none(filter_by={'id': user_id})
+            if user and user.groups.exists():
+                group_name = user.groups.first().name
                 if group_name == 'Администраторы':
                     return 'centre'
                 elif group_name == 'Сотрудники':

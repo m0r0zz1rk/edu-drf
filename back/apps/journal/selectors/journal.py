@@ -4,16 +4,19 @@ from django.apps import apps
 from django.db.models import Q, QuerySet
 from django_filters import rest_framework as filters
 
+from apps.commons.orm.base_orm import BaseORM
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES
 
 # Модель журнала событий
 journal_model = apps.get_model('journal', 'Journal')
 
+# Класс ORM для журнаоа событий
+journal_orm = BaseORM(model=journal_model)
 
 def journal_queryset() -> QuerySet:
     """Получение queryset с записями журнала"""
-    return journal_model.objects.all().order_by('-date_create')
+    return journal_orm.get_filter_records(order_by=['-date_create', ])
 
 
 class JournalFilter(filters.FilterSet):

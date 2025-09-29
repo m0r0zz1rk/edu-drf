@@ -3,13 +3,14 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.applications.api.applications_view_set import ApplicationsViewSet
 from apps.applications.selectors.event_application import event_application_orm, event_application_queryset, \
-    event_application_model, EventApplicationFilter
+    EventApplicationFilter
 from apps.applications.serializers.base_application import BaseApplicationSerializer
 from apps.applications.serializers.base_application.payment_data_serializer import PaymentDataSerializer
 from apps.applications.serializers.base_application.response_application_create_serializer import \
     ApplicationCreateSerializer
 from apps.applications.serializers.base_application.study_url_serializer import StudyUrlSerializer
-from apps.applications.serializers.event_application import EventApplicationDetailSerializer, EventApplicationUpdateSerializer
+from apps.applications.serializers.event_application import (EventApplicationDetailSerializer,
+                                                             EventApplicationUpdateSerializer)
 from apps.applications.services.base_application import base_application_service
 from apps.applications.services.event_application import event_application_service
 from apps.authen.services.profile import profile_service
@@ -165,7 +166,7 @@ class EventApplicationUserViewSet(ApplicationsViewSet):
             id_new_app = base_application_service.create_app(
                 request.user.id,
                 serialize.validated_data['group_id'],
-                event_application_model
+                event_application_orm
             )
             return response_utils.ok_response_dict({'app_id': id_new_app})
         else:

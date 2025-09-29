@@ -3,11 +3,12 @@ from typing import Union
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.services.ad.ad_centre import AdCentreService
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.edu.selectors.services.education_service import education_service_model
-from apps.edu.selectors.services.information_service import information_service_model
+from apps.edu.selectors.services.education_service import education_service_model, education_service_orm
+from apps.edu.selectors.services.information_service import information_service_model, information_service_orm
 from apps.guides.services.audience_category import AudienceCategoryService
 from apps.guides.services.event_type import EventTypeService
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.services.journal import journal_service
 
 
 class AddUpdateService(MainProcessing):
@@ -55,11 +56,11 @@ class AddUpdateService(MainProcessing):
         """Добавление/обновление услуги"""
         try:
             cat_obj_list = []
-            service_model = information_service_model
+            service_orm = information_service_orm
             if self.service_type == 'edu':
                 self.process_data['program_id'] = self.process_data['program']
                 del self.process_data['program']
-                service_model = education_service_model
+                service_orm = education_service_orm
             else:
                 event_type = self.ets.get_event_type_object_by_name(self.process_data['type'])
                 self.process_data['type_id'] = event_type.object_id
@@ -75,10 +76,14 @@ class AddUpdateService(MainProcessing):
                         if self.acs.get_category_object_by_name(cat_name) is not None
                     ]
                     del self.process_data['categories']
-            service, _ = service_model.objects.update_or_create(
-                object_id=self.process_data['object_id'],
-                defaults=self.process_data
-            )
+            service = service_orm.get_one_record_or_none(filter_by={'object_id': self.process_data['object_id']})
+            if service:
+                service_orm.update_record(
+                    filter_by={'object_id': self.process_data['object_id']},
+                    update_object=self.process_data
+                )
+            else:
+                service = service_orm.create_record(self.process_data)
             if self.service_type == 'info':
                 service.categories.clear()
                 service.categories.add(*cat_obj_list)
@@ -87,7 +92,7 @@ class AddUpdateService(MainProcessing):
             description = 'информационно-консультационной услуги (мероприятия)'
             if self.service_type == 'edu':
                 description = 'образовательной услуги (курса)'
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
@@ -104,7 +109,7 @@ class AddUpdateService(MainProcessing):
         description = 'Информационно-консультационная услуга (мероприятие)'
         if self.service_type == 'edu':
             description = 'Образовательная услуга (курс)'
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

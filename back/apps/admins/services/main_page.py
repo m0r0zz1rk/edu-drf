@@ -1,6 +1,5 @@
-from django.contrib.auth.models import User
-
 from apps.applications.services.base_application import BaseApplicationService
+from apps.authen.selectors.user import user_orm
 from apps.authen.services.profile import ProfileService
 from apps.commons.services.ad.ad_centre_coko_user import ad_centre_coko_user_utils
 from apps.commons.utils.django.user import UserUtils
@@ -34,7 +33,7 @@ class MainPageService:
                 'first_login': self.uu.get_user_date_joined(request.user.id)
             },
             'study_info': {
-                'user_count': User.objects.count(),
+                'user_count': user_orm.get_all_objects_count(),
                 'app_count': BaseApplicationService.apps_count(),
                 'course_count': EducationServiceService.get_count(),
                 'event_count': InformationServiceService.get_count()

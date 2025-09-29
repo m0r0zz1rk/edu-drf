@@ -1,11 +1,13 @@
 from typing import Union, Optional
 from django.contrib.auth.models import User
 
+from apps.authen.selectors.student_profile import student_profile_orm
+from apps.authen.selectors.user import user_orm
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.user import user_utils
 from apps.commons.utils.validate import ValidateUtils
 from apps.guides.selectors.profiles.coko import coko_profile_model
-from apps.guides.selectors.state import state_model
+from apps.guides.selectors.state import state_model, state_orm
 from apps.guides.selectors.profiles.student import student_profile_model
 from apps.users.services.apps import apps_service
 
@@ -34,7 +36,8 @@ class ProfileService:
         'curator_groups'
     ]
 
-    def is_profile_exist(self, attribute_name: str, value) -> bool:
+    @staticmethod
+    def is_profile_exist(attribute_name: str, value) -> bool:
         """
         Проверка на существующий профиль пользователя по заданному атрибуту и его значению
         :param attribute_name: наименование атрибута (поле модели профиля)
@@ -43,11 +46,8 @@ class ProfileService:
         """
         data = {attribute_name: value}
         try:
-            return (student_profile_model.objects.
-                    select_related('django_user').
-                    select_related('state').
-                    filter(**data).exists() or
-                    coko_profile_model.objects.filter(**data).exists())
+            profile = student_profile_orm.get_one_record_or_none(filter_by=data)
+            return profile is not None
         except Exception:
             return False
 
@@ -73,15 +73,8 @@ class ProfileService:
         """
         if self.is_profile_exist(attribute_name, value):
             find = {attribute_name: value}
-            if (student_profile_model.objects.
-                    select_related('django_user').
-                    select_related('state').
-                    filter(**find).exists()):
-                prof = (student_profile_model.objects.
-                        select_related('django_user').
-                        select_related('state').
-                        filter(**find).first())
-            else:
+            prof = student_profile_orm.get_one_record_or_none(filter_by=find)
+            if not prof:
                 prof = coko_profile_model.objects.select_related('django_user').filter(**find).first()
             if output == 'profile':
                 return prof
@@ -99,11 +92,7 @@ class ProfileService:
                 return prof.display_name
         return None
 
-    def set_student_profile_data(
-            self,
-            prof: student_profile_model,
-            data: dict
-    ) -> Union[bool, str]:
+    def set_student_profile_data(self, prof: student_profile_model, data: dict) -> Union[bool, str]:
         """
         Запись информации в профиль обучающегося
         :param prof: профиль обучающегося
@@ -114,26 +103,23 @@ class ProfileService:
             try:
                 for key, value in data.items():
                     if key == 'state':
-                        state = state_model.objects.filter(name=value).first()
+                        state = state_orm.get_one_record_or_none(filter_by={'name': value})
                         setattr(prof, key, state)
                     elif key == 'email':
-                        user = User.objects.get(id=prof.django_user_id)
+                        user = user_orm.get_one_record_or_none(filter_by={'id': prof.django_user_id})
                         setattr(user, key, value)
                         user.save()
                     else:
                         if getattr(prof, key) != value:
                             setattr(prof, key, value)
+                prof.updated_from_new = True
                 prof.save()
                 return True
             except Exception:
                 return ExceptionHandling.get_traceback()
         return False
 
-    def set_coko_profile_data(
-            self,
-            prof: coko_profile_model,
-            data: dict
-    ) -> Union[bool, str]:
+    def set_coko_profile_data(self, prof: coko_profile_model, data: dict) -> Union[bool, str]:
         """
         Запись информации в профиль сотрудника ЦОКО
         :param prof: профиль сотрудника ЦОКО
@@ -144,6 +130,7 @@ class ProfileService:
             try:
                 for key, value in data.items():
                     setattr(prof, key, value)
+                prof.updated_from_new = True
                 prof.save()
                 return True
             except Exception:
@@ -191,9 +178,9 @@ class ProfileService:
                         return False
                 return True
             else:
-                if User.objects.filter(email=value).exists():
-                    if User.objects.filter(email=value).first().id != user_id:
-                        return False
+                user = user_orm.get_one_record_or_none(filter_by={'email': value})
+                if user and user.id != user_id:
+                    return False
                 return True
         return False
 

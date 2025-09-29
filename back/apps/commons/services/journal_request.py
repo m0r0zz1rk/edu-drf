@@ -1,7 +1,7 @@
 from apps.commons.utils.django.response import ResponseUtils
 from apps.journal.consts.journal_modules import JOURNAL_MODULES
 from apps.journal.consts.journal_rec_statuses import JOURNAL_REC_STATUSES, ERROR
-from apps.journal.services.journal import JournalService
+from apps.journal.services.journal import journal_service
 
 
 class JournalRequestBuilder:
@@ -53,7 +53,6 @@ class JournalRequest:
     _module = _status = None
     _payload = _output = _description = _response_message = ''
     _source = 'Внешний запрос'
-    _journal_service = JournalService()
     _response_utils = ResponseUtils()
 
     def __init__(self, builder: JournalRequestBuilder):
@@ -64,7 +63,7 @@ class JournalRequest:
 
     def add_journal_rec(self):
         """Добавление записи в журнал"""
-        self._journal_service.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self._source,
                 'module': self._module,

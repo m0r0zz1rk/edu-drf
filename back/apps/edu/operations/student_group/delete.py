@@ -2,8 +2,9 @@ from typing import Union
 
 from apps.commons.abc.main_processing import MainProcessing
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.edu.selectors.student_group import student_group_model
+from apps.edu.selectors.student_group import student_group_orm
 from apps.journal.consts.journal_rec_statuses import ERROR, SUCCESS
+from apps.journal.services.journal import journal_service
 
 
 class DeleteStudentGroup(MainProcessing):
@@ -24,10 +25,10 @@ class DeleteStudentGroup(MainProcessing):
     def _main_process(self):
         """Удаление учебной группы"""
         try:
-            student_group_model.objects.filter(object_id=self.process_data['group_id']).first().delete()
+            student_group_orm.delete_record(filter_by={'object_id': self.process_data['group_id']})
             self.process_completed = True
         except Exception:
-            self.ju.create_journal_rec(
+            journal_service.create_journal_rec(
                 {
                     'source': self.source,
                     'module': self.module,
@@ -41,7 +42,7 @@ class DeleteStudentGroup(MainProcessing):
 
     def _process_success(self):
         """Фиксация сообщения об успешном удалении учебной группы"""
-        self.ju.create_journal_rec(
+        journal_service.create_journal_rec(
             {
                 'source': self.source,
                 'module': self.module,

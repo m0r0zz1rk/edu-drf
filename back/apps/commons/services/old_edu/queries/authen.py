@@ -1,22 +1,23 @@
 from django.contrib.auth.models import User, Group
 from sqlalchemy import text
 
+from apps.authen.selectors.user import user_orm
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
+from apps.commons.utils.django.exception import exception_handling
 from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.guides.selectors.state import state_model
 from apps.guides.selectors.profiles.student import student_profile_model
 
 django_user_fields = [
     'password',
-    'last_login',
+    '',
     'is_superuser',
     'username',
     'first_name',
     'last_name',
     'email',
     'is_staff',
-    'is_active',
-    'date_joined'
+    'is_active'
 ]
 
 student_profile_fields = [
@@ -46,28 +47,34 @@ class AuthenData:
         """
         Получение пользователей Django
         """
-        users = User.objects.all()
+        users = user_orm.get_filter_records()
         with old_edu_connect_engine.connect() as conn:
             dj_users_query = conn.execute(text('SELECT * from dbo.auth_user'))
             dj_users = dj_users_query.all()
         for dj_user in dj_users:
-            if len(list(filter(lambda us: us.id == dj_user[0], users))) > 0:
-                exist = list(filter(lambda us: us.id == dj_user[0], users))[0]
-                if exist.password == dj_user[1]:
+            try:
+                exist = None
+                if len(list(filter(lambda us: us.id == dj_user[0], users))) > 0:
+                    exist = list(filter(lambda us: us.id == dj_user[0], users))[0]
+                    if exist.password == dj_user[1]:
+                        continue
+                if len(list(filter(lambda us: us.username == dj_user[4], users))) > 0:
                     continue
-            if len(list(filter(lambda us: us.username == dj_user[4], users))) > 0:
-                continue
-            new_user = {}
-            for i in range(0, len(django_user_fields)):
-                new_user[django_user_fields[i]] = dj_user[i+1]
-            _, created = User.objects.update_or_create(
-                id=dj_user[0],
-                defaults=new_user
-            )
-            if created:
+                new_user = {}
+                for i in range(0, len(django_user_fields)):
+                    if django_user_fields[i] != '':
+                        new_user[django_user_fields[i]] = dj_user[i+1]
+                if exist:
+                    user = User(id=exist.id)
+                    for key, value in new_user:
+                        setattr(user, key, value)
+                    user.save()
+                    print(f'Пользователь "{dj_user[4]}" - обновлено')
+                    continue
+                User.objects.create_user(**new_user)
                 print(f'Пользователь "{dj_user[4]}" - добавлено')
-            else:
-                print(f'Пользователь "{dj_user[4]}" - обновлено')
+            except Exception:
+                print('django_users error:', exception_handling.get_traceback())
 
     @staticmethod
     def get_student_profile_info():
@@ -87,6 +94,8 @@ class AuthenData:
                 if len(profile_user) == 0:
                     continue
                 exist = profile_user[0]
+                if profile.updated_from_new:
+                    continue
                 if profile.phone == exist[1] and \
                         profile.surname == exist[2] and \
                         profile.name == exist[3] and \
