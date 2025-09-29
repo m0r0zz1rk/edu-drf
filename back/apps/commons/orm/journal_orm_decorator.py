@@ -30,7 +30,7 @@ def journal_orm_decorator(
                 res = function(*args, **kwargs)  # noqa
                 # journal_info['status'] = SUCCESS
                 # journal_info['description'] = f'Запрос на "{request_type}" к модели {model} выполнен успешно'
-                # output = repr(res)
+                # output = repr(res)т
             except Exception as e:
                 journal_info['status'] = ERROR
                 journal_info['description'] = f'Запрос на "{request_type}" к модели {model} завершился ошибкой'

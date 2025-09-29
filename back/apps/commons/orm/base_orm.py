@@ -50,7 +50,7 @@ class BaseORM:
         if filter_by:
             payload = {**filter_by}
         if exclude:
-            payload['exclide'] = exclude
+            payload['exclude'] = exclude
         if order_by:
             payload['order_by'] = order_by
 

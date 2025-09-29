@@ -2,7 +2,7 @@ import uuid
 from typing import Optional
 
 from apps.commons.utils.django.exception import ExceptionHandling
-from apps.journal.selectors.journal_output import journal_output_model, journal_output_orm
+from apps.journal.selectors.journal_output import journal_output_model
 
 
 class OutputService:
@@ -15,8 +15,8 @@ class OutputService:
         :param journal_rec_id: object_id записи журнала событий
         :return: true - выходные данные есть, false - выходных данных нет
         """
-        rec = journal_output_orm.get_one_record_or_none(filter_by={'journal_rec_id': journal_rec_id})
-        return rec is not None
+        # rec = journal_output_orm.get_one_record_or_none(filter_by={'journal_rec_id': journal_rec_id})
+        return journal_output_model.objects.filter(journal_rec_id=journal_rec_id).exists()
 
     def get_output(self, journal_rec_id: uuid) -> Optional[str]:
         """
@@ -25,7 +25,7 @@ class OutputService:
         :return: str - выходные данные || None
         """
         if self.is_output_exist(journal_rec_id):
-            rec = journal_output_orm.get_one_record_or_none(filter_by={'journal_rec_id': journal_rec_id})
+            rec = journal_output_model.objects.filter(journal_rec_id=journal_rec_id).first()
             return rec.output
         return None
 
@@ -38,12 +38,11 @@ class OutputService:
         """
         try:
             if self.is_output_exist(journal_rec_id):
-                journal_output_orm.update_record(
-                    filter_by={'journal_rec_id': journal_rec_id},
-                    update_object={'output': output}
-                )
+                rec = journal_output_model.objects.filter(journal_rec_id=journal_rec_id).first()
+                rec.output = output
+                rec.save()
             else:
-                journal_output_orm.create_record({'journal_rec_id': journal_rec_id, 'output': output})
+                journal_output_model.objects.create(journal_rec_id=journal_rec_id, output=output)
             return None
         except Exception:
             return ExceptionHandling.get_traceback()
