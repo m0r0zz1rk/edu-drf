@@ -192,3 +192,15 @@ class StudentGroupCertListSerializer(StudentGroupDocRequestSerializer):
         allow_null=False,
         label='Дата приказа об отчислении'
     )
+
+
+class StudentGroupUpdatePayment(serializers.Serializer):
+    """Сериализация данных для запроса на изменение типа оплаты у обучающихся группы"""
+    group_id = serializers.UUIDField(
+        allow_null=False,
+        label='object_id группы'
+    )
+    payment_type = serializers.BooleanField(
+        allow_null=False,
+        label='Тип оплаты (true - физ. лицо, false - юр.лицо)'
+    )

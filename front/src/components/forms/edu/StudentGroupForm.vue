@@ -139,6 +139,15 @@
           variant="flat"
           v-if="groupTab === 'apps' && userRole === 'centre'"
           color="coko-blue"
+          text="Смена оплаты"
+          :loading="loading"
+          @click="$refs.paymentTypeChangeDialog.dialog = true"
+        />
+
+        <v-btn
+          variant="flat"
+          v-if="groupTab === 'apps' && userRole === 'centre'"
+          color="coko-blue"
           text="Перенос заявок"
           :loading="loading"
           @click="getAppsToMove(); $refs.appMoveDialog.dialog = true"
@@ -253,6 +262,51 @@
         :payData="checkData.pay"
         :changeCheckData="changeCheckData"
         :updateApps="updateApps"
+      />
+
+    </template>
+
+  </CokoDialog>
+
+  <CokoDialog v-if="userRole === 'centre'" ref="paymentTypeChangeDialog" :cardActions="true">
+
+    <template v-slot:title>Изменение типа оплаты обучающихся</template>
+
+    <template v-slot:text>
+      Выберите тип оплаты, который необходимо установить всем обучающиимя
+      <v-row
+        dense
+      >
+
+        <v-col
+          cols="12"
+          md="12"
+          sm="12"
+        >
+          <v-select
+            bg-color="white"
+            variant="solo"
+            v-model="paymentType"
+            :items="paymentTypes"
+            item-title="title"
+            item-value="key"
+            label="Тип оплаты"
+            :loading="loading"
+          />
+        </v-col>
+
+      </v-row>
+
+    </template>
+
+    <template v-slot:actions>
+
+      <v-btn
+        variant="flat"
+        :loading="loading"
+        color="coko-blue"
+        text="Сохранить"
+        @click="changePaymentType()"
       />
 
     </template>
@@ -567,6 +621,13 @@ export default {
       appsToMove: [],
       // Архив со сканами удостоверений
       licenseArchive: null,
+      // Возможные типы оплаты
+      paymentTypes: [
+        {key: false, title: 'Юр. лицо'},
+        {key: true, title: 'Физ. лицо'}
+      ],
+      // Тип оплаты всех обучающихся
+      paymentType: false
     }
   },
   methods: {
@@ -806,6 +867,24 @@ export default {
     // Обновить данные на вкладке "Заявки"
     updateApps() {
       this.$refs.studentGroupAppModule.$refs.mainAppsTable.getRecs()
+    },
+    //Сменить тип оплаты
+    async changePaymentType() {
+      this.loading = true
+      const paymentChangeRequest = await apiRequest(
+        '/backend/api/v1/edu/student_group/payment_type/',
+        'POST',
+        true,
+        {group_id: this.groupId, payment_type: this.paymentType},
+      )
+      if (paymentChangeRequest.success) {
+        showAlert('success', 'Смена типа оплаты', 'Тип оплаты успешно изменен')
+        this.updateApps()
+        this.$refs.paymentTypeChangeDialog.close()
+      } else {
+        showAlert('error', 'Смена типа оплаты', 'Ошибка при смене типа оплаты')
+      }
+      this.loading = false
     }
   },
   mounted() {

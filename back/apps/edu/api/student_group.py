@@ -1,6 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 
+from apps.applications.services.base_application import base_application_service
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
 from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
@@ -10,7 +11,8 @@ from apps.edu.exceptions.student_group.lessons_not_found import LessonsNotFound,
 from apps.edu.selectors.student_group import student_group_queryset, StudentGroupFilter, student_group_orm
 from apps.edu.serializers.student_group import StudentGroupListSerializer, StudentGroupAddSerializer, \
     StudentGroupUpdateSerializer, StudentGroupDocRequestSerializer, \
-    StudentGroupBaseDocRequestSerializer, StudentGroupRetrieveSerializer, StudentGroupCertListSerializer
+    StudentGroupBaseDocRequestSerializer, StudentGroupRetrieveSerializer, StudentGroupCertListSerializer, \
+    StudentGroupUpdatePayment
 from apps.edu.services.student_group import student_group_service
 from apps.journal.consts.journal_modules import EDU
 
@@ -187,5 +189,31 @@ class StudentGroupViewSet(EduViewSet):
                 return response_utils.file_response(doc.file)
             else:
                 return response_utils.bad_request_response('Договор оферты отсутствует')
+        else:
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Смена типа оплаты обучающихся",
+        request_body=StudentGroupUpdatePayment,
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при изменении типа оплаты',
+            '200': 'ОК'
+        }
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Смена типа оплаты успешно проведена',
+        f'Ошибка при смене типа оплаты'
+    )
+    def payment_type(self, request, *args, **kwargs):
+        serialize = StudentGroupUpdatePayment(data=request.data)
+        if serialize.is_valid():
+            base_application_service.update_payment_type(
+                serialize.validated_data.get('group_id'),
+                serialize.validated_data.get('payment_type')
+            )
+            return response_utils.ok_response('ОК')
         else:
             return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')

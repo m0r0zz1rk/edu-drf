@@ -228,5 +228,4 @@ class StudentGroupService:
             update_object=dict(survey_show=True)
         )
 
-
 student_group_service = StudentGroupService()

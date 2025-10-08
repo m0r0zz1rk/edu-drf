@@ -49,8 +49,8 @@ def set_cells_width(ws: Worksheet, width: int):
     :param width:
     :return:
     """
-    for index, col in enumerate(ws, start=1):
-        ws.column_dimensions[get_column_letter(index)].width = 50
+    for index in range(1, 100):
+        ws.column_dimensions[get_column_letter(index)].width = width
 
 
 def set_model_fields_name_to_sheet(sheet, fields: list):

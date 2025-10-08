@@ -14,6 +14,7 @@ from apps.authen.services.profile import profile_service
 from apps.commons.orm.base_orm import BaseORM
 from apps.commons.utils.django.settings import settings_utils
 from apps.docs.selectors.student_group_offer import student_group_offer_orm
+from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.services.student_group import student_group_service
 from apps.guides.selectors.region import irkutsk_state_object
 
@@ -315,6 +316,23 @@ class BaseApplicationService:
         :return: QuerySet с заявками
         """
         return orm.get_filter_records(filter_by=dict(group_id=group_id))
+
+    @staticmethod
+    def update_payment_type(group_id: uuid, payment_type: bool) -> None:
+        """
+        Смена типа оплаты у заявки
+        :param orm: Класс ORM для работы с заявками (на ПК или ИКУ)
+        :param group_id: object_id учебной группы, в которой необходимо изменить тип оплаты
+        :param payment_type: тип оплаты (True - физ. лицо, False - юр. лицо)
+        :return:
+        """
+        group = student_group_service.get_student_group('object_id', group_id)
+        if not group:
+            raise StudentGroupNotFound
+        orm = course_application_orm if group.ou else event_application_orm
+        apps = orm.get_filter_records(filter_by={'group_id': group_id})
+        for app in apps:
+            orm.update_record(filter_by={'object_id': app.object_id},update_object={'physical': payment_type})
 
 
 base_application_service = BaseApplicationService()

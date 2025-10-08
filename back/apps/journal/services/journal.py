@@ -69,7 +69,7 @@ class JournalService:
                         new_rec.save()
             except Exception:
                 error_data = {
-                    'soruce': 'Процесс создания записи в журнале событий',
+                    'source': 'Процесс создания записи в журнале событий',
                     'module': COMMON,
                     'status': ERROR,
                     'description': ''
