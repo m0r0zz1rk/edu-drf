@@ -1,8 +1,7 @@
-from django.contrib.auth.models import User
 from sqlalchemy import text
 
 from apps.commons.services.old_edu.db.db_engine import old_edu_connect_engine
-from apps.commons.utils.data_types.date import date_utils
+from apps.guides.selectors.profiles.coko import coko_profile_model
 from apps.surveys.consts.survey_question_type import SHORT, ONE, MANY
 from apps.surveys.selectors.student_answer import student_answer_model
 from apps.surveys.selectors.survey import survey_model
@@ -29,29 +28,23 @@ class SurveysData:
         exists = (survey_model.objects.
                   select_related('creator').
                   all())
-        users = User.objects.all()
+        profiles = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
-            sql = ('SELECT survey.[id], survey.[description], prof.[user_id] FROM [edu-new].[dbo].[centre_surveys] '
-                   'as survey inner join [edu-new].[dbo].[authen_profiles] as prof '
-                   'on survey.[creator_id] = prof.[id]')
+            sql = ('SELECT * FROM [dbo].[centre_surveys]')
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for surv in data:
             try:
-                user_id = list(filter(lambda user: user.id == surv[2], users))[0].id
+                user_id = list(filter(lambda prof: prof.old_id == surv[4], profiles))[0].django_user_id
             except Exception:
-                print(f'profile - {surv[2]}')
+                print(f'profile - {surv[4]}')
                 continue
             if len(list(filter(lambda survey: survey.old_id == surv[0], exists))) > 0:
-                exist = list(filter(lambda survey: survey.old_id == surv[0], exists))[0]
-                if exist.updated_from_new:
-                    continue
-                if exist.creator_id == user_id and exist.description == surv[1]:
-                    continue
+                continue
             new_survey = {
                 'old_id': surv[0],
                 'creator_id': user_id,
-                'description': surv[1]
+                'description': surv[2]
             }
             _, created = survey_model.objects.update_or_create(
                 old_id=surv[0],

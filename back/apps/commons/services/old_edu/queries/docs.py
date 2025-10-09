@@ -131,7 +131,7 @@ class DocsData:
                     select_related('state').
                     all())
         with old_edu_connect_engine.connect() as conn:
-            sql = ('SELECT stdoc.[id], stdoc.[file], prof.[user_id] '
+            sql = ('SELECT stdoc.[id], stdoc.[file], prof.[id] '
                    'from dbo.students_docs as stdoc inner join dbo.authen_profiles as prof on '
                    'stdoc.[profile_id] = prof.[id] '
                    'where stdoc.[doc_type_id] = 5')
@@ -143,6 +143,7 @@ class DocsData:
             try:
                 profile = list(filter(lambda prof: prof.old_id == pay_doc[2], profiles))[0]
             except Exception:
+                print('profile - ', pay_doc[2])
                 continue
             try:
                 file = open(
@@ -150,12 +151,12 @@ class DocsData:
                     'rb',
                 )
             except Exception:
+                print('file - ', pay_doc[1])
                 continue
             new_pay_doc = {
                 'old_id': pay_doc[0],
                 'profile_id': profile.object_id,
             }
-            print(new_pay_doc)
             pay_doc_object, _ = pay_doc_model.objects.update_or_create(
                 **new_pay_doc
             )

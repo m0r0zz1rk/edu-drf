@@ -448,10 +448,7 @@ class EduData:
                   all())
         curators = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
-            sql = ('SELECT gr.[id] as group_id, prof.[user_id] as teacher_django_id'
-                   ' from dbo.centre_studentgroups as gr inner join '
-                   'dbo.authen_profiles as prof on gr.curator_id = prof.id '
-                   'where gr.[curator_id] is not NULL')
+            sql = ('SELECT id, curator_id from dbo.centre_studentgroups')
             data_query = conn.execute(text(sql))
             data = data_query.all()
         for st_group in data:
@@ -566,7 +563,7 @@ class EduData:
                             all())
         coko_profiles = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
-            sql = ('SELECT lesson.[id], stsch.[name], prof.[user_id] FROM [edu-new].[dbo].[centre_courselessons] '
+            sql = ('SELECT lesson.[id], stsch.[name], prof.[id] FROM [edu-new].[dbo].[centre_courselessons] '
                    'as lesson inner join [edu-new].[dbo].[centre_stschedule] as stsch on lesson.[stschedule_id] = '
                    'stsch.[id] inner join [edu-new].[dbo].[authen_profiles] as prof on lesson.[teacher_id] = '
                    'prof.[id]')
@@ -684,7 +681,7 @@ class EduData:
                             all())
         coko_profiles = coko_profile_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
-            sql = ('SELECT lesson.[id], prof.[user_id] FROM [edu-new].[dbo].[centre_eventslessons] as lesson '
+            sql = ('SELECT lesson.[id], prof.[id] FROM [edu-new].[dbo].[centre_eventslessons] as lesson '
                    'inner join [edu-new].[dbo].[authen_profiles] as prof on lesson.[teacher_id] = prof.[id]')
             data_query = conn.execute(text(sql))
             data = data_query.all()

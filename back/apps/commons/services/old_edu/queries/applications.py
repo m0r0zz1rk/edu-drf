@@ -77,7 +77,7 @@ class ApplicationsData:
         with old_edu_connect_engine.connect() as conn:
             sql = (
                 "SELECT app.[id], app.[check_diploma_info], app.[check_survey], app.[certificate_id], app.[group_id],"
-                "app.[pay_doc_id], prof.[user_id], app.[status_id], form.[workless], form.[region_id], form.[mo_id], "
+                "app.[pay_doc_id], prof.[id], app.[status_id], form.[workless], form.[region_id], form.[mo_id], "
                 "form.[oo_id], form.[oo_new], form.[position_cat_id], form.[position_id], form.[type] as 'physical', "
                 "form.[edu_level_id], form.[edu_cat_id], form.[edu_doc_id], form.[check_surname], "
                 "form.[change_surname_id], form.[edu_serial], form.[edu_number], form.[edu_date], form.[cert_mail], "
@@ -247,7 +247,7 @@ class ApplicationsData:
         """
         exists = event_application_model.objects.all()
         with old_edu_connect_engine.connect() as conn:
-            sql = ("select app.[id], prof.[user_id], app.[group_id], app.[status_id], app.[pay_doc_id], "
+            sql = ("select app.[id], prof.[id], app.[group_id], app.[status_id], app.[pay_doc_id], "
                    "app.[check_survey], form.[workless], form.[region_id], form.[mo_id], form.[oo_id], "
                    "form.[oo_new], form.[position_cat_id], form.[position_id], form.[type] from "
                    "[edu-new].[dbo].[students_apps] as app inner join [edu-new].[dbo].[authen_profiles] as prof "
@@ -373,7 +373,7 @@ class ApplicationsData:
                    ",[cert].[blank_serial]"
                    ",[cert].[blank_number]"
                    ",[cert].[group_id]"
-                   ",[student].[user_id] "
+                   ",[student].[id] "
                    "FROM [edu-new].[dbo].[centre_studentscerts] as cert "
                    "inner join [edu-new].[dbo].[authen_profiles] as student "
                    "on cert.[student_id] = student.[id]")
