@@ -1,0 +1,5 @@
+Для сброса счетчика id в таблице с пользователями в T-SQL:
+use edu
+
+DBCC CHECKIDENT('dbo.auth_user', RESEED, 9)
+

@@ -1,3 +1,7 @@
+from django.contrib.auth.models import User
+from django.core.management.color import no_style
+from django.db import connection
+
 from apps.commons.services.old_edu.queries.applications import ApplicationsData
 from apps.commons.services.old_edu.queries.authen import AuthenData
 from apps.commons.services.old_edu.queries.docs import DocsData
@@ -17,6 +21,11 @@ def get_all_edu_data():
     """
     Получение всех данных из олдовой базы edu
     """
+
+    sequence_sql = connection.ops.sequence_reset_sql(no_style(), [User, ])
+    with connection.cursor() as cursor:
+        for sql in sequence_sql:
+            cursor.execute(sql)
 
     # Модуль guides
     print('### Начало работы с модулем Справочники')

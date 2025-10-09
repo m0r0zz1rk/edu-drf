@@ -53,24 +53,12 @@ class AuthenData:
             dj_users = dj_users_query.all()
         for dj_user in dj_users:
             try:
-                exist = None
-                if len(list(filter(lambda us: us.id == dj_user[0], users))) > 0:
-                    exist = list(filter(lambda us: us.id == dj_user[0], users))[0]
-                    if exist.password == dj_user[1]:
-                        continue
                 if len(list(filter(lambda us: us.username == dj_user[4], users))) > 0:
                     continue
                 new_user = {}
                 for i in range(0, len(django_user_fields)):
                     if django_user_fields[i] != '':
                         new_user[django_user_fields[i]] = dj_user[i+1]
-                if exist:
-                    user = User(id=exist.id)
-                    for key, value in new_user:
-                        setattr(user, key, value)
-                    user.save()
-                    print(f'Пользователь "{dj_user[4]}" - обновлено')
-                    continue
                 User.objects.create_user(**new_user)
                 print(f'Пользователь "{dj_user[4]}" - добавлено')
             except Exception:
@@ -86,11 +74,14 @@ class AuthenData:
                 select_related('state').
                 filter(old_id=0).count() > 0):
             with old_edu_connect_engine.connect() as conn:
-                user_profiles_query = conn.execute(text('SELECT * from dbo.authen_profiles'))
+                user_profiles_query = conn.execute(text(
+                    'SELECT * FROM dbo.authen_profiles INNER JOIN dbo.auth_user ON '
+                    'dbo.authen_profiles.user_id = dbo.auth_user.id'
+                ))
                 user_profiles = user_profiles_query.all()
             profiles = student_profile_model.objects.select_related('django_user').select_related('state')
             for profile in profiles:
-                profile_user = list(filter(lambda prof: prof[12] == profile.django_user_id, user_profiles))
+                profile_user = list(filter(lambda prof: prof[18] == profile.django_user.username, user_profiles))
                 if len(profile_user) == 0:
                     continue
                 exist = profile_user[0]
@@ -106,7 +97,7 @@ class AuthenData:
                         profile.teacher == exist[9] and \
                         profile.health == exist[10]:
                     continue
-                profile.old_id = exist[12]
+                profile.old_id = exist[0]
                 for i in range(0, len(student_profile_fields)):
                     if student_profile_fields[i] in ['id', 'date_reg']:
                         continue
@@ -150,19 +141,20 @@ class AuthenData:
             with old_edu_connect_engine.connect() as conn:
                 user_profiles_query = conn.execute(
                     text(
-                        'SELECT * from dbo.authen_profiles'
+                        'SELECT * FROM dbo.authen_profiles INNER JOIN dbo.auth_user ON '
+                        'dbo.authen_profiles.user_id = dbo.auth_user.id'
                     )
                 )
                 user_profiles = user_profiles_query.all()
             for profile in coko_profile_model.objects.filter(old_id=0):
                 profile_user = list(filter(
-                    lambda prof: prof[12] == profile.django_user_id,
+                    lambda prof: prof[18] == profile.django_user.username,
                     user_profiles
                 ))
                 if len(profile_user) == 0:
                     continue
                 profile_user = profile_user[0]
-                profile.old_id = profile_user[12]
+                profile.old_id = profile_user[0]
                 profile.surname = profile_user[2]
                 profile.name = profile_user[3]
                 profile.patronymic = profile_user[4]

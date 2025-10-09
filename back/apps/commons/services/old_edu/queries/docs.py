@@ -98,7 +98,7 @@ class DocsData:
             except Exception:
                 continue
             try:
-                profile_id = list(filter(lambda prof: prof.django_user_id == user_doc[4], profiles))[0].object_id
+                profile_id = list(filter(lambda prof: prof.old_id == user_doc[3], profiles))[0].object_id
             except Exception:
                 continue
             new_doc = {
