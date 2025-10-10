@@ -209,12 +209,12 @@
               >
                 <v-select
                   :items="sex"
+                  item-title="title"
+                  item-value="key"
                   bg-color="white"
                   label="Пол*"
-                  v-model="profileData['sex']"
+                  v-model="profileData.sex"
                   :loading="formLoading"
-                  :rules="[rules.required,]"
-                  @update:modelValue="e => profileData['sex'] = e"
                   variant="solo"
                 ></v-select>
               </v-col>
@@ -226,11 +226,12 @@
               >
                 <v-select
                   :items="health"
+                  item-title="title"
+                  item-value="key"
                   bg-color="white"
                   label="Ограничения по здоровью*"
-                  v-model="profileData['health']"
+                  v-model="profileData.health"
                   :loading="formLoading"
-                  :rules="[rules.required,]"
                   @update:modelValue="e => profileData['health'] = e"
                   variant="solo"
                 ></v-select>
@@ -244,9 +245,11 @@
                 <v-select
                   v-if="profileUuid"
                   :items="teacher"
+                  item-title="title"
+                  item-value="key"
                   bg-color="white"
                   label="Является преподавателем"
-                  v-model="profileData['teacher']"
+                  v-model="profileData.teacher"
                   :loading="formLoading"
                   @update:modelValue="e => profileData['teacher'] = e"
                   variant="solo"
@@ -361,9 +364,15 @@ import CourseApps from "@/components/forms/profile/CourseApps.vue";
 import DocViewer from "@/components/DocViewer.vue";
 import {useDisplay} from "vuetify";
 import EventApps from "@/components/forms/profile/EventApps.vue";
+import profile from "../../views/Profile.vue";
 
 export default {
   name: "ProfileForm",
+  computed: {
+    profile() {
+      return profile
+    }
+  },
   components: {EventApps, DocViewer, CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
   props: {
     profileUuid: String, // Вариативный параметр, object_id профиля пользователя,
@@ -383,26 +392,26 @@ export default {
         'snils': '',
         'state': '',
         'birthday': '',
-        'sex': '',
-        'health': '',
-        'teacher': ''
+        'sex': false,
+        'health': false,
+        'teacher': false
       },
       // Список доступных государств
       states: [],
       // Список полов
       sex: [
-        'Мужской',
-        'Женский'
+        {key: true, title: 'Мужской'},
+        {key: false, title: 'Женский'}
       ],
       // Список возможных значений поля "Ограничение по здоровью"
       health: [
-        'Да',
-        'Нет'
+        {key: true, title: 'Да'},
+        {key: false, title: 'Нет'}
       ],
       // Список возможных значений поля "Является преподавателем"
       teacher: [
-        'Да',
-        'Нет'
+        {key: true, title: 'Да'},
+        {key: false, title: 'Нет'}
       ],
       // Параметр оторбражения анимации загрузки на элеметнах формы
       formLoading: true,
@@ -501,6 +510,7 @@ export default {
       this.formLoading = false
     },
     checkValidData() {
+      console.log(this.profileData)
       Object.keys(this.profileData).map((key) => {
         if (key === 'phone') {
           if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length < 18) {
@@ -594,15 +604,7 @@ export default {
         }
         body = {}
         Object.keys(this.profileData).map((key) => {
-          if (key === 'sex') {
-            body[key] = this.profileData[key] === 'Мужской'
-          } else if (key === 'health') {
-            body[key] = this.profileData[key] === 'Да'
-          } else if (key === 'teacher') {
-            if (this.profileUuid) {
-              body[key] = this.profileData[key] === 'Да'
-            }
-          } else if (key === 'birthday') {
+          if (key === 'birthday') {
             body[key] = convertDateToBackend(this.profileData[key])
           } else {
             body[key] = this.profileData[key]
@@ -644,23 +646,6 @@ export default {
         this.profileData.name = this.profileData.name.replace(/[^А-Яа-я]/ig, '')
         this.profileData.patronymic = this.profileData.patronymic.replace(/[^А-Яа-я]/ig, '')
         if (['+7 (8', '+7 (7'].includes(this.profileData['phone'])) {this.profileData['phone'] = '+7 ('}
-        if (this.profileData['sex']) {
-          this.profileData['sex'] = 'Мужской'
-        } else {
-          this.profileData['sex'] = 'Женский'
-        }
-        if (this.profileData['health']) {
-          this.profileData['health'] = 'Да'
-        } else {
-          this.profileData['health'] = 'Нет'
-        }
-        if (this.profileUuid) {
-          if (this.profileData['teacher']) {
-            this.profileData['teacher'] = 'Да'
-          } else {
-            this.profileData['teacher'] = 'Нет'
-          }
-        }
         this.profileData['birthday'] = convertBackendDate(this.profileData['birthday'])
       },
       deep: true
