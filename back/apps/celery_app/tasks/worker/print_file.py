@@ -63,7 +63,7 @@ def email_print_file(group_id: uuid, admin_email: str, to_print_office: bool):
         group = student_group_service.get_student_group('object_id', group_id)
 
         # Создание папки (при необходимости) для файла печати
-        group_path = os.path.join(print_path, group.code)
+        group_path = os.path.join(print_path, group.code.strip())
         if not os.path.exists(group_path):
             os.makedirs(group_path)
 
@@ -95,28 +95,31 @@ def email_print_file(group_id: uuid, admin_email: str, to_print_office: bool):
         # Далее добавление в файл основы созданного сертификата
         apps = course_application_service.get_group_apps(group_id)
         for app in apps:
-            certificate = course_certificate_service.get_certificate('application_id', app.object_id)
-            if not certificate:
+            try:
+                certificate = course_certificate_service.get_certificate('application_id', app.object_id)
+                if not certificate:
+                    continue
+                doc = DocxTemplate(template_path)
+                profile = app.profile
+                context['fio'] = f'{profile.surname} {profile.name} {profile.patronymic}'
+                context['reg_number'] = certificate.registration_number
+                context['sign'] = InlineImage(doc, image_descriptor=sign_descriptor)
+                # context['sign'] = InlineImage(doc, image_descriptor=sign_descriptor)
+                doc.render(context)
+                # Сохранение временного файла с данным о сертификате
+                doc.save(os.path.join(group_path, "new_cert.docx"))
+                # Объявление композера с основным файлом
+                composer = Composer(main)
+                # Открытие временного файла с данным о сертификате
+                doc2 = docx.Document(os.path.join(group_path, "new_cert.docx"))
+                # Вставка файла с данными о сертификате в основной файл
+                composer.append(doc2)
+                # Сохранение обновленного файла основы
+                composer.save(os.path.join(group_path, 'Печать.docx'))
+                # Удаление временного файла
+                os.remove(os.path.join(group_path, "new_cert.docx"))
+            except Exception:
                 continue
-            doc = DocxTemplate(template_path)
-            profile = app.profile
-            context['fio'] = f'{profile.surname} {profile.name} {profile.patronymic}'
-            context['reg_number'] = certificate.registration_number
-            context['sign'] = InlineImage(doc, image_descriptor=sign_descriptor)
-            # context['sign'] = InlineImage(doc, image_descriptor=sign_descriptor)
-            doc.render(context)
-            # Сохранение временного файла с данным о сертификате
-            doc.save(os.path.join(group_path, "new_cert.docx"))
-            # Объявление композера с основным файлом
-            composer = Composer(main)
-            # Открытие временного файла с данным о сертификате
-            doc2 = docx.Document(os.path.join(group_path, "new_cert.docx"))
-            # Вставка файла с данными о сертификате в основной файл
-            composer.append(doc2)
-            # Сохранение обновленного файла основы
-            composer.save(os.path.join(group_path, 'Печать.docx'))
-            # Удаление временного файла
-            os.remove(os.path.join(group_path, "new_cert.docx"))
         email_address = [admin_email, ]
         # email_address = [settings_utils.get_parameter_from_settings('TEST_EMAIL'), ]
         if to_print_office:
