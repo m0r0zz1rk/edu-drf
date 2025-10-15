@@ -3,7 +3,7 @@ import os
 from ruopenrefs.providers.mosru import OksmRef
 from xlsxtpl.writerx import BookWriter
 
-from apps.applications.consts.education import MIDDLE_PROFESSIONAL
+from apps.applications.consts.education import MIDDLE_PROFESSIONAL, STUDENT
 from apps.applications.selectors.course_application import course_application_orm
 from apps.applications.selectors.course_certificate import course_certificate_orm
 from apps.commons.utils.django.settings import settings_utils
@@ -72,7 +72,7 @@ class FisFrdo:
                         "Диплом о профессиональной переподготовке")
                 for app in course_application_orm.get_filter_records(filter_by=dict(group_id=group_id)):
                     cert = course_certificate_orm.get_one_record_or_none(filter_by=dict(application_id=app.object_id))
-                    if app.education_level != 'Студент':
+                    if app.education_level != STUDENT:
                         if app.education_level == MIDDLE_PROFESSIONAL:
                             edu_level = 'Среднее профессиональное образование'
                         else:
@@ -88,9 +88,9 @@ class FisFrdo:
                         'type_dpp': program.type,
                         'name_dpp': program.name,
                         'edu_level': edu_level,
-                        'surn_diploma': app.diploma_surname if app.education_level != 'Студент' else '',
-                        'edu_ser': app.education_serial if app.education_level != 'Студент' else '',
-                        'edu_numb': app.education_number if app.education_level != 'Студент' else '',
+                        'surn_diploma': app.diploma_surname if app.education_level != STUDENT else '',
+                        'edu_ser': app.education_serial if app.education_level != STUDENT else '',
+                        'edu_numb': app.education_number if app.education_level != STUDENT else '',
                         'year_study': group.ou.date_start.strftime('%Y'),
                         'duration': program.duration,
                         'surname': app.profile.surname,

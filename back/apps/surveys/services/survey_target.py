@@ -101,12 +101,16 @@ class SurveyTargetService:
             if target_type[1] == target_info['type']:
                 target_info['type'] = target_type[0]
         self.remove_exist_survey_type(target_info['type'])
-        obj_id = target_info['object_id']
-        del target_info['object_id']
-        survey_target_orm.update_record(
-            filter_by={'object_id': obj_id},
-            update_object=target_info
-        )
+        if target_info.get('object_id'):
+            obj_id = target_info['object_id']
+            del target_info['object_id']
+            survey_target_orm.update_record(
+                filter_by={'object_id': obj_id},
+                update_object=target_info
+            )
+        else:
+            del target_info['object_id']
+            survey_target_orm.create_record(target_info)
 
     def delete_survey_target(self, target_id: uuid):
         """
