@@ -3,6 +3,7 @@ import uuid
 
 from xlsxtpl.writerx import BookWriter
 
+from apps.applications.consts.education import STUDENT
 from apps.applications.selectors.course_certificate import course_certificate_orm
 from apps.commons.utils.data_types.date import date_utils
 from apps.commons.utils.django.settings import settings_utils
@@ -53,7 +54,8 @@ class CertificatesList(BaseStudentGroupDoc):
                 'patronymic': app.profile.patronymic,
                 'registration_number': '',
                 'blank_serial': '',
-                'blank_number': ''
+                'blank_number': '',
+                'note': '' if app.education_level != STUDENT else 'Справка'
             }
             certificate_info = course_certificate_orm.get_one_record_or_none(
                 dict(application_id=app.object_id)

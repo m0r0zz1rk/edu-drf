@@ -70,8 +70,13 @@ class FisFrdo:
                 program = group.ou.program
                 view = ("Удостоверение о повышении квалификации" if program.type == 'Повышение квалификации' else
                         "Диплом о профессиональной переподготовке")
-                for app in course_application_orm.get_filter_records(filter_by=dict(group_id=group_id)):
-                    cert = course_certificate_orm.get_one_record_or_none(filter_by=dict(application_id=app.object_id))
+                apps = course_application_orm.get_filter_records( filter_by=dict(group_id=group_id))
+                certs = course_certificate_orm.get_filter_records(
+                    filter_by=dict(application_id__in=[app.object_id for app in apps]),
+                    order_by=['blank_serial', 'blank_number']
+                )
+                for cert in certs:
+                    app = list(filter(lambda rec: rec.object_id == cert.application_id, apps))[0]
                     if app.education_level != STUDENT:
                         if app.education_level == MIDDLE_PROFESSIONAL:
                             edu_level = 'Среднее профессиональное образование'

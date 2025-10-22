@@ -130,8 +130,8 @@ class JournalDoc(BaseStudentGroupDoc):
             categories = self.student_group.iku.categories.all()
         categories_str = ''
         for category in categories:
-            categories_str += f'{category.name} '
-        return categories_str[:-1]
+            categories_str += f'{category.name}, '
+        return categories_str[:-2]
 
     def _get_journal_template_path(self) -> str:
         """
@@ -255,7 +255,7 @@ class JournalDoc(BaseStudentGroupDoc):
                         )
             else:
                 student_info['terr'] = (
-                    f'Иркутская область ({application.mo.name})'
+                    application.mo.name
                     if application.region.name == 'Иркутская область' else
                     application.region.name
                 )
@@ -363,11 +363,12 @@ class JournalDoc(BaseStudentGroupDoc):
         """
         _, manager = self._get_department_and_manager()
         control_lessons = self._lessons.exclude(control='').order_by('date')
+        final_theme = self.student_group.ou.program.name if self.student_group.ou else self.student_group.iku.name
         for index, lesson in enumerate(control_lessons, start=1):
             theme = lesson.theme
             if lesson.kug_theme_id:
                 kug_el = self._schedule_service.get_kug_element_by_theme_id(lesson.kug_theme_id)
-                theme = kug_el.name
+                theme = kug_el.name[2:]
             context = {
                 'cats': self._get_categories(),
                 'day_lesson': lesson.date.strftime('%d'),
@@ -375,7 +376,8 @@ class JournalDoc(BaseStudentGroupDoc):
                 'year_lesson': lesson.date.strftime('%Y'),
                 'control_form': lesson.control,
                 'manager': manager,
-                'theme': theme,
+                'theme': theme if index != len(control_lessons) else final_theme,
+                'lector': profile_service.get_profile_or_info_by_attribute('object_id', lesson.teacher, 'display_name'),
                 'students': self._get_students_list()
             }
             if index != len(control_lessons):
