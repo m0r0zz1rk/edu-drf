@@ -15,7 +15,8 @@ class CloseDoc(BaseStudentGroupDoc):
         Получение общей суммы по оказанной услуге (кол-во студентов на стоимость услуги)
         :return: числовое, общая сумма
         """
-        summary = self.student_group.ou.program.price * self._get_application_count()
+        price = self.student_group.ou.program.price if self.student_group.ou else self.student_group.iku.price
+        summary = price * self._get_application_count()
         return f'{summary} ({num2words(summary, lang="ru")})'
 
     def _get_context(self) -> dict:
@@ -23,20 +24,23 @@ class CloseDoc(BaseStudentGroupDoc):
         Получение словаря с данными для подстановки
         :return: словарь с данными
         """
-        type_dpp, _ = self._get_program_and_certificates_types()
-        program = self.student_group.ou.program
         date_start, date_end = self._get_date_start_and_end()
         context = {
-            'type_dpp': type_dpp,
-            'prog_name': program.name,
-            'duration': program.duration,
             'date_start': date_start.strftime('%d.%m.%Y'),
             'date_end': date_end.strftime('%d.%m.%Y'),
             'code': self.student_group.code,
             'students_count': self._get_application_count(),
             'sum': self._get_total_price()
         }
-
+        if self.student_group.ou:
+            type_dpp, _ = self._get_program_and_certificates_types()
+            program = self.student_group.ou.program
+            context['type_dpp'] = type_dpp
+            context['prog_name'] = program.name
+            context['duration'] = program.duration
+        else:
+            context['theme'] = self.student_group.iku.name
+            context['duration'] = self.student_group.iku.duration
         return context
 
     def get_response(self, folder_tuple: tuple, xlsx: bool = True) -> HttpResponse:

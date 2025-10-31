@@ -198,7 +198,7 @@
     </v-expansion-panel>
 
     <v-expansion-panel
-      v-if="studentGroupInfo?.service_type === 'ou' && userRole === 'centre'"
+      v-if="userRole === 'centre'"
       color="coko-blue"
       title="Закрывной документ"
     >
@@ -312,7 +312,7 @@ import {apiRequest} from "@/commons/apiRequest";
 import {studentGroupDocTypes} from "@/commons/consts/edu/studentGroupDocTypes";
 import {showAlert} from "@/commons/alerts";
 import {useDisplay} from "vuetify";
-import {convertDateToBackend, convertEnglishDate} from "@/commons/date";
+import {convertBackendDate, convertDateToBackend, convertEnglishDate} from "@/commons/date";
 
 export default {
   name: "StudentGroupDocs",
@@ -472,6 +472,26 @@ export default {
       }
       this.loading = false
     }
+  },
+  watch: {
+    enrollDate: function(newValue) {
+      try {
+        if (!(newValue instanceof Date)) {
+          this.enrollDate = convertBackendDate(newValue)
+        }
+      } catch(e) {
+        console.log('enrollDate error: ', e)
+      }
+    },
+    expDate: function(newValue) {
+      try {
+        if (!(newValue instanceof Date)) {
+          this.expDate = convertBackendDate(newValue)
+        }
+      } catch(e) {
+        console.log('expDate error: ', e)
+      }
+    },
   },
   mounted() {
     this.setInfo()

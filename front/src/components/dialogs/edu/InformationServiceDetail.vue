@@ -240,7 +240,18 @@ export default {
       informationServiceID: null, // object_id объекта мероприятия (при редактировании)
       dialog: false, // Параметр отображения диалогового окна
       loading: false, // Параметр отобажения индикатора загрузки на компонентах формы
-      informationService: null, // установленный объект мероприятия
+      informationService: {
+        "object_id": null,
+        "department": null,
+        "type": null,
+        "name": null,
+        "categories": null,
+        "location": 'ГАУ ИО ЦОПМКиМКО',
+        "duration": null,
+        "price": null,
+        "date_start": null,
+        "date_end": null
+      }, // установленный объект мероприятия
     }
   },
   methods: {
@@ -350,21 +361,26 @@ export default {
   },
   watch: {
     // Преобразование даты форма дд.мм.гггг в объект Date при изменении информации о приказе ДПП
-    informationService: function() {
-      if (this.informationService.date_start !== null) {
-        try {
-          this.informationService.date_start = convertBackendDate(this.informationService.date_start)
-        } catch (e) {
-          this.informationService.date_start = new Date(this.informationService.date_start)
+    informationService: {
+      handler() {
+        console.log('date_start: ', this.informationService.date_start)
+        if (this.informationService.date_start !== null && this.informationService.date_start.length === 10) {
+          try {
+            console.log('date_start: ', this.informationService.date_start)
+            this.informationService.date_start = convertBackendDate(this.informationService.date_start)
+          } catch (e) {
+            this.informationService.date_start = new Date(this.informationService.date_start)
+          }
         }
-      }
-      if (this.informationService.date_end !== null) {
-        try {
-          this.informationService.date_end = convertBackendDate(this.informationService.date_end)
-        } catch (e) {
-          this.informationService.date_end = new Date(this.informationService.date_end)
+        if (this.informationService.date_end !== null && this.informationService.date_end.length === 10) {
+          try {
+            this.informationService.date_end = convertBackendDate(this.informationService.date_end)
+          } catch (e) {
+            this.informationService.date_end = new Date(this.informationService.date_end)
+          }
         }
-      }
+      },
+      deep: true
     },
     // Получение объекта ИКУ в случае изменений ID объекта
     informationServiceID: async function() {

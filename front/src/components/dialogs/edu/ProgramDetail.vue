@@ -303,7 +303,7 @@
 import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import contentTypeFormats from "@/commons/consts/contentTypeFormats";
-import {convertDateToBackend} from "@/commons/date";
+import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 import KUGTable from "@/components/tables/KUGTable.vue";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 
@@ -337,7 +337,7 @@ export default {
       orderObject: {
         'order_id': null,
         'order_number': '',
-        'order_date': '',
+        'order_date': null,
         'order_file': null,
       },
       // Возможные типы файлов приказов ДПП
@@ -352,7 +352,7 @@ export default {
       this.orderObject = {
         'order_id': null,
         'order_number': '',
-        'order_date': '',
+        'order_date': null,
         'order_file': null,
       }
       Object.keys(this.programObject).map((key) => {
@@ -545,10 +545,17 @@ export default {
   },
   watch: {
     // Преобразование даты форма дд.мм.гггг в объект Date при изменении информации о приказе ДПП
-    orderObject: function() {
-      if (this.orderObject['order_date'] !== null) {
-        this.orderObject['order_date'] = new Date(this.orderObject['order_date'])
-      }
+    orderObject: {
+      handler() {
+        if (this.orderObject.order_date !== null && this.orderObject.order_date.length === 10) {
+          try {
+            this.orderObject.order_date = convertBackendDate(this.orderObject.order_date)
+          } catch (e) {
+            this.orderObject.order_date = new Date(this.orderObject.order_date)
+          }
+        }
+      },
+      deep: true
     }
   },
   mounted() {
