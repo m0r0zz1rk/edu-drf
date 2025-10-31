@@ -88,7 +88,8 @@ class UserUtils:
         """
         if ValidateUtils.validate_data(['email', 'username', 'password'], data):
             try:
-                user_orm.create_record(data)
+                new_user = user_orm.create_record(data)
+                print('new_user: ', new_user)
                 return True
             except Exception:
                 return ExceptionHandling.get_traceback()

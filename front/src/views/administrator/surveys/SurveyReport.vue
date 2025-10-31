@@ -219,7 +219,7 @@ import serviceTypes from "@/commons/consts/edu/serviceTypes";
 import studentGroupStatuses from "@/commons/consts/edu/studentGroupStatuses";
 import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
-import {convertDateToBackend} from "@/commons/date";
+import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 
 export default {
   name: 'SurveyReport',
@@ -405,6 +405,26 @@ export default {
   },
   mounted() {
     this.getStatuses()
+  },
+  watch: {
+    'reportInfo.start_period': function (newValue, oldValue) {
+      try {
+        if (!(newValue instanceof Date)) {
+          this.reportInfo.start_period = convertBackendDate(newValue)
+        }
+      } catch(e) {
+        console.log('start_period error: ', e)
+      }
+    },
+    'reportInfo.end_period': function (newValue, oldValue) {
+      try {
+        if (!(newValue instanceof Date)) {
+          this.reportInfo.end_period = convertBackendDate(newValue)
+        }
+      } catch(e) {
+        console.log('end_period error: ', e)
+      }
+    },
   }
 }
 

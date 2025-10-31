@@ -109,10 +109,10 @@ class BaseORM:
             payload=repr(create_object)
         )
         def function():
-            create_object['updated_from_new'] = True
             if self.model.__name__ == 'User':
                 new_obj = self.model.objects.create_user(**create_object)
             else:
+                create_object['updated_from_new'] = True
                 new_obj = self.model.objects.create(**create_object)
             return new_obj
 

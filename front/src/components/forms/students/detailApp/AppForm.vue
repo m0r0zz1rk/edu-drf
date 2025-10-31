@@ -280,10 +280,7 @@
 
   </template>
 
-  <CokoDialog
-    ref="ooSelectDialog"
-    :cardActions="false"
-  >
+  <CokoDialog ref="ooSelectDialog" :cardActions="false">
 
     <template v-slot:title>
       Справочник ОО
@@ -306,10 +303,7 @@
 
   </CokoDialog>
 
-  <CokoDialog
-      ref="educationDocSelectDialog"
-      :cardActions="false"
-  >
+  <CokoDialog ref="educationDocSelectDialog" :cardActions="false">
 
     <template v-slot:title>
       Документы обучающегося
@@ -340,10 +334,7 @@
 
   </CokoDialog>
 
-  <CokoDialog
-      ref="surnameDocSelectDialog"
-      :cardActions="false"
-  >
+  <CokoDialog ref="surnameDocSelectDialog" :cardActions="false">
 
     <template v-slot:title>
       Документы обучающегося
@@ -370,9 +361,7 @@
 
   </CokoDialog>
 
-  <CokoDialog
-      ref="docViewerDialog"
-  >
+  <CokoDialog ref="docViewerDialog">
 
     <template v-slot:title>
       <p v-if="!mobileDisplay">Просмотр документа</p>
@@ -400,7 +389,7 @@ import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import educationLevels from "@/commons/consts/apps/educationLevels";
 import educationCategories from "@/commons/consts/apps/educationCategories";
-import {convertBackendDate, convertDateToBackend} from "@/commons/date";
+import {convertBackendDate} from "@/commons/date";
 import {useDisplay} from "vuetify";
 
 export default {
@@ -703,10 +692,11 @@ export default {
     'internalApp.education_date': function (newValue, oldValue) {
       try {
         if (!(newValue instanceof Date)) {
-          this.changeAppAttribute('education_date', convertDateToBackend(newValue))
+          this.changeAppAttribute('education_date', convertBackendDate(newValue))
         }
-      } catch(e) {}
-
+      } catch(e) {
+        console.log('education_date error: ', e)
+      }
     },
     'internalApp.certificate_mail': function (newValue, oldValue) {
       try {

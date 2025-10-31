@@ -141,7 +141,8 @@
                 sm="6"
             >
               <v-date-input
-                  id="registrationBirthday"
+                  v-model="birthday"
+                  @input="e => e.target.value.length === 10 ? birthday = e.target.value : ''"
                   v-mask="'##.##.####'"
                   bg-color="white"
                   :rules="[rules.required,]"
@@ -286,6 +287,7 @@ import emailPattern from "@/commons/emailPattern";
 import DialogContentWithError from "@/components/dialogs/DialogContentWithError.vue";
 import {useDisplay} from "vuetify";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
+import {convertBackendDate, convertDateToBackend} from "@/commons/date";
 
 export default {
   name: 'RegistrationDialog',
@@ -305,6 +307,8 @@ export default {
         name: '',
         patronymic: ''
       },
+      // Дата рождения
+      birthday: null,
       dialog: false,
       uniqFailed: false,
       uniqueData: [
@@ -396,8 +400,7 @@ export default {
         this.$refs["content-error"].showContentError('Выберите государство')
         return null
       }
-      let birthday = document.querySelector('#registrationBirthday').value
-      if (birthday.length === 0) {
+      if (this.birthday === null || !(this.birthday instanceof Date)) {
         this.$refs["content-error"].showContentError('Выберите дату рождения')
         return null
       }
@@ -433,7 +436,7 @@ export default {
         'email': email,
         'snils': snils,
         'state': state,
-        'birthday': birthday,
+        'birthday': convertDateToBackend(this.birthday),
         'sex': sex === 'Мужской',
         'health': health === 'Да',
         'password': password
@@ -517,6 +520,15 @@ export default {
         this.fio.patronymic = this.fio.patronymic.replace(/[^А-Яа-я]/ig, '')
       },
       deep: true
+    },
+    birthday: function(newValue) {
+      try {
+        if (!(newValue instanceof Date)) {
+          this.birthday = convertBackendDate(newValue)
+        }
+      } catch(e) {
+        console.log('birthday error: ', e)
+      }
     }
   }
 }
