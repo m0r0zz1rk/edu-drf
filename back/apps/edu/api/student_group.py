@@ -2,6 +2,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 
 from apps.applications.services.base_application import base_application_service
+from apps.authen.services.profile import profile_service
 from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.drf.viewset.consts.swagger_text import SWAGGER_TEXT
 from apps.commons.permissions.is_admin_or_coko import IsAdminOrCoko
@@ -44,7 +45,18 @@ class StudentGroupViewSet(EduViewSet):
         f'Ошибка при получении списка "{swagger_object_name}"'
     )
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+        if 'dep' in request.GET:
+            curator_groups = profile_service.get_curator_groups(request.user.id)
+            if curator_groups:
+                queryset = queryset.filter(curator__django_user_id=request.user.id)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return response_utils.ok_response_dict(serializer.data)
+        # return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
         tags=[f'Учебная часть. {swagger_object_name}', ],

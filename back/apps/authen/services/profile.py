@@ -195,5 +195,14 @@ class ProfileService:
         """
         return coko_profile_model.objects.count()
 
+    def get_curator_groups(self, user_id: int) -> bool:
+        """
+        Проверка отображения только кураторских групп у сотрудника центра
+        :param user_id: id пользователя, приходящий из request.user.id
+        :return: True - только кураторские группы, False - все группы центра
+        """
+        prof = self.get_profile_or_info_by_attribute('django_user_id', user_id, 'profile')
+        return prof.curator_groups
+
 
 profile_service = ProfileService()

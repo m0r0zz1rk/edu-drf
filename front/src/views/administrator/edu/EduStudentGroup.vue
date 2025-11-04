@@ -45,34 +45,13 @@ export default {
       userDep: this.userRole === 'dep' ? getCookie('cokoDep') : 'centre',
       statuses: [],
       tableHeaders: [
-        {
-          'title': 'Шифр',
-          'key': 'code'
-        },
-        {
-          'title': 'Статус',
-          'key': 'status'
-        },
-        {
-          'title': 'Наименование услуги',
-          'key': 'service_name'
-        },
-        {
-          'title': 'Начало обучения',
-          'key': 'date_start'
-        },
-        {
-          'title': 'Окончание обучения',
-          'key': 'date_end'
-        },
-        {
-          'title': 'Куратор',
-          'key': 'curator'
-        },
-        {
-          'title': 'Количество заявок',
-          'key': 'apps_count'
-        }
+        {'title': 'Шифр', 'key': 'code'},
+        {'title': 'Статус', 'key': 'status'},
+        {'title': 'Наименование услуги', 'key': 'service_name'},
+        {'title': 'Начало обучения', 'key': 'date_start'},
+        {'title': 'Окончание обучения', 'key': 'date_end'},
+        {'title': 'Куратор', 'key': 'curator'},
+        {'title': 'Количество заявок', 'key': 'apps_count'}
       ], // Заголовки таблицы
       fieldsArray: null, // Описание заголовков
       // URL эндпоинта на получение данных
