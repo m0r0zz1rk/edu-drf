@@ -596,7 +596,7 @@ export default {
     this.initSearchValues()
     this.headers = this.tableHeaders
     this.pageRecCount = this.pageRecCountOptions[0]
-    this.getRecs()
+    // this.getRecs()
   },
   watch: {
     page: function() {
