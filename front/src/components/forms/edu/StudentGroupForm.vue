@@ -155,6 +155,15 @@
 
         <v-btn
           variant="flat"
+          v-if="groupTab === 'apps' && userRole === 'centre'"
+          color="coko-blue"
+          text="Удаление заявок"
+          :loading="loading"
+          @click="appsRemove()"
+        />
+
+        <v-btn
+          variant="flat"
           v-if="groupTab === 'apps' && checkData?.oo?.length !== 0"
           color="coko-blue"
           text="ОО"
@@ -822,6 +831,32 @@ export default {
     // Получение списка заявок для переноса из таблицы на вкладке "Заявки"
     getAppsToMove() {
       this.appsToMove = this.$refs.studentGroupAppModule.$refs.mainAppsTable.itemsList
+    },
+    // Удаление выбранных заявок
+    async appsRemove() {
+      const apps = this.$refs.studentGroupAppModule.$refs.mainAppsTable.itemsList
+      if (apps.length === 0) {
+        showAlert('error', 'Удаление заявок', 'Выберите заявки')
+        return false
+      }
+      if (confirm('Вы уверены что хотите удалить выбранные заявки?')) {
+        this.loading = true
+        let groupType = 'course'
+        if (this.serviceType === 'iku') {groupType = 'event'}
+        const appsRemoveRequest = await apiRequest(
+          `/backend/api/v1/applications/${groupType}_remove_apps/`,
+          'DELETE',
+          true,
+          {apps: apps}
+        )
+        if (appsRemoveRequest.success) {
+          showAlert('success', 'Удаление заявок', 'Заявки успешно удалены')
+          this.$refs.studentGroupAppModule.$refs.mainAppsTable.getRecs()
+        } else {
+          showAlert('error', 'Удаление заявок', appsRemoveRequest.error)
+        }
+        this.loading = false
+      }
     },
     // Функция подгрузки сканов удостоверений
     async uploadLicenses() {

@@ -213,7 +213,7 @@ class BaseApplicationService:
     @staticmethod
     def move_application(
             orm: BaseORM,
-            apps: list,
+            apps: list[uuid],
             destination_group_id: uuid
     ):
         """
@@ -333,6 +333,17 @@ class BaseApplicationService:
         apps = orm.get_filter_records(filter_by={'group_id': group_id})
         for app in apps:
             orm.update_record(filter_by={'object_id': app.object_id},update_object={'physical': payment_type})
+
+    @staticmethod
+    def remove_apps(orm: BaseORM, apps: list[uuid]):
+        """
+        Удаление заявок
+        :param orm: Класс ORM для работы с заявками (course_application_orm или event_application_orm)
+        :param apps: список object_id заявок
+        :return:
+        """
+        for app in apps:
+            orm.delete_record(filter_by=dict(object_id=app))
 
 
 base_application_service = BaseApplicationService()

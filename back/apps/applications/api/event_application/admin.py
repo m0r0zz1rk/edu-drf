@@ -6,6 +6,8 @@ from apps.applications.selectors.application_filter import ApplicationFilter
 from apps.applications.selectors.event_application import event_application_orm, event_application_queryset
 from apps.applications.serializers.base_application import ApplicationOOUpdateSerializer, \
     ApplicationPayAcceptSerializer, ApplicationPayDenySerializer
+from apps.applications.serializers.base_application.base_application_bulk_delete_serializer import \
+    BaseApplicationBulkDeleteSerializer
 from apps.applications.serializers.base_application.check_data.base_application_move import AppMoveSerializer, \
     AppMoveAllSerializer
 from apps.applications.serializers.event_application import EventApplicationGroupListSerializer, \
@@ -183,6 +185,28 @@ class EventApplicationAdminViewSet(ApplicationsViewSet):
             return response_utils.ok_response('Оплата успешно отклонена')
         else:
             return response_utils.bad_request_response(f'Ошибка сериализации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Заявки. {swagger_object_name}', ],
+        operation_description="Массовое удаление заявок",
+        request_body=BaseApplicationBulkDeleteSerializer,
+        responses={
+            '403': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при выполнении запроса',
+            '200': 'OK'
+        }
+    )
+    @view_set_journal_decorator(
+        APPLICATIONS,
+        f'Заявки успешно удалены',
+        f'Ошибка при удалении заявок'
+    )
+    def bulk_destroy(self, request, *args, **kwargs):
+        serialize = BaseApplicationBulkDeleteSerializer(data=request.data)
+        if serialize.is_valid():
+            base_application_service.remove_apps(event_application_orm, serialize.validated_data.get('apps'))
+            return response_utils.ok_response('OK')
+        return response_utils.bad_request_response(f'Ошибка сериализации: {repr(serialize.errors)}')
 
     @swagger_auto_schema(
         tags=[f'Заявки. {swagger_object_name}', ],
