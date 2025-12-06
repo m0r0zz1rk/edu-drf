@@ -198,6 +198,15 @@ export default {
       if (!([newValue, oldValue].includes(null)) && newValue !== this.eduData) {
         this.changeCheckData('edu', newValue)
       }
+    },
+    'eduApp.education_date': function(newValue, oldValue) {
+      try {
+        if (!(newValue instanceof Date)) {
+          this.eduApp.education_date = convertDateToBackend(newValue)
+        }
+      } catch (e) {
+        console.log('education_date error: ', e)
+      }
     }
   }
 }

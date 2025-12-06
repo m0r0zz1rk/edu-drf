@@ -97,7 +97,7 @@ class BaseApplicationService:
                 if application_orm.model.__name__ == 'EventApplication':
                     fields = self._new_event_app_fields
                 for field in fields:
-                    setattr(app, field, getattr(last_app, field))
+                    app[field] = getattr(last_app, field)
             new_app = application_orm.create_record(app)
             return new_app.object_id
         except Exception as e:

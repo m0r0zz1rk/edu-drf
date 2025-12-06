@@ -6,19 +6,10 @@
   />
 
   <PdfApp
-    v-if="base64String !== null && contentType === 'application/pdf'"
+    v-if="base64String !== null"
     :pdf="base64String"
     defaultLocale="ru"
   />
-
-  <object
-      v-if="base64String !== null && (contentType !== 'application/pdf')"
-      style="max-height: 150vh; max-width: 100vw"
-      :data="base64String"
-      :type="contentType"
-  >
-    <embed :src="base64String"/>
-  </object>
 
 </template>
 
