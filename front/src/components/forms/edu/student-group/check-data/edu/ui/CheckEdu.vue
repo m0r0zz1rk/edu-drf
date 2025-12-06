@@ -34,7 +34,6 @@
             <v-text-field label="Серия документа" v-model="eduApp.education_serial" :loading="loading"/>
             <v-text-field label="Номер документа" v-model="eduApp.education_number" :loading="loading"/>
             <v-date-input
-              format="DD.MM.YYYY"
               v-mask="'##.##.####'"
               bg-color="white"
               label="Дата выдачи документа"
@@ -202,7 +201,7 @@ export default {
     'eduApp.education_date': function(newValue, oldValue) {
       try {
         if (!(newValue instanceof Date)) {
-          this.eduApp.education_date = convertDateToBackend(newValue)
+          this.eduApp.education_date = convertBackendDate(newValue)
         }
       } catch (e) {
         console.log('education_date error: ', e)
