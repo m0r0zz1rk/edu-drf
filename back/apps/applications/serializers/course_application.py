@@ -141,7 +141,7 @@ class CourseBaseUpdateSerializer(CourseApplicationDetailSerializer):
 class CourseApplicationUpdateSerializer(CourseBaseUpdateSerializer):
     """Сериализация данных при сохранении информации по заявке на курс"""
     education_doc_id = serializers.UUIDField(
-        allow_null=True,
+        allow_null=False,
         label='object_id документа об образовании'
     )
     surname_doc_id = serializers.UUIDField(

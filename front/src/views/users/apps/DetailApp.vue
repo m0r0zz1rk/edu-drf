@@ -166,6 +166,8 @@ export default {
   },
   data() {
     return {
+      // Фамилия обучающегося в профиле
+      profileSurname: '',
       // Объект заявки
       app: null,
       // Данные для заполнения анкеты
@@ -193,6 +195,16 @@ export default {
       if (this.app.status === 'draft') {
         this.appTab = 'form'
       }
+    },
+    // Получение фамилии обучающегося из профиля
+    async getProfileSurname() {
+      const surnameRequest = await apiRequest(
+        '/backend/api/v1/auth/get_profile/',
+        'GET',
+        true,
+        null
+      )
+      this.profileSurname = surnameRequest.surname
     },
     // Получение массива данных для заполнения анкеты заявки
     async getFormData() {
@@ -239,8 +251,24 @@ export default {
     changeAppField(field, value) {
       this.app[field] = value
     },
+    // Проверка заполнения полей
+    checkFields() {
+      if (!this.app.education_doc_id) {
+        showAlert('error', 'Проверка заявки', 'Выберите диплом')
+        return false
+      }
+      if (this.app.diploma_surname !== this.profileSurname) {
+        if (!this.app.surname_doc_id) {
+          showAlert('error', 'Проверка заявки', 'Выберите документ о смене фамилии')
+          return false
+        }
+      }
+      return true
+    },
     // Сохранение изменений в заявке
     async saveApp(inWork = false) {
+      const checkApp = this.checkFields()
+      if (!checkApp) return
       if (confirm('Вы уверены, что хотите сохранить информацию?')) {
         if (this.app.education_date !== null && this.app.education_date instanceof Date) {
           this.app.education_date = convertDateToBackend(this.app.education_date)
@@ -300,6 +328,7 @@ export default {
     }
   },
   mounted() {
+    this.getProfileSurname()
     this.getFormData()
   }
 }
