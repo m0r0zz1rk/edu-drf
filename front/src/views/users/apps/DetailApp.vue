@@ -253,14 +253,16 @@ export default {
     },
     // Проверка заполнения полей
     checkFields() {
-      if (!this.app.education_doc_id) {
-        showAlert('error', 'Проверка заявки', 'Выберите диплом')
-        return false
-      }
-      if (this.app.diploma_surname !== this.profileSurname) {
-        if (!this.app.surname_doc_id) {
-          showAlert('error', 'Проверка заявки', 'Выберите документ о смене фамилии')
+      if (this.appType === 'ou') {
+        if (!this.app.education_doc_id) {
+          showAlert('error', 'Проверка заявки', 'Выберите диплом')
           return false
+        }
+        if (this.app.diploma_surname !== this.profileSurname) {
+          if (!this.app.surname_doc_id) {
+            showAlert('error', 'Проверка заявки', 'Выберите документ о смене фамилии')
+            return false
+          }
         }
       }
       return true
