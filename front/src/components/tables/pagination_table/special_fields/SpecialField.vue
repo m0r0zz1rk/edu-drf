@@ -119,6 +119,32 @@
   <div
       v-if="ui === 'appPayCheck'"
   >
+    <v-icon
+      v-if="item.pay_doc_id === null"
+      color="coko-blue"
+      icon="mdi-upload"
+      @click="$refs[`payUpload_${item.student.profile_id}`].dialog = true"
+    />
+    <CokoDialog :ref="`payUpload_${item.student.profile_id}`" :cardActions="true">
+      <template v-slot:title>
+        Загрузить документ об оплате обучающегося "{{item.student.display_name}}"
+      </template>
+
+      <template v-slot:text>
+        <VFileInput :ref="`payFile_${item.student.profile_id}`" label="Выберите документ об оплате" />
+      </template>
+
+      <template v-slot:actions>
+        <v-btn
+          variant="flat"
+          :loading="loading"
+          color="coko-blue"
+          text="Сохранить"
+          @click="savePayDoc(item)"
+        />
+      </template>
+
+    </CokoDialog>
     <BooleanBadge
         :bool="['pay', 'study', 'study_complete', 'archive'].includes(item.status)"
     />
@@ -172,10 +198,15 @@ import AppStudentInfo from "@/components/tables/pagination_table/special_fields/
 import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
 import BooleanBadge from "@/components/badges/BooleanBadge.vue";
 import AppMove from "@/components/tables/pagination_table/special_fields/sources/AppMove.vue";
+import CokoDialog from "@/components/dialogs/CokoDialog.vue";
+import {showAlert} from "@/commons/alerts";
+import {apiRequest} from "@/commons/apiRequest";
+import {getBase64} from "@/commons/files";
 
 export default {
   name: "SpecialField",
   components: {
+    CokoDialog,
     AppMove,
     BooleanBadge,
     AppStatusBadge,
@@ -190,7 +221,7 @@ export default {
     mobileDisplay: Boolean, // Отображение на экране мобильного устройства
     // Функция для просмотра документов
     openDocViewerFunction: Function,
-    // Функция для получения полной заяки и просмотра анкеты в группе
+    // Функция для получения полной заявки и просмотра анкеты в группе
     selectGroupAppFunction: Function,
     // Функция получения записей в таблице
     getRecs: Function,
@@ -200,7 +231,49 @@ export default {
   data() {
     return {
       // Список соответствий расширения файла и MIME типа
-      fileContentTypes: fileContentTypes
+      fileContentTypes: fileContentTypes,
+      // Параметр лоадера на форме
+      loading: false
+    }
+  },
+  methods: {
+    // Подгрузка документа об оплате
+    async savePayDoc(item) {
+      const profile_id = item.student.profile_id
+      const files = this.$refs[`payFile_${profile_id}`]
+      if (files && files.modelValue.length === 0) {
+        showAlert('error', 'Загрузка файла', 'Выберите документ об оплате')
+        return
+      }
+      let formData = new FormData()
+      const base64file = await getBase64(files.modelValue[0])
+      formData.append("profile_id", profile_id)
+      formData.append("app_id", item.object_id)
+      formData.append("file",base64file)
+      this.loading = true
+      const saveAppRequest = await apiRequest(
+        '/backend/api/v1/docs/pay_doc/create/',
+        'POST',
+        true,
+        formData,
+        false,
+        true
+      )
+      if (saveAppRequest.error) {
+        showAlert(
+          'error',
+          'Сохранение заявки',
+          saveAppRequest.error
+        )
+      } else {
+        showAlert(
+          'success',
+          'Сохранение заявки',
+          saveAppRequest.success
+        )
+        this.getRecs()
+      }
+      this.loading = false
     }
   }
 }
