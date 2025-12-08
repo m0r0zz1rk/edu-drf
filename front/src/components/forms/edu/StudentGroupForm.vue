@@ -164,7 +164,7 @@
 
         <v-btn
           variant="flat"
-          v-if="groupTab === 'apps' && checkData?.oo?.length !== 0"
+          v-if="groupTab === 'apps' && userRole === 'centre' && checkData?.oo?.length !== 0"
           color="coko-blue"
           text="ОО"
           :loading="loading"
