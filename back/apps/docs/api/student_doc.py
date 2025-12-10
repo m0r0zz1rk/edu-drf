@@ -49,17 +49,17 @@ class StudentDocViewSet(viewsets.ModelViewSet):
         try:
             user_id = request.user.id
             if 'profile_id' in request.GET:
-                if not request.user.is_superuser:
-                    journal_request = JournalRequest(
-                        self._journal_request_builder
-                        .set_module(DOCS)
-                        .set_status(ERROR)
-                        .set_description('Отказано в доступе')
-                        .set_payload(f'ID пользователя: {request.user.id}, получение списка документов пользователя')
-                        .set_output('-')
-                        .set_response_message('Отказано в доступе')
-                    )
-                    return journal_request.create_response()
+                # if not request.user.is_superuser:
+                #     journal_request = JournalRequest(
+                #         self._journal_request_builder
+                #         .set_module(DOCS)
+                #         .set_status(ERROR)
+                #         .set_description('Отказано в доступе')
+                #         .set_payload(f'ID пользователя: {request.user.id}, получение списка документов пользователя')
+                #         .set_output('-')
+                #         .set_response_message('Отказано в доступе')
+                #     )
+                #     return journal_request.create_response()
                 user_id = profile_service.get_profile_or_info_by_attribute(
                     'object_id',
                     request.GET['profile_id'],
@@ -99,17 +99,17 @@ class StudentDocViewSet(viewsets.ModelViewSet):
                 raise APIProcessError
             user_id = request.user.id
             if 'profile_id' in request.GET:
-                if not request.user.is_superuser:
-                    journal_request = JournalRequest(
-                        self._journal_request_builder
-                        .set_module(DOCS)
-                        .set_status(ERROR)
-                        .set_description('Отказано в доступе')
-                        .set_payload(f'ID пользователя: {request.user.id}, получение списка документов пользователя')
-                        .set_output('-')
-                        .set_response_message('Отказано в доступе')
-                    )
-                    return journal_request.create_response()
+                # if not request.user.is_superuser:
+                #     journal_request = JournalRequest(
+                #         self._journal_request_builder
+                #         .set_module(DOCS)
+                #         .set_status(ERROR)
+                #         .set_description('Отказано в доступе')
+                #         .set_payload(f'ID пользователя: {request.user.id}, получение списка документов пользователя')
+                #         .set_output('-')
+                #         .set_response_message('Отказано в доступе')
+                #     )
+                #     return journal_request.create_response()
                 user_id = profile_service.get_profile_or_info_by_attribute(
                     'object_id',
                     request.GET['profile_id'],
