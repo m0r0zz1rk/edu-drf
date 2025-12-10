@@ -131,7 +131,7 @@
       </template>
 
       <template v-slot:text>
-        <VFileInput :ref="`payFile_${item.student.profile_id}`" label="Выберите документ об оплате" />
+        <VFileInput v-model="payFiles[item.student.profile_id]" label="Выберите документ об оплате" />
       </template>
 
       <template v-slot:actions>
@@ -232,6 +232,8 @@ export default {
     return {
       // Список соответствий расширения файла и MIME типа
       fileContentTypes: fileContentTypes,
+      // Объект с документами об оплате
+      payFiles: {},
       // Параметр лоадера на форме
       loading: false
     }
@@ -240,13 +242,13 @@ export default {
     // Подгрузка документа об оплате
     async savePayDoc(item) {
       const profile_id = item.student.profile_id
-      const files = this.$refs[`payFile_${profile_id}`]
-      if (files && files.modelValue.length === 0) {
+      const files = this.payFiles[profile_id]
+      if (!files) {
         showAlert('error', 'Загрузка файла', 'Выберите документ об оплате')
         return
       }
       let formData = new FormData()
-      const base64file = await getBase64(files.modelValue[0])
+      const base64file = await getBase64(files)
       formData.append("profile_id", profile_id)
       formData.append("app_id", item.object_id)
       formData.append("file",base64file)
