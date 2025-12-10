@@ -67,7 +67,7 @@ class FormsDoc(BaseStudentGroupDoc):
                 cell=ws.cell(row=1, column=index),
                 value=column,
                 font_bold=True,
-                align_center=True,
+                align_center=False,
                 border=True
             )
 
@@ -117,7 +117,7 @@ class FormsDoc(BaseStudentGroupDoc):
                 set_cell_value(
                     cell=ws.cell(row=app_index, column=col_index),
                     value=value,
-                    align_center=True,
+                    align_center=False,
                     border=True
                 )
 
@@ -131,4 +131,4 @@ class FormsDoc(BaseStudentGroupDoc):
         worksheet.title = 'Анкеты'
         self._set_columns(worksheet)
         self._set_data(worksheet)
-        set_cells_width(worksheet, 50)
+        # set_cells_width(worksheet, 50)
