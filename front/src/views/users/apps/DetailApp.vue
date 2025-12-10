@@ -64,6 +64,7 @@
                 <div v-if="(formData !== null) && (app !== null)">
                   <AppForm
                     ref="appForm"
+                    :notStudent="false"
                     :studentApp="app"
                     :disabled="!(editStatuses.includes(app.status))"
                     :appType="appType"

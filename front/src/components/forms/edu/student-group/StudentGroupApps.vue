@@ -36,6 +36,7 @@
       <AppForm
         v-if="selectedApp !== null"
         ref="appForm"
+        :notStudent="true"
         :disabled="false"
         :studentApp="selectedApp"
         :appType="serviceType"

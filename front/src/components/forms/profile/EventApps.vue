@@ -33,6 +33,7 @@
         v-if="(selectedApp !== null) && (formData !== null)"
         ref="appForm"
         appType="iku"
+        :notStudent="true"
         :disabled="false"
         :studentApp="selectedApp"
         :mos="formData.mo"

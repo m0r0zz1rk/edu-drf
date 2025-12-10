@@ -320,7 +320,7 @@
           :addButton="true"
           :xlsxButton="false"
           :getRecsURL="internalApp.education_level === 'student' ? getTrainingURL : getDiplomaURL"
-          addRecURL="/backend/api/v1/docs/upload_student_doc/"
+          :addRecURL="addDocUrl"
           :openDocViewerFunction="openDocViewer"
           :tableHeaders="docTableHeaders"
           :fieldsArray="docFieldsArray"
@@ -349,7 +349,7 @@
           :addButton="true"
           :xlsxButton="false"
           :getRecsURL="getChangeSurnameURL"
-          addRecURL="/backend/api/v1/docs/upload_student_doc/"
+          :addRecURL="addDocUrl"
           :openDocViewerFunction="openDocViewer"
           :tableHeaders="docTableHeaders"
           :fieldsArray="docFieldsArray"
@@ -396,6 +396,8 @@ export default {
   name: 'AppForm',
   components: {PaginationTable, CokoDialog, AppStatusBadge},
   props: {
+    // Параметр редактирования НЕ студентом
+    notStudent: Boolean,
     // Объект заявки обучающегося
     studentApp: Object,
     // Параметр блокировки редактирования элементов формы
@@ -425,6 +427,8 @@ export default {
       getDiplomaURL: '/backend/api/v1/docs/student_docs/?doc_type=diploma',
       // URL для получения списка документов о смене фамилии
       getChangeSurnameURL: '/backend/api/v1/docs/student_docs/?doc_type=change_surname',
+      // URL для добавления документа
+      addDocUrl: '/backend/api/v1/docs/upload_student_doc/',
       // Тип документа
       docType: null,
       // Параметр отображения анимации загрузки на элементах формы
@@ -479,6 +483,15 @@ export default {
     }
   },
   methods: {
+    // Проверить кто редактирует - если не студент, то добавить profile_id в get параметры
+    checkWhoEdit() {
+      if (this.notStudent) {
+        this.getTrainingURL += `&profile_id=${this.studentApp.profile_id}`
+        this.getDiplomaURL += `&profile_id=${this.studentApp.profile_id}`
+        this.getChangeSurnameURL += `&profile_id=${this.studentApp.profile_id}`
+        this.addDocUrl += `?profile_id=${this.studentApp.profile_id}`
+      }
+    },
     // Открыть окно для просмотра документа
     openDocViewer(fio, docId, docName, docType) {
       this.docId = docId
@@ -710,6 +723,7 @@ export default {
     }
   },
   mounted() {
+    this.checkWhoEdit()
     this.setInternalApp()
     this.getOoTypes()
   }
