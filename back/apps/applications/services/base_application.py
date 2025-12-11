@@ -198,12 +198,13 @@ class BaseApplicationService:
                     getattr(app, f'{field.name}_id')
                 )
             elif field.name == 'oo':
-                if app_info.get('oo_new') != '':
-                    updated_app[field.name+'_id'] = None
-                    updated_app[field.name+'_new'] = app_info.get('oo_new', getattr(app, 'oo_new'))
-                else:
-                    updated_app[field.name+'_id'] = app_info.get('oo_id', getattr(app, 'oo_id'))
-                    updated_app[field.name+'_new'] = ''
+                if 'oo_id' in app_info and 'oo_new' in app_info:
+                    if app_info.get('oo_new') != '':
+                        updated_app[field.name+'_id'] = None
+                        updated_app[field.name+'_new'] = app_info.get('oo_new', getattr(app, 'oo_new'))
+                    else:
+                        updated_app[field.name+'_id'] = app_info.get('oo_id', getattr(app, 'oo_id'))
+                        updated_app[field.name+'_new'] = ''
             else:
                 updated_app[field.name] = app_info.get(field.name, getattr(app, field.name))
         if 'in_work' in app_info and app_info['in_work']:
