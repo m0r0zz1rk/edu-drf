@@ -15,7 +15,7 @@ from apps.edu.operations.calendar_chart.add_update_calendar_chart_element import
 from apps.edu.operations.calendar_chart.delete_calendar_chart_element import DeleteCalendarChartElement
 from apps.edu.selectors.calender_chart.calendar_chart_chapter import calendar_chart_chapter_model, \
     calendar_chart_chapter_orm
-from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_orm
+from apps.edu.selectors.calender_chart.calendar_chart_theme import calendar_chart_theme_orm, calendar_chart_theme_model
 from apps.edu.selectors.program import program_orm
 from apps.edu.services.program import ProgramService
 from apps.edu.services.schedule import ScheduleService
@@ -97,13 +97,13 @@ class CalendarChartService:
                     chapter_obj[field.name] = getattr(chapter, field.name)
             chapter_obj['program'] = chapter.program_id
             themes = []
-            th_recs = calendar_chart_chapter_orm.get_filter_records(
+            th_recs = calendar_chart_theme_orm.get_filter_records(
                 filter_by={'chapter_id': chapter.object_id},
                 order_by=['position',]
             )
             for theme in th_recs:
                 theme_obj = {}
-                for field in calendar_chart_chapter_model._meta.concrete_fields:
+                for field in calendar_chart_theme_model._meta.concrete_fields:
                     if field.name not in ['date_create', 'program']:
                         theme_obj[field.name] = getattr(theme, field.name)
                 theme_obj['chapter'] = theme.chapter_id
@@ -273,14 +273,14 @@ class CalendarChartService:
         hour_types = ('lecture', 'practice', 'trainee', 'individual')
         for number, chapter in enumerate(kug['chapters'], start=1):
             chapter_info = {
-                'chapter': f'Раздел {number}. {chapter["name"]}'
+                'chapter': f'Раздел {number}. {chapter["name"].replace(". ", "")}'
             }
             themes = []
             if len(chapter.get('themes')) > 0:
                 for theme in chapter['themes']:
                     theme_info = {
-                        'chapter': chapter['name'],
-                        'theme': theme['name'],
+                        'chapter': chapter['name'].replace(". ", ""),
+                        'theme': theme['name'].replace(". ", ""),
                         'theme_id': theme['object_id']
                     }
                     for ht in hour_types:
@@ -292,8 +292,8 @@ class CalendarChartService:
                     themes.append(theme_info)
             else:
                 theme_info = {
-                    'chapter': chapter.get('name'),
-                    'theme': chapter.get('name'),
+                    'chapter': chapter.get('name').replace(". ", ""),
+                    'theme': chapter.get('name').replace(". ", ""),
                     'theme_id': chapter.get('object_id')
                 }
                 for ht in hour_types:
