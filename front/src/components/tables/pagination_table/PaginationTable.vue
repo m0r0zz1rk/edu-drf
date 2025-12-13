@@ -1,6 +1,7 @@
 <template>
   <v-data-table
     sticky
+    ref="dataTable"
     v-model="itemsList"
     v-bind:class="{'adaptive-no-tab-table': noTab, 'adaptive-tab-table': !(noTab)}"
     :headers="headers"
@@ -335,6 +336,7 @@ import specialFieldsList from "@/components/tables/pagination_table/special_fiel
 import SpecialField from "@/components/tables/pagination_table/special_fields/SpecialField.vue";
 import PaginationTableEditDialog from "@/components/tables/pagination_table/dialogs/PaginationTableEditDialog.vue";
 import {getCookie} from "@/commons/cookie";
+import {nextTick} from "vue";
 
 // Компонент пагинационной таблицы
 export default {
@@ -600,6 +602,13 @@ export default {
   },
   watch: {
     page: function() {
+      nextTick(() => {
+        const el = this.$refs.dataTable.$el
+        const wrapper = el?.querySelector('.v-table__wrapper')
+        if (wrapper) {
+          wrapper.scrollTop = 0
+        }
+      })
       this.getRecs()
     },
     pageRecCount: function() {
@@ -608,7 +617,7 @@ export default {
       } else {
         this.page = 1
       }
-    }
+    },
   }
 }
 </script>
