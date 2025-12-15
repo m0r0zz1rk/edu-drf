@@ -78,6 +78,15 @@ class CourseCertificateService:
             update_object=certificate_data
         )
 
+    @staticmethod
+    def get_blank_number_start_zero_count(blank_number: str) -> int:
+        """
+        Получение количества нулей в начале номера бланка
+        :param blank_number - номер бланка
+        :return: количество нулей
+        """
+        return len(blank_number) - len(blank_number.lstrip('0'))
+
     def generate_certificates_data(self, certificate_data: dict):
         """
         Генерация данных об удостоверениях на основе полученных данных
@@ -94,31 +103,22 @@ class CourseCertificateService:
             certificate_data.get('group_id')
         )
         for index, app in enumerate(apps, start=0):
-            if self.is_certificate_exists(
-                registration_number=str(int(initial_values['registration_number'])+index),
-                blank_serial=initial_values['blank_serial'],
-                blank_number=str(int(initial_values['blank_number'])+index)
-            ):
+            zero_count = self.get_blank_number_start_zero_count(initial_values['blank_number'])
+            data = {
+                'registration_number': str(int(initial_values['registration_number'])+index),
+                'blank_serial': initial_values.get('blank_serial'),
+                'blank_number': f'{"0"*zero_count}{str(int(initial_values["blank_number"])+index)}'
+            }
+            if self.is_certificate_exists(**data):
                 raise DuplicateCertificateInfo
             cert = course_certificate_orm.get_one_record_or_none(dict(application_id=app.object_id))
             if cert:
                 course_certificate_orm.update_record(
                     filter_by=dict(application_id=app.object_id),
-                    update_object=dict(
-                        registration_number=str(int(initial_values['registration_number']) + index),
-                        blank_serial=initial_values['blank_serial'],
-                        blank_number=str(int(initial_values['blank_number']) + index)
-                    )
+                    update_object=data
                 )
             else:
-                course_certificate_orm.create_record(
-                    dict(
-                        application_id=app.object_id,
-                        registration_number=str(int(initial_values['registration_number']) + index),
-                        blank_serial=initial_values['blank_serial'],
-                        blank_number=str(int(initial_values['blank_number']) + index)
-                    )
-                )
+                course_certificate_orm.create_record({'application_id': app.object_id, **data})
 
 
 course_certificate_service = CourseCertificateService()
