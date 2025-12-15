@@ -8,7 +8,7 @@
   <PdfApp
     v-if="base64String !== null"
     :pdf="base64String"
-    defaultLocale="ru"
+    :config="viewerConfig"
   />
 
 </template>
@@ -42,7 +42,12 @@ export default {
       // Строка base64
       base64String: null,
       // Тип контента
-      contentType: null
+      contentType: null,
+      // Конфигурация вьюера для подключения русского языка
+      viewerConfig: {
+        locale: 'ru',
+        localeUrl: '/locale/'
+      }
     }
   },
   methods: {
