@@ -45,6 +45,8 @@
     color="coko-blue"
     :rail="$vuetify.display.xs ? false : sideMenuRail"
     v-model="sideMenu"
+    @mouseenter="sideMenuRail = false"
+    @mouseleave="sideMenuRail = true"
   >
 
     <SideMenu />
