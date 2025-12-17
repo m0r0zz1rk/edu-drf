@@ -33,7 +33,7 @@ class EducationServiceService:
     def get_info_by_service(self, attribute_name: str, value: str, info: str) -> Optional[str]:
         """
         Получение информации о услуги
-        :param attribute_name: наименование атриубта для поиска
+        :param attribute_name: наименование атрибута для поиска
         :param value: значения атрибута
         :param info: информация (dep_name, date_start, service_name)
         :return: str - display_name подразделения AD, None - ОУ не найдена
@@ -52,15 +52,16 @@ class EducationServiceService:
         return None
 
     @staticmethod
-    def service_count(department: str) -> int:
+    def service_count(department: str, date_start: datetime.date) -> int:
         """
         Получение количества ОУ (курсов) для подразделения в текущем году
         :param department: display_name подразделения AD
+        :param date_start: дата начала
         :return: количество ОУ (курсов)
         """
         programs = program_orm.get_filter_records(filter_by={'department__display_name': department})
         services = education_service_orm.get_filter_records(
-            filter_by={'program__in': programs, 'date_start__year': datetime.datetime.now().year}
+            filter_by={'program__in': programs, 'date_start__year': date_start.year}
         )
         return services.count()
 

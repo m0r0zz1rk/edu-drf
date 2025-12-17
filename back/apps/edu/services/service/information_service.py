@@ -21,14 +21,15 @@ class InformationServiceService:
         return information_service_orm.get_all_objects_count()
 
     @staticmethod
-    def service_count(department: str) -> int:
+    def service_count(department: str, date_start: datetime.date) -> int:
         """
         Получение количества ОУ (курсов) для подразделения в текущем году
         :param department: display_name подразделения AD
+        :param date_start: дата начала
         :return: количество ОУ (курсов)
         """
         services = information_service_orm.get_filter_records(
-            filter_by={'department__display_name': department, 'date_start__year': datetime.datetime.now().year}
+            filter_by={'department__display_name': department, 'date_start__year': date_start.year}
         )
         return services.count()
 

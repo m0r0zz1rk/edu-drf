@@ -58,10 +58,11 @@ class StudentGroupService:
         """
         return student_group_offer_orm.get_one_record_or_none(filter_by={'group_id': group_id})
 
-    def generate_group_code(self, department: str, service_type: str) -> str:
+    def generate_group_code(self, department: str, service_id: uuid, service_type: str) -> str:
         """
         Генерация кода для учебной группы
         :param department: Наименование подразделения из AD (display_name)
+        :param service_id - object_id курса / мероприятия
         :param service_type: Тип услуги (ou, iku)
         :return: сгенерированный код
         """
@@ -73,15 +74,19 @@ class StudentGroupService:
                     short_name += letter
                 else:
                     short_name += letter[:1].upper()
-            month = str(datetime.datetime.now().month)
+            ru_date_start = education_service_service.get_info_by_service('object_id', service_id, 'date_start')
+            if not ru_date_start:
+                ru_date_start = information_service_service.get_info_by_service('object_id', service_id, 'date_start')
+            date_start = datetime.datetime.strptime(ru_date_start, '%d.%m.%Y')
+            year = str(date_start.year)
+            month = str(date_start.month)
             if len(month) == 1:
                 month = '0' + month
-            year = str(datetime.datetime.now().year)
             code = short_name
-            service_count = EducationServiceService.service_count(department)
+            service_count = EducationServiceService.service_count(department, date_start)
             type_sign = 'ПК'
             if service_type != 'ou':
-                service_count = InformationServiceService.service_count(department)
+                service_count = InformationServiceService.service_count(department, date_start)
                 type_sign = 'С'
             code += f'-{type_sign}{str(service_count+1)}' if service_count != 0 else f'-{type_sign}1'
             code += f'-{month}-{year[2:]}'
@@ -116,8 +121,8 @@ class StudentGroupService:
             )
         if dep is not None:
             department = dep
+        create_data['code'] = self.generate_group_code(department, create_data['service_id'], create_data.get('type'))
         del create_data['service_id']
-        create_data['code'] = self.generate_group_code(department, create_data.get('type'))
         del create_data['type']
         student_group_orm.create_record(create_data)
 

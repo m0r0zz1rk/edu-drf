@@ -52,11 +52,12 @@ class AddStudentGroup(MainProcessing):
                 )
             if dep is not None:
                 department = dep
-            del self.process_data['service_id']
             self.process_data['code'] = self.sgs.generate_group_code(
                 department,
+                self.process_data['service_id'],
                 self.process_data['type']
             )
+            del self.process_data['service_id']
             del self.process_data['type']
             student_group_orm.create_record(self.process_data)
             self.process_completed = True
