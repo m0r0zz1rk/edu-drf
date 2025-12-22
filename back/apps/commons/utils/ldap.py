@@ -80,6 +80,8 @@ class LdapUtils:
                     SUBTREE,
                     attributes=[attribute]
                 )
+                print('attribute: ', attribute)
+                print('entries: ', conn.entries)
                 users = conn.entries
                 if len(users) > 0:
                     if users[0][attribute].value is None:

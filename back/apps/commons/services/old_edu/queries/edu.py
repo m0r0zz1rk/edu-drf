@@ -398,6 +398,7 @@ class EduData:
                     continue
             if len(list(filter(lambda gr: gr.old_id == group[0], exists))) > 0:
                 exist = list(filter(lambda gr: gr.old_id == group[0], exists))[0]
+                print(f'code: {group[1]} --- status: {group[15]}')
                 if exist.updated_from_new:
                     continue
                 if exist.code == group[1] and \

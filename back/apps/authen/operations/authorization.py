@@ -120,6 +120,19 @@ class Authorization(MainProcessing):
                         self.auth_user,
                         centre_info[1]
                     )
+            if profile.internal_phone == 100:
+                try:
+                    profile_service.set_coko_profile_data(
+                        profile,
+                        {
+                            'internal_phone': ldap_utils.get_ad_attribute_coko_user(
+                                'telephoneNumber',
+                                self.auth_user.username
+                            )
+                        }
+                    )
+                except Exception as e:
+                    pass
             if profile.surname == 'Фамилия':
                 profile_service.set_coko_profile_data(
                     profile,
@@ -147,17 +160,4 @@ class Authorization(MainProcessing):
                         user_utils.add_user_to_group('username', username, 'Администраторы')
                     else:
                         user_utils.add_user_to_group('username', username, 'Сотрудники')
-            if profile.internal_phone == '100':
-                try:
-                    profile_service.set_coko_profile_data(
-                        profile,
-                        {
-                            'internal_phone': ldap_utils.get_ad_attribute_coko_user(
-                                'telephoneNumber',
-                                self.auth_user.username
-                            )
-                        }
-                    )
-                except Exception as e:
-                    pass
         self.auth_data = TokenUtils(self.auth_user.id).jwt_token()
