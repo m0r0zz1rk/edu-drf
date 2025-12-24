@@ -150,7 +150,7 @@ class BaseApplicationService:
             if app.oo_new:
                 data.get('oo').append({
                     **base_obj,
-                    'mo': app.mo.name,
+                    'mo': app.mo.name if app.mo else '-',
                     'oo_new': app.oo_new
                 })
             if app.status == CHECK and app.pay_doc_id is not None:
