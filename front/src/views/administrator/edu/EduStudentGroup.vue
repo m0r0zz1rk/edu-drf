@@ -63,7 +63,9 @@ export default {
     getURL() {
       let urlGet = "/backend/api/v1/edu/student_group/"
       if (this.userRole === 'dep') {
-        urlGet += `?dep=${this.userDep}`
+        urlGet += `?dep=${this.userDep}&status=not_complete`
+      } else {
+        urlGet += `?status=not_complete`
       }
       this.urlGet = urlGet
     },

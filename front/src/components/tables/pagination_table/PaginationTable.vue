@@ -479,8 +479,9 @@ export default {
         'Выгрузка Excel',
         'Скачивание файла начнется автоматически после завершения формирования'
       )
-      let xlsxRequest = await apiRequest(
-        this.getRecsURL+'export/',
+      const split = this.getRecsURL.split('?')
+      const xlsxRequest = await apiRequest(
+        `${split[0]}export/`,
         'get',
         true,
         null,
@@ -499,15 +500,6 @@ export default {
           'Ошибка при формировании файла'
         )
       }
-      // let xlsxHeaders = []
-      // this.headers.map((header) => {
-      //   xlsxHeaders.push(header.title)
-      // })
-      // xlsxDownloadFunction(
-      //   this.tableTitle,
-      //   xlsxHeaders,
-      //   this.recs
-      // )
     },
     async getRecs() {
       this.tableLoading = true
