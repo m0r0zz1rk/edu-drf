@@ -35,6 +35,15 @@ student_profile_fields = [
     'state_id'
 ]
 
+special_emails_new_group = [
+    'a717tt@mail.ru',
+    'ivan.grodnikov@mail.ru',
+    'natalya.stefanceva@mail.ru',
+    'elenavasileva517@gmail.com',
+    'popova-alena-2014@yandex.ru',
+    'anna.nadina.73@mail.ru'
+]
+
 
 class AuthenData:
     """
@@ -53,6 +62,8 @@ class AuthenData:
             dj_users = dj_users_query.all()
         for dj_user in dj_users:
             try:
+                if dj_user[7] in special_emails_new_group:
+                    continue
                 if len(list(filter(lambda us: us.username == dj_user[4], users))) > 0:
                     continue
                 new_user = {}
@@ -87,15 +98,7 @@ class AuthenData:
                 exist = profile_user[0]
                 if profile.updated_from_new:
                     continue
-                if profile.phone == exist[1] and \
-                        profile.surname == exist[2] and \
-                        profile.name == exist[3] and \
-                        profile.patronymic == exist[4] and \
-                        profile.sex == exist[5] and \
-                        profile.birthday == exist[6] and \
-                        profile.snils == exist[7] and \
-                        profile.teacher == exist[9] and \
-                        profile.health == exist[10]:
+                if profile.phone == exist[1] and profile.snils == exist[7]:
                     continue
                 profile.old_id = exist[0]
                 for i in range(0, len(student_profile_fields)):

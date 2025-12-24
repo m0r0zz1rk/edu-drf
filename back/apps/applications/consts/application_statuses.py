@@ -21,3 +21,6 @@ APPLICATION_STATUSES = (
 
 # Статусы для активных заявок
 ACTIVE_STATUSES = (DRAFT, WORK, WAIT_PAY, CHECK, PAY, STUDY, STUDY_COMPLETE)
+
+# Статусы для заявок с проверенным документом об оплате
+PAY_STATUSES = (PAY, STUDY, STUDY_COMPLETE, ARCHIVE)
