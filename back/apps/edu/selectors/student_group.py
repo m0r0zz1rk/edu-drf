@@ -6,7 +6,7 @@ from django_filters import rest_framework as filters
 
 from apps.commons.orm.base_orm import BaseORM
 
-from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES
+from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES, COMPLETE
 
 # Модель учебных групп
 student_group_model = apps.get_model('edu', 'StudentGroup')
@@ -98,6 +98,8 @@ class StudentGroupFilter(filters.FilterSet):
 
     def filter_status(self, queryset, name, value):
         """Фильтрация по статусу учебной группы"""
+        if value == 'not_complete':
+            return queryset.exclude(status=COMPLETE)
         for k, v in STUDENT_GROUP_STATUSES:
             if v == value:
                 return queryset.filter(status=k)
