@@ -53,7 +53,7 @@
         <v-card-title
           class="login-card-title"
         >
-          Крайние активные заявки
+          Активные заявки
         </v-card-title>
         <v-card-text
           style="background-color: white"

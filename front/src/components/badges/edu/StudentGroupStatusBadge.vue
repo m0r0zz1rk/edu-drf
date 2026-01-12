@@ -14,7 +14,7 @@
 
   <v-badge v-if="studentGroupStatus === 'COMPLETE'"
            color="green"
-           content="Заврешено"
+           content="Завершено"
            inline
   />
 
