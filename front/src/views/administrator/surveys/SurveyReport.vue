@@ -236,7 +236,7 @@ export default {
       reportInfo: {
         survey_id: null,
         survey_description: '(не выбран)',
-        type: 'all',
+        type: 'group',
         start_period: new Date(),
         end_period: new Date(),
         group_code: '(не выбрана)',

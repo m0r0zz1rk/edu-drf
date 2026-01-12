@@ -2,10 +2,6 @@
 
 const surveyReportTypes = [
     {
-        key: 'all',
-        title: 'Все'
-    },
-    {
         key: 'service_type',
         title: 'По типу услуги'
     },
