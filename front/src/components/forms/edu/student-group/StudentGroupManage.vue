@@ -24,7 +24,6 @@
 
     <v-expansion-panel
       title="Изменение куратора"
-      v-if="userRole === 'centre'"
     >
       <v-expansion-panel-text>
         <b>{{curator}}</b><br/>
