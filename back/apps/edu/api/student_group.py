@@ -1,3 +1,4 @@
+from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 
@@ -49,7 +50,7 @@ class StudentGroupViewSet(EduViewSet):
         if 'dep' in request.GET:
             curator_groups = profile_service.get_curator_groups(request.user.id)
             if curator_groups:
-                queryset = queryset.filter(curator__django_user_id=request.user.id)
+                queryset = queryset.filter(Q(curator__django_user_id=request.user.id) | Q(curator=None))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
