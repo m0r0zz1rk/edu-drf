@@ -7,6 +7,7 @@ from django.db.models import QuerySet
 from django.http import HttpResponse
 from pandas._libs.tslibs.offsets import BDay
 
+from apps.authen.services.profile import profile_service
 from apps.commons.utils.data_types.string import string_utils
 from apps.commons.utils.django.settings import settings_utils
 from apps.docs.selectors.student_group_offer import student_group_offer_orm
@@ -232,5 +233,21 @@ class StudentGroupService:
             filter_by=dict(object_id=group_id),
             update_object=dict(survey_show=True)
         )
+
+    def check_user_is_group_curator(self, group_id: uuid.UUID, user_id: int) -> bool:
+        """
+        Метод для проверки является ли пользователь куратором учебной группы
+        :param group_id: object_id учебной группы
+        :param user_id: ID пользователя в таблице users
+        :return: True - является, False - не является
+        """
+        profile_id = profile_service.get_profile_or_info_by_attribute('django_user_id', user_id, 'profile_id')
+        if not profile_id:
+            return False
+        group = self.get_student_group('object_id', str(group_id))
+        if not group:
+            return False
+        return group.curator_id == profile_id
+
 
 student_group_service = StudentGroupService()

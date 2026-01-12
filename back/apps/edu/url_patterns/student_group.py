@@ -10,6 +10,7 @@ student_group_urlpatterns = [
     path('student_group/doc/', StudentGroupViewSet.as_view({'post': 'doc'})),
     path('student_group/offer/', StudentGroupViewSet.as_view({'post': 'offer'})),
     path('student_group/payment_type/', StudentGroupViewSet.as_view({'post': 'payment_type'})),
+    path('student_group/check_curator/', StudentGroupViewSet.as_view({'post': 'check_group_curator'}))
 ]
 
 student_group_urlpatterns += student_group_router.urls

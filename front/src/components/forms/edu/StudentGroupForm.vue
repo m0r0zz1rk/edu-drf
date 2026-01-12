@@ -155,7 +155,7 @@
 
         <v-btn
           variant="flat"
-          v-if="groupTab === 'apps' && userRole === 'centre'"
+          v-if="groupTab === 'apps' && (userRole === 'centre' || userIsCurator)"
           color="coko-blue"
           text="Удаление заявок"
           :loading="loading"
@@ -577,46 +577,18 @@ export default {
       ],
       // Описание столбцов таблицы для выбора учебной группы
       groupFieldsArray: [
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'code',
-          addRequired: true,
-        },
+        {ui: 'input', type: 'text', key: 'code', addRequired: true,},
         {
           ui: 'studentGroupStatus',
           items: [...studentGroupStatuses.map((status) => { return status.title })],
           key: 'status',
           addRequired: false
         },
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'service_name',
-          addRequired: true,
-        },
-        {
-          ui: 'date',
-          key: 'date_start',
-          addRequired: true,
-        },
-        {
-          ui: 'date',
-          key: 'date_end',
-          addRequired: true,
-        },
-        {
-          ui: 'input',
-          type: 'text',
-          key: 'curator',
-          addRequired: true,
-        },
-        {
-          ui: 'input',
-          type: 'number',
-          key: 'apps_count',
-          addRequired: true,
-        }
+        {ui: 'input', type: 'text', key: 'service_name', addRequired: true,},
+        {ui: 'date', key: 'date_start', addRequired: true,},
+        {ui: 'date', key: 'date_end', addRequired: true,},
+        {ui: 'input', type: 'text', key: 'curator', addRequired: true,},
+        {ui: 'input', type: 'number', key: 'apps_count', addRequired: true,}
       ],
       // Выбранная группа для переноса
       groupForMove: null,
@@ -630,6 +602,8 @@ export default {
       appsToMove: [],
       // Архив со сканами удостоверений
       licenseArchive: null,
+      // Признак, что пользователь является куратором группы
+      userIsCurator: false,
       // Возможные типы оплаты
       paymentTypes: [
         {key: false, title: 'Юр. лицо'},
@@ -920,9 +894,21 @@ export default {
         showAlert('error', 'Смена типа оплаты', 'Ошибка при смене типа оплаты')
       }
       this.loading = false
+    },
+    // Проверка на куратора группы
+    async checkCurator() {
+      const request = await apiRequest(
+          '/backend/api/v1/edu/student_group/check_curator/',
+          'POST',
+          true,
+          {group_id: this.groupId},
+          true
+      )
+      this.userIsCurator = request.status === 200
     }
   },
   mounted() {
+    this.checkCurator()
     this.getGroupInfo()
   }
 }

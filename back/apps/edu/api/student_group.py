@@ -14,7 +14,7 @@ from apps.edu.selectors.student_group import student_group_queryset, StudentGrou
 from apps.edu.serializers.student_group import StudentGroupListSerializer, StudentGroupAddSerializer, \
     StudentGroupUpdateSerializer, StudentGroupDocRequestSerializer, \
     StudentGroupBaseDocRequestSerializer, StudentGroupRetrieveSerializer, StudentGroupCertListSerializer, \
-    StudentGroupUpdatePayment
+    StudentGroupUpdatePayment, StudentGroupCheckCuratorSerializer
 from apps.edu.services.student_group import student_group_service
 from apps.journal.consts.journal_modules import EDU
 
@@ -228,5 +228,34 @@ class StudentGroupViewSet(EduViewSet):
                 serialize.validated_data.get('payment_type')
             )
             return response_utils.ok_response('ОК')
+        else:
+            return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Учебная часть. {swagger_object_name}', ],
+        operation_description="Проверка куратора группы",
+        request_body=StudentGroupCheckCuratorSerializer,
+        responses={
+            '401': 'Пользователь не авторизован или не является администратором',
+            '400': 'Ошибка при выполнении запроса',
+            '403': 'Пользователь не является куратором учебной группы',
+            '200': 'Пользователь является куратором учебной групы'
+        }
+    )
+    @view_set_journal_decorator(
+        EDU,
+        f'Проверка куратора группы успешно проведена',
+        f'Ошибка при проверке куратора группы'
+    )
+    def check_group_curator(self, request, *args, **kwargs):
+        serialize = StudentGroupCheckCuratorSerializer(data=request.data)
+        if serialize.is_valid():
+            result = student_group_service.check_user_is_group_curator(
+                group_id=serialize.validated_data.get('group_id'),
+                user_id=request.user.id
+            )
+            if result:
+                return response_utils.ok_response('Является куратором')
+            return response_utils.forbidden_no_data('Не является куратором')
         else:
             return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')

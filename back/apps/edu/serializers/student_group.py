@@ -209,3 +209,12 @@ class StudentGroupUpdatePayment(serializers.Serializer):
         allow_null=False,
         label='Тип оплаты (true - физ. лицо, false - юр.лицо)'
     )
+
+
+class StudentGroupCheckCuratorSerializer(serializers.Serializer):
+    """
+    Сериализация данных при проверке куратора учебной группы
+    """
+    group_id = serializers.UUIDField(
+        allow_null=False,
+    )
