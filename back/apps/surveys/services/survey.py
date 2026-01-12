@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 
 from apps.surveys.exceptions.survey import SurveyNotExist, SurveyDataNotValid
 from apps.surveys.selectors.survey import survey_model, survey_orm
@@ -48,7 +49,7 @@ class SurveyService:
         raise SurveyNotExist
 
     @staticmethod
-    def get_survey_id_for_group(group_id: uuid) -> uuid:
+    def get_survey_id_for_group(group_id: uuid.UUID) -> Optional[uuid.UUID]:
         """
         Получение опроса для учебной группы
         :param group_id: object_id учебной группы

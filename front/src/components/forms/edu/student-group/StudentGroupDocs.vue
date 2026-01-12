@@ -302,6 +302,25 @@
 
     </v-expansion-panel>
 
+    <v-expansion-panel
+        color="coko-blue"
+        title="Отчет по опросу"
+    >
+
+      <v-expansion-panel-text>
+
+        <v-btn
+            color="coko-blue"
+            :loading="loading"
+            @click="e => {generateSurveyReport()}"
+        >
+          Сформировать
+        </v-btn>
+
+      </v-expansion-panel-text>
+
+    </v-expansion-panel>
+
   </v-expansion-panels>
 
 </template>
@@ -469,6 +488,31 @@ export default {
       } else {
         showAlert('success', 'Загрузка скана', 'Документ успешно загружен')
         this.offerModal = false
+      }
+      this.loading = false
+    },
+    // Сформировать отчет по опросу
+    async generateSurveyReport() {
+      this.loading = true
+      const today = new Date()
+      const body = {
+        survey_id: this.studentGroupInfo.survey_id,
+        type: 'group',
+        start_period: convertDateToBackend(today),
+        end_period: convertDateToBackend(today),
+        group_id: this.groupId,
+        service_type: this.studentGroupInfo.service_type === 'ou' ? 'edu' : 'iku'
+      }
+      const reportRequest = await apiRequest(
+          '/backend/api/v1/surveys/generate_report/',
+          'POST',
+          true,
+          body
+      )
+      if (reportRequest.success) {
+        showAlert('success', 'Отчет по опросу', reportRequest.success)
+      } else {
+        showAlert('error', 'Отчет по опросу', 'Произошла ошибка при формировании отчета по опросу')
       }
       this.loading = false
     }

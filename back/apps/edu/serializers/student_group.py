@@ -3,6 +3,7 @@ from rest_framework import serializers
 from apps.applications.services.base_application import base_application_service
 from apps.edu.consts.student_group.doc_types import STUDENT_GROUP_DOC_TYPES
 from apps.edu.selectors.student_group import student_group_model
+from apps.surveys.services.survey import survey_service
 
 
 class StudentGroupListSerializer(serializers.ModelSerializer):
@@ -80,6 +81,7 @@ class StudentGroupRetrieveSerializer(StudentGroupListSerializer):
     """
     check_data = serializers.SerializerMethodField(label='Данные для проверки')
     service_type = serializers.SerializerMethodField(label='Тип услуги')
+    survey_id = serializers.SerializerMethodField(label='object_id назначенного опроса')
 
     def get_check_data(self, obj):
         return base_application_service.get_check_data(obj.object_id)
@@ -87,9 +89,12 @@ class StudentGroupRetrieveSerializer(StudentGroupListSerializer):
     def get_service_type(self, obj):
         return 'ou' if obj.ou else 'iku'
 
+    def get_survey_id(self, obj):
+        return survey_service.get_survey_id_for_group(obj.object_id)
+
     class Meta:
         model = StudentGroupListSerializer.Meta.model
-        fields = StudentGroupListSerializer.Meta.fields + ('check_data', 'service_type')
+        fields = StudentGroupListSerializer.Meta.fields + ('check_data', 'service_type', 'survey_id')
 
 
 class StudentGroupAddSerializer(serializers.Serializer):
