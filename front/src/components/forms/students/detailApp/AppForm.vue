@@ -261,7 +261,7 @@
           :items="booleanOptions"
           item-title="title"
           item-value="key"
-          label="Отправка удостоверения почтой*"
+          label="Отправка удостоверения почтой России*"
           :readonly="disabled"
           :loading="loading"
       />
@@ -270,7 +270,7 @@
           v-if="internalApp.certificate_mail"
           color="coko-blue"
           v-model="internalApp.mail_address"
-          label="Почтовый адрес для отправки удостоверения"
+          label="Почтовый адрес для отправки удостоверения почтой России"
           :readonly="disabled"
           :loading="loading"
       />
