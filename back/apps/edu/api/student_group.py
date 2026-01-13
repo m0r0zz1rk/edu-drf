@@ -256,6 +256,6 @@ class StudentGroupViewSet(EduViewSet):
             )
             if result:
                 return response_utils.ok_response('Является куратором')
-            return response_utils.forbidden_no_data('Не является куратором')
+            return response_utils.forbidden_no_data()
         else:
             return response_utils.bad_request_response(f'Ошибка валидации: {repr(serialize.errors)}')
