@@ -12,6 +12,7 @@ from docx.shared import Pt
 from openpyxl.workbook import Workbook
 from pandas._libs.tslibs.offsets import BDay
 
+from apps.applications.consts.application_statuses import DRAFT
 from apps.applications.selectors.course_application import course_application_orm
 from apps.applications.selectors.event_application import event_application_orm
 from apps.commons.utils.django.settings import settings_utils
@@ -149,10 +150,12 @@ class BaseStudentGroupDoc:
         if self.student_group.ou:
             return (course_application_orm.get_filter_records(
                 filter_by={'group_id': self.student_group.object_id},
+                exclude={'status': DRAFT},
                 order_by=['profile__surname', 'profile__name', 'profile__patronymic']
             ))
         return (event_application_orm.get_filter_records(
             filter_by={'group_id': self.student_group.object_id},
+            exclude={'status': DRAFT},
             order_by=['profile__surname', 'profile__name', 'profile__patronymic']
         ))
 

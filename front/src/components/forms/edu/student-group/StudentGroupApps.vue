@@ -1,7 +1,7 @@
 <template>
 
   <PaginationTable
-    tableTitle="Заявки обучающихся"
+    tableTitle="Заявки обучающихся c учетом черновиков"
     ref="mainAppsTable"
     tableWidth="98"
     :noTab="false"

@@ -125,7 +125,11 @@ class EventApplicationService:
         :param group_id: object_id учебной группы
         :return: QuerySet с заявками
         """
-        return event_application_orm.get_filter_records(filter_by={'group_id': group_id})
+        return event_application_orm.get_filter_records(
+            filter_by={'group_id': group_id},
+            exclude={'status': DRAFT},
+            order_by=['profile__surname', 'profile__name', 'profile__patronymic']
+        )
 
     @staticmethod
     def get_total_apps_count() -> int:

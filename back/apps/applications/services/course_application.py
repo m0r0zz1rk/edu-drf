@@ -129,6 +129,7 @@ class CourseApplicationService:
         """
         return course_application_orm.get_filter_records(
             filter_by={'group_id': group_id},
+            exclude={'status': DRAFT},
             order_by=['profile__surname', 'profile__name', 'profile__patronymic']
         )
 

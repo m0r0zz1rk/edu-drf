@@ -256,7 +256,7 @@ class BaseApplicationService:
         group = student_group_service.get_student_group('object_id', group_id)
         orm = event_application_orm
         base_url = f'{settings_utils.get_parameter_from_settings("AIS_ADDRESS")}student/app/'
-        prefix = '/event'
+        prefix = 'event/'
         if group.ou:
             orm = course_application_orm
             prefix = 'course/'

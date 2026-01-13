@@ -78,7 +78,7 @@
           bg-color="white"
           variant="solo"
           controlVariant="split"
-          label="Ссылка на мероприятие"
+          label="Ссылка на мероприятие (в формате https://....)"
           :min="1"
           v-model="groupInfo.event_url"
           :loading="loading"

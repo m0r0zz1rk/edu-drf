@@ -5,7 +5,7 @@ const studentGroupStatuses = [
   },
   {
     key: 'PROCESS',
-    title: 'В процессе'
+    title: 'Идет обучение'
   },
   {
     key: 'COMPLETE',

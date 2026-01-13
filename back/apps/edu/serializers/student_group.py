@@ -150,6 +150,12 @@ class StudentGroupUpdateSerializer(serializers.Serializer):
         allow_blank=False,
         label='Форма обучения'
     )
+    event_url = serializers.URLField(
+        max_length=3000,
+        allow_null=False,
+        allow_blank=False,
+        label='Ссылка на обучение'
+    )
     plan_seats_number = serializers.IntegerField(
         min_value=0,
         allow_null=True,

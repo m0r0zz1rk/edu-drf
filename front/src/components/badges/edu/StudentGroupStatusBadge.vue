@@ -8,7 +8,7 @@
 
   <v-badge v-if="studentGroupStatus === 'PROCESS'"
            color="blue"
-           content="В процессе"
+           content="Идет обучение"
            inline
   />
 
