@@ -120,7 +120,7 @@
       v-if="ui === 'appPayCheck'"
   >
     <v-icon
-      v-if="item.pay_doc_id === null"
+      v-if="item.pay_doc_id === null || item.status === 'wait_pay'"
       color="coko-blue"
       icon="mdi-upload"
       @click="$refs[`payUpload_${item.student.profile_id}`].dialog = true"

@@ -121,7 +121,7 @@ export default {
       if (this.rejectReason === '') {
         showAlert('error', 'Проверка оплаты', 'Заполните причину отказа'); return
       }
-      if (confirm(`Вы уверены, что хотите отколнить оплату ${this.payApp.student} ?`)) {
+      if (confirm(`Вы уверены, что хотите отклонить оплату ${this.payApp.student} ?`)) {
         this.loading = true
         let url = endpoints['coursePayDenied']
         if (this.serviceType === 'iku') { url = endpoints['eventPayDenied'] }
