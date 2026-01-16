@@ -17,6 +17,7 @@ class YearFormsReport:
 
     # Данные для всех типов услуг
     common_cells = {
+        'Группа': 'group.code',
         'Телефон': 'profile.phone',
         'Email': 'profile.django_user.email',
         'Фамилия': 'profile.surname',
