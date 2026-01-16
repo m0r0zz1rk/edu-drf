@@ -135,6 +135,15 @@
             @click="saveSurvey()"
           />
 
+          <v-btn
+            variant="flat"
+            v-if="app.status === 'draft'"
+            color="coko-blue"
+            text="Удалить"
+            :loading="loading"
+            @click="deleteSurvey()"
+          />
+
         </v-card-actions>
 
       </v-card>
@@ -327,6 +336,31 @@ export default {
           showAlert('error', 'Опросы', saveAnswersRequest.error)
         }
         appSurvey.loading = false
+      }
+    },
+    // Удаление заявки в статусе черновик
+    async deleteSurvey() {
+      if (confirm('Вы уверены, что хотите удалить черновик?')) {
+        this.loading = true
+        if (this.app.status === 'draft') {
+          const deleteAppResponse = await apiRequest(
+              `/backend/api/v1/applications/${this.$route.params.serviceType}_application_user/${this.app.object_id}/`,
+              'DELETE',
+              true,
+              null
+          )
+          if (deleteAppResponse.error) {
+            showAlert('error', 'Удаление заявки', deleteAppResponse.error)
+            this.loading = false
+            return false
+          } else {
+            showAlert('success', 'Удаление заявки', 'Заявка успешно удалена')
+            this.$router.push({path: '/'})
+          }
+        } else {
+          showAlert('error', 'Удаление заявки', 'Удаление только для черновиков')
+        }
+        this.loading = false
       }
     }
   },

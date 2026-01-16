@@ -2,6 +2,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 
 from apps.applications.api.applications_view_set import ApplicationsViewSet
+from apps.applications.consts.application_statuses import DRAFT
 from apps.applications.selectors.course_application import course_application_orm, course_application_queryset, \
     CourseApplicationFilter
 from apps.applications.serializers.base_application import BaseApplicationSerializer
@@ -196,3 +197,19 @@ class CourseApplicationUserViewSet(ApplicationsViewSet):
             return response_utils.ok_response('Обновление выполнено')
         else:
             return response_utils.bad_request_response(f'Ошибка сериализации: {repr(serialize.errors)}')
+
+    @swagger_auto_schema(
+        tags=[f'Заявки. {swagger_object_name}', ],
+        operation_description="Удаление записи",
+        responses=SWAGGER_TEXT['delete']
+    )
+    @view_set_journal_decorator(
+        APPLICATIONS,
+        f'Запись "{swagger_object_name}" успешно удалена',
+        f'Ошибка при удалении записи "{swagger_object_name}"'
+    )
+    def destroy(self, request, *args, **kwargs):
+        app = course_application_service.get_course_app(self.kwargs.get('object_id'))
+        if app.status == DRAFT:
+            return super().destroy(request, *args, **kwargs)
+        return response_utils.bad_request_response('Нельзя удалить заявку (удаление только для черновиков)')
