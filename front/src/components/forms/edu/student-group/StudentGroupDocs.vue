@@ -198,6 +198,25 @@
     </v-expansion-panel>
 
     <v-expansion-panel
+        color="coko-blue"
+        title="Черновики"
+    >
+
+      <v-expansion-panel-text>
+
+        <v-btn
+            color="coko-blue"
+            :loading="loading"
+            @click="e => {getDoc('drafts', 'xlsx')}"
+        >
+          Скачать
+        </v-btn>
+
+      </v-expansion-panel-text>
+
+    </v-expansion-panel>
+
+    <v-expansion-panel
       v-if="userRole === 'centre'"
       color="coko-blue"
       title="Закрывной документ"

@@ -196,7 +196,7 @@ class BaseStudentGroupDoc:
         """
         pass
 
-    def _generate_wb(self) -> Workbook():
+    def _generate_wb(self) -> Workbook:
         """
         Генерация эксель файла
         :return:

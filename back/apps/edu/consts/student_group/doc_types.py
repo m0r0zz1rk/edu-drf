@@ -9,6 +9,7 @@ STUDENT_JOURNAL = 'student_journal'
 CLOSE_DOC = 'close_doc'
 SCHEDULE = 'schedule'
 CERTIFICATES_LIST = 'certificates_list'
+DRAFTS = 'drafts'
 
 # Типы документов для выгрузки по учебной группе
 STUDENT_GROUP_DOC_TYPES = (
@@ -23,4 +24,5 @@ STUDENT_GROUP_DOC_TYPES = (
     (CLOSE_DOC, 'Закрывной документ'),
     (SCHEDULE, 'Расписание'),
     (CERTIFICATES_LIST, 'Ведомость удостоверений'),
+    (DRAFTS, 'Черновики')
 )

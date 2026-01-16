@@ -6,5 +6,6 @@ export const studentGroupDocTypes = {
   transfer_order: 'Приказ о зачислении',
   deduction_order: 'Приказ об отчислении',
   forms: 'Анкеты',
-  student_journal: 'Журнал'
+  student_journal: 'Журнал',
+  drafts: 'Черновики'
 }

@@ -15,7 +15,7 @@ from apps.docs.services.student_group.excel.certificates_list import Certificate
 from apps.edu.consts.student_group.doc_type_class_mapping import STUDENT_GROUP_DOC_TYPE_MAPPING
 from apps.edu.consts.student_group.doc_type_path_mapping import STUDENT_GROUP_DOC_TYPE_PATH_MAPPING
 from apps.edu.consts.student_group.doc_types import STUDENT_GROUP_DOC_TYPES, FORMS, STUDENT_JOURNAL, SCHEDULE, \
-    CERTIFICATES_LIST
+    CERTIFICATES_LIST, DRAFTS
 from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES
 from apps.edu.exceptions.student_group.generate_code_error import GenerateCodeError
 from apps.edu.selectors.student_group import student_group_model, student_group_orm
@@ -129,9 +129,9 @@ class StudentGroupService:
 
     @staticmethod
     def get_doc_response(
-            group_id: uuid,
-            doc_type: STUDENT_GROUP_DOC_TYPES,
-            orders_info: dict = None
+        group_id: uuid,
+        doc_type: STUDENT_GROUP_DOC_TYPES,
+        orders_info: dict = None
     ) -> HttpResponse:
         """
         Получение респонза с запрашиваемым документом по учебной группе
@@ -145,7 +145,7 @@ class StudentGroupService:
             return doc_class.get_response((), True)
         xlsx = False
         doc_class = STUDENT_GROUP_DOC_TYPE_MAPPING[doc_type](group_id)
-        if doc_type in [FORMS, STUDENT_JOURNAL, SCHEDULE]:
+        if doc_type in [FORMS, STUDENT_JOURNAL, SCHEDULE, DRAFTS]:
             xlsx = True
         return doc_class.get_response(
             STUDENT_GROUP_DOC_TYPE_PATH_MAPPING[doc_type],
