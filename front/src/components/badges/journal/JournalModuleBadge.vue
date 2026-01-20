@@ -22,55 +22,55 @@ export default {
         },
         {
           name: 'ADMINS',
-          alias: 'ЛК администратора'
+          alias: 'ЦОКО'
         },
         {
           name: 'APPLICATIONS',
-          alias: 'Модуль заявок'
+          alias: 'Заявки'
         },
         {
           name: 'AUTHEN',
-          alias: 'Модуль авторизации/регистрации'
+          alias: 'Авторизация'
         },
         {
           name: 'CELERY',
-          alias: 'Модуль очереди задач Celery'
+          alias: 'Celery'
         },
         {
           name: 'DOCS',
-          alias: 'Модуль документов'
+          alias: 'Документы'
         },
         {
           name: 'EDU',
-          alias: 'Модуль учебной части'
+          alias: 'Учебная часть'
         },
         {
           name: 'GUIDES',
-          alias: 'Модуль справочников'
+          alias: 'Справочники'
         },
         {
           name: 'JOURNAL',
-          alias: 'Модуль журнала событий'
+          alias: 'Журнал событий'
         },
         {
           name: 'REPORTS',
-          alias: 'Модуль отчетов'
+          alias: 'Отчеты'
         },
         {
           name: 'SETTINGS',
-          alias: 'Модуль настроек'
+          alias: 'Настройки'
         },
         {
           name: 'SURVEYS',
-          alias: 'Модуль опросов'
+          alias: 'Опросы'
         },
         {
           name: 'USERS',
-          alias: 'ЛК Пользователя'
+          alias: 'Обучающийся'
         },
         {
           name: 'ORM',
-          alias: 'Модуль запросов к БД'
+          alias: 'Работа с БД'
         }
       ]
     }

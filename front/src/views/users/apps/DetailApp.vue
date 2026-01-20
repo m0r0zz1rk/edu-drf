@@ -263,9 +263,26 @@ export default {
     },
     // Проверка заполнения полей
     checkFields() {
+      console.log('app: ', this.app)
       if (this.appType === 'ou') {
+        if (!this.app.position_category_id) {
+          showAlert('error', 'Проверка заявки', 'Выберите категорию должности')
+          return false
+        }
+        if (!this.app.position_id) {
+          showAlert('error', 'Проверка заявки', 'Выберите должность')
+          return false
+        }
+        if (this.app.education_level === '') {
+          showAlert('error', 'Проверка заявки', 'Выберите уровень образования')
+          return false
+        }
         if (!this.app.education_doc_id) {
           showAlert('error', 'Проверка заявки', 'Выберите диплом')
+          return false
+        }
+        if (this.app.diploma_surname === '') {
+          showAlert('error', 'Проверка заявки', 'Введите фамилию в дипломе')
           return false
         }
         if (this.app.diploma_surname !== this.profileSurname) {
