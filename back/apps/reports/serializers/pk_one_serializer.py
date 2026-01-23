@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 class PKOneSerializer(serializers.Serializer):
     """
-    Сериализация параметров для отчета ПК-1
+    Сериализация параметров для отчета 1-ПК
     """
     report_year = serializers.IntegerField(
         min_value=2000,

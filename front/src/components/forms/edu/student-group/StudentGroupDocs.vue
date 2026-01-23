@@ -419,7 +419,7 @@ export default {
       }
       this.loading = false
     },
-    // Формирование запроса на получение ведомоисти удостоверений
+    // Формирование запроса на получение ведомости удостоверений
     async getCertificatesList() {
       if ((this.enrollNumber === '') ||
           (this.expNumber === '') ||

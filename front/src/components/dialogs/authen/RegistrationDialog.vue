@@ -340,7 +340,7 @@ export default {
       // Выбранное государство
       selectedState: 'Россия',
       sex: ['Мужской', 'Женский'],
-      health: ['Да', 'Нет'],
+      health: ['Нет', 'Да'],
       agreementCheckbox: false
     }
   },

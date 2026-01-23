@@ -65,7 +65,7 @@ def get_all_edu_data():
     # edu_data.get_program_calendar_themes()
     # edu_data.get_program_categories()
     # edu_data.get_education_services()
-    edu_data.get_student_groups()
+    # edu_data.get_student_groups()
     # edu_data.set_group_curator()
     # edu_data.get_course_schedule()
     # edu_data.set_course_schedule_theme_teacher()

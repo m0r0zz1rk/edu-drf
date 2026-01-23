@@ -119,7 +119,7 @@ class FisFrdo:
         writer.render_sheet(info, 'Шаблон', 0)
 
     def generate_file(self) -> BookWriter:
-        """Генерация Excel файла с отчетом ПК-1"""
+        """Генерация Excel файла с отчетом ФИС ФРДО"""
         # Объявление райтера для записи данных в шаблон отчета
         writer = BookWriter(fis_frdo_path)
         # Заполнение данными

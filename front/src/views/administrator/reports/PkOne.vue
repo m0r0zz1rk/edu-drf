@@ -41,7 +41,7 @@
 
 <script>
 
-// Форма для формирования отчета ПК-1
+// Форма для формирования отчета 1-ПК
 import monthList from "@/commons/consts/reports/monthList";
 import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
@@ -68,9 +68,9 @@ export default {
         true
       )
       if (serviceChartRequest.status === 200) {
-        showAlert('success', 'ПК-1', 'Запрос обработан, файл будет отправлен на почту')
+        showAlert('success', '1-ПК', 'Запрос обработан, файл будет отправлен на почту')
       } else {
-        showAlert('error', 'ПК-1', 'Ошибка при обработке запроса')
+        showAlert('error', '1-ПК', 'Ошибка при обработке запроса')
       }
       this.loading = false
     }

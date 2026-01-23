@@ -62,14 +62,14 @@ class ReportMainViewSet(ReportsViewSet):
 
     @swagger_auto_schema(
         tags=[f'Отчеты', ],
-        operation_description="Получение отчета ПК-1",
+        operation_description="Получение отчета 1-ПК",
         request_body=PKOneSerializer,
         responses=responses
     )
     @view_set_journal_decorator(
         REPORTS,
-        f'Запрос на получение отчета ПК-1 успешно обработан',
-        f'Ошибка при обработке запроса на получение отчета ПК-1'
+        f'Запрос на получение отчета 1-ПК успешно обработан',
+        f'Ошибка при обработке запроса на получение отчета 1-ПК'
     )
     def pk_one(self, request, *args, **kwargs):
         serialize = PKOneSerializer(data=request.data)

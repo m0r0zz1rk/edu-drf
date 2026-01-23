@@ -17,7 +17,7 @@
             >
               <v-tab class="coko-tab" value="dpp">Перечень ДПП</v-tab>
               <v-tab class="coko-tab" value="service">График услуг</v-tab>
-              <v-tab class="coko-tab" value="pk-1">ПК-1</v-tab>
+              <v-tab class="coko-tab" value="pk-1">1-ПК</v-tab>
               <v-tab class="coko-tab" value="frdo">ФИС ФРДО</v-tab>
               <v-tab class="coko-tab" value="forms">Анкеты</v-tab>
             </v-tabs>

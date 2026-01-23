@@ -11,17 +11,17 @@ from apps.commons.utils.django.settings import settings_utils
 from apps.edu.selectors.services.education_service import education_service_orm
 from apps.edu.selectors.student_group import student_group_orm, student_group_model
 
-# Путь к шаблону отчета ПК-1
+# Путь к шаблону отчета 1-ПК
 pk_one_path = os.path.join(
     settings_utils.get_parameter_from_settings('MEDIA_ROOT'),
     'Шаблоны',
     'Отчеты',
-    'шаблон_ПК-1.xlsx'
+    'шаблон_1-ПК.xlsx'
 )
 
 
 class PKOneReport:
-    """Класс для формирования отчета ПК-1 за выбранный год"""
+    """Класс для формирования отчета 1-ПК за выбранный год"""
 
     def __init__(self, report_data: dict):
         """
@@ -502,7 +502,7 @@ class PKOneReport:
         writer.render_sheet(info_empty, 'Раздел 6.5', 34)
 
     def generate_file(self) -> BookWriter:
-        """Генерация Excel файла с отчетом ПК-1"""
+        """Генерация Excel файла с отчетом 1-ПК"""
         # Объявление райтера для записи данных в шаблон отчета
         writer = BookWriter(pk_one_path)
         # Заполнение данными

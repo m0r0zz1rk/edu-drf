@@ -57,7 +57,7 @@
         </v-tab>
 
         <v-tab
-          v-if="studentGroupInfo?.service_type === 'ou' && userRole === 'centre'"
+          v-if="studentGroupInfo?.service_type === 'ou'"
           class="coko-tab"
           value="certificate"
         >
@@ -109,7 +109,7 @@
 
         <StudentGroupCertificates
           ref="studentGroupCertificates"
-          v-if="studentGroupInfo?.service_type === 'ou' && groupTab === 'certificate' && userRole === 'centre'"
+          v-if="studentGroupInfo?.service_type === 'ou' && groupTab === 'certificate'"
           :groupCode="studentGroupInfo?.code"
           :openDocViewer="openDocViewer"
         />
@@ -209,7 +209,7 @@
 
         <v-btn
           variant="flat"
-          v-if="groupTab === 'certificate' && userRole === 'centre'"
+          v-if="groupTab === 'certificate'"
           color="coko-blue"
           text="Подгрузка"
           :loading="loading"
@@ -450,7 +450,7 @@
     <template v-slot:text>
       Для корректной загрузки сканов удостоверений пользователей необходимо подгрузить архив в формате .rar, в
       котором располагаются сканы удостоверений пользователей cо следующим форматом имени файла:
-      (регистрационный номер).pdf
+      регистрационный номер.pdf
       <v-row
         dense
       >

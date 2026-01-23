@@ -154,7 +154,7 @@ class YearFormsReport:
         self._set_data(ws)
 
     def generate_file(self) -> Workbook:
-        """Генерация Excel файла с отчетом ПК-1"""
+        """Генерация Excel файла с отчетом 1-ПК"""
         # Объявление новой книги Excel
         wb = Workbook()
         # Заполнение данными
