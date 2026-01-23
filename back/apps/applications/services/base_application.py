@@ -1,7 +1,7 @@
 import uuid
 from typing import Callable, Optional
 
-from django.db.models import Model, QuerySet
+from django.db.models import QuerySet
 
 from apps.applications.consts.application_statuses import CHECK, WORK, WAIT_PAY, PAY, STUDY, STUDY_COMPLETE
 from apps.applications.exceptions.application import ApplicationCreateError
