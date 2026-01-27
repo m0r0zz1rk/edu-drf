@@ -47,7 +47,7 @@
                 v-if="(app.status === 'archive') && (app.certificate_doc_id)"
                 class="coko-tab"
                 value="certificate"
-                text="Сертификат"
+                text="Удостоверение"
               />
             </v-tabs>
 

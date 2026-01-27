@@ -3,7 +3,7 @@
   <v-btn color="coko-blue" text="Просмотр" @click="$refs.docViewerDialog.dialog = true"/>
 
   <CokoDialog ref="docViewerDialog">
-    <template v-slot:title>Просмотр сертификата</template>
+    <template v-slot:title>Просмотр удостоверения</template>
     <template v-slot:text><DocViewer fileType="student" :fileId="certificateId"/></template>
   </CokoDialog>
 

@@ -179,6 +179,7 @@
               <v-select
                   :items="health"
                   id="registrationHealth"
+                  :value="regHealth"
                   bg-color="white"
                   label="Ограничения по здоровью*"
                   :loading="formLoading"
@@ -341,6 +342,7 @@ export default {
       selectedState: 'Россия',
       sex: ['Мужской', 'Женский'],
       health: ['Нет', 'Да'],
+      regHealth: 'Нет',
       agreementCheckbox: false
     }
   },
@@ -409,11 +411,6 @@ export default {
         this.$refs["content-error"].showContentError('Выберите пол')
         return null
       }
-      let health = document.querySelector('#registrationHealth')._value
-      if (health.length === 0) {
-        this.$refs["content-error"].showContentError('Укажите, есть ли у Вас ограничения по здоровью')
-        return null
-      }
       let password = document.querySelector('#registrationPass1').value
       let confirm = document.querySelector('#registrationPass2').value
       if ((password.length < 8) || (confirm.length < 8)) {
@@ -438,7 +435,7 @@ export default {
         'state': state,
         'birthday': convertDateToBackend(this.birthday),
         'sex': sex === 'Мужской',
-        'health': health === 'Да',
+        'health': this.regHealth === 'Да',
         'password': password
       }
     },
