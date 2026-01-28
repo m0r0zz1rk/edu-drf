@@ -139,6 +139,8 @@
                           </template>
 
                           <template v-if="header.key === 'name'">
+                              <b v-if="openChapter.filter((chapter) => chapter.chapter_id === item.object_id)[0].open"> V </b>
+                              <b v-else> > </b>
                               Раздел {{item['position']}}. {{item['name']}}
                           </template>
 

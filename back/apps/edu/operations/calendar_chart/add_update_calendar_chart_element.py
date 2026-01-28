@@ -48,18 +48,17 @@ class AddUpdateCalendarChartElement(MainProcessing):
     def _main_process(self):
         """Добавление/обновление элемента КУГ"""
         try:
-            el_type = 'theme'
-            if 'program_id' in self.process_data.keys():
-                el_type = 'chapter'
-            object_id = self.process_data['object_id']
-            del self.process_data['object_id']
             orm = calendar_chart_theme_orm
-            if el_type == 'chapter':
+            if 'program_id' in self.process_data.keys():
                 orm = calendar_chart_chapter_orm
-            orm.update_record(
-                filter_by={'object_id': object_id},
-                update_object=self.process_data
-            )
+            object_id = self.process_data['object_id']
+            print(f'process_data: {self.process_data}')
+            exist = orm.get_one_record_or_none(filter_by=dict(object_id=object_id))
+            if not exist:
+                orm.create_record(create_object=self.process_data)
+            else:
+                del self.process_data['object_id']
+                orm.update_record(filter_by={'object_id': object_id},update_object=self.process_data)
             self.process_completed = True
         except Exception:
             journal_service.create_journal_rec(
