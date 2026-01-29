@@ -213,11 +213,12 @@ class BaseStudentGroupDoc:
         """
         pass
 
-    def _set_student_data_into_table(self, doc, table_index: int = 0):
+    def _set_student_data_into_table(self, doc, table_index: int = 0, close_doc: bool = False):
         """
         Подстановка данных о студентах в первую таблицу полученного файла ворд
         :param doc: Word файл
         :param table_index: Номер таблицы в документе (по умолчанию первая таблица)
+        :param close_doc: признак работы с закрывным документом
         :return:
         """
         file_stream = io.BytesIO()
@@ -225,6 +226,8 @@ class BaseStudentGroupDoc:
         document = Document(file_stream)
         table = document.tables[table_index]
         applications = self._get_group_applications()
+        if close_doc:
+            applications = applications.filter(physical=True)
         for index, application in enumerate(applications):
             row_cells = table.add_row().cells
             row_cells[0].text = str(index + 1)

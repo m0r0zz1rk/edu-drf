@@ -10,13 +10,20 @@ class CloseDoc(BaseStudentGroupDoc):
     Класс для формирования закрывного документа по учебной группе (только для ОУ)
     """
 
+    def _get_physical_application_count(self) -> int:
+        """
+        Получение количества заявок от физ лиц
+        """
+        apps = self._get_group_applications()
+        return apps.filter(physical=True).count()
+
     def _get_total_price(self) -> str:
         """
         Получение общей суммы по оказанной услуге (кол-во студентов на стоимость услуги)
         :return: числовое, общая сумма
         """
         price = self.student_group.ou.program.price if self.student_group.ou else self.student_group.iku.price
-        summary = price * self._get_application_count()
+        summary = price * self._get_physical_application_count()
         return f'{summary} ({num2words(summary, lang="ru")})'
 
     def _get_context(self) -> dict:
@@ -29,7 +36,7 @@ class CloseDoc(BaseStudentGroupDoc):
             'date_start': date_start.strftime('%d.%m.%Y'),
             'date_end': date_end.strftime('%d.%m.%Y'),
             'code': self.student_group.code,
-            'students_count': self._get_application_count(),
+            'students_count': self._get_physical_application_count(),
             'sum': self._get_total_price()
         }
         if self.student_group.ou:
@@ -58,6 +65,6 @@ class CloseDoc(BaseStudentGroupDoc):
             self._get_template_path(folder_tuple),
             self._get_context()
         )
-        doc = self._set_student_data_into_table(doc, 1)
+        doc = self._set_student_data_into_table(doc, 1, True)
         doc.save(response)
         return response

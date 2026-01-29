@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 from datetime import date
+from itertools import zip_longest
 
 from xlsxtpl.writerx import BookWriter
 
@@ -407,15 +408,22 @@ class JournalDoc(BaseStudentGroupDoc):
         :param writer: объект BookWriter для записи данных в шаблон Excel
         :return:
         """
-        context = {
-            'mos': self.get_dict_with_all_object(mo_service),
-            'oo_types': self.get_dict_with_all_object(oo_type_service),
-            'position_categories': self.get_dict_with_all_object(position_category_service)
-        }
+        mos = self.get_dict_with_all_object(mo_service)
+        oo_types = self.get_dict_with_all_object(oo_type_service)
+        position_categories = self.get_dict_with_all_object(position_category_service)
         applications = self._get_group_applications()
+        context = {
+            'mos': mos,
+            'mos_length': len(applications.exclude(mo=None)),
+            'oo_types': oo_types,
+            'oo_types_length': len(applications),
+            'position_categories': position_categories,
+            'position_categories_length': len(applications),
+            'items': zip_longest(mos, oo_types, position_categories, fillvalue=None),
+        }
         for application in applications:
             mapping = {
-                'mos': application.mo.name,
+                'mos': application.mo.name if application.mo else '',
                 'oo_types': application.oo.oo_type.name,
                 'position_categories': application.position_category.name
             }

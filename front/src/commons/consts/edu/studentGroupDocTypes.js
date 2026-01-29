@@ -5,6 +5,7 @@ export const studentGroupDocTypes = {
   offer_project: 'Проект договора оферты',
   transfer_order: 'Приказ о зачислении',
   deduction_order: 'Приказ об отчислении',
+  close_doc: 'Закрывной документ',
   forms: 'Анкеты',
   student_journal: 'Журнал',
   drafts: 'Черновики'
