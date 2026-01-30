@@ -146,7 +146,7 @@
 
     </CokoDialog>
     <BooleanBadge
-        :bool="['pay', 'study', 'study_complete', 'archive'].includes(item.status)"
+        :bool="item.pay_doc_id !== null && ['pay', 'study', 'study_complete', 'archive'].includes(item.status)"
     />
     <v-icon
         v-if="item.pay_doc_id !== null"
