@@ -443,7 +443,7 @@
 
   </CokoDialog>
 
-  <CokoDialog v-if="userRole === 'centre'" ref="uploadLicense" :cardActions="true">
+  <CokoDialog ref="uploadLicense" :cardActions="true">
 
     <template v-slot:title>Подгрузка сканов удостоверений</template>
 
