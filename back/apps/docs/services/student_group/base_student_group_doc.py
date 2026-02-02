@@ -18,9 +18,11 @@ from apps.applications.selectors.event_application import event_application_orm
 from apps.commons.utils.django.settings import settings_utils
 from apps.commons.utils.ldap import ldap_utils
 from apps.docs.utils.docx_utils import generate_word_file
+from apps.edu.consts.planning_parameters import PlanningParameters
 from apps.edu.exceptions.student_group.curator_not_set import CuratorNotSet
 from apps.edu.exceptions.student_group.student_group_not_found import StudentGroupNotFound
 from apps.edu.selectors.student_group import student_group_orm
+from apps.edu.services.planning_parameter import planning_parameter_service
 
 
 class BaseStudentGroupDoc:
@@ -100,7 +102,9 @@ class BaseStudentGroupDoc:
         :param date_start: дата начала обучения
         :return: дата
         """
-        return date_start - BDay(settings_utils.get_parameter_from_settings('ORDER_DATE_DAYS'))
+        return date_start - BDay(
+            int(planning_parameter_service.get_parameter_value_by_name(PlanningParameters.ORDER_DATE_DAYS))
+        )
 
     @staticmethod
     def _get_pay_date(date_start: datetime) -> datetime:
@@ -109,7 +113,9 @@ class BaseStudentGroupDoc:
         :param date_start: дата начала обучения
         :return: дата
         """
-        return date_start - BDay(settings_utils.get_parameter_from_settings('PAY_DATE_DAYS'))
+        return date_start - BDay(
+            int(planning_parameter_service.get_parameter_value_by_name(PlanningParameters.PAY_DATE_DAYS))
+        )
 
     def _get_price(self) -> int:
         """

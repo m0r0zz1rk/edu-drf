@@ -12,6 +12,7 @@ from apps.commons.utils.data_types.string import string_utils
 from apps.commons.utils.django.settings import settings_utils
 from apps.docs.selectors.student_group_offer import student_group_offer_orm
 from apps.docs.services.student_group.excel.certificates_list import CertificatesList
+from apps.edu.consts.planning_parameters import PlanningParameters
 from apps.edu.consts.student_group.doc_type_class_mapping import STUDENT_GROUP_DOC_TYPE_MAPPING
 from apps.edu.consts.student_group.doc_type_path_mapping import STUDENT_GROUP_DOC_TYPE_PATH_MAPPING
 from apps.edu.consts.student_group.doc_types import STUDENT_GROUP_DOC_TYPES, FORMS, STUDENT_JOURNAL, SCHEDULE, \
@@ -19,6 +20,7 @@ from apps.edu.consts.student_group.doc_types import STUDENT_GROUP_DOC_TYPES, FOR
 from apps.edu.consts.student_group.statuses import STUDENT_GROUP_STATUSES
 from apps.edu.exceptions.student_group.generate_code_error import GenerateCodeError
 from apps.edu.selectors.student_group import student_group_model, student_group_orm
+from apps.edu.services.planning_parameter import planning_parameter_service
 from apps.edu.services.service.education_service import EducationServiceService, education_service_service
 from apps.edu.services.service.information_service import InformationServiceService, information_service_service
 
@@ -197,7 +199,9 @@ class StudentGroupService:
             )
             name = group.iku.name
             date_start = group.iku.date_start
-        deadline = date_start - BDay(settings_utils.get_parameter_from_settings('PAY_DATE_DAYS'))
+        deadline = date_start - BDay(
+            int(planning_parameter_service.get_parameter_value_by_name(PlanningParameters.PAY_DATE_DAYS))
+        )
         return event_type, name, date_start, deadline
 
     @staticmethod

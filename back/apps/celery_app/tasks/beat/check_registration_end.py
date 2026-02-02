@@ -1,8 +1,10 @@
 import datetime
+from pandas._libs.tslibs.offsets import BDay
 
 from apps.celery_app.decorators.journal_celery_task import journal_celery_task
-from apps.commons.utils.django.settings import settings_utils
+from apps.edu.consts.planning_parameters import PlanningParameters
 from apps.edu.consts.student_group.statuses import STATEMENT, REGISTRATION
+from apps.edu.services.planning_parameter import planning_parameter_service
 from apps.edu.services.student_group import student_group_service
 from web_app.init_celery import app
 
@@ -24,8 +26,10 @@ def check_registration_end():
         changed = []
         for group in groups:
             date_start = group.ou.date_start if group.ou else group.iku.date_start
-            delta = date_start - datetime.date.today()
-            if delta.days <= settings_utils.get_parameter_from_settings('STUDENT_GROUP_STATEMENT_DAYS'):
+            delta = date_start - BDay(
+                int(planning_parameter_service.get_parameter_value_by_name(PlanningParameters.STUDENT_GROUP_STATEMENT_DAYS))
+            )
+            if datetime.date.today() >= delta:
                 student_group_service.update_group_status(group.object_id, STATEMENT)
                 changed.append(group.code)
         return f'Обновлены статусы у следующих групп: {repr(changed)}'

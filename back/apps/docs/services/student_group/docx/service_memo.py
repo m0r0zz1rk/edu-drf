@@ -7,7 +7,9 @@ from pytrovich.maker import PetrovichDeclinationMaker
 from apps.commons.utils.data_types.string import string_utils
 from apps.commons.utils.django.settings import settings_utils
 from apps.docs.services.student_group.base_student_group_doc import BaseStudentGroupDoc
+from apps.edu.consts.planning_parameters import PlanningParameters
 from apps.edu.serializers.schedule import date_utils
+from apps.edu.services.planning_parameter import planning_parameter_service
 
 # Библиотека для работы с падежами
 lib = PetrovichDeclinationMaker()
@@ -80,7 +82,9 @@ class ServiceMemo(BaseStudentGroupDoc):
             date = self.student_group.ou.date_start
         else:
             date = self.student_group.iku.date_start
-        return date - BDay(settings_utils.get_parameter_from_settings('SERVICE_MEMO_DAYS'))
+        return date - BDay(
+            int(planning_parameter_service.get_parameter_value_by_name(PlanningParameters.SERVICE_MEMO_DAYS))
+        )
 
     def _get_curator_fio_accusative_case(self) -> str:
         """

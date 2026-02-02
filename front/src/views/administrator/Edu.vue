@@ -16,9 +16,9 @@
 
               <v-tab class="coko-tab" value="group">Учебные группы</v-tab>
               <v-tab class="coko-tab" value="dpp">ДПП</v-tab>
-              <v-tab class="coko-tab" value="planning" v-if="userRole !== 'dep'">Планирование</v-tab>
               <v-tab class="coko-tab" value="ou">Курсы (ОУ)</v-tab>
               <v-tab class="coko-tab" value="iku">Мероприятия (ИКУ)</v-tab>
+              <v-tab class="coko-tab" value="planning" v-if="userRole !== 'dep'">Планирование</v-tab>
 
 
             </v-tabs>
