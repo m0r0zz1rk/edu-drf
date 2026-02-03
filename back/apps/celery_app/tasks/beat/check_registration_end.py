@@ -1,5 +1,5 @@
-import datetime
 from pandas._libs.tslibs.offsets import BDay
+from pandas import Timestamp
 
 from apps.celery_app.decorators.journal_celery_task import journal_celery_task
 from apps.edu.consts.planning_parameters import PlanningParameters
@@ -29,7 +29,7 @@ def check_registration_end():
             delta = date_start - BDay(
                 int(planning_parameter_service.get_parameter_value_by_name(PlanningParameters.STUDENT_GROUP_STATEMENT_DAYS))
             )
-            if datetime.date.today() >= delta:
+            if Timestamp.today().date() >= delta.date():
                 student_group_service.update_group_status(group.object_id, STATEMENT)
                 changed.append(group.code)
         return f'Обновлены статусы у следующих групп: {repr(changed)}'

@@ -28,7 +28,7 @@ class FormsDoc(BaseStudentGroupDoc):
         'Организация': 'oo',
         'Категория должности': 'position_category.name',
         'Должность': 'position.name',
-        'Тип': 'type',
+        'Тип оплаты': 'type',
         'Тип ОО': 'oo.oo_type.name',
         'Оплачено': 'pay'
     }
