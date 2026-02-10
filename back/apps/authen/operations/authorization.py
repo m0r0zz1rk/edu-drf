@@ -1,3 +1,4 @@
+from copy import copy
 from typing import Union
 
 from django.contrib.auth import authenticate, login
@@ -76,22 +77,28 @@ class Authorization(MainProcessing):
         )
 
     def _main_process(self):
-        username = self.process_data['login']
+        username = self.process_data.get('login')
         centre_auth = self.process_data.get('centre_auth')
         if not centre_auth:
+            user_login = self.process_data.get('login')
             username = profile_service.get_profile_or_info_by_attribute(
                 'phone',
-                self.process_data['login'],
+                user_login,
                 'username'
             )
             if username is None:
                 username = profile_service.get_profile_or_info_by_attribute(
                     'snils',
-                    self.process_data['login'],
+                    user_login,
                     'username'
                 )
                 if username is None:
-                    username = user_utils.get_username_by_email(self.process_data['login'])
+                    if '@coko38.ru' in user_login:
+                        self.auth_error = 'Для авторизации используйте форму входа на вкладке "Сотрудник центра"'
+                        self._auth_error(False)
+                        self.process_completed = False
+                        return None
+                    username = user_utils.get_username_by_email(user_login)
                     if username is None:
                         self.auth_error = 'Пользователь не найден'
                         self._auth_error(False)

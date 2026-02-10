@@ -43,7 +43,7 @@
       Образовательная организация:<br/>
       <v-btn
         color="coko-blue"
-        v-if="(!disabled) && (internalApp.region_name === 'Иркутская область') && (internalApp.mo_id !== null)"
+        v-if="(!disabled)"
         text="Справочник"
         @click="$refs.ooSelectDialog.dialog = true"
         :readonly="disabled"
@@ -52,15 +52,7 @@
       <v-textarea
         color="coko-blue"
         v-model="oo"
-        :label="
-            internalApp.region_name === 'Иркутская область' ?
-              internalApp.mo_id === null ?
-                'Введите название ОО (для выбора из справочника выберите МО)*'
-                :
-                'Введите название ОО или выберите из справочника*'
-              :
-              'Введите название ОО*'
-        "
+        :label="'Введите название ОО или выберите из справочника*'"
         :readonly="disabled"
         :loading="loading"
       />
@@ -294,7 +286,7 @@
           :noTab="false"
           :addButton="false"
           :xlsxButton="false"
-          :getRecsURL="'/backend/api/v1/users/oos/'+internalApp.mo_id+'/'"
+          :getRecsURL="`/backend/api/v1/users/oos/${internalApp.mo_id !== null ? internalApp.mo_id : '36dd878b-53aa-4bd7-b35e-c54e58713cff'}/`"
           :tableHeaders="ooTableHeaders"
           :fieldsArray="ooFieldsArray"
           :itemSelectEvent="selectOo"

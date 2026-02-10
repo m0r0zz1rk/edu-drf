@@ -30,7 +30,7 @@
 
         <DialogContentWithError ref="content-error">
 
-          <b>
+          <b style="font-size: 24px; color: red">
             ВНИМАНИЕ! Все существующие занятия учебных дней, которые будут задействованы
             в процессе генерации, будут удалены
           </b>
@@ -39,6 +39,7 @@
 
           <v-data-table
               sticky
+              item-key="day"
               v-if="template !== null"
               class="adaptive-schedule-table"
               style="overflow: auto;"
@@ -49,26 +50,20 @@
               loading-text="Подождите, идет загрузка данных..."
               hide-default-footer
               :disable-pagination="true"
+              :items-per-page="-1"
           >
 
             <template v-slot:headers="{ columns, isSorted, getSortIcon, toggleSort }">
               <tr v-if="!(mobileDisplay)" style="position: sticky; top: 0; z-index: 5">
                 <template v-for="column in columns">
-                  <td
-                      style="
+                  <td style="
                           text-align: center;
                           background-color: #373c59;
                           color: white;
-                        "
-                  >
-                    <b>
-                      {{column.title}}
-                    </b>
-
+                        ">
+                    <b>{{column.title}}</b>
                   </td>
-
                 </template>
-
               </tr>
 
               <tr v-if="mobileDisplay" style="position: sticky; top: 0; z-index: 5">
@@ -79,77 +74,48 @@
 
             <template v-slot:item="{ item, index }">
 
-              <tr
-                  v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay}"
-              >
+              <tr :key="item.day" v-bind:class="{'v-data-table__tr v-data-table__tr--mobile': mobileDisplay}">
 
-                <template v-for="header in headers">
+                <template v-for="header in headers" :key="item.day" >
 
-                  <td
-                      style="text-align: center;"
-                  >
+                  <td style="text-align: center;">
 
-                    <div v-if="mobileDisplay" class="v-data-table__td-title">
-
-                      {{header.title}}
-
-                    </div>
+                    <div v-if="mobileDisplay" class="v-data-table__td-title">{{header.title}}</div>
 
                     <template v-if="header.key === 'day'">
-
                       {{item[header.key]}}<br/>({{getDayOfWeek(item[header.key])}})
-
                     </template>
 
                     <template v-if="header.key === 'study_day'">
-
-                      <v-checkbox
-                        class="d-inline-flex"
-                        v-model="item[header.key]"
-                      />
-
+                      <v-checkbox class="d-inline-flex" v-model="item[header.key]"/>
                     </template>
 
                     <template v-if="header.key === 'time_start'">
-
-                      <v-text-field
-                        v-model="item[header.key]"
-                        :active="timePickerDialogs.filter((rec) => rec.day === item['day'])[0].open"
-                        :focused="timePickerDialogs.filter((rec) => rec.day === item['day'])[0].open"
-                        append-inner-icon="mdi-clock-time-four-outline"
-                        :disabled="!(item['study_day'])"
-                        readonly
-                      >
-
-                        <v-dialog
-                          v-model="timePickerDialogs.filter((rec) => rec.day === item['day'])[0].open"
-                          activator="parent"
-                          width="auto"
-                        >
-
-                          <v-time-picker
-                            v-if="timePickerDialogs.filter((rec) => rec.day === item['day'])[0].open"
-                            format="24hr"
-                            title="Выберите время начала занятия"
+                      <v-menu :close-on-content-click="false">
+                        <template #activator="{ props }">
+                          <v-text-field
+                              v-bind="props"
+                              v-model="item[header.key]"
+                              label="Время начала"
+                              placeholder="HH:mm"
+                              v-mask="'##:##'"
+                              clearable
+                          />
+                        </template>
+                        <v-time-picker
                             v-model="item[header.key]"
-                          ></v-time-picker>
-
-
-                        </v-dialog>
-
-                      </v-text-field>
-
+                            format="24hr"
+                        />
+                      </v-menu>
                     </template>
 
                     <template v-if="header.key === 'hours_count'">
-
                       <v-number-input
                         :min="1"
                         :max="8"
                         :disabled="!(item['study_day'])"
                         v-model="item[header.key]"
                       />
-
                     </template>
 
                   </td>
@@ -210,6 +176,7 @@ export default {
   },
   data() {
     return {
+      menu: false,
       dialog: false, // Параметр отображения диалогового окна
       loading: false, // Параметр выполнения процесса и отключения возможности редактирования формы
       mobileDisplay: useDisplay().smAndDown, // Проверка на дисплей мобильного устройства
@@ -238,10 +205,11 @@ export default {
   },
   methods: {
     getDayOfWeek,
-    // Формирование базового шалона расписания для формы
+    // Формирование базового шаблона расписания для формы
     createScheduleTemplate() {
       let temp = []
       let tsd = []
+      console.log('days: ', this.days)
       this.days.map((day) => {
         temp.push({
           'day': day,
@@ -254,33 +222,36 @@ export default {
           'open': false
         })
       })
+      console.log('template: ',temp)
       this.template = temp
       this.timePickerDialogs = tsd
     },
     // Процесс генерации шаблона расписания учебной группы
     async generateSchedule() {
-      this.loading = true
-      let scheduleGenerateRequest = await apiRequest(
-          '/backend/api/v1/edu/schedule/generate/',
-          'POST',
-          true,
-          {
-            'group_id': this.groupId,
-            'generate': this.template
-          }
-      )
-      if (scheduleGenerateRequest.error) {
-        showAlert('error', 'Генерация расписания', scheduleGenerateRequest.error)
-      } else {
-        this.dialog = false
-        showAlert(
-            'success',
-            'Генерация расписания',
-            scheduleGenerateRequest.success
+      if (confirm('Вы уверены, что хотите выполнить генерацию?')) {
+        this.loading = true
+        let scheduleGenerateRequest = await apiRequest(
+            '/backend/api/v1/edu/schedule/generate/',
+            'POST',
+            true,
+            {
+              'group_id': this.groupId,
+              'generate': this.template
+            }
         )
-        this.getSchedule()
+        if (scheduleGenerateRequest.error) {
+          showAlert('error', 'Генерация расписания', scheduleGenerateRequest.error)
+        } else {
+          this.dialog = false
+          showAlert(
+              'success',
+              'Генерация расписания',
+              scheduleGenerateRequest.success
+          )
+          this.getSchedule()
+        }
+        this.loading = false
       }
-      this.loading = false
     }
   },
   mounted() {

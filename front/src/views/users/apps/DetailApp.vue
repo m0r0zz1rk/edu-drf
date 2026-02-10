@@ -38,7 +38,7 @@
                 text="Обучение"
               />
               <v-tab
-                v-if="!(app.check_survey) && serviceLastDay"
+                v-if="!(['study_complete', 'archive'].includes(app.status)) && !(app.check_survey) && serviceLastDay"
                 class="coko-tab"
                 value="survey"
                 text="Опрос"
