@@ -82,47 +82,23 @@
                       <div v-if="mobileDisplay" class="v-data-table__td-title">{{header.title}}</div>
                       <template v-if="['time_start_str', 'time_end_str'].includes(header.key)">
 
-                        <v-text-field
-                            v-model="item[header.key]"
-                            :active="lessonsDialogs.filter((rec) => rec.lessonId === index)[0][header.key]"
-                            :focused="lessonsDialogs.filter((rec) => rec.lessonId === index)[0][header.key]"
-                            append-inner-icon="mdi-clock-time-four-outline"
-                            readonly
-                        >
-
-                          <v-dialog
-                              v-model="lessonsDialogs.filter((rec) => rec.lessonId === index)[0][header.key]"
-                              activator="parent"
-                              width="auto"
-                          >
-
-                            <v-time-picker
-                                v-if="lessonsDialogs.filter((rec) => rec.lessonId === index)[0][header.key]"
-                                format="24hr"
-                                :title="header.key === 'time_start_str' ?
-                                  'Выберите время начала занятия'
-                                  :
-                                  'Выберите время окончания занятия'
-                                "
+                        <v-menu :close-on-content-click="false">
+                          <template #activator="{ props }">
+                            <v-text-field
+                                v-bind="props"
                                 v-model="item[header.key]"
-                                @update:modelValue="e => {
-                                    item['time_end_str'] = convertSecondsToTimeStr(
-                                        convertTimeStrToSeconds(item['time_start_str'])+2700
-                                    )
-                                    if (item['teacher'] !== null) {
-                                      checkTeacherBusy(
-                                          item['teacher'],
-                                          item['time_start_str'],
-                                          index
-                                      )
-                                    }
-                                }"
-                            ></v-time-picker>
-
-
-                          </v-dialog>
-
-                        </v-text-field>
+                                label="Время начала"
+                                placeholder="HH:mm"
+                                v-mask="'##:##'"
+                                clearable
+                            />
+                          </template>
+                          <v-time-picker
+                              title="Укажите время"
+                              v-model="item[header.key]"
+                              format="24hr"
+                          />
+                        </v-menu>
 
                       </template>
 
@@ -131,12 +107,13 @@
                           <div :title="item[header.key]">
                             <v-text-field
                                 v-model="item[header.key]"
-                                :active="lessonsDialogs.filter((rec) => rec.lessonId === index)[0]['theme']"
-                                :focused="lessonsDialogs.filter((rec) => rec.lessonId === index)[0]['theme']"
+                                :active="checkTheme(index)"
+                                :focused="checkTheme(index)"
                                 readonly
                             >
                               <v-dialog
-                                  v-model="lessonsDialogs.filter((rec) => rec.lessonId === index)[0]['theme']"
+                                  v-if="this.lessonsDialogs.filter((rec) => rec.lessonId === index).length > 0"
+                                  v-model="this.lessonsDialogs.filter((rec) => rec.lessonId === index)[0]['theme']"
                                   activator="parent"
                                   width="auto"
                               >
@@ -322,6 +299,13 @@
 
         <v-btn
             color="coko-blue"
+            text="Удалить все"
+            :loading="loading"
+            @click="deleteAll()"
+        ></v-btn>
+
+        <v-btn
+            color="coko-blue"
             text="Сохранить"
             :loading="loading"
             @click="saveDayInfo()"
@@ -406,6 +390,7 @@ export default {
     return {
       loading: false, // Параметр отображения анимации загрузки на элементах формы
       dialog: false, // Параметр отображения диалогового окна
+      kugDialog: false,
       editDialog: false, // Параметр отображения диалогового окна для изменения учебного занятия
       mobileDisplay: useDisplay().smAndDown, // Проверка на дисплей мобильного устройства
       headers: [
@@ -653,6 +638,20 @@ export default {
         this.getSchedule()
       }
       this.loading = false
+    },
+    // Проверка параметра theme для строки таблицы
+    checkTheme(index) {
+      if (this.lessonsDialogs.filter((rec) => rec.lessonId === index) > 0) {
+        return this.lessonsDialogs.filter((rec) => rec.lessonId === index)[0]['theme']
+      }
+      return false
+    },
+    // Удалить все занятия
+    deleteAll() {
+      if (confirm('Вы уверены, что хотите удалить все занятия?')) {
+        this.dayInfo.lessons = []
+        this.lessonsDialogs = []
+      }
     }
   },
   mounted() { this.createTimePickerDialogs() }

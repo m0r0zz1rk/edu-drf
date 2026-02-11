@@ -19,7 +19,7 @@
         v-if="internalApp.region_name === 'Иркутская область'"
         color="coko-blue"
         v-model="internalApp.mo_id"
-        :items="mos"
+        :items="mos.filter(mo => !(mo.name.includes('Другой')))"
         item-title="name"
         item-value="object_id"
         label="МО*"
@@ -286,7 +286,7 @@
           :noTab="false"
           :addButton="false"
           :xlsxButton="false"
-          :getRecsURL="`/backend/api/v1/users/oos/${internalApp.mo_id !== null ? internalApp.mo_id : '36dd878b-53aa-4bd7-b35e-c54e58713cff'}/`"
+          :getRecsURL="`/backend/api/v1/users/oos/${internalApp.mo_id !== null ? internalApp.mo_id : getAnotherRegionObjectID()}/`"
           :tableHeaders="ooTableHeaders"
           :fieldsArray="ooFieldsArray"
           :itemSelectEvent="selectOo"
@@ -560,6 +560,10 @@ export default {
       this.internalApp.surname_doc_id = doc.object_id
       this.$refs.surnameDocSelectDialog.dialog = false
     },
+    // Получить object_id МО "(Другой регион)"
+    getAnotherRegionObjectID() {
+      return this.mos.filter(mo => mo.name.includes('Другой'))[0].object_id
+    }
   },
   watch: {
     'internalApp.region_id': function (newValue, oldValue) {

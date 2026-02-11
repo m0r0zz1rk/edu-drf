@@ -103,6 +103,7 @@
                           />
                         </template>
                         <v-time-picker
+                            title="Укажите время"
                             v-model="item[header.key]"
                             format="24hr"
                         />
