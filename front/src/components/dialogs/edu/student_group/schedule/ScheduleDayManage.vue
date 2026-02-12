@@ -87,16 +87,40 @@
                             <v-text-field
                                 v-bind="props"
                                 v-model="item[header.key]"
-                                label="Время начала"
+                                :label="header.key === 'time_start_str' ? 'Время начала' : 'Время окончания'"
                                 placeholder="HH:mm"
                                 v-mask="'##:##'"
                                 clearable
+                                @update:modelValue="e => {
+                                  item['time_end_str'] = convertSecondsToTimeStr(
+                                      convertTimeStrToSeconds(item['time_start_str'])+2700
+                                  )
+                                  if (item['teacher'] !== null) {
+                                    checkTeacherBusy(
+                                        item['teacher'],
+                                        item['time_start_str'],
+                                        index
+                                    )
+                                  }
+                              }"
                             />
                           </template>
                           <v-time-picker
                               title="Укажите время"
                               v-model="item[header.key]"
                               format="24hr"
+                              @update:modelValue="e => {
+                                  item['time_end_str'] = convertSecondsToTimeStr(
+                                      convertTimeStrToSeconds(item['time_start_str'])+2700
+                                  )
+                                  if (item['teacher'] !== null) {
+                                    checkTeacherBusy(
+                                        item['teacher'],
+                                        item['time_start_str'],
+                                        index
+                                    )
+                                  }
+                              }"
                           />
                         </v-menu>
 
