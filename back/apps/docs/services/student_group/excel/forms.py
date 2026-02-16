@@ -30,7 +30,8 @@ class FormsDoc(BaseStudentGroupDoc):
         'Должность': 'position.name',
         'Тип оплаты': 'type',
         'Тип ОО': 'oo.oo_type.name',
-        'Оплачено': 'pay'
+        'Оплачено': 'pay',
+        'Опрос пройден': 'check_survey'
     }
 
     _course_forms_columns = {
@@ -106,6 +107,8 @@ class FormsDoc(BaseStudentGroupDoc):
                     value = 'Физическое лицо' if app.physical else 'Юридическое лицо'
                 elif col == 'certificate_mail':
                     value = 'Да' if app.certificate_mail else 'Нет'
+                elif col == 'check_survey':
+                    value = 'Да' if app.check_survey else 'Нет'
                 elif col == 'pay':
                     value = 'Да' if app.status in [PAY, STUDY, STUDY_COMPLETE, ARCHIVE] else 'Нет'
                 else:
