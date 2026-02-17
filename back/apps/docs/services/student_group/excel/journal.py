@@ -369,7 +369,7 @@ class JournalDoc(BaseStudentGroupDoc):
             theme = lesson.theme
             if lesson.kug_theme_id:
                 kug_el = self._schedule_service.get_kug_element_by_theme_id(lesson.kug_theme_id)
-                theme = kug_el.name[2:]
+                theme = kug_el.name[2:] if kug_el.name.startswith('.') else kug_el.name
             context = {
                 'cats': self._get_categories(),
                 'day_lesson': lesson.date.strftime('%d'),
@@ -382,7 +382,7 @@ class JournalDoc(BaseStudentGroupDoc):
                 'students': self._get_students_list()
             }
             if index != len(control_lessons):
-                writer.render_sheet(context, f'Зачетная ведомость ПА {2 - index}', 3)
+                writer.render_sheet(context, f'Зачетная ведомость ПА {index}', 3)
             else:
                 writer.render_sheet(context, f'Зачетная ведомость ИА', 4)
 
@@ -447,4 +447,8 @@ class JournalDoc(BaseStudentGroupDoc):
             self._fill_test_lists(writer)
         else:
             self._fill_statistics_list(writer)
+        for ws in writer.workbook.worksheets:
+            if ws.print_area:
+                area = ws.print_area
+                ws.print_area = area
         return writer

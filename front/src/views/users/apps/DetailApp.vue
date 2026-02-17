@@ -273,7 +273,7 @@ export default {
           showAlert('error', 'Проверка заявки', 'Выберите должность')
           return false
         }
-        if (this.app.education_level === '') {
+        if (!this.app.education_level || this.app.education_level === '') {
           showAlert('error', 'Проверка заявки', 'Выберите уровень образования')
           return false
         }
