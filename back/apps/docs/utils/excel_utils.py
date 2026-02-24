@@ -62,10 +62,13 @@ def set_model_fields_name_to_sheet(sheet, fields: list):
     """
     for index, field in enumerate(fields, start=1):
         cell = sheet.cell(row=1, column=index)
-        try:
-            value = field.verbose_name
-        except AttributeError:
-            value = field.name
+        if field == 'django_user_email':
+            value = 'Email пользователя'
+        else:
+            try:
+                value = field.verbose_name
+            except AttributeError:
+                value = field.name
         set_cell_value(cell, value, True, True, True)
 
 

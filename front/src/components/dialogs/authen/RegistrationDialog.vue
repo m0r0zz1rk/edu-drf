@@ -512,9 +512,9 @@ export default {
     },
     fio: {
       handler() {
-        this.fio.surname = this.fio.surname.replace(/[^А-Яа-я]/ig, '')
-        this.fio.name = this.fio.name.replace(/[^А-Яа-я]/ig, '')
-        this.fio.patronymic = this.fio.patronymic.replace(/[^А-Яа-я]/ig, '')
+        this.fio.surname = this.fio.surname.replace(/[^А-Яа-яЁё]/ig, '')
+        this.fio.name = this.fio.name.replace(/[^А-Яа-яЁё]/ig, '')
+        this.fio.patronymic = this.fio.patronymic.replace(/[^А-Яа-яЁё]/ig, '')
       },
       deep: true
     },

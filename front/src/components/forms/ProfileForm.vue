@@ -642,9 +642,9 @@ export default {
   watch: {
     profileData: {
       handler() {
-        this.profileData.surname = this.profileData.surname.replace(/[^А-Яа-я]/ig, '')
-        this.profileData.name = this.profileData.name.replace(/[^А-Яа-я]/ig, '')
-        this.profileData.patronymic = this.profileData.patronymic.replace(/[^А-Яа-я]/ig, '')
+        this.profileData.surname = this.profileData.surname.replace(/[^А-Яа-яЁё]/ig, '')
+        this.profileData.name = this.profileData.name.replace(/[^А-Яа-яЁё]/ig, '')
+        this.profileData.patronymic = this.profileData.patronymic.replace(/[^А-Яа-яЁё]/ig, '')
         if (['+7 (8', '+7 (7'].includes(this.profileData['phone'])) {this.profileData['phone'] = '+7 ('}
         this.profileData['birthday'] = convertBackendDate(this.profileData['birthday'])
       },

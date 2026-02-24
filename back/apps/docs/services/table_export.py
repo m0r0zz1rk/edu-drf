@@ -44,6 +44,8 @@ class TableExport:
             if field.name not in self._exclude_fields\
                     and not isinstance(field, (ManyToOneRel, ManyToManyRel, OneToOneRel)):
                 self._fields.append(field)
+        if self.model.__name__ == 'StudentProfile':
+            self._fields.append('django_user_email')
 
     def _create_records_generator(self):
         """
@@ -77,7 +79,7 @@ class TableExport:
                 cell = sheet.cell(row=row, column=col)
                 set_cell_value(
                     cell,
-                    self._get_value_by_field(record, field),
+                    self._get_value_by_field(record, field) if field != 'django_user_email' else record.django_user.email,
                     True,
                     False,
                     True
