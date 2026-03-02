@@ -326,6 +326,15 @@
         :loading="formLoading"
         @click="saveProfile()"
       ></v-btn>
+
+      <v-btn
+          variant="flat"
+          v-if="userInfoTab === 'profile'"
+          color="coko-blue"
+          text="Удалить"
+          :loading="formLoading"
+          @click="deleteProfile()"
+      ></v-btn>
     </v-card-actions>
 
   </v-card>
@@ -634,6 +643,23 @@ export default {
         }
         if (dataSaveRequest.error) {
           this.$refs["content-error"].showContentError(dataSaveRequest.error)
+          this.formLoading = false
+        }
+      }
+    },
+    async deleteProfile() {
+      if (confirm('Вы уверены, что хотите удалить профиль пользователя?')) {
+        this.formLoading = true
+        const deleteRequest = await apiRequest(
+            `/backend/api/v1/guides/student_profile/${this.profileUuid}`,
+            'DELETE'
+        )
+        if (deleteRequest.success) {
+          showAlert('success', 'Удаление профиля', 'Профиль удален')
+          this.formLoading = false
+          this.closeDialogEvent()
+        } else {
+          showAlert('error', 'Удаление профиля', 'Ошибка при удалении профиля')
           this.formLoading = false
         }
       }

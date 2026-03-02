@@ -248,3 +248,16 @@ class StudentProfileViewSet(GuideViewSet):
     )
     def export(self, request, *args, **kwargs):
         return super().export(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=[f'Cправочники. {swagger_object_name}', ],
+        operation_description="Удаление записи",
+        responses=SWAGGER_TEXT['delete']
+    )
+    @view_set_journal_decorator(
+        GUIDES,
+        f'Удаление "{swagger_object_name}" успешно выполнено',
+        f'Ошибка при выполнении удаления "{swagger_object_name}"'
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)

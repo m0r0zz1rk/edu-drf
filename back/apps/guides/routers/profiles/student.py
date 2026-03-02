@@ -1,9 +1,9 @@
 from django.urls import path
 
-from apps.commons.drf.routers.LRUE_router import ListRetrieveUpdateExportRouter
+from apps.commons.drf.routers.LRUDE_router import ListRetrieveUpdateDeleteExportRouter
 from apps.guides.api.profiles.student import StudentProfileViewSet
 
-student_profile_router = ListRetrieveUpdateExportRouter(trailing_slash=True)
+student_profile_router = ListRetrieveUpdateDeleteExportRouter(trailing_slash=True)
 student_profile_router.register('student_profile', StudentProfileViewSet)
 
 student_profile_urlpatterns = [
