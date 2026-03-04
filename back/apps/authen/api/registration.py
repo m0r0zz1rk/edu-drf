@@ -183,7 +183,9 @@ class RegistrationViewSet(viewsets.ViewSet):
             'birthday',
             'sex',
             'health',
-            'password'
+            'password',
+            'email_mailing',
+            'phone_mailing'
         ]
         if not self.ru.validate_params_to_list(request, params):
             self.ju.create_journal_rec(

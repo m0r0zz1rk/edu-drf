@@ -90,7 +90,8 @@ class ProfileViewSet(ViewSet):
         responses={
             '400': 'Сообщение "Повторите попытку позже"',
             '403': 'Пользователь не авторизован',
-            '200': StudentMainPageSerializer}
+            '200': StudentMainPageSerializer
+        }
     )
     def get_main_page_student(self, request, *args, **kwargs):
         output_data = profile_service.get_profile_main_page_info(request.user.id)

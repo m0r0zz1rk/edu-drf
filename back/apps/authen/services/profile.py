@@ -25,7 +25,9 @@ class ProfileService:
         'state',
         'birthday',
         'sex',
-        'health'
+        'health',
+        'email_mailing',
+        'phone_mailing'
     ]
 
     set_coko_profile_fields = [

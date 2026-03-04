@@ -22,6 +22,7 @@
         ></slot>
 
         <v-btn
+            v-if="!hideCloseButton"
             icon="mdi-close"
             color="coko-blue"
             @click="dialog = !(dialog)"
@@ -76,6 +77,8 @@ export default {
   props: {
     // Параметр отображения блока для управляющих кнопок
     cardActions: Boolean,
+    // Параметр сокрытия кнопки закрытия окна
+    hideCloseButton: Boolean
   },
   data() {
     return {

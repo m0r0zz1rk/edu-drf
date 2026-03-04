@@ -29,7 +29,9 @@ class BaseProfileSerializer(serializers.ModelSerializer):
             'state',
             'birthday',
             'sex',
-            'health'
+            'health',
+            'email_mailing',
+            'phone_mailing'
         ]
 
 

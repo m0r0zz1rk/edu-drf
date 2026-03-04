@@ -27,7 +27,9 @@ class Registration(MainProcessing):
         'birthday',
         'sex',
         'health',
-        'password'
+        'password',
+        'email_mailing',
+        'phone_mailing'
     ]
     pu = ProfileService()
     gu = GroupUtils()

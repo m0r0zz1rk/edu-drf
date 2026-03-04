@@ -27,7 +27,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
             'birthday',
             'sex',
             'health',
-            'password'
+            'password',
+            'email_mailing',
+            'phone_mailing'
         ]
 
 

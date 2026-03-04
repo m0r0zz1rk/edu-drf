@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from apps.authen.models.base_profile import BaseProfile
@@ -48,6 +48,16 @@ class StudentProfile(BaseProfile):
         default=False,
         verbose_name='У пользователя имеются ограничения по здоровью'
     )
+    email_mailing = models.BooleanField(
+        null=True,
+        default=None,
+        verbose_name='Согласие на рассылку по почте'
+    )
+    phone_mailing = models.BooleanField(
+        null=True,
+        default=None,
+        verbose_name='Согласие на рассылку по телефону'
+    )
 
     def __str__(self):
         return self.display_name
@@ -65,6 +75,13 @@ def create_user_profile(instance, created, **kwargs):
             new_profile = StudentProfile(django_user_id=instance.id)
             new_profile.save()
 
+
+@receiver(post_delete, sender=StudentProfile)
+def delete_django_user(sender, instance, **kwargs):
+    """Удаление пользователя Django после удаления профиля"""
+    user = instance.django_user
+    if user:
+        user.delete()
 
 @receiver(post_save, sender=User)
 def check_groups_and_set_first_user_admin(instance, created, **kwargs):

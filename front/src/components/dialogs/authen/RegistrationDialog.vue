@@ -236,17 +236,20 @@
             <template v-slot:title>Согласие на обработку ПДН</template>
             <template v-slot:text>
               <p>
-                Нажимая кнопку «Регистрация» я даю свое согласие Государственному автономному учреждению
-                Иркутской области «Центр оценки профессионального мастерства, квалификаций педагогов и мониторинга
-                качества образования» (далее - ГАУ ИО «ЦОПМКиМКО»), адрес местонахождения: 664023, Иркутская область,
-                город Иркутск, улица Лыткина, строение 75/1 , на обработку моих персональных данных в автоматизированной
-                информационной системе "Учебный центр" (далее - АИС) в целях регистрации и использования АИС
-                в образовательных целях.<br/>
+                Нажимая на кнопку «Регистрация» я даю свое согласие Государственному
+                автономному учреждению Иркутской области «Центр оценки профессионального
+                мастерства, квалификаций педагогов и мониторинга качества образования»
+                (далее - ГАУ ИО ЦОПМКиМКО), адрес местонахождения: 664023, Иркутская область,
+                город Иркутск, улица Лыткина, строение 75/1 , на обработку моих персональных
+                данных в автоматизированной информационной системе «Учебный центр» (далее - АИС)
+                в целях предоставления образовательных и информационно-консультационных услуг (курсы и семинары).<br/>
                 Перечень обрабатываемых персональных данных, передаваемых в АИС:<br/>
                 - Фамилия, имя, отчество;<br/>
                 - Телефон;<br/>
                 - Адрес электронной почты;<br/>
-                - СНИЛС.<br/>
+                - СНИЛС;<br/>
+                - Дата рождения;<br/>
+                - Пол.<br/>
                 Настоящее согласие, выданное мной ГАУ ИО "ЦОПМКиМКО", действует до момента удаления моей учетной записи
                 в АИС, либо до момента прекращения ГАУ ИО "ЦОПМКиМКО" эксплуатации АИС, если иное не предусмотрено
                 законодательством Российской Федерации.<br/>
@@ -264,6 +267,15 @@
               </v-checkbox>
             </template>
           </CokoDialog>
+          <br/>
+          <MailingDialog
+              ref="mailingDialog"
+              :showMainButton="true"
+              :emailMailing="emailMailing"
+              :phoneMailing="phoneMailing"
+              :setMailingByEmail="(val) => emailMailing = val"
+              :setMailingByPhone="(val) => phoneMailing = val"
+          />
         </slot>
       </DialogContentWithError>
 
@@ -289,10 +301,11 @@ import DialogContentWithError from "@/components/dialogs/DialogContentWithError.
 import {useDisplay} from "vuetify";
 import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import {convertBackendDate, convertDateToBackend} from "@/commons/date";
+import MailingDialog from "@/components/dialogs/authen/MailingDialog.vue";
 
 export default {
   name: 'RegistrationDialog',
-  components: {CokoDialog, DialogContentWithError},
+  components: {MailingDialog, CokoDialog, DialogContentWithError},
   props: {
     usePreLoader: Function
   },
@@ -343,7 +356,11 @@ export default {
       sex: ['Мужской', 'Женский'],
       health: ['Нет', 'Да'],
       regHealth: 'Нет',
-      agreementCheckbox: false
+      agreementCheckbox: false,
+      // Рассылка по email
+      emailMailing: null,
+      // Рассылка по номеру телефона
+      phoneMailing: null
     }
   },
   methods: {
@@ -425,6 +442,10 @@ export default {
         this.$refs["content-error"].showContentError('Дайте согласие на обработку ПДн')
         return null
       }
+      if (this.emailMailing === null || this.phoneMailing === null) {
+        this.$refs["mailingDialog"].openMailingDialog()
+        return null
+      }
       return {
         'surname': surname,
         'name': name,
@@ -436,7 +457,9 @@ export default {
         'birthday': convertDateToBackend(this.birthday),
         'sex': sex === 'Мужской',
         'health': this.regHealth === 'Да',
-        'password': password
+        'password': password,
+        'email_mailing': this.emailMailing,
+        'phone_mailing': this.phoneMailing
       }
     },
     async registration() {
