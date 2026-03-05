@@ -69,3 +69,11 @@ class ProfileChangePasswordSerializer(serializers.Serializer):
         allow_null=False,
         label='Пароль'
     )
+
+
+class MailingSerializer(serializers.ModelSerializer):
+    """Сериализация данных для сохранения информации по рассылкам"""
+
+    class Meta:
+        model = student_profile_model
+        fields = ['email_mailing', 'phone_mailing']

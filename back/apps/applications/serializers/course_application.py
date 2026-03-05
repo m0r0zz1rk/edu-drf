@@ -41,7 +41,8 @@ class CourseApplicationDetailSerializer(FullBaseApplicationSerializer):
     )
     education_date = serializers.DateField(
         format='%d.%m.%Y',
-        label='Дата выдачи диплома'
+        label='Дата выдачи диплома',
+        allow_null=True
     )
     certificate_doc_name = serializers.SerializerMethodField(
         label='Наименование скана удостоверения'

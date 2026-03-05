@@ -7,10 +7,12 @@ from rest_framework.viewsets import ViewSet
 from apps.authen.operations.update_profile import UpdateProfile
 from apps.authen.serializers.main_pages.student_main_page import StudentMainPageSerializer
 from apps.authen.serializers.profile import (ProfileInputSerializer,
-                                             ProfileOutputSerializer, ProfileChangePasswordSerializer)
+                                             ProfileOutputSerializer, ProfileChangePasswordSerializer,
+                                             MailingSerializer)
 from apps.authen.serializers.registration import RegistrationUniquePhoneSerializer, \
     RegistrationUniqueEmailSerializer, RegistrationUniqueSnilsSerializer
 from apps.authen.services.profile import profile_service
+from apps.commons.decorators.viewset.view_set_journal_decorator import view_set_journal_decorator
 from apps.commons.utils.django.exception import ExceptionHandling
 from apps.commons.utils.django.response import ResponseUtils, response_utils
 from apps.commons.utils.django.user import user_utils
@@ -353,3 +355,27 @@ class ProfileViewSet(ViewSet):
                 repr(request.data)
             )
         return response_utils.ok_response('Пароль успешно изменен')
+
+    @swagger_auto_schema(
+        tags=['Приложение авторизации/аутентификации. Профиль', ],
+        operation_description="Согласие на рассылку",
+        request_body=MailingSerializer,
+        responses={
+            '400': 'Ошибка при попытке сохранения по рассылкам',
+            '403': 'Пользователь не авторизован',
+            '200': 'Информация успешно сохранена'
+        }
+    )
+    @view_set_journal_decorator(
+        AUTHEN,
+        'Список "Приложение авторизации/аутентификации" получен',
+        'Ошибка при получении списка "Приложение авторизации/аутентификации"'
+    )
+    def mailing(self, request, *args, **kwargs):
+        """Сохранение информации по рассылкам"""
+        serialize = MailingSerializer(data=request.data)
+        if serialize.is_valid():
+            profile_service.update_mailing(request.user.id, serialize.validated_data)
+            return response_utils.ok_response('Информация успешно сохранена')
+        else:
+            return response_utils.bad_request_response(f'Ошибка сериализации данных: {serialize.errors}')
