@@ -46,6 +46,9 @@ class StudentMainPageSerializer(serializers.ModelSerializer):
         allow_empty=True,
         label='Активные заявки'
     )
+    need_mailing = serializers.BooleanField(
+        label='Необходимо указать рассылку'
+    )
 
     class Meta:
         model = student_profile_model
@@ -54,5 +57,6 @@ class StudentMainPageSerializer(serializers.ModelSerializer):
             'email',
             'phone',
             'snils',
+            'need_mailing',
             'active_apps'
         ]

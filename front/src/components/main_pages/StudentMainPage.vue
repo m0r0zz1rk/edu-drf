@@ -86,6 +86,17 @@
       </v-card>
     </v-col>
   </v-row>
+
+  <MailingDialog
+    ref="mailingDialog"
+    :phoneMailing="phoneMailing"
+    :emailMailing="emailMailing"
+    :showMainButton="false"
+    :setMailingByEmail="(val) => {console.log(val); emailMailing = val}"
+    :setMailingByPhone="(val) => {console.log(val); phoneMailing = val}"
+    :onMailingClose="mailingSave"
+  />
+
 </template>
 
 <script>
@@ -93,14 +104,19 @@ import {apiRequest} from "@/commons/apiRequest";
 import {showAlert} from "@/commons/alerts";
 import AppStatusBadge from "@/components/badges/students/AppStatusBadge.vue";
 import AppTypeBadge from "@/components/badges/students/AppTypeBadge.vue";
+import MailingDialog from "@/components/dialogs/authen/MailingDialog.vue";
 
 export default {
   name: "StudentMainPage",
-  components: {AppTypeBadge, AppStatusBadge},
+  components: {MailingDialog, AppTypeBadge, AppStatusBadge},
   data() {
     return {
       lastActiveApps: [],
-      profileInfo: {}
+      profileInfo: {},
+      // Рассылка по Email
+      emailMailing: true,
+      // Рассылка по телефону
+      phoneMailing: true,
     }
   },
   methods: {
@@ -121,12 +137,31 @@ export default {
           } else {
             this.profileInfo = data
             this.lastActiveApps = data.active_apps
+            if (data.need_mailing) {
+              this.$refs.mailingDialog.openMailingDialog()
+            }
           }
         })
     },
     // Переход к заявке
     goToApp(type, object_id) {
       this.$router.push(`/student/app/${type}/${object_id}`)
+    },
+    // Сохранение информации о рассылке
+    mailingSave() {
+      apiRequest(
+          '/backend/api/v1/auth/mailing/',
+          'POST',
+          true,
+          {'email_mailing': this.emailMailing, 'phone_mailing': this.phoneMailing}
+      )
+          .then((data) => {
+            if (data.success) {
+              showAlert('success', 'Согласие на рассылку', data.success)
+            } else {
+              showAlert('error', 'Согласие на рассылку', data.error)
+            }
+          })
     }
   },
   mounted() {

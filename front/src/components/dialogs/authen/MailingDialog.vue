@@ -4,20 +4,40 @@ import CokoDialog from "@/components/dialogs/CokoDialog.vue";
 import {showAlert} from "@/commons/alerts";
 
 // Функции установки параметров согласия на отправку по Email и согласия на отправку по номеру телефона
-const {emailMailing, phoneMailing, setMailingByEmail, setMailingByPhone} = defineProps({
+const {
+  emailMailing,
+  phoneMailing,
+  setMailingByEmail,
+  setMailingByPhone,
+  showMainButton,
+  onMailingClose
+} = defineProps({
   emailMailing: Boolean | null,
   phoneMailing: Boolean | null,
   setMailingByEmail: Function,
   setMailingByPhone: Function,
-  showMainButton: Boolean
+  showMainButton: Boolean,
+  onMailingClose: Function,
 })
+
+// Параметр блокировки кнопок
+const loading = ref(false)
 
 // Ссылка на диалоговое окно с согласием на получение рассылки
 const innerMailingDialog = ref(null)
 // Хэндлер для открытия диалогового окна с согласием на рассылку
 const openMailingDialog = () => {innerMailingDialog.value.dialog = true}
 // Хэндлер для закрытия диалогового окна с согласием на рассылку
-const closeMailingDialog = () => {innerMailingDialog.value.dialog = false}
+const closeMailingDialog = () => {
+  loading.value = true
+  setTimeout(() => {
+    if (onMailingClose) {
+      onMailingClose()
+    }
+    loading.value = false
+    innerMailingDialog.value.dialog = false
+  }, 1000)
+}
 
 // Ссылка на диалоговое окно с согласием на обработку ПДн при получении рассылки
 const innerPDnDialog = ref(null)
@@ -130,8 +150,8 @@ defineExpose({openMailingDialog})
 
     <template v-slot:actions>
       <v-spacer/>
-      <v-btn color="coko-blue" variant="flat" @click="handleNotAgreedMailing" text="НЕ даю согласие" />
-      <v-btn color="coko-blue" variant="flat" @click="handleAgreedMailing" text="Даю согласие" />
+      <v-btn :loading="loading" color="coko-blue" variant="flat" @click="handleNotAgreedMailing" text="НЕ даю согласие" />
+      <v-btn :loading="loading" color="coko-blue" variant="flat" @click="handleAgreedMailing" text="Даю согласие" />
     </template>
 
   </CokoDialog>

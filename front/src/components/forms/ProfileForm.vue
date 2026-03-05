@@ -257,6 +257,17 @@
               </v-col>
 
             </v-row>
+
+            <MailingDialog
+                v-if="formLoading === false"
+                ref="mailingDialog"
+                :showMainButton="true"
+                :emailMailing="profileData.email_mailing"
+                :phoneMailing="profileData.phone_mailing"
+                :setMailingByEmail="(val) => profileData.email_mailing = val"
+                :setMailingByPhone="(val) => profileData.phone_mailing = val"
+            />
+            <br/>
             <small class="text-caption text-medium-emphasis">* - обязательные для заполнения поля</small>
 
           </div>
@@ -329,7 +340,7 @@
 
       <v-btn
           variant="flat"
-          v-if="userInfoTab === 'profile'"
+          v-if="profileUuid && userInfoTab === 'profile'"
           color="coko-blue"
           text="Удалить"
           :loading="formLoading"
@@ -374,6 +385,7 @@ import DocViewer from "@/components/DocViewer.vue";
 import {useDisplay} from "vuetify";
 import EventApps from "@/components/forms/profile/EventApps.vue";
 import profile from "../../views/Profile.vue";
+import MailingDialog from "@/components/dialogs/authen/MailingDialog.vue";
 
 export default {
   name: "ProfileForm",
@@ -382,7 +394,9 @@ export default {
       return profile
     }
   },
-  components: {EventApps, DocViewer, CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
+  components: {
+    MailingDialog,
+    EventApps, DocViewer, CourseApps, PaginationTable, CokoDialog, DialogContentWithError, PasswordChange},
   props: {
     profileUuid: String, // Вариативный параметр, object_id профиля пользователя,
     closeDialogEvent: Function, // Событие для закрытия диалогового окна (для просмотра профиля из справочников)
@@ -403,7 +417,9 @@ export default {
         'birthday': '',
         'sex': false,
         'health': false,
-        'teacher': false
+        'teacher': false,
+        'email_mailing': false,
+        'phone_mailing': false,
       },
       // Список доступных государств
       states: [],
@@ -521,31 +537,33 @@ export default {
     checkValidData() {
       console.log(this.profileData)
       Object.keys(this.profileData).map((key) => {
-        if (key === 'phone') {
-          if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length < 18) {
-            this.$refs["content-error"].showContentError('Введите корректный номер телефона')
+        if (!(['email_mailing', 'phone_mailing']).includes(key)) {
+          if (key === 'phone') {
+            if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length < 18) {
+              this.$refs["content-error"].showContentError('Введите корректный номер телефона')
+              this.dataValid = false
+              return false
+            }
+          }
+          if (key === 'email') {
+            if ([undefined, null].includes(this.profileData[key]) || !(emailPattern.test(this.profileData[key]))) {
+              this.$refs["content-error"].showContentError('Введите корректный email')
+              this.dataValid = false
+              return false
+            }
+          }
+          if (key === 'snils') {
+            if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length < 14) {
+              this.$refs["content-error"].showContentError('Введите корректный СНИЛС')
+              this.dataValid = false
+              return false
+            }
+          }
+          if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length === 0) {
+            this.$refs["content-error"].showContentError('Заполните все обязательные поля формы')
             this.dataValid = false
             return false
           }
-        }
-        if (key === 'email') {
-          if ([undefined, null].includes(this.profileData[key]) || !(emailPattern.test(this.profileData[key]))) {
-            this.$refs["content-error"].showContentError('Введите корректный email')
-            this.dataValid = false
-            return false
-          }
-        }
-        if (key === 'snils') {
-          if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length < 14) {
-            this.$refs["content-error"].showContentError('Введите корректный СНИЛС')
-            this.dataValid = false
-            return false
-          }
-        }
-        if ([undefined, null].includes(this.profileData[key]) || this.profileData[key].length === 0) {
-          this.$refs["content-error"].showContentError('Заполните все обязательные поля формы')
-          this.dataValid = false
-          return false
         }
       })
     },

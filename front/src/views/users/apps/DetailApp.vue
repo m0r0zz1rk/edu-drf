@@ -278,17 +278,20 @@ export default {
           return false
         }
         if (!this.app.education_doc_id) {
-          showAlert('error', 'Проверка заявки', 'Выберите диплом')
+          showAlert('error', 'Проверка заявки', 'Выберите диплом/справку об обучении')
           return false
         }
-        if (this.app.diploma_surname === '') {
-          showAlert('error', 'Проверка заявки', 'Введите фамилию в дипломе')
-          return false
-        }
-        if (this.app.diploma_surname !== this.profileSurname) {
-          if (!this.app.surname_doc_id) {
-            showAlert('error', 'Проверка заявки', 'Выберите документ о смене фамилии')
+        console.log(this.app.education_level)
+        if (this.app.education_level !== 'student') {
+          if (this.app.diploma_surname === '') {
+            showAlert('error', 'Проверка заявки', 'Введите фамилию в дипломе')
             return false
+          }
+          if (this.app.diploma_surname !== this.profileSurname) {
+            if (!this.app.surname_doc_id) {
+              showAlert('error', 'Проверка заявки', 'Выберите документ о смене фамилии')
+              return false
+            }
           }
         }
       }

@@ -160,6 +160,7 @@ class ProfileService:
                 'email': user.email,
                 'phone': prof.phone,
                 'snils': prof.snils,
+                'need_mailing': prof.email_mailing is None and prof.phone_mailing is None,
                 'active_apps': apps_service.get_active_apps(user_id)
             }
         return None
@@ -206,5 +207,16 @@ class ProfileService:
         prof = self.get_profile_or_info_by_attribute('django_user_id', user_id, 'profile')
         return prof.curator_groups
 
+    def update_mailing(self, user_id: int, mailing_data: dict[str, bool]) -> None:
+        """
+        Обновление информации по рассылкам
+        :param user_id: Идентификатор пользователя из request.user.id
+        :param mailing_data: словарь формата: {phone_mailing: (bool), email_mailing: (bool)}
+        :return None
+        """
+        prof = self.get_profile_or_info_by_attribute('django_user_id', user_id, 'profile')
+        prof.phone_mailing = mailing_data.get('phone_mailing')
+        prof.email_mailing = mailing_data.get('email_mailing')
+        prof.save()
 
 profile_service = ProfileService()
