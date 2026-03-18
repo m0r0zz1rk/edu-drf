@@ -116,7 +116,7 @@ class FormsDoc(BaseStudentGroupDoc):
                     for attribute in col.split('.'):
                         value = getattr(value, attribute, '-')
                 if 'date' in col:
-                    value = value.strftime('%d.%m.%Y')
+                    value = value.strftime('%d.%m.%Y') if value else '-'
                 set_cell_value(
                     cell=ws.cell(row=app_index, column=col_index),
                     value=value,

@@ -32,7 +32,7 @@
                 text="Оплата"
               />
               <v-tab
-                v-if="['pay', 'study'].includes(app.status) && app.physical"
+                v-if="['pay', 'study'].includes(app.status) && app.physical && serviceStarted"
                 class="coko-tab"
                 value="study"
                 text="Обучение"
@@ -86,7 +86,7 @@
               />
 
               <AppStudy
-                v-if="appTab === 'study'"
+                v-if="appTab === 'study' && serviceStarted"
                 :serviceType="this.$route.params.serviceType"
                 :app="this.app"
               />
@@ -186,6 +186,8 @@ export default {
       appTab: 'info',
       // Параметр проверки на крайний день проведения услуги
       serviceLastDay: false,
+      // Параметр проверки на проведение услуги
+      serviceStarted: false,
       // Параметр оторбажения анимации загрузки на элементах формы
       loading: false,
       // Тип услуги в заявке
@@ -197,8 +199,9 @@ export default {
   methods: {
     // Проверка на крайний день проведения услуги
     checkServiceLastDay() {
-      let dates = this.app.service_date_range.split(' - ')
+      const dates = this.app.service_date_range.split(' - ')
       this.serviceLastDay = convertBackendDate(dates[1]) <= new Date()
+      this.serviceStarted = convertDateToBackend(dates[0]) >= new Date()
     },
     // Проверка на черновик заявки (если статус заявки "Черновик" - то открыть вкладку "Анкета")
     checkAppDraft(){

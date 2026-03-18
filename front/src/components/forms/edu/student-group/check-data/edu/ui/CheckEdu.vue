@@ -159,7 +159,7 @@ export default {
         'PATCH',
         true,
         {
-          'education_date': convertDateToBackend(this.eduApp.education_date),
+          'education_date': this.eduApp.education_date ? convertDateToBackend(this.eduApp.education_date) : null,
           'education_serial': this.eduApp.education_serial,
           'education_number': this.eduApp.education_number,
           'diploma_surname': this.eduApp.diploma_surname,
