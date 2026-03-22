@@ -225,6 +225,7 @@ class StudentGroupViewSet(EduViewSet):
         if serialize.is_valid():
             base_application_service.update_payment_type(
                 serialize.validated_data.get('group_id'),
+                serialize.validated_data.get('change_apps'),
                 serialize.validated_data.get('payment_type')
             )
             return response_utils.ok_response('ОК')

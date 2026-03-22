@@ -1,6 +1,7 @@
 from .beat.check_registration_end import check_registration_end
 from .beat.show_survey import show_survey
 from .beat.check_start_event import check_start_event
+from .beat.check_event_end import check_event_end
 from .beat.get_ad_and_old_data import get_ad_and_old_data
 
 from .worker import (password_reset_email_task, email_offer_pay, email_print_file, email_pay_accept, email_pay_denied,

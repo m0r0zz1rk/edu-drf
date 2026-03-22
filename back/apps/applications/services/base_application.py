@@ -319,11 +319,11 @@ class BaseApplicationService:
         return orm.get_filter_records(filter_by=dict(group_id=group_id))
 
     @staticmethod
-    def update_payment_type(group_id: uuid, payment_type: bool) -> None:
+    def update_payment_type(group_id: uuid.UUID, change_apps: list[uuid.UUID], payment_type: bool) -> None:
         """
         Смена типа оплаты у заявки
-        :param orm: Класс ORM для работы с заявками (на ПК или ИКУ)
         :param group_id: object_id учебной группы, в которой необходимо изменить тип оплаты
+        :param change_apps: Список заявок (если нужно изменить не у всех заявок группы)
         :param payment_type: тип оплаты (True - физ. лицо, False - юр. лицо)
         :return:
         """
@@ -331,7 +331,10 @@ class BaseApplicationService:
         if not group:
             raise StudentGroupNotFound
         orm = course_application_orm if group.ou else event_application_orm
-        apps = orm.get_filter_records(filter_by={'group_id': group_id})
+        if change_apps:
+            apps = orm.get_filter_records(filter_by=dict(object_id__in=change_apps))
+        else:
+            apps = orm.get_filter_records(filter_by={'group_id': group_id})
         for app in apps:
             orm.update_record(filter_by={'object_id': app.object_id},update_object={'physical': payment_type})
 

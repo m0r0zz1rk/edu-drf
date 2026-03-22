@@ -34,12 +34,16 @@ class CeleryConfig:
     def _set_beat_schedule(self):
         """Установка задач по расписанию"""
         self.app.conf.beat_schedule = {
-            'check-registration-end': {
-                'task': 'apps.celery_app.tasks.beat.check_registration_end.check_registration_end',
-                'schedule': crontab(minute="*/2")
-            },
+            # 'check-registration-end': {
+            #     'task': 'apps.celery_app.tasks.beat.check_registration_end.check_registration_end',
+            #     'schedule': crontab(minute=0, hour=0)
+            # },
             # 'check-start-event': {
             #     'task': 'apps.celery_app.tasks.beat.check_start_event.check_start_event',
+            #     'schedule': crontab(minute=0, hour=0)
+            # },
+            # 'check-event-end': {
+            #     'task': 'apps.celery_app.tasks.beat.check_event_end.check_event_end',
             #     'schedule': crontab(minute=0, hour=0)
             # },
             # 'show-survey': {
@@ -48,8 +52,7 @@ class CeleryConfig:
             # },
             # 'get-ad-and-old-data': {
             #     'task': 'apps.celery_app.tasks.beat.get_ad_and_old_data.get_ad_and_old_data',
-            #     # 'schedule': crontab(minute=0, hour=1)
-            #     'schedule': crontab(minute='*/2',)
+            #     'schedule': crontab(minute=0, hour=0)
             # },
         }
 

@@ -211,6 +211,10 @@ class StudentGroupUpdatePayment(serializers.Serializer):
         allow_null=False,
         label='object_id группы'
     )
+    change_apps = serializers.ListSerializer(
+        child=serializers.CharField(),
+        label='Список object_id заявок для изменения оплаты'
+    )
     payment_type = serializers.BooleanField(
         allow_null=False,
         label='Тип оплаты (true - физ. лицо, false - юр.лицо)'

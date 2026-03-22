@@ -141,7 +141,7 @@
           color="coko-blue"
           text="Смена оплаты"
           :loading="loading"
-          @click="$refs.paymentTypeChangeDialog.dialog = true"
+          @click="getAppsToMove(); $refs.paymentTypeChangeDialog.dialog = true"
         />
 
         <v-btn
@@ -282,7 +282,13 @@
     <template v-slot:title>Изменение типа оплаты обучающихся</template>
 
     <template v-slot:text>
-      Выберите тип оплаты, который необходимо установить всем обучающиимя
+      <div v-if="appsToMove.length === 0">
+        Выберите тип оплаты, который необходимо установить всем обучающимся
+      </div>
+
+      <div v-else>
+        Выберите тип оплаты, который необходимо установить выбранным обучающимся (количество: {{ appsToMove.length }})
+      </div>
       <v-row
         dense
       >
@@ -884,7 +890,7 @@ export default {
         '/backend/api/v1/edu/student_group/payment_type/',
         'POST',
         true,
-        {group_id: this.groupId, payment_type: this.paymentType},
+        {group_id: this.groupId, change_apps: this.appsToMove, payment_type: this.paymentType},
       )
       if (paymentChangeRequest.success) {
         showAlert('success', 'Смена типа оплаты', 'Тип оплаты успешно изменен')
