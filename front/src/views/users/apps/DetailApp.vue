@@ -201,7 +201,7 @@ export default {
     checkServiceLastDay() {
       const dates = this.app.service_date_range.split(' - ')
       this.serviceLastDay = convertBackendDate(dates[1]) <= new Date()
-      this.serviceStarted = convertDateToBackend(dates[0]) >= new Date()
+      this.serviceStarted = convertBackendDate(dates[0]) >= new Date()
     },
     // Проверка на черновик заявки (если статус заявки "Черновик" - то открыть вкладку "Анкета")
     checkAppDraft(){
@@ -267,6 +267,11 @@ export default {
     // Проверка заполнения полей
     checkFields() {
       console.log('app: ', this.app)
+      if (this.app.referral_source === '') {
+        const event = this.$route.params.serviceType === 'course' ? 'курсе' : 'мероприятии'
+        showAlert('error', 'Проверка заявки', `Укажите источник получения информации о ${event}`)
+        return false
+      }
       if (this.appType === 'ou') {
         if (!this.app.position_category_id) {
           showAlert('error', 'Проверка заявки', 'Выберите категорию должности')

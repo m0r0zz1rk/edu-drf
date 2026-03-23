@@ -31,7 +31,8 @@ class FormsDoc(BaseStudentGroupDoc):
         'Тип оплаты': 'type',
         'Тип ОО': 'oo.oo_type.name',
         'Оплачено': 'pay',
-        'Опрос пройден': 'check_survey'
+        'Опрос пройден': 'check_survey',
+        'Источник данных о мероприятии': 'referral_source'
     }
 
     _course_forms_columns = {
@@ -45,6 +46,15 @@ class FormsDoc(BaseStudentGroupDoc):
         'Получение удостоверения почтой': 'certificate_mail',
         'Физический адрес доставки удостоверения': 'mail_address'
     }
+
+    _default_referral_source = [
+        'канал ГАУ ИО ЦОПМКиМКО в MAX',
+        'сайт ГАУ ИО ЦОПМКиМКО',
+        'госпаблик ВКонтакте',
+        'информационное письмо о проведении семинара',
+        'информационное письмо о проведении курса',
+        'почтовая рассылка'
+    ]
 
     def _get_context(self) -> dict:
         pass
@@ -111,6 +121,12 @@ class FormsDoc(BaseStudentGroupDoc):
                     value = 'Да' if app.check_survey else 'Нет'
                 elif col == 'pay':
                     value = 'Да' if app.status in [PAY, STUDY, STUDY_COMPLETE, ARCHIVE] else 'Нет'
+                elif col == 'referral_source':
+                    source = getattr(app, col)
+                    if source not in self._default_referral_source:
+                        value = f'другое: {source}'
+                    else:
+                        value = source
                 else:
                     value = app
                     for attribute in col.split('.'):

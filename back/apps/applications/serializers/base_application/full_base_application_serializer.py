@@ -103,5 +103,6 @@ class FullBaseApplicationSerializer(BaseApplicationSerializer):
             'position_category_id',
             'position_name',
             'position_id',
-            'physical'
+            'physical',
+            'referral_source'
         )

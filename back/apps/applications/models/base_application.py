@@ -85,6 +85,12 @@ class BaseApplication(BaseTable):
         default=True,
         verbose_name='Физическое лицо'
     )
+    referral_source = models.CharField(
+        max_length=500,
+        blank=True,
+        default='',
+        verbose_name='Источник информации о курсе/мероприятии'
+    )
 
     def __str__(self):
         return f'Заявка пользователя {self.profile.display_name} для группы {self.group.code}'

@@ -269,7 +269,39 @@
 
     </template>
 
-
+    Откуда Вы узнали про {{ appType === 'ou' ? 'данный курс' : 'данный семинар' }} ? *
+    <v-radio-group v-model="referralRadio">
+      <v-radio value="канал ГАУ ИО ЦОПМКиМКО в MAX">
+        <template #label>
+          канал ГАУ ИО ЦОПМКиМКО в &nbsp;<a href="https://max.ru/id3811469215_gos" target="_blank">MAX</a>
+        </template>
+      </v-radio>
+      <v-radio value="сайт ГАУ ИО ЦОПМКиМКО">
+        <template #label>
+          сайт &nbsp;<a href="https://coko38.ru/" target="_blank">ГАУ ИО ЦОПМКиМКО</a>
+        </template>
+      </v-radio>
+      <v-radio value="госпаблик ВКонтакте">
+        <template #label>
+          госпаблик &nbsp;<a href="https://vk.com/irkcoko38" target="_blank">ВКонтакте</a>
+        </template>
+      </v-radio>
+      <v-radio
+          v-if="appType"
+          :value="`информационное письмо о проведении ${appType === 'ou' ? 'семинара' : 'курса'}`"
+          :label="`информационное письмо о проведении ${appType === 'ou' ? 'семинара' : 'курса'}`"
+      />
+      <v-radio
+          value="почтовая рассылка"
+          label="почтовая рассылка"
+      />
+      <v-radio label="Другое" value="another" />
+    </v-radio-group>
+    <v-text-field
+        v-if="referralRadio === 'another'"
+        label="Свой вариант:"
+        v-model="anotherReferralSource"
+    />
   </template>
 
   <CokoDialog ref="ooSelectDialog" :cardActions="false">
@@ -409,6 +441,19 @@ export default {
   },
   data() {
     return {
+      // Выбранный radio Для referral_source
+      referralRadio: '',
+      // Возможные параметры referral_source
+      possibleReferral: [
+          'канал ГАУ ИО ЦОПМКиМКО в MAX',
+          'сайт ГАУ ИО ЦОПМКиМКО',
+          'госпаблик ВКонтакте',
+          `информационное письмо о проведении ${this.appType === 'ou' ? 'семинара' : 'курса'}`,
+          'почтовая рассылка',
+          'знакомые / друзья / коллеги'
+      ],
+      // Другое значение referral_source
+      anotherReferralSource: '',
       // Параметр проверки мобильного устройства
       mobileDisplay: useDisplay().smAndDown,
       // Выбранный документ
@@ -475,6 +520,13 @@ export default {
     }
   },
   methods: {
+    // Установить значения referralSource
+    setReferralSource () {
+      this.anotherReferralSource = !(this.possibleReferral.includes(this.internalApp.referral_source)) ?
+          this.internalApp.referral_source : ''
+      this.referralRadio = !(this.possibleReferral.includes(this.internalApp.referral_source)) ? 'another' :
+          this.internalApp.referral_source
+    },
     // Проверить кто редактирует - если не студент, то добавить profile_id в get параметры
     checkWhoEdit() {
       if (this.notStudent) {
@@ -716,12 +768,23 @@ export default {
       try {
         this.changeAppAttribute('mail_address', newValue)
       } catch(e) {}
+    },
+    'anotherReferralSource': function(newValue) {
+      this.changeAppAttribute('referral_source', newValue)
+    },
+    'referralRadio': function(newValue) {
+      if (this.possibleReferral.includes(newValue)) {
+        this.changeAppAttribute('referral_source', newValue)
+      } else {
+        this.changeAppAttribute('referral_source', this.anotherReferralSource)
+      }
     }
   },
   mounted() {
     this.checkWhoEdit()
     this.setInternalApp()
     this.getOoTypes()
+    this.setReferralSource()
   }
 }
 
@@ -732,4 +795,5 @@ export default {
 </style>
 <script setup>
 import DocViewer from "@/components/DocViewer.vue";
+import app from "@/App.vue";
 </script>
