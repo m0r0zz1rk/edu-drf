@@ -289,7 +289,6 @@ export default {
           showAlert('error', 'Проверка заявки', 'Выберите диплом/справку об обучении')
           return false
         }
-        console.log(this.app.education_level)
         if (this.app.education_level !== 'student') {
           if (this.app.diploma_surname === '') {
             showAlert('error', 'Проверка заявки', 'Введите фамилию в дипломе')
@@ -300,6 +299,18 @@ export default {
               showAlert('error', 'Проверка заявки', 'Выберите документ о смене фамилии')
               return false
             }
+          }
+          if (this.app.education_serial === '') {
+            showAlert('error', 'Проверка заявки', 'Введите серию диплома')
+            return false
+          }
+          if (this.app.education_number === '') {
+            showAlert('error', 'Проверка заявки', 'Введите номер диплома')
+            return false
+          }
+          if (['', null, undefined].includes(this.app.education_date)) {
+            showAlert('error', 'Проверка заявки', 'Введите дату выдачи диплома')
+            return false
           }
         }
       }

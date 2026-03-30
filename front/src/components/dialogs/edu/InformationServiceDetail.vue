@@ -327,7 +327,7 @@ export default {
       this.loading = true
       let body = {}
       Object.keys(this.informationService).map((key) => {
-        if (key.includes('date')) {
+        if (key.includes('date_')) {
           body[key] = convertDateToBackend(this.informationService[key])
         } else if (key === 'categories') {
           let cats = ''

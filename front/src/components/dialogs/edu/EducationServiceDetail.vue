@@ -378,7 +378,7 @@ export default {
       Object.keys(this.educationService).map((key) => {
         if (key === 'program') {
           body[key] = this.educationService.program.object_id
-        } else if (key.includes('date')) {
+        } else if (key.includes('date_')) {
           body[key] = convertDateToBackend(this.educationService[key])
         } else {
           body[key] = this.educationService[key]
