@@ -17,7 +17,7 @@
     "pdf-viewer-vue": "^0.2.7",
     "roboto-fontface": "*",
     "uuid": "^9.0.1",
-    "v-viewer": "^3.0.20",
+    "v-viewer": "^3.0.23",
     "viewerjs": "^1.11.6",
     "vue": "^3.4.0",
     "vue-i18n": "^9.13.1",

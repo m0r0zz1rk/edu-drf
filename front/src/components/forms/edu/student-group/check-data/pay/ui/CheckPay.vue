@@ -5,7 +5,7 @@
       v-if="internalPayData.length === 0"
       color="success"
       icon="$success"
-      title="Проверка ОО"
+      title="Проверка оплаты"
       text="Все документы были проверены"
     />
     <template v-if="internalPayData.length > 0 & payApp !== null">

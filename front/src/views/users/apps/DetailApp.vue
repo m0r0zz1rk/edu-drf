@@ -267,6 +267,10 @@ export default {
     // Проверка заполнения полей
     checkFields() {
       console.log('app: ', this.app)
+      if (this.app.oo_id === null && this.app.oo_new === '') {
+        showAlert('error', 'Проверка заявки', 'Выберите/введите образовательную организацию')
+        return false
+      }
       if (this.app.referral_source === '') {
         const event = this.$route.params.serviceType === 'course' ? 'курсе' : 'мероприятии'
         showAlert('error', 'Проверка заявки', `Укажите источник получения информации о ${event}`)

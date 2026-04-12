@@ -7,7 +7,7 @@
       v-if="internalEduData.length === 0"
       color="success"
       icon="$success"
-      title="Проверка ОО"
+      title="Проверка образования"
       text="Все документы были проверены"
     />
     <template v-if="internalEduData.length > 0 & eduApp !== null">

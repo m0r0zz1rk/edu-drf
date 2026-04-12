@@ -93,35 +93,29 @@ class TableExport:
         :param field: Поле таблицы в БД
         :return: значение
         """
-        try:
-            value = getattr(record, field.name)
-        except AttributeError:
-            return '#ERROR#'
+        value = getattr(record, field.name)
+
         if value is None:
             return '-'
-        if isinstance(field, (CharField, TextField, IntegerField, PositiveIntegerField, EmailField)):
-            if isinstance(field, CharField):
-                if field.choices:
-                    try:
-                        return dict(field.choices)[value]
-                    except KeyError:
-                        pass
-            return value
-        if isinstance(field, BooleanField):
-            if field.name == 'sex':
-                return 'М' if value else 'Ж'
-            return '+' if value else '-'
-        if isinstance(field, DateField):
-            return value.strftime('%d.%m.%Y')
-        if isinstance(field, DateTimeField):
-            return value.strftime('%d.%m.%Y %H:%M')
-        if isinstance(field, ForeignKey):
-            return str(value)
-        if isinstance(field, ManyToManyField):
-            objects = ''
-            for obj in value.all():
-                objects += f'{str(obj)}; '
-            return objects[:-2]
+
+        field_type_map = {
+            CharField: lambda v: dict(field.choices)[v] if field.choices else v,
+            TextField: lambda v: v,
+            IntegerField: lambda v: v,
+            PositiveIntegerField: lambda v: v,
+            EmailField: lambda v: v,
+            BooleanField: lambda v: 'М' if v else 'Ж' if field.name == 'sex' else '+' if v else '-',
+            DateField: lambda v: v.strftime('%d.%m.%Y'),
+            DateTimeField: lambda v: v.strftime('%d.%m.%Y %H:%M'),
+            ForeignKey: lambda v: str(v),
+            ManyToManyField: lambda v: '; '.join(str(obj) for obj in v.all()),
+        }
+
+        field_type = type(field)
+
+        if field_type in field_type_map:
+            return field_type_map[field_type](value)
+
         return f'Неизвестный тип - {repr(field)}'
 
     def get_excel(self) -> HttpResponse:
