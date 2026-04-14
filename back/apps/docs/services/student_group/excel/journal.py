@@ -424,7 +424,7 @@ class JournalDoc(BaseStudentGroupDoc):
         for application in applications:
             mapping = {
                 'mos': application.mo.name if application.mo else '',
-                'oo_types': application.oo.oo_type.name,
+                'oo_types': application.oo.oo_type.name if application.oo else '',
                 'position_categories': application.position_category.name
             }
             for key, value in mapping.items():
