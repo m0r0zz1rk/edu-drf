@@ -5,7 +5,7 @@ from apps.applications.selectors.course_application import course_application_or
 from apps.applications.selectors.event_application import event_application_orm
 from apps.applications.services.course_application import course_application_service
 from apps.applications.services.event_application import event_application_service
-from apps.surveys.consts.survey_target_types import INFO
+from apps.surveys.consts.survey_target_types import INFO, EDU
 from apps.surveys.selectors.student_answer import student_answer_orm
 from apps.surveys.services.survey import survey_service
 from apps.surveys.services.survey_question import SurveyQuestionService
@@ -37,7 +37,7 @@ class StudentAnswerService:
             ans_data = {
                 'survey_id': survey_id,
                 'group_code': group.code,
-                'group_type': 'ПК' if group.ou else INFO,
+                'group_type': EDU if group.ou else INFO,
                 'question': question.text,
                 'answer': answer.get('value')
             }
