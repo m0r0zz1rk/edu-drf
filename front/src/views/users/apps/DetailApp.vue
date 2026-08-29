@@ -267,7 +267,11 @@ export default {
     // Проверка заполнения полей
     checkFields() {
       console.log('app: ', this.app)
-      if (this.app.oo_id === null && this.app.oo_new === '') {
+      if (this.app.region_name === 'Иркутская область' && !this.app.mo_id) {
+        showAlert('error', 'Проверка заявки', 'Выберите муниципальное образование')
+        return false
+      }
+      if (this.app.oo_id === null && this.app.oo_new === '' && ['', '-'].includes(this.app.oo_name)) {
         showAlert('error', 'Проверка заявки', 'Выберите/введите образовательную организацию')
         return false
       }
