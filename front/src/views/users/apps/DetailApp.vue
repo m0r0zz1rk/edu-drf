@@ -275,20 +275,15 @@ export default {
         showAlert('error', 'Проверка заявки', 'Выберите/введите образовательную организацию')
         return false
       }
-      if (this.app.referral_source === '') {
-        const event = this.$route.params.serviceType === 'course' ? 'курсе' : 'мероприятии'
-        showAlert('error', 'Проверка заявки', `Укажите источник получения информации о ${event}`)
+      if (!this.app.position_category_id) {
+        showAlert('error', 'Проверка заявки', 'Выберите категорию должности')
+        return false
+      }
+      if (!this.app.position_id) {
+        showAlert('error', 'Проверка заявки', 'Выберите должность')
         return false
       }
       if (this.appType === 'ou') {
-        if (!this.app.position_category_id) {
-          showAlert('error', 'Проверка заявки', 'Выберите категорию должности')
-          return false
-        }
-        if (!this.app.position_id) {
-          showAlert('error', 'Проверка заявки', 'Выберите должность')
-          return false
-        }
         if (!this.app.education_level || this.app.education_level === '') {
           showAlert('error', 'Проверка заявки', 'Выберите уровень образования')
           return false
@@ -321,6 +316,11 @@ export default {
             return false
           }
         }
+      }
+      if (this.app.referral_source === '') {
+        const event = this.$route.params.serviceType === 'course' ? 'курсе' : 'мероприятии'
+        showAlert('error', 'Проверка заявки', `Укажите источник получения информации о ${event}`)
+        return false
       }
       return true
     },
